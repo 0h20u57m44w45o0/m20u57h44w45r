@@ -1,0 +1,1308 @@
+﻿/*Calculator*/
+/*Coder:MoHuangRui/
+/*data:09.6.4*/
+
+//head files
+
+//define some macros
+# define SIZE 100
+# define PI 3.1415926535897932384626433832795028841971693
+
+//global parameters
+int Radian=1;//angle in radian mode is default
+double Angle_Factor=1;//if in radian mode, then angle factor is 1
+
+//struct data type declaration
+typedef struct OPERAND{
+double *base;
+double *top;
+int stacksize;
+} Operand;
+typedef struct OPERATOR{
+char *base;
+char *top;
+int stacksize;
+} Operator;
+
+//global array to store the priority of each operator
+/*
+  +	     -	     *	     /	     ^	    exp	     ln	     lg	    abs	    sin	    cos	    tan	     (	     )	     [	     ]	     {	     }	     \0
+*/
+char Prior[19][19]={
+{'>',	'>',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'>',	'<',	'>',	'<',	'>',	'>'},
+{'>',	'>',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'>',	'<',	'>',	'<',	'>',	'>'},
+{'>',	'>',	'>',	'>',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'>',	'<',	'>',	'<',	'>',	'>'},
+{'>',	'>',	'>',	'>',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'>',	'<',	'>',	'<',	'>',	'>'},
+{'>',	'>',	'>',	'>',	'>',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'>',	'<',	'>',	'<',	'>',	'>'},
+{'>',	'>',	'>',	'>',	'>',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'>',	'<',	'>',	'<',	'>',	'>'},
+{'>',	'>',	'>',	'>',	'>',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'>',	'<',	'>',	'<',	'>',	'>'},
+{'>',	'>',	'>',	'>',	'>',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'>',	'<',	'>',	'<',	'>',	'>'},
+{'>',	'>',	'>',	'>',	'>',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'>',	'<',	'>',	'<',	'>',	'>'},
+{'>',	'>',	'>',	'>',	'>',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'>',	'<',	'>',	'<',	'>',	'>'},
+{'>',	'>',	'>',	'>',	'>',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'>',	'<',	'>',	'<',	'>',	'>'},
+{'>',	'>',	'>',	'>',	'>',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'>',	'<',	'>',	'<',	'>',	'>'},
+{'<',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'=',	'<',	'w',	'<',	'w',	'w'},
+{'w',	'w',	'w',	'w',	'w',	'w',	'w',	'w',	'w',	'w',	'w',	'w',	'w',	'w',	'w',	'w',	'w',	'w',	'w'},
+{'<',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'w',	'<',	'=',	'<',	'w',	'w'},
+{'w',	'w',	'w',	'w',	'w',	'w',	'w',	'w',	'w',	'w',	'w',	'w',	'w',	'w',	'w',	'w',	'w',	'w',	'w'},
+{'<',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'w',	'<',	'w',	'<',	'=',	'w'},
+{'w',	'w',	'w',	'w',	'w',	'w',	'w',	'w',	'w',	'w',	'w',	'w',	'w',	'w',	'w',	'w',	'w',	'w',	'w'},
+{'<',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'<',	'w',	'<',	'w',	'<',	'w',	'='}
+};
+
+//function declarations
+//part one: expression calculator
+int Set_Calculator();//configure calculator
+int Cal_Expression(char expression[]);//main function for expression calculation
+int Expression_Translator(char exp[]);//translate the expression
+int Push_Operand(Operand *s,double e);//push an element to operand stack
+int Push_Operator(Operator *s,char e);//push an element to operator stack
+double Pop_Operand(Operand *s);//pop an element from operand stack
+char Pop_Operator(Operator *s);//pop an element from operator stack
+double Get_Top_Operand(Operand *s);//get the top element of operand stack
+char Get_Top_Operator(Operator *s);//get the top element of operator stack
+int Mark(char op);//query the mark of each operator
+char Precede(char op1,char op2);//query the priority of each operator pair
+int Unary_Operate(double a,char op,double result[]);//unary operator calculation function
+int Binary_Operate(double a,char op,double b,double result[]);//binary operator calculation function
+int IsUnaryOp(char sym);//check whether a character is a unary operator
+int IsBinaryOp(char sym);//check whether a character is a binary operator
+int IsLeftParen(char sym);//check whether a character is a left parentheses
+int IsRightParen(char sym);//check whether a character is a right parentheses
+int IsConstant(char sym);//check whether a character is a constant
+int IsEndTag(char sym);//end tag check
+int IsOperator(char target[],char curop[],int flag[]);//check whether a character is a operator
+
+//part two: y+ wall distance estimation
+int Cal_Turbulence();//main function for wall distance calculation
+double cal_Re(double u,double L,double ρ,double µ);//calculate Reynolds number
+double cal_Cf(double Re);//y plus wall distance estimation,for Re<1e9
+double cal_τw(double Cf,double ρ,double u);//wall shear stress
+double cal_ustar(double τw,double ρ);// dimensionless u
+double cal_y(double yplus,double µ,double ρ,double ustar);//wall distance
+double cal_lt(double L);//turbulent length scale
+double cal_I(double Re);//turbulent intensity level
+double cal_k(double u,double I);//turbulence kinetic energy
+double cal_ε(double k,double lt);//turbulence dissipation rate
+double cal_ω(double k,double ε);//specific turbulence dissipation rate
+double cal_µt(double k,double ε,double ρ);//turbulent viscosity
+double cal_ratio(double µt,double µ);//turbulent viscosity ratio
+double cal_Ret(double ratio);//turbulent Reynolds number
+
+//standard functions
+void Information();//program information
+void Help();//user manual
+int ReadCommand(char str[], int maxlength);//command reader
+int ReadInt(int inf,int sup,int integer[]);//read an integer
+int GetFirstFloat(char **start,double number[]);//get the first float number of an expression
+int ReadFloat(double inf,double sup,double number[]);//read an float
+int IsDigit(char character);//check whether an character is a digit
+int IsNotDigit(char character);//check whether an character is a digit
+void Error(const char *state);//error control
+
+//main function
+void main()
+{
+ //initialize part:
+ char commandspace[1026];//to store the input command
+ char *command=commandspace+1;//target command begins at the second position of storage address
+ //use as a flag to judge whether '+' and '-' are unary operator based on the assumption that
+ //if "+" "-" appears as unary operator then it must after a "(" except at the beginning of expression
+ commandspace[0]='(';
+ //show program information:
+ Information();
+ //main loop:
+ while(1)
+ {
+  printf("*******************************************************************************\n");
+  printf("Command:\n\n");
+  if(ReadCommand(command,1024)==0)
+  {
+   continue;//if read command failed then start a new loop
+  }
+  if(strcmp(command,"exit")==0)//input 'exit' to exit the program
+  {
+   break;
+  }
+  else
+  {
+   if(strcmp(command,"help")==0)//show user manual
+   {
+    Help();
+   }
+   else
+   {
+    if(strcmp(command,"x")==0)// turbulent y+ wall distance calculator
+    {
+     if(Cal_Turbulence()==0)
+	 {
+	  continue;
+	 }
+    }
+    else
+    {
+	 if(strcmp(command,"set")==0)
+	 {
+	  if(Set_Calculator()==0)
+	  {
+	   continue;
+	  }
+	 }
+	 else
+	 {
+	  if(Cal_Expression(command)==0)//expression calculator
+	  {
+	   continue;
+	  }
+	 }
+	}
+   }
+  }  
+ }//end main loop
+}//end main
+
+//set calculator parameters
+int Set_Calculator()
+{
+ int flag=1;
+ printf("*******************************************************************************\n");
+ printf("Choose item by press the order number\n");
+ printf("\n 1 Angle in radian\n 2 Angle in degree\n\nChoose:");
+ if(ReadInt(1,2,&flag)==0)
+ {
+  Error("Wrong option, now return to calculator...");
+  return 0;
+ }
+ printf("\n");
+ switch(flag)
+ {
+  case 1:Radian=1;Angle_Factor=1;printf("Set angle in radian successful!\n");break;
+  case 2:Radian=0;Angle_Factor=PI/180;printf("Set angle in degree successful!\n");break;
+ }
+ printf("*******************************************************************************\n");
+ //show information agains
+ Information();
+ return 1;
+}
+
+//main function for expression calculate
+int Cal_Expression(char expression[])
+{
+ //declare some variables
+ Operand *opnd,opn;
+ Operator *optr,opt;
+ //initialize stacks pointer
+ opnd=&opn;
+ optr=&opt;
+ double opndstack[SIZE];
+ char optrstack[SIZE];
+ opnd->base=opndstack;
+ opnd->top=opnd->base;
+ opnd->stacksize=SIZE-1;
+ optr->base=optrstack;
+ optr->top=optr->base;
+ optr->stacksize=SIZE-1;
+ //translate the expression
+ if(Expression_Translator(expression)==0)
+ {
+  return 0;
+ }
+ //now begin to calculate
+ char *p=expression;//pointer to point the expression
+ char headop,curop;//use to store the top operator of optr stack and current operator
+ int flag=0;//use to determine whether "+" and "-" are unary operator or binary operator
+ double num=0,num1=0,num2=0;
+ Push_Operator(optr,'\0');//push a flag to the stack of operator
+ //calculator loop
+ while((p[0]!='\0') || (Get_Top_Operator(optr)!='\0'))
+ {
+  if(IsDigit(p[0]))//numbers go to stack:opnd
+  {
+   if(GetFirstFloat(&p,&num)==0)
+   {
+	return 0;break;
+   }
+   else
+   {
+    if((IsBinaryOp(p[0]))||(IsRightParen(p[0]))||(IsEndTag(p[0])))
+	{
+	 Push_Operand(opnd,num);
+	}
+	else
+	{
+	 Error("Wrong expression after a float");
+	 return 0;break;
+	}
+   }
+  }//if
+  else
+  {
+   if(IsConstant(p[0]))//constants go to stack:opnd
+   {
+	if((IsBinaryOp(p[1]))||(IsRightParen(p[1]))||(IsEndTag(p[1])))
+	{
+	 switch(p[0])
+	 {
+	  case'p': Push_Operand(opnd,PI);
+		       p++;
+		       break;
+	 }
+	}
+	else
+	{
+	 Error("Wrong expression after a constant");
+	 return 0;break;
+	}
+   }
+   else
+   {
+	if(IsOperator(p,&curop,&flag))//if is a operator,go to stack: optr
+	{
+     switch(Precede(Get_Top_Operator(optr),curop))//compare the priority of operators
+     {
+      case'<': if(flag == -1)//it means '+' '-' show as a unary operator, then push a 0 to make them become to binary operator
+	           {
+	            Push_Operand(opnd,0);
+	           }
+		       Push_Operator(optr,curop);
+		       p++;
+               break;
+      case'=': Pop_Operator(optr);
+		       p++;
+               break;
+      case'>': headop=Pop_Operator(optr);
+               if(IsUnaryOp(headop))//if it's a unary operator,then call Unary_Operate()
+               {
+                num1=Pop_Operand(opnd);
+			    if(Unary_Operate(num1,headop,&num)==0)
+		 	    {
+			     return 0;break;
+			    }
+                Push_Operand(opnd,num);
+                break;
+               }
+               else//if is a binary operator, then call Binary_Operate()
+               {
+			    num1=Pop_Operand(opnd);
+                num2=Pop_Operand(opnd);
+			    if(Binary_Operate(num2,headop,num1,&num)==0)
+			    {
+				 return 0;break;
+			    }
+                Push_Operand(opnd,num);
+                break;
+               }
+	  default: Error("Can't match parenthesis");
+		       return 0;
+	 	       break;
+     }//end switch
+    }//end if Operator
+    else//if other symbols
+    {
+     return 0;break;
+    }
+   }
+  }
+ }
+ //output the results
+ num=fabs(Get_Top_Operand(opnd));
+ if((num<1e-2)||(num>1e5)){printf("= %.6e\n\n",Get_Top_Operand(opnd));}
+ else{printf("= %.8lf\n\n",Get_Top_Operand(opnd));}
+ return 1;
+}
+ 
+//translate the input expression to specific format then then program can recognize
+//every operator correctly, such as use "e" "n" "g" stands for "exp" "ln" "lg" respectively
+int Expression_Translator(char exp[])
+{
+ char *pa=exp;
+ char *pb=exp;
+ while(pa[0]!='\0')
+ {
+  switch(pa[0])
+  {
+   case'e': if((pa[1]=='x')&&(pa[2]=='p'))//use "e" stands for "exp"
+		    {
+			 pb[0]='e';
+			 pb++;
+			 pa=pa+3;
+		    }
+			else
+			{
+			 Error("Unknow operator: \"e..\"");
+			 return 0;
+			}
+		    break;
+   case'l': if((pa[1]=='n'))//use "n" stands for "ln"
+		    {
+		     pb[0]='n';
+			 pb++;
+			 pa=pa+2;
+		    }
+	 	    else
+		    {
+		     if((pa[1]=='g'))//use "g" stands for "lg"
+		     {
+			  pb[0]='g';
+			  pb++;
+			  pa=pa+2;
+		     }
+			 else
+			 {
+			  Error("Unknow operator: \"l..\"");
+			  return 0;
+			 }
+		    }
+		    break;
+   case'a': if((pa[1]=='b')&&(pa[2]=='s'))//use "a" stands for "abs"
+		    {
+		     pb[0]='a';
+			 pb++;
+			 pa=pa+3;
+		    }
+		    else
+			{
+			 Error("Unknow operator: \"a..\"");
+			 return 0;
+			}
+		    break;
+   case's': if((pa[1]=='i')&&(pa[2]=='n'))//use "s" stands for "sin"
+		    {
+		     pb[0]='s';
+			 pb++;
+			 pa=pa+3;
+		    }
+		    else
+			{
+			 Error("Unknow operator: \"s..\"");
+			 return 0;
+			}
+		    break;
+   case'c': if((pa[1]=='o')&&(pa[2]=='s'))//use "c" stands for "cos"
+		    {
+		     pb[0]='c';
+			 pb++;
+			 pa=pa+3;
+		    }
+		    else
+			{
+			 Error("Unknow operator: \"c..\"");
+			 return 0;
+			}
+		    break;
+   case't': if((pa[1]=='a')&&(pa[2]=='n'))//use "t" stands for "tan"
+		    {
+		     pb[0]='t';
+			 pb++;
+			 pa=pa+3;
+		    }
+		    else
+			{
+			 Error("Unknow operator: \"t..\"");
+			 return 0;
+			}
+		    break;
+   case'p': if((pa[1]=='i'))//use "p" stands for "pi"
+		    {
+		     pb[0]='p';
+			 pb++;
+			 pa=pa+2;
+		    }
+		    else
+			{
+			 Error("Unknow operator: \"p..\"");
+			 return 0;
+			}
+		    break;
+   default: if((IsDigit(pa[0]))||(pa[0]=='.')||(pa[0]=='+')||(pa[0]=='-')||(pa[0]=='*')||(pa[0]=='/')||(pa[0]=='^')||(IsLeftParen(pa[0]))||(IsRightParen(pa[0])))//legal input single character
+			{
+			 pb[0]=pa[0];
+			 pb++;
+			 pa++;
+			 break;
+			}
+			else//illegal input character
+			{
+			 Error("Unknow operator in expression");
+			 return 0;
+			}
+  }
+ }
+ //add a '\0' at the end of translated expression
+ pb[0]='\0';
+ return 1;
+}
+
+//push an element to operand stack
+int Push_Operand(Operand *s,double e)
+{
+ if(s->top-s->base >= s->stacksize)
+ {
+  Error("Expression is  too long");
+  return 0;
+ }
+ *s->top=e;
+ s->top++;
+ return 1;
+}
+
+//push an element to operator stack
+int Push_Operator(Operator *s,char e)
+{
+ if(s->top-s->base >= s->stacksize)
+ {
+  Error("Expression is  too long");
+  return 0;
+ }
+ *s->top=e;
+ s->top++;
+ return 1;
+}
+
+//pop the top element of operand stack
+double Pop_Operand(Operand *s)
+{
+ if(s->top == s->base)
+ {
+  Error("There is something wrong with expression");
+  return 0;
+ }
+ return (*(--s->top));
+}
+
+//pop the top element of operator stack
+char Pop_Operator(Operator *s)
+{
+ if(s->top == s->base)
+ {
+  Error("There is something wrong with expression");
+  return 0;
+ }
+ return (*(--s->top));
+}
+
+//get the top element of operand stack
+double Get_Top_Operand(Operand *s)
+{
+ if(s->top == s->base)
+ {
+  Error("There is something wrong with expression");
+  return 0;
+ }
+ return (*(s->top-1));
+}
+
+//get the top element of operator stack
+char Get_Top_Operator(Operator *s)
+{
+ if(s->top == s->base)
+ {
+  Error("There is something wrong with expression");
+  return 0;
+ }
+ return (*(s->top-1));
+}
+
+//query the mark of operator
+int Mark(char op)
+{
+ int i=0;
+ switch(op)
+ {
+  case '+': i=0;break;
+  case '-': i=1;break;
+  case '*': i=2;break;
+  case '/': i=3;break;
+  case '^': i=4;break;
+  case 'e': i=5;break;
+  case 'n': i=6;break;
+  case 'g': i=7;break;
+  case 'a': i=8;break;
+  case 's': i=9;break;
+  case 'c': i=10;break;
+  case 't': i=11;break;
+  case '(': i=12;break;
+  case ')': i=13;break;
+  case '[': i=14;break;
+  case ']': i=15;break;
+  case '{': i=16;break;
+  case '}': i=17;break;
+  case '\0': i=18;break;
+  default: Error("Wrong expression");break;
+ }
+ return i;
+}
+
+//query the priority of each operator pair
+char Precede(char op1,char op2)
+{
+ int i,j;
+ i=Mark(op1);
+ j=Mark(op2);
+ return Prior[i][j];
+}
+
+//binary operator calculation
+int Binary_Operate(double a,char op,double b,double result[])
+{
+ double temp=0;
+ switch(op)
+ {
+  case'+':result[0]=a+b;
+	      return 1;break;
+  case'-':result[0]=a-b;
+	      return 1;break;
+  case'*':result[0]=a*b;
+	      return 1;break;
+  case'/':if(fabs(b)<1e-100)
+		  {
+		   Error("Zero denominator");
+		   result[0]=0;return 0;break;
+		  }
+		  result[0]=a/b;
+	      return 1;break;
+  case'^':temp=pow(a,b);
+	      if((temp>(-1e150))&&(temp<(1e150)))
+		  {
+		   result[0]=temp;
+	       return 1;break;
+		  }
+		  else
+		  {
+		   Error("Incorrect x^y");
+		   result[0]=0;return 0;break;
+		  }
+  default: result[0]=0;return 0;
+ }
+}
+
+//unary operator calculation
+int Unary_Operate(double a,char op,double result[])
+{
+ switch(op)
+ {
+  case'e':result[0]=exp(a);
+	      return 1;break;
+  case'n':if(a<=0)
+		  {
+		   Error("Negative argument of ln(x)");
+		   result[0]=0;return 0;break;
+		  }
+	      result[0]=log(a);
+		  return 1;break;
+  case'g':if(a<=0)
+		  {
+		   Error("Negative argument of lg(x)");
+		   result[0]=0;return 0;break;
+		  }
+	      result[0]=log10(a);
+		  return 1;break;
+  case'a':result[0]=fabs(a);
+	      return 1;break;
+  case's':if(fabs(sin(a*Angle_Factor))<1e-15){result[0]=0;return 1;}
+		  else{result[0]=sin(a*Angle_Factor);return 1;}
+          break;
+  case'c':if(fabs(cos(a*Angle_Factor))<1e-15){result[0]=0;return 1;}
+		  else{result[0]=cos(a*Angle_Factor);return 1;}
+          break;
+  case't':if(fabs(cos(a*Angle_Factor))<1e-15)
+		  {
+		   Error("Ilegal argument of tan(a)");
+		   result[0]=0;return 0;break;
+		  }
+		  else
+		  {
+		   if(fabs(sin(a*Angle_Factor))<1e-15){result[0]=0;return 1;}
+		   else{result[0]=sin(a*Angle_Factor)/cos(a*Angle_Factor);return 1;}
+		  }
+          break;
+  default: result[0]=0;return 0;
+ }
+}
+
+//unary operator check
+int IsUnaryOp(char sym)
+{
+ if((sym=='e')||(sym=='n')||(sym=='g')||(sym=='a')||(sym=='s') || (sym=='c') || (sym=='t'))
+ return 1;
+ else
+ return 0;
+}
+
+//binary operator check
+int IsBinaryOp(char sym)
+{
+ if((sym=='+')||(sym=='-')||(sym=='*')||(sym=='/')||(sym=='^'))
+ return 1;
+ else
+ return 0;
+}
+
+//left parentheses check
+int IsLeftParen(char sym)
+{
+ if((sym=='(')||(sym=='[')||(sym=='{'))
+ return 1;
+ else
+ return 0;
+}
+
+//right parentheses check
+int IsRightParen(char sym)
+{
+ if((sym==')')||(sym==']')||(sym=='}'))
+ return 1;
+ else
+ return 0;
+}
+
+//defined constant check
+int IsConstant(char sym)
+{
+ if((sym=='p'))
+ return 1;
+ else
+ return 0;
+}
+
+//end tag check
+int IsEndTag(char sym)
+{
+ if((sym=='\0'))
+ return 1;
+ else
+ return 0;
+}
+
+//operator check
+int IsOperator(char target[],char curop[],int flag[])
+{
+ flag[0]=0;//set flag=0 means "+" and "-" are binary operator as default 
+ switch(target[0])
+ {
+  case'+':if(IsDigit(target[1])||IsUnaryOp(target[1])||IsLeftParen(target[1])||IsConstant(target[1]))
+		  {
+		   if(IsLeftParen(target[-1]))// it means '+' is a unary operator,  then use flag[0]=-1 to identify
+		   {
+		    flag[0]=-1;
+		   }
+	       curop[0]='+';     
+	       return 1;
+		  }
+		  else
+		  {
+		   Error("Wrong expression after +");
+		   return 0;
+		  }
+		  break;
+  case'-':if(IsDigit(target[1])||IsUnaryOp(target[1])||IsLeftParen(target[1])||IsConstant(target[1]))
+		  {
+		   if(IsLeftParen(target[-1]))// it means '-' is a unary operator,  then use flag[0]=-1 to identify
+		   {
+		    flag[0]=-1;
+		   }
+	       curop[0]='-';     
+	       return 1;
+		  }
+		  else
+		  {
+		   Error("Wrong expression after -");
+		   return 0;
+		  }
+		  break;
+  case'*':if(IsDigit(target[1])||IsUnaryOp(target[1])||IsLeftParen(target[1])||IsConstant(target[1]))
+		  {
+		   if(IsLeftParen(target[-1]))
+		   {
+		    Error("Wrong expression before *");
+			return 0;
+		   }
+	       curop[0]='*';     
+	       return 1;
+		  }
+		  else
+		  {
+		   Error("Wrong expression after *");
+		   return 0;
+		  }
+		  break;
+  case'/':if(IsDigit(target[1])||IsUnaryOp(target[1])||IsLeftParen(target[1])||IsConstant(target[1]))
+		  {
+		   if(IsLeftParen(target[-1]))
+		   {
+		    Error("Wrong expression before /");
+			return 0;
+		   }
+	       curop[0]='/';     
+	       return 1;
+		  }
+		  else
+		  {
+		   Error("Wrong expression after /");
+		   return 0;
+		  }
+		  break;
+  case'^':if(IsDigit(target[1])||IsUnaryOp(target[1])||IsLeftParen(target[1])||IsConstant(target[1]))
+		  {
+		   if(IsLeftParen(target[-1]))
+		   {
+		    Error("Wrong expression before ^");
+			return 0;
+		   }
+	       curop[0]='^';     
+	       return 1;
+		  }
+		  else
+		  {
+		   Error("Wrong expression after ^");
+		   return 0;
+		  }
+		  break;
+  case'e':if(IsDigit(target[1])||IsLeftParen(target[1])||IsConstant(target[1]))
+		  {
+	       curop[0]='e';     
+	       return 1;
+		  }
+		  else
+		  {
+		   Error("Wrong expression after exp");
+		   return 0;
+		  }
+		  break;
+  case'n':if(IsDigit(target[1])||IsLeftParen(target[1])||IsConstant(target[1]))
+		  {
+	       curop[0]='n';     
+	       return 1;
+		  }
+		  else
+		  {
+		   Error("Wrong expression after ln");
+		   return 0;
+		  }
+		  break;
+  case'g':if(IsDigit(target[1])||IsLeftParen(target[1])||IsConstant(target[1]))
+		  {
+	       curop[0]='g';     
+	       return 1;
+		  }
+		  else
+		  {
+		   Error("Wrong expression after lg");
+		   return 0;
+		  }
+		  break;
+  case'a':if(IsDigit(target[1])||IsLeftParen(target[1])||IsConstant(target[1]))
+		  {
+	       curop[0]='a';     
+	       return 1;
+		  }
+		  else
+		  {
+		   Error("Wrong expression after abs");
+		   return 0;
+		  }
+		  break;
+  case's':if(IsDigit(target[1])||IsLeftParen(target[1])||IsConstant(target[1]))
+		  {
+	       curop[0]='s';     
+	       return 1;
+		  }
+		  else
+		  {
+		   Error("Wrong expression after sin");
+		   return 0;
+		  }
+		  break;
+  case'c':if(IsDigit(target[1])||IsLeftParen(target[1])||IsConstant(target[1]))
+		  {
+	       curop[0]='c';     
+	       return 1;
+		  }
+		  else
+		  {
+		   Error("Wrong expression after cos");
+		   return 0;
+		  }
+		  break;
+  case't':if(IsDigit(target[1])||IsLeftParen(target[1])||IsConstant(target[1]))
+		  {
+	       curop[0]='t';     
+	       return 1;
+		  }
+		  else
+		  {
+		   Error("Wrong expression after tan");
+		   return 0;
+		  }
+		  break;
+  case'(':if(IsDigit(target[1])||IsUnaryOp(target[1])||IsLeftParen(target[1])||IsConstant(target[1])||(target[1]=='+')||(target[1]=='-'))
+		  {
+	       curop[0]='(';     
+	       return 1;
+		  }
+		  else
+		  {
+		   Error("Wrong expression after (");
+		   return 0;
+		  }
+		  break;
+  case')':if(IsBinaryOp(target[1])||IsRightParen(target[1])||IsEndTag(target[1]))
+		  {
+	       curop[0]=')';     
+	       return 1;
+		  }
+		  else
+		  {
+		   Error("Wrong expression after )");
+		   return 0;
+		  }
+		  break;
+  case'[':if(IsDigit(target[1])||IsUnaryOp(target[1])||IsLeftParen(target[1])||IsConstant(target[1])||(target[1]=='+')||(target[1]=='-'))
+		  {
+	       curop[0]='[';     
+	       return 1;
+		  }
+		  else
+		  {
+		   Error("Wrong expression after [");
+		   return 0;
+		  }
+		  break;
+  case']':if(IsBinaryOp(target[1])||IsRightParen(target[1])||IsEndTag(target[1]))
+		  {
+	       curop[0]=']';     
+	       return 1;
+		  }
+		  else
+		  {
+		   Error("Wrong expression after ]");
+		   return 0;
+		  }
+		  break;
+  case'{':if(IsDigit(target[1])||IsUnaryOp(target[1])||IsLeftParen(target[1])||IsConstant(target[1])||(target[1]=='+')||(target[1]=='-'))
+		  {
+	       curop[0]='{';     
+	       return 1;
+		  }
+		  else
+		  {
+		   Error("Wrong expression after {");
+		   return 0;
+		  }
+		  break;
+  case'}':if(IsBinaryOp(target[1])||IsRightParen(target[1])||IsEndTag(target[1]))
+		  {
+		   curop[0]='}';     
+	       return 1;
+		  }
+		  else
+		  {
+		   Error("Wrong expression after }");
+		   return 0;
+		  }
+		  break;
+  case'\0':curop[0]='\0';
+	      return 1;break;
+  default:return 0;break;
+ }
+}
+
+//program information
+void Information()
+{
+ if(Radian==1)
+ {
+  printf("\n%45s\n\n","Expression Calculator (Current Mode: Angle in radian)");
+ }
+ else
+ {
+  printf("\n%45s\n\n","Expression Calculator (Current Mode: Angle in degree)");
+ }
+ printf("*******************************************************************************\n");
+ printf("Input \'help\' to open user manual\n");
+}
+void Help()
+{
+ printf("\n*******************************************************************************\n");
+ printf("%36s\n","Manual");
+ printf("%50s\n\n","All rights reserved by MoHuangRui");
+ printf("*******************************************************************************\n");
+ printf("When the program is at the state:\n");
+ printf("Command:\n");
+ printf("Following options are valid\n");
+ printf("1) Input \'exit\' to exit program\n");
+ printf("2) Input \'x\' to open Turbulence y+ Wall Distance Calculator\n");
+ printf("3) Input \'help\' to open user manual\n");
+ printf("4) Input \'set\' to set parameters like angle in radian(default mode) or degree, etc.\n");
+ printf("5) Input an math expression to calculate it\n");
+ printf("6) Press \'Up Arrow\' or \'Down Arrow\' to recall history command\n");
+ printf("*******************************************************************************\n");
+ printf("             Manual For Expression Calculator\n");
+ printf("Notice: Please avoid ambiguity expressions and use parenthesis:\n");
+ printf("        \'()\',\'[]\',\'{}\' to make semantic clear\n");
+ printf("Support: +,-,*,/,x^y,exp(x),ln(x),lg(x),abs(x),sin(a),cos(a),tan(a),pi\n");
+ printf("         where, x,y are numbers or expressions; a is a degree or radian; pi is π\n");
+ printf("Example: 1.5*sin(-pi/6)-[cos(pi/3)]^2+ln{exp[5*lg(abs(-100))]}\n");
+ printf("Tips: Support multiple expressions seperated by space, but output is not elegent\n");
+ printf("*******************************************************************************\n");
+ printf("            Manual For Turbulence y+ Wall Distance Calculator\n");
+ printf("Function: Using for estimating the Re,ystar,I,k,ε,ω,etc\n");
+ printf("Notice: 1)Please input the required values in SI unit\n");
+ printf("        2)Support scientific notation for physic quantities,like L=1.0e2\n");
+ printf("        3)The estimation of turbulence properties are based on the\n");
+ printf("          mixing-length theory,then the result may be different with others\n");
+ printf("          which use different formulas for the calculation of lt,ε,ω,etc\n");
+ printf("          the good news is the order of magnitudes are consistency,\n");
+ printf("          that's enough for estimation~\n");
+ printf("        4)the choose of characteristic length needs a well understanding of\n");
+ printf("          the underlying physics of your problem.\n");
+}
+
+//turbulence y+ wall distance calculator
+int Cal_Turbulence()
+{
+ int flag=0; 
+ double lt_any=0,L_any=0,yplus_any=0;
+ double u_any=0,ustar_any,τw_any;
+ double ρ_air=1.225,ρ_water=998.2,ρ_any=0;
+ double Cf_any=0;
+ double µ_air=1.7894e-5,µ_water=1.003e-3,µ_any=0;
+ double Re_any=0,ε_any=0,k_any=0,ω_any=0,I_any=0,µt_any=0,ratio_any=0,Ret_any=0,y_wall=0;
+ printf("*******************************************************************************\n");
+ printf("%45s\n","Turbulence y+ Wall Distance Calculator");
+ printf("*******************************************************************************\n");
+ printf("Choose media by press the order number\n");
+ printf("\n 1 Air(standard)\n 2 Water(standard)\n 3 User define\n\nChoose:");
+ if(ReadInt(1,3,&flag)==0)
+ {
+  return 0;
+ }
+ printf("\n");
+ switch(flag)
+ {
+  case 1:ρ_any=ρ_air;µ_any=µ_air;break;
+  case 2:ρ_any=ρ_water;µ_any=µ_water;break;
+  case 3:printf(" Density(kg/m^3)=");
+	     if(ReadFloat(0,1e10,&ρ_any)==0)
+		 {
+		  return 0;break;
+		 }
+		 printf(" Dynamic viscosity(kg/ms)=");
+		 if(ReadFloat(0,1e10,&µ_any)==0)
+		 {
+		  return 0;break;
+		 }
+ }
+ printf(" Character velocity(m/s) U=");
+ if(ReadFloat(-1e10,1e10,&u_any)==0)
+ {
+  return 0;
+ }
+ printf(" Character length(m) L=");
+ if(ReadFloat(0,1e10,&L_any)==0)
+ {
+  return 0;
+ }
+ printf(" Yplus=");
+ if(ReadFloat(0,1000,&yplus_any)==0)
+ {
+  return 0;
+ }
+ //calculate variables
+ u_any=fabs(u_any);//velocity magnitude
+ Re_any=cal_Re(u_any,L_any,ρ_any,µ_any);
+ Cf_any=cal_Cf(Re_any);
+ τw_any=cal_τw(Cf_any,ρ_any,u_any);
+ ustar_any=cal_ustar(τw_any,ρ_any);
+ y_wall=cal_y(yplus_any,µ_any,ρ_any,ustar_any);
+ lt_any=cal_lt(L_any);
+ I_any=cal_I(Re_any);
+ k_any=cal_k(u_any,I_any);
+ ε_any=cal_ε(k_any,lt_any);
+ ω_any=cal_ω(k_any,ε_any);
+ µt_any=cal_µt(k_any,ε_any,ρ_any);
+ ratio_any=cal_ratio(µt_any,µ_any);
+ Ret_any=cal_Ret(ratio_any);
+ //output values
+ printf("\n(~.~) Compute finished!\n");
+ printf("\n Reynolds number Re=%.4e",Re_any);
+ printf("\n Near wall distance Y=%.4e m",y_wall);
+ printf("\n Turbulence length scale lt=%.4e m",lt_any);
+ printf("\n Turbulence Intensity level I=%.4lf %%",I_any*100);
+ printf("\n Kinetic energy k=%.4e J/kg",k_any);
+ printf("\n Turbulent dissipation ε=%.4e J/kgs",ε_any);
+ printf("\n Specific turbulent dissipation rate ω=%.4e 1/s",ω_any);
+ printf("\n Turbulent viscosity mut=%.4e kg/ms",µt_any);
+ printf("\n Turbulent Reynolds Ret=%.4e",Ret_any);
+ printf("\n Viscosity ratio mut/mu=%.4e\n",ratio_any);
+ return 1;
+}
+//calculate Reynolds number
+double cal_Re(double u,double L,double ρ,double µ)
+{
+ return(ρ*u*L/µ);
+}
+// y plus wall distance estimation,for Re<10e9
+double cal_Cf(double Re)
+{
+ return pow((2*log10(Re)-0.65),-2.3);
+}
+double cal_τw(double Cf,double ρ,double u)
+{
+ return (Cf*0.5*ρ*u*u);
+}
+double cal_ustar(double τw,double ρ)
+{
+ return (sqrt(τw/ρ));
+}
+double cal_y(double yplus,double µ,double ρ,double ustar)
+{
+return (yplus*µ/(ρ*ustar));
+}
+//calculate turbulence length scale by hydraulic diameter
+double cal_lt(double L)
+{
+ return (0.07*L);
+}
+//calculate turbulence intensity
+double cal_I(double Re)
+{
+ return (0.16*(pow(Re,-0.125)));
+}
+//claculate turbulent kinetic energy
+double cal_k(double u,double I)
+{
+ return(1.5*(pow(u*I,2)));
+}
+//calculate turbulent dissipation rate
+double cal_ε(double k,double lt)
+{
+ double Cµ=0.09;
+ return(pow(Cµ,0.75)*pow(k,1.5)/lt);
+}
+double cal_ω(double k,double ε)
+{
+ double Cµ=0.09;
+ return(ε/(k*Cµ));
+}
+double cal_µt(double k,double ε,double ρ)
+{
+ double Cµ=0.09;
+ return((k*k*Cµ*ρ)/ε);
+}
+double cal_ratio(double µt,double µ)
+{
+ return(µt/µ);
+}
+double cal_Ret(double ratio)
+{
+ double Cµ=0.09;
+ return(ratio/Cµ);
+}
+
+//standard functions
+
+//read command
+int ReadCommand(char str[], int maxlength)
+{
+ if(scanf_s("%s",str,maxlength))
+ {
+  return 1;
+ }
+ else
+ {
+  Error("Length of command exceeds limit");
+  fflush(stdin);
+  return 0;
+ }
+}
+
+//this function check whether target input string is a signed integer, if true then read in it
+int ReadInt(int inf,int sup,int integer[])
+{
+ char s[11];//to store the input string
+ integer[0]=0;//initialize to zero
+ if(ReadCommand(s,10)==0){return 0;}
+ char *p='\0';//pointer to point the first digit of string
+ int num=0;
+ char sym='+';//save the symbol '-'
+ if(s[0]=='-')
+ {
+  sym='-';
+  p=s+1;
+ }
+ else
+ {
+  if(s[0]=='+')
+  {
+   sym='+';
+   p=s+1;
+  }
+  else
+  {
+   p=s;
+  }
+ }
+ if(IsNotDigit(p[0]))//insure not only + or - inputed
+ {
+  Error("Not a integer");
+  return 0;
+ }
+ while(p[0]!='\0')
+ {
+  if(IsDigit(p[0]))
+  {
+   num=num*10+p[0]-'0';
+   p++;
+  }
+  else
+  {
+    Error("Not a integer");
+	return 0;
+  }
+ }//end while to finish read the command
+ if(sym=='-')
+ {
+  num=-num;
+ }
+ if((num<inf)||(num>sup))
+ {
+  Error("Wrong input, Check its limit, now return to main interface...");
+  return 0;
+ }
+ integer[0]=num;
+ return 1;
+}
+
+//this function get the first float from target string
+int GetFirstFloat(char **start,double number[])
+{
+ double num=0,intpart=0,decipart=0;
+ char sym='+';//store sign symbol
+ int i=0;//counter for decimal part
+ number[0]=0;//initialize
+ if(start[0][0]=='-')
+ {
+  sym='-';
+  start[0]++;
+ }
+ else
+ {
+  if(start[0][0]=='+')
+  {
+   sym='+';
+   start[0]++;
+  }
+ }
+ if(IsNotDigit(start[0][0]))//insure not only + or - inputed
+ {
+  Error("Wrong input");
+  return 0;
+ }
+ while(IsDigit(start[0][0]))
+ {
+  intpart=intpart*10+start[0][0]-'0';
+  start[0]++;
+ }
+ if(start[0][0]=='.')
+ {
+  start[0]++;
+  if(IsNotDigit(start[0][0]))
+  {
+   Error("Missing digit after \'.\'");
+   return 0;
+  }
+  else
+  {
+   while(IsDigit(start[0][0]))
+   {
+    decipart=decipart*10+start[0][0]-'0';
+    start[0]++;i++;
+   }
+   for(;i>0;i--)
+   {
+    decipart=decipart/10;
+   }
+  }
+ }
+ num=intpart+decipart;
+ if(sym=='-')
+ {
+  num=-num;
+ }
+ number[0]=num;
+ return 1;
+}
+
+//this function check whether target input string is a float, if true then read in it
+int ReadFloat(double inf,double sup,double number[])
+{
+ char s[51];
+ number[0]=0;//initialize
+ if(ReadCommand(s,50)==0){return 0;}
+ char *p=s;//pointer to point the string
+ double num=0,num1=0,num2=0;//save the num -12e-78 before e and after e
+ if(GetFirstFloat(&p,&num1)==0)
+ {
+  return 0;
+ }
+ if(p[0]=='e')
+ {
+  p++;
+  if(GetFirstFloat(&p,&num2)==0)
+  {
+   return 0;
+  }
+ }
+ if(p[0]=='\0')
+ {
+  num=num1*pow(10,num2);
+  if((num<inf)||(num>sup))
+  {
+   Error("Wrong input, Check its limit, now return to main interface...");
+   return 0;
+  }
+  else
+  {
+   number[0]=num;
+   return 1;
+  }
+ }
+ else
+ {
+  Error("Wrong input");
+  return 0;
+ }
+}
+
+//check whether target character is digit
+int IsDigit(char character)
+{
+ if((character>='0')&&(character<='9'))
+ {
+  return 1;
+ }
+ else
+ {
+  return 0;
+ }
+}
+
+//check whether target character is digit
+int IsNotDigit(char character)
+{
+ if((character>='0')&&(character<='9'))
+ {
+  return 0;
+ }
+ else
+ {
+  return 1;
+ }
+}
+
+//general error control, if happened then show infomation
+void Error(const char *state)
+{
+ printf("\n(>_<)! oops, %s\n\n",state);
+}

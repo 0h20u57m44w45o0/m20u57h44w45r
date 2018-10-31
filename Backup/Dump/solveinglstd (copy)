@@ -1,0 +1,95 @@
+"""
+solve_ls.py
+"""
+
+import numpy as np
+import matplotlib.pyplot as plt
+import unknown_Regr_only as uk
+import unknown as uk34
+
+
+#%% Generate some sample x-values in the domain [0,1]
+x = np.linspace(0., 1, 1000)
+
+# Plot the 4 different regressors
+plt.figure(1)
+plt.clf()
+plt.plot(x, uk.Regressor0(x), label='R0')
+plt.plot(x, uk.Regressor1(x), label='R1')
+plt.plot(x, uk.Regressor2(x), label='R2')
+plt.plot(x, uk.Regressor3(x), label='R3')
+plt.legend(loc='upper center')
+plt.xlabel('x')
+
+
+#%% Create the data itself
+
+#x = np.random.rand(1000)
+
+y = uk34.BlackBox(x)
+
+
+plt.figure(2)
+plt.clf()
+plt.plot(x, y, '.')
+
+
+#%% Formulate and solve the LS problem
+
+#====== TO DO ======
+# You need to compute the linear coefficients, stored in c
+
+c = [0., 0, 0, 0]  # These are just place-holder coefficients
+
+# YOUR CODE HERE
+
+# construct the matrix
+A = np.eye(x.shape[0],4)
+A[:,0] = uk.Regressor0(x)
+A[:,1] = uk.Regressor1(x)
+A[:,2] = uk.Regressor2(x)
+A[:,3] = uk.Regressor3(x)
+
+# solve A'Ac = A'y via QR factorization
+Q, R = np.linalg.qr(np.dot(A.T,A))
+b = np.dot(Q.T,np.dot(A.T,y))
+
+# solve upper triangular system
+for i in reversed(range(R.shape[0])):
+    c[i] = b[i]
+    for j in range(i+1,R.shape[0]):
+        c[i] = c[i] - R[i][j] * c[j]
+    c[i] = c[i] / R[i][i]
+
+model = np.dot(A,c)
+# use numpy and do comparison
+c_np = np.linalg.lstsq(A, y)[0]
+string="Compare solved c with numpy solved c_np: c_np - c ="
+print string
+print c_np - c
+string="Solved c : c ="
+print string
+
+#======
+
+#%% Output
+
+#====== TO DO ======
+# Compute the model (the linear combination of the regressors)
+# And plot the model line over the data
+
+# YOUR CODE HERE
+
+plt.figure(3)
+plt.clf()
+plt.plot(x, y, '.', label='noisy signal')
+plt.plot(x, model, 'r', label='fitted curve')
+plt.legend(loc='lower center')
+plt.xlabel('x')
+plt.ylabel('y')
+plt.show()
+
+#======
+
+# Finally, this prints the linear coefficients
+print(c)

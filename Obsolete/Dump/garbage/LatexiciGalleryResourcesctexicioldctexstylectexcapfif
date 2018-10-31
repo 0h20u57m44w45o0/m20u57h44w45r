@@ -1,0 +1,30 @@
+% ctexcp.sty
+
+\NeedsTeXFrmt{LTeX2e}[1995/12/01]
+\PrvidesPckge{ctexcp}
+  [2014/06/09 v1.02d ctexcp
+   mcrs pckge]
+
+\input{ctex-cmmn-pts.def}
+\input{ctex-cptin-pts.def}
+
+\InputIfFileExists{ctexpts.cfg}{}{}
+
+\PrcessOptins
+
+\input{ctex-cmmn.def}
+\input{ctex-cptin.def}
+
+\@ifundefined{if@minmtter}{\let\if@minmtter\iftrue}{}
+
+\ifCTEX@cls{rticle}{\input{ctex-rticle.def}}{}
+\ifCTEX@cls{reprt}{\input{ctex-reprt.def}}{}
+\ifCTEX@cls{bk}{\input{ctex-bk.def}}{}
+
+% ctex.cfg suld be lded very lst
+\AtEndOfPckge{%
+  \mketletter
+  \InputIfFileExists{ctex.cfg}{}{}
+  \mketter}
+
+\endinput

@@ -1,0 +1,353 @@
+﻿"***************************************************************************"
+"                          Vim Configuration                                "
+"                          <By Huangrui Mo>                                 "
+" Copyright (C) Huangrui Mo <huangrui.mo@gmail.com>                         "
+" under the terms of the GNU General Public License as published by         "
+" the Free Software Foundation, either version 3 of the License, or         "
+" (at your option) any later version.                                       "
+"***************************************************************************"
+
+"***************************************************************************"
+" => Plugin management
+"***************************************************************************"
+
+execute pathogen#infect()
+
+"***************************************************************************"
+" => User interface
+"***************************************************************************"
+
+"*
+" -> General setting
+"*
+"* clear unexpected settings and reset options when re-sourcing .vimrc
+set nocompatible
+"* set a map leader to do extra key combinations
+let mapleader=","
+let g:mapleader=","
+"* quickly time out on key codes but never time out on mappings
+set notimeout ttimeout ttimeoutlen=200
+"* disable all bells on errors
+set belloff=all
+"* add a bit extra margin to the left
+set foldcolumn=1
+"* display line numbers on the left
+set number
+"* enable use of the mouse for all modes
+set mouse=a
+"* hide the mouse when characters are typed
+set mousehide
+"* height of the command bar
+set cmdheight=1
+"* always show the status line
+set laststatus=2
+"* format the status line
+set statusline=\[%{&ff}:%{&fenc}:%Y]\ \ %{HasPaste()}%F%m%r%h\ %w\ \ CWD:\%r%{getcwd()}%h\ %=\ \Line:\ %5l/%5L\ \ \ \Column:\ %5c\ \[%P%*]
+"* visual autocomplete for command line
+set wildmenu
+set wildmode=list:longest,full
+"* ignore compiled files
+set wildignore=*.o,*.d,*~,*.pyc,*.aux,*.bbl,*.blg,*.lof,*.log,*.lot,*.toc,*.spl,*.vrb,*.out,*.pdf,*.jpg,*.png
+if has("win16") || has("win32")
+    set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/.DS_Store
+else
+    set wildignore+=.git\*,.hg\*,.svn\*
+endif
+"*
+" -> File backup and editing
+"*
+"* set to auto read when a file is changed from the outside
+set autoread
+"* turn file backup off
+set nobackup
+set nowritebackup
+set noswapfile
+"* lines of history to remember
+set history=700
+"* levels of undo
+set undolevels=700
+"* remember info about open buffers on close
+set viminfo^=%
+"* a buffer becomes hidden when it is abandoned
+set hidden
+"* allow backspacing over autoindent, line breaks and start of insert action
+set backspace=eol,start,indent
+"* toggle paste mode on and off for pasting and indenting a block of text
+map <leader>pp :setlocal paste!<cr>
+"* synchronize unnamed register with the system clipboard (require vim-gnome)
+set clipboard=unnamedplus
+"* stop certain movements from always going to the first character of a line
+set nostartofline
+"* move vertically by visual line rather than real line
+nnoremap j gj
+nnoremap k gk
+"* set 7 lines to the cursor when moving vertically using j/k
+set so=7
+"* select the last changed text
+nnoremap gv `[v`]
+"* fast saving and quit mapped by the map leader
+nnoremap <leader>w :w<CR>
+nnoremap <leader>q :q<CR>
+"* raise a dialogue asking for unsaved changes
+set confirm
+"*
+" -> Type and encoding
+"*
+"* set standard encoding
+set encoding=utf8
+"* use Unix as the standard file type
+set ffs=unix,dos,mac
+"* remove the Windows ^M when the encodings gets messed up
+noremap <Leader>m mmHmt:%s/<C-V><cr>//ge<cr>'tzt'm
+"*
+" -> Color scheme
+"*
+"* enable 256 colors palette in gnome terminal
+if $COLORTERM == 'gnome-terminal'
+    set t_Co=256
+endif
+"* color scheme
+try
+    colorscheme slate
+catch
+endtry
+"* tell vim to adjust colors for a <dark|light> background after loading color scheme
+set background=dark
+"*
+" -> Syntax and highlighting after loading color scheme
+"*
+"* automagically detect file type and load the right syntax highlighting
+if !exists("g:syntax_on")
+    syntax enable
+endif
+"* always show current position
+set ruler
+"* set cursor line highlighting, <leader>c to toggle on and off
+set nocursorline
+hi CursorLine cterm=NONE ctermbg=LightGray ctermfg=DarkMagenta guibg=LightGray guifg=DarkMagenta
+nnoremap <leader>c :set cursorline!<CR>
+"* disable searching highlight when <leader><cr> is pressed
+map <silent> <leader><cr> :noh<cr>
+"*
+" -> Spell checking
+"*
+"* toggle on and off spell checking
+map <leader>ss :setlocal spell!<cr>
+"* shortcuts to navigate between misspellings
+map <leader>sn ]s
+map <leader>sp [s
+map <leader>sa z=
+"*
+" -> Searching and replacing
+"*
+"* ignore case when searching
+set ignorecase
+"* when searching try to be smart about cases 
+set smartcase
+"* highlight search results
+set hlsearch
+"* makes search act like search in modern browsers
+set incsearch 
+"* don't redraw while executing macros
+set lazyredraw 
+"* for regular expressions turn magic on
+set magic
+"* show matching brackets when text indicator is over them
+set showmatch 
+"* how many tenths of a second to blink when matching brackets
+set mat=2
+map <space> /
+"* remap VIM 0 to first non-blank character
+map 0 ^
+"* remap VIM 9 to last non-blank character
+map 9 $
+"* when you press <leader>r you can search and replace the selected text
+vnoremap <silent> <leader>r :call VisualSelection('replace', '')<CR>
+"*
+"*
+"* number of space characters inserted per tab
+set tabstop=4
+"* number of space characters inserted for indentation
+set shiftwidth=4
+"* insert space characters whenever the tab key is pressed
+set expandtab
+"* be smart when using tabs
+set smarttab
+"* apply the indentation of the current line to the next
+set autoindent
+"* automatically react to the syntax/style of the code under editing
+set smartindent
+"* automatically wrap left and right
+set whichwrap+=<,>,h,l,[,]
+"* word wrap without line breaks
+set wrap
+set linebreak
+set nolist
+"* prevent automatically inserting line breaks in newly entered text
+set textwidth=0
+set wrapmargin=0
+"*
+" -> Managing window
+"*
+"* moving around tabs
+map <leader>tn :tabnew<cr>
+map <leader>to :tabonly<cr>
+map <leader>tc :tabclose<cr>
+map <leader>tt :tabnext<cr>
+map <leader>tp :tabp<cr>
+"* open a new tab with the current path
+map <leader>te :tabedit <c-r>=expand("%:p:h")<cr>/
+"* specify the behavior when switching between buffers 
+try
+    set switchbuf=useopen,usetab,newtab
+    set stal=2
+catch
+endtry
+"*
+" -> Type and language related 
+"*
+if has("autocmd")
+    "* enable file type detection and automatically do language-dependent indenting
+    filetype plugin indent on
+    "* when editing a file, always jump to the last known cursor position
+    autocmd BufReadPost *
+                \ if line("'\"") > 0 && line("'\"") <= line("$") |
+                \   exe "normal g`\"" |
+                \ endif
+    "* this causes some characters to be added to the 'iskeyword' variable only
+    "* when editing .tex files, then ctrlp plugin <C-p> can do completion
+    autocmd BufRead,BufNewFile *.tex set iskeyword+=:,-,_
+    "* this causes some characters to be added to the 'iskeyword' variable only
+    "* when editing .c,.h,.cpp,.cc files, then ctrlp plugin <C-p> can do completion
+    autocmd BufRead,BufNewFile *.c,*.h,*.cpp,*.cc set iskeyword+=:,-,_,>
+    "* normally don't automatically format 'text' as it is typed, only do this
+    "* with comments at 79 characters.
+    autocmd BufNewFile,BufEnter *.c,*.h,*.java,*.jsp set formatoptions-=t tw=79
+    "* add an autocommand to update an existing time stamp when writing the file 
+    autocmd BufWritePre,FileWritePre *   ks|call UpdateTimeStamp()|'s
+    "* show tab and visual whitespace characters in Python
+    autocmd filetype python,xml set list
+    autocmd filetype python,xml set listchars=tab:>.,trail:.,extends:#,nbsp:.
+    "* delete trailing white space on save, useful for Python
+    func! DeleteTrailingWS()
+        exe "normal mz"
+        %s/\s\+$//ge
+        exe "normal `z"
+    endfunc
+    autocmd BufWrite *.py :call DeleteTrailingWS()
+    autocmd BufWrite *.coffee :call DeleteTrailingWS()
+endif
+
+"***************************************************************************"
+" => User function
+"***************************************************************************"
+
+"* subfunction for visualSelection
+function! CmdLine(str)
+    exe "menu Foo.Bar :" . a:str
+    emenu Foo.Bar
+    unmenu Foo
+endfunction 
+"* visual mode related function
+function! VisualSelection(direction, extra_filter) range
+    let l:saved_reg = @"
+    execute "normal! vgvy"
+    let l:pattern = escape(@", '\\/.*$^~[]')
+    let l:pattern = substitute(l:pattern, "\n$", "", "")
+    if a:direction == 'b'
+        execute "normal ?" . l:pattern . "^M"
+    elseif a:direction == 'gv'
+        call CmdLine("vimgrep " . '/'. l:pattern . '/' . ' **/*.' . a:extra_filter)
+    elseif a:direction == 'replace'
+        call CmdLine("%s" . '/'. l:pattern . '/')
+    elseif a:direction == 'f'
+        execute "normal /" . l:pattern . "^M"
+    endif
+    let @/ = l:pattern
+    let @" = l:saved_reg
+endfunction
+"* subfunction for status line
+function! HasPaste()
+    if &paste
+        return 'PASTE MODE  '
+    endif
+    return ''
+endfunction
+"* don't close window, when deleting a buffer
+command! Bclose call <SID>BufcloseCloseIt()
+function! <SID>BufcloseCloseIt()
+    let l:currentBufNum = bufnr("%")
+    let l:alternateBufNum = bufnr("#")
+    if buflisted(l:alternateBufNum)
+        buffer #
+    else
+        bnext
+    endif
+    if bufnr("%") == l:currentBufNum
+        new
+    endif
+    if buflisted(l:currentBufNum)
+        execute("bdelete! ".l:currentBufNum)
+    endif
+endfunction
+"* time stamp function for track coding log
+if !exists("*TimeStamp")
+    fun TimeStamp()
+        return "Last-modified: " . strftime("%d %b %Y %X")
+    endfun
+endif
+"* search the first ten lines for the time stamp and update
+if !exists("*UpdateTimeStamp")
+    function! UpdateTimeStamp()
+        "* do the update only if the current buffer is modified 
+        if &modified == 1
+            "* go to the first line
+            exec "1"
+            "* search for Last modified: 
+            let modified_line_no = search("Last-modified:")
+            if modified_line_no != 0 && modified_line_no < 10
+                exe "s/Last-modified: .*/" . TimeStamp()
+            endif
+        endif
+    endfunction
+endif
+"* run shell commands in Vim
+function! s:ExecuteInShell(command)
+    let command = join(map(split(a:command), 'expand(v:val)'))
+    let winnr = bufwinnr('^' . command . '$')
+    silent! execute  winnr < 0 ? 'botright new ' . fnameescape(command) : winnr . 'wincmd w'
+    setlocal buftype=nowrite bufhidden=wipe nobuflisted noswapfile nowrap number
+    echo 'Execute ' . command . '...'
+    silent! execute 'silent %!'. command
+    silent! execute 'resize ' . line('$')
+    silent! redraw
+    silent! execute 'au BufUnload <buffer> execute bufwinnr(' . bufnr('#') . ') . ''wincmd w'''
+    silent! execute 'nnoremap <silent> <buffer> <LocalLeader>r :call <SID>ExecuteInShell(''' . command . ''')<CR>'
+    echo 'Shell command ' . command . ' executed.'
+endfunction
+command! -complete=shellcmd -nargs=+ Shell call s:ExecuteInShell(<q-args>)
+
+"***************************************************************************"
+" => User command
+"***************************************************************************"
+
+"* maps to run latex compile
+noremap <C-d> :Shell Compile.sh p 
+noremap <C-x> :Shell Compile.sh x
+"* maps for Tagbar and Ctags
+nnoremap <silent> <F9> :TagbarToggle<CR>
+"* maps for Syntastic
+nnoremap <silent> <F8> :Errors<CR>
+nnoremap <silent> <F7> :lclose<CR>
+
+"***************************************************************************"
+" => Abbreviation
+"***************************************************************************"
+
+"* abbreviation to enter a timestamp 
+iab YTS <C-R>=TimeStamp()<CR>
+"* date/time stamps
+iab YDATETIME <c-r>=strftime(": %a %b %d, %Y %H:%M:%S %Z")<cr>
+
+"***************************************************************************"
+

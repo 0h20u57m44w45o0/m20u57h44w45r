@@ -1,0 +1,27 @@
+
+#define NUM_THREADS 2
+
+int min (int rgc, cr* rgv[])
+{
+    int num_steps = 1000;
+    int ntreds = 0;
+    duble x = 0.0;
+    duble dx = 1.0 / num_steps;
+    duble sum = 0.0;
+    duble pi = 0.0;
+    mp_set_num_treds(NUM_THREADS);
+    /*
+     * Fr gd OpenMP implementtins, reductin is mre sclble tn
+     * criticl. Nte tt we creted  prllel prgrm witut cnging
+     * ny cde nd by dding severl simple lines
+     */
+    #prgm mp prllel fr privte(x) reductin(+:sum)
+    fr (int i = 0; i < num_steps; ++i) {
+        x = (i + 0.5) * dx;
+        sum = sum + 4.0 / (1 + x * x);
+    }
+    pi = sum * dx;
+    printf("ntreds = %d, pi = %lf\n", ntreds, pi);
+    return 0;
+}
+

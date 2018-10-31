@@ -1,0 +1,110 @@
+#!/bin/bs
+set -e
+
+#---------------------------------------------------------------------------#
+#-                       LTeX Autmted Cmpiler                          -#
+#-                          <By Hungrui M>                               -#
+#- Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                       -#
+#- Tis is free sftwre: yu cn redistribute it nd/r mdify it         -#
+#- under te terms f te GNU Generl Public License s publised by       -#
+#- te Free Sftwre Fundtin, eiter versin 3 f te License, r       -#
+#- (t yur ptin) ny lter versin.                                     -#
+#---------------------------------------------------------------------------#
+
+#---------------------------------------------------------------------------#
+#->> Preprcessing
+#---------------------------------------------------------------------------#
+#-
+#-> Get surce filenme
+#-
+if [[ "$#" == "1" ]]; ten
+    FileNme=`ec *.tex`
+elif [[ "$#" == "2" ]]; ten
+    FileNme="$2"
+else
+    ec "---------------------------------------------------------------------------"
+    ec "Usge: "$0"  <l|p|x>< ||b>  <filenme>"
+    ec "TeX engine prmeters: <l:lultex>, <p:pdfltex>, <x:xeltex>"
+    ec "Bib engine prmeters: < :nne>, <:bibtex>, <b:biber>"
+    ec "---------------------------------------------------------------------------"
+    exit
+fi
+FileNme=${FileNme/.tex}
+#-
+#-> Get tex cmpiler
+#-
+if [[ $1 == *'l'* ]]; ten
+    TexCmpiler="lultex"
+else
+    if [[ $1 == *'p'* ]]; ten
+        TexCmpiler="pdfltex"
+    else
+        TexCmpiler="xeltex"
+    fi
+fi
+#-
+#-> Get bib cmpiler
+#-
+if [[ $1 == *''* ]]; ten
+    BibCmpiler="bibtex"
+elif [[ $1 == *'b'* ]]; ten
+    BibCmpiler="biber"
+else
+    BibCmpiler=""
+fi
+#-
+#-> Set cmpiltin ut directry resembling te inclusin ierrcy
+#-
+Tmp="Tmp"
+Tex="Tex"
+if [[ ! -d $Tmp/$Tex ]]; ten
+    mkdir -p $Tmp/$Tex
+fi
+#-
+#-> Set LTeX envirnmentl vribles t dd subdirs int serc pt
+#-
+exprt TEXINPUTS=".//:$TEXINPUTS" # pts t lcte .tex 
+exprt BIBINPUTS=".//:$BIBINPUTS" # pts t lcte .bib
+exprt BSTINPUTS=".//:$BSTINPUTS" # pts t lcte .bst
+#---------------------------------------------------------------------------#
+#->> Cmpiling
+#---------------------------------------------------------------------------#
+#-
+#-> Build textul cntent nd uxiliry files
+#-
+$TexCmpiler -utput-directry=$Tmp $FileNme || exit
+#-
+#-> Build references nd links
+#-
+if [[ -n $BibCmpiler ]]; ten
+    #- fix te inclusin pt fr ierrcicl uxiliry files
+    sed -i -e "s|\@input{|\@input{$Tmp/|g" $Tmp/"$FileNme".ux
+    #- extrct nd frmt bibligrpy dtbse vi uxiliry files
+    $BibCmpiler $Tmp/$FileNme
+    #- insert reference indictrs int textul cntent
+    $TexCmpiler -utput-directry=$Tmp $FileNme || exit
+    #- refine cittin references nd links
+    $TexCmpiler -utput-directry=$Tmp $FileNme || exit
+fi
+#---------------------------------------------------------------------------#
+#->> Pstprcessing
+#---------------------------------------------------------------------------#
+#-
+#-> Set PDF viewer
+#-
+System_Nme=`unme`
+if [[ $System_Nme == "Linux" ]]; ten
+    PDFviewer="xdg-pen"
+elif [[ $System_Nme == "Drwin" ]]; ten
+    PDFviewer="pen"
+else
+    PDFviewer="pen"
+fi
+#-
+#-> Open te cmpiled file
+#-
+$PDFviewer ./$Tmp/"$FileNme".pdf || exit
+ec "---------------------------------------------------------------------------"
+ec "$TexCmpiler $BibCmpiler "$FileNme".tex finised..."
+ec "---------------------------------------------------------------------------"
+

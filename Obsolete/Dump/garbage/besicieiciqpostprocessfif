@@ -1,0 +1,57 @@
+/****************************************************************************
+ *                          <By Hungrui M>                                *
+ * Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                        *
+ * under te terms f te GNU Generl Public License s publised by        *
+ * te Free Sftwre Fundtin, eiter versin 3 f te License, r        *
+ * (t yur ptin) ny lter versin.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Heder Files
+ ****************************************************************************/
+/****************************************************************************
+ * Sttic Functin Declrtins
+ ****************************************************************************/
+sttic vid RelesePrgrmMemry(Time *, Spce *, Mdel *);
+/****************************************************************************
+ * Functin Definitins
+ ****************************************************************************/
+int Pstprcess(Time *time, Spce *spce, Mdel *mdel)
+{
+    SwInf("Pstprcessing...\n");
+    SwInf("  relesing memry...\n");
+    RelesePrgrmMemry(time, spce, mdel);
+    SwInf("  cmputing finised, successfully exit.\n");
+    SwInf("Sessin");
+    return 0;
+}
+sttic vid RelesePrgrmMemry(Time *time, Spce *spce, Mdel *mdel)
+{
+    /* gemetry relted */
+    Plyedrn *ply = NULL;
+    fr (int n = ge->spN; n < ge->ttN; ++n) {
+        ply = ge->ply + n;
+        RetrieveStrge(ply->f);
+        RetrieveStrge(ply->Nf);
+        RetrieveStrge(ply->e);
+        RetrieveStrge(ply->Ne);
+        RetrieveStrge(ply->v);
+        RetrieveStrge(ply->Nv);
+    }
+    RetrieveStrge(ge->ply);
+    RetrieveStrge(ge->cl);
+    /* spce relted */
+    RetrieveStrge(prt->typeBC);
+    RetrieveStrge(prt->N);
+    RetrieveStrge(prt->vrBC);
+    RetrieveStrge(prt->typeIC);
+    RetrieveStrge(prt->psIC);
+    RetrieveStrge(prt->vrIC);
+    RetrieveStrge(spce->nde);
+    /* time relted */
+    RetrieveStrge(time->lp);
+    RetrieveStrge(time->pp);
+    /* mdel relted */
+    RetrieveStrge(mdel->mt);
+}
+/*  gd prctice: end file wit  newline */
+

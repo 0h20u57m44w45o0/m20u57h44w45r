@@ -1,0 +1,54 @@
+# QR decomposition of a matrix A: A = QR
+
+import numpy as np
+
+def myQR(A):
+    '''
+    Q, R = myQR(A)
+    Performs QR factorization of input matrix A, where
+    A is mxn
+    Q is mxm and orthogonal
+    R is mxn and upper-triangular
+    '''
+    "Initialize Q and R"
+    R = A.copy()
+    M, N = np.shape(R)
+    Q = np.eye(M,M)
+    '''
+    Perform Householder reflection on each column vector of A
+    to construct Q and R for matrix A
+    If M > N, transform N columns to get an upper-trangular R
+    If M <= N, only need to transform the first m-1 columns to get an upper-trangular R
+    '''
+    K = min([M, N]) - (M <= N)
+    for k in range(K):
+        '''
+        Construct Qk via the kth householder reflection
+             [I | 0]
+        Qk = -------
+             [0 | F]
+        where Qk is mxm, I is kxk, F is (m-k)x(m-k)
+        '''
+        Qk = np.eye(M,M)
+        Qk[k:,k:] = householder_reflection(R[k:,k])
+        '''
+        Construct Q and R
+        Q = Q0 * ... * Qk * ... * QN-1
+        R = QN-1 * ... * Qk * ... * Q0 * A
+        Matrix multiplication can be reduced by using the property of Qk
+        '''
+        Q[:,k:] = np.dot(Q[:,k:], Qk[k:,k:])
+        R[k:,k:] = np.dot(Qk[k:,k:], R[k:,k:])
+    return Q, R
+
+def householder_reflection(x):
+    '''
+    F = householder_reflection(x)
+    Construct F for Householder reflection of vector x
+    '''
+    normalizer = x[0] + np.sign(x[0]) * np.sqrt(np.dot(x,x))
+    u = x / normalizer
+    u[0] = 1.0
+    F = np.eye(x.shape[0]) - 2.0 * np.dot(u[:,None], u[None,:]) / np.dot(u,u)
+    return F
+

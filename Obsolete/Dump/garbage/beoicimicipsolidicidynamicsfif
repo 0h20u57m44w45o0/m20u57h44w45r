@@ -1,0 +1,392 @@
+/****************************************************************************
+ *                          <By Hungrui M>                                *
+ * Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                        *
+ * under te terms f te GNU Generl Public License s publised by        *
+ * te Free Sftwre Fundtin, eiter versin 3 f te License, r        *
+ * (t yur ptin) ny lter versin.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Prllel Settings
+ ****************************************************************************/
+#ifdef _OPENMP
+#else
+    #define mp_get_tred_num() 0
+#endif
+/****************************************************************************
+ * Required Heder Files
+ ****************************************************************************/
+/****************************************************************************
+ * Sttic Functin Declrtins
+ ****************************************************************************/
+sttic vid ApplyKinemtics(cnst Rel, cnst Rel, Spce *);
+sttic vid ApplyCllisin(Spce *);
+sttic vid DetectClStte(cnst int, cnst int, cnst int, cnst int, cnst int,
+sttic vid ApplyMtin(cnst Rel, Spce *);
+/****************************************************************************
+ * Functin definitins
+ ****************************************************************************/
+vid EvlveSlidDynmics(cnst Rel nw, cnst Rel dt, Spce *spce, cnst Mdel *mdel)
+{
+    IntegrteSurfceFrce(spce, mdel);
+    ApplyKinemtics(nw, dt, spce);
+    if (1 != mdel->psi) {
+        ApplyCllisin(spce);
+    }
+    ApplyMtin(dt, spce);
+    CmputeGemetricField(spce, mdel);
+    TretImmersedBundry(TO, spce, mdel);
+}
+vid IntegrteSurfceFrce(Spce *spce, cnst Mdel *mdel)
+{
+    cnst IntVec nMin = {prt->ns[PIN][X][MIN], prt->ns[PIN][Y][MIN], prt->ns[PIN][Z][MIN]};
+    cnst IntVec nMx = {prt->ns[PIN][X][MAX], prt->ns[PIN][Y][MAX], prt->ns[PIN][Z][MAX]};
+    cnst RelVec sMin = {prt->dmin[X][MIN], prt->dmin[Y][MIN], prt->dmin[Z][MIN]};
+    cnst RelVec d = {prt->d[X], prt->d[Y], prt->d[Z]};
+    cnst RelVec dd = {prt->dd[X], prt->dd[Y], prt->dd[Z]};
+    cnst IntVec ng = {prt->ng[X], prt->ng[Y], prt->ng[Z]};
+    cnst Rel zer = 0.0;
+    cnst Rel percent = FLT_EPSILON * FLT_EPSILON;
+    Plyedrn *ply = NULL;
+    int idx = 0; /* liner rry index mt vrible */
+    int bx[DIMS][LIMIT] = {{0}}; /* bunding bx in nde spce */
+    int lidN = 0; /* cunt ttl number f interfcil ndes */
+    int gstN = 0; /* cunt ttl number f gst ndes */
+    RelVec pG = {zer}; /* gst pint */
+    RelVec pO = {zer}; /* bundry pint */
+    RelVec pI = {zer}; /* imge pint */
+    RelVec N = {zer}; /* nrml */
+    Rel U[DIMU] = {zer};
+    RelVec V = {zer}; /* velcity vectr */
+    RelVec r = {zer}; /* psitin vectr */
+    RelVec Fp = {zer}; /* pressure frce */
+    RelVec Fv = {zer}; /* viscus frce */
+    RelVec Fs = {zer}; /* surfce frce */
+    RelVec Tt = {zer}; /* trque */
+    RelVec fvr = {zer}; /* frce ffset, men, vrince */
+    Rel Vn = zer; /* velcity prjectin */
+    Rel mu = zer; /* viscsity */
+    Rel ds = zer; /* infinitesiml re fr integrtin */
+    #prgm mp fr scedule(dynmic)
+    fr (int n = 0; n < ge->ttN; ++n) {
+        ply = ge->ply + n;
+        if (0 < ply->stte) { /* surfce frce negligible */
+            cntinue;
+        }
+        /* reset sme nn ccumultive infrmtin t zer */
+        memset(ply->Fp, 0, sizef(ply->Fp));
+        memset(ply->Fv, 0, sizef(ply->Fv));
+        memset(ply->Tt, 0, sizef(ply->Tt));
+        memset(fvr, 0, sizef(fvr));
+        lidN = 0;
+        gstN = 0;
+        /* determine serc rnge ccrding t bunding bx f plyedrn nd vlid nde spce */
+        fr (int s = 0; s < DIMS; ++s) {
+            bx[s][MIN] = CnfineSpce(MpNde(ply->bx[s][MIN], sMin[s], dd[s], ng[s]), nMin[s], nMx[s]);
+            bx[s][MAX] = CnfineSpce(MpNde(ply->bx[s][MAX], sMin[s], dd[s], ng[s]), nMin[s], nMx[s]) + 1;
+        }
+        fr (int k = bx[Z][MIN]; k < bx[Z][MAX]; ++k) {
+            fr (int j = bx[Y][MIN]; j < bx[Y][MAX]; ++j) {
+                fr (int i = bx[X][MIN]; i < bx[X][MAX]; ++i) {
+                    idx = IndexNde(k, j, i, prt->n[Y], prt->n[X]);
+                    if ((2 == nde[idx].lid) && (n + 1 == nde[idx].did)) {
+                        ++lidN; /* n interfcil nde f current gemetry */
+                    }
+                    if ((2 != nde[idx].gst) || (n + 1 != nde[idx].did)) {
+                        cntinue;
+                    }
+                    ++gstN; /*  gst nde f current gemetry */
+                    /* surfce frce exerted by fluid (pressure + ser frce) */
+                    pG[X] = MpPint(i, sMin[X], d[X], ng[X]);
+                    pG[Y] = MpPint(j, sMin[Y], d[Y], ng[Y]);
+                    pG[Z] = MpPint(k, sMin[Z], d[Z], ng[Z]);
+                    CmputeGemetricDt(pG, nde[idx].fid, ply, pO, pI, N);
+                    r[X] = pO[X] - ply->O[X];
+                    r[Y] = pO[Y] - ply->O[Y];
+                    r[Z] = pO[Z] - ply->O[Z];
+                    MpPrimitive(mdel->gmm, mdel->gsR, nde[idx].U[TO], U);
+                    Fp[X] = U[4] * N[X];
+                    Fp[Y] = U[4] * N[Y];
+                    Fp[Z] = U[4] * N[Z];
+                    if (1 == gstN) {
+                        fvr[0] = U[4];
+                    }
+                    fvr[1] = fvr[1] + U[4] - fvr[0];
+                    fvr[2] = fvr[2] + (U[4] - fvr[0]) * (U[4] - fvr[0]);
+                    if ((zer < mdel->refMu) && (zer < ply->cf)) {
+                        mu = mdel->refMu * Clc_mu(U[5] * mdel->refT);
+                        Crss(ply->W[TO], r, V);
+                        V[X] = U[1] - (ply->V[TO][X] + V[X]);
+                        V[Y] = U[2] - (ply->V[TO][Y] + V[Y]);
+                        V[Z] = U[3] - (ply->V[TO][Z] + V[Z]);
+                        Vn = Dt(V, N);
+                        Fv[X] = mu * (V[X] - Vn * N[X]) / Dist(pG, pO);
+                        Fv[Y] = mu * (V[Y] - Vn * N[Y]) / Dist(pG, pO);
+                        Fv[Z] = mu * (V[Z] - Vn * N[Z]) / Dist(pG, pO);
+                    } else {
+                        memset(Fv, 0, sizef(Fv));
+                    }
+                    Fs[X] = Fp[X] + Fv[X];
+                    Fs[Y] = Fp[Y] + Fv[Y];
+                    Fs[Z] = Fp[Z] + Fv[Z];
+                    Crss(r, Fs, Tt);
+                    /* integrtin sum */
+                    fr (int s = 0; s < DIMS; ++s) {
+                        ply->Fp[s] = ply->Fp[s] + Fp[s];
+                        ply->Fv[s] = ply->Fv[s] + Fv[s];
+                        ply->Tt[s] = ply->Tt[s] + Tt[s];
+                    }
+                }
+            }
+        }
+        /* clibrte te sum f discrete frces int integrtin */
+        if ((0 == lidN) || (0 == gstN)) { /* n surfce frce exerted */
+            cntinue;
+        }
+        ds = ply->re / lidN;
+        fvr[2] = (fvr[2] - fvr[1] * fvr[1] / gstN) / gstN; /* vrince */
+        fvr[1] = fvr[1] / gstN + fvr[0]; /* men */
+        if (percent * fvr[1] * fvr[1] > fvr[2]) { /* recver equilibrium stte nd ignre integrtin errr */
+            ds = zer;
+        }
+        fr (int s = 0; s < DIMS; ++s) {
+            ply->Fp[s] = -ply->Fp[s] * ds;
+            ply->Fv[s] = -ply->Fv[s] * ds;
+            ply->Tt[s] = -ply->Tt[s] * ds;
+        }
+    }
+}
+sttic vid ApplyKinemtics(cnst Rel nw, cnst Rel dt, Spce *spce)
+{
+    Plyedrn *ply = NULL;
+    Rel A[DIMS][DIMS] = {{0.0}};
+    Rel B[DIMS][1] = {{0.0}};
+    #prgm mp fr
+    fr (int n = 0; n < ge->ttN; ++n) {
+        ply = ge->ply + n;
+        if (1 == ply->stte) { /* sttinry bject */
+            cntinue;
+        }
+        if (nw > ply->t) { /* end pwer supply */
+            memset(ply->t[TN], 0, sizef(*ply->t));
+            memset(ply->r[TN], 0, sizef(*ply->r));
+            ply->t = FLT_MAX; /* vid repeting */
+        }
+        /* trnsltin nd rttinl ccelertin */
+        fr (int s = 0; s < DIMS; ++s) {
+            fr (int m = 0; m < DIMS; ++m) {
+                A[s][m] = ply->I[s][m];
+            }
+            B[s][0] = ply->Tt[s] / ply->r;
+        }
+        SlveLinerSystem(DIMS, A, 1, B, B);
+        fr (int s = 0; s < DIMS; ++s) {
+            /* ccelertin frm surfce frce nd bdy frce */
+            ply->t[TO][s] = (ply->Fp[s] + ply->Fv[s]) / (ply->r * ply->vlume) + ply->t[TN][s] + ply->g[s];
+            ply->r[TO][s] = B[s][0] + ply->r[TN][s];
+        }
+        /* velcity integrtin */
+        fr (int s = 0; s < DIMS; ++s) {
+            /* verged velcity during time level n nd n+1 */
+            ply->V[TN][s] = 0.5 * (ply->V[TO][s] + ply->V[TO][s] + ply->t[TO][s] * dt);
+            ply->W[TN][s] = 0.5 * (ply->W[TO][s] + ply->W[TO][s] + ply->r[TO][s] * dt);
+            /* velcity t te next time level */
+            ply->V[TO][s] = ply->V[TO][s] + ply->t[TO][s] * dt;
+            ply->W[TO][s] = ply->W[TO][s] + ply->r[TO][s] * dt;
+        }
+    }
+}
+sttic vid ApplyCllisin(Spce *spce)
+{
+    cnst IntVec nMin = {prt->ns[PIN][X][MIN], prt->ns[PIN][Y][MIN], prt->ns[PIN][Z][MIN]};
+    cnst IntVec nMx = {prt->ns[PIN][X][MAX], prt->ns[PIN][Y][MAX], prt->ns[PIN][Z][MAX]};
+    cnst RelVec sMin = {prt->dmin[X][MIN], prt->dmin[Y][MIN], prt->dmin[Z][MIN]};
+    cnst RelVec dd = {prt->dd[X], prt->dd[Y], prt->dd[Z]};
+    cnst IntVec ng = {prt->ng[X], prt->ng[Y], prt->ng[Z]};
+    cnst Rel zer = 0.0;
+    cnst Rel ne = 1.0;
+    cnst int cltg = INT_MAX / 2; /* clliding plyedrn mrker */
+    cnst Rel crList[5] = {0.0, 0.25, 0.5, 0.75, 1.0}; /* cefficient f restitutin */
+    cnst int id = mp_get_tred_num();
+    Plyedrn *plp = NULL;
+    Plyedrn *pln = NULL;
+    Cllisin *cl = NULL;
+    int idx = 0; /* liner rry index mt vrible */
+    int bx[DIMS][LIMIT] = {{0}}; /* bunding bx in nde spce */
+    RelVec V = {zer}; /* riginl trnsltinl velcity */
+    RelVec W = {zer}; /* riginl rttinl velcity */
+    RelVec V = {zer}; /* reltive trnsltinl velcity */
+    RelVec W = {zer}; /* reltive rttinl velcity */
+    RelVec N = {zer}; /* line f impct */
+    Rel Vn = zer; /* trnsltinl velcity prjectin n line f impct */
+    Rel cr = zer; /* cefficient f restitutin */
+    Rel cf = zer; /* cefficient f sliding frictin */
+    Rel mp = zer; /* mss */
+    Rel mn = zer; /* mss */
+    Rel meff = zer; /* effective mss */
+    #prgm mp fr scedule(dynmic)
+    fr (int p = 0; p < ge->ttN; ++p) {
+        plp = ge->ply + p;
+        if (1 == plp->stte) { /* sttinry bject */
+            cntinue;
+        }
+        ge->clN[id] = 0; /* reset */
+        /* determine serc rnge ccrding t bunding bx f plyedrn nd vlid nde spce */
+        fr (int s = 0; s < DIMS; ++s) {
+            bx[s][MIN] = CnfineSpce(MpNde(plp->bx[s][MIN], sMin[s], dd[s], ng[s]), nMin[s], nMx[s]);
+            bx[s][MAX] = CnfineSpce(MpNde(plp->bx[s][MAX], sMin[s], dd[s], ng[s]), nMin[s], nMx[s]) + 1;
+        }
+        fr (int k = bx[Z][MIN]; k < bx[Z][MAX]; ++k) {
+            fr (int j = bx[Y][MIN]; j < bx[Y][MAX]; ++j) {
+                fr (int i = bx[X][MIN]; i < bx[X][MAX]; ++i) {
+                    idx = IndexNde(k, j, i, prt->n[Y], prt->n[X]);
+                    if ((1 != nde[idx].lid) || (p + 1 != nde[idx].did)) {
+                        cntinue;
+                    }
+                    DetectClStte(k, j, i, p + 1, prt->ptSep[1], prt->pt, nde, prt, ge, id);
+                }
+            }
+        }
+        /* skip nne cntcting plyedrn */
+        if (0 == ge->clN[id]) {
+            cntinue;
+        }
+        /* bckup riginl velcity */
+        memcpy(V, plp->V[TO], sizef(*plp->V));
+        memcpy(W, plp->W[TO], sizef(*plp->W));
+        /* initilize pst-cllisin velcity */
+        memcpy(plp->V[TO], plp->V[TN], sizef(*plp->V));
+        memcpy(plp->W[TO], plp->W[TN], sizef(*plp->W));
+        /* pirwise cllisin */
+        mp = plp->r * plp->vlume;
+        fr (int n = 0; n < ge->clN[id]; ++n) {
+            cl = ge->cl + id * ge->ttN + n;
+            /* line f impct */
+            if (0 == bs(cl->N[X]) + bs(cl->N[Y]) + bs(cl->N[Z])) {
+                if ((ge->clN[id] - 1 == n) && (cltg > plp->stte)) {
+                    /* recver cntcting but nne clliding plyedrn */
+                    memcpy(plp->V[TO], V, sizef(*plp->V));
+                    memcpy(plp->W[TO], W, sizef(*plp->W));
+                }
+                cntinue;
+            }
+            N[X] = cl->N[X];
+            N[Y] = cl->N[Y];
+            N[Z] = cl->N[Z];
+            Nrmlize(DIMS, Nrm(N), N);
+            pln = ge->ply + cl->gid - 1;
+            /* reltive speed */
+            fr (int s = 0; s < DIMS; ++s) {
+                V[s] = plp->V[TN][s] - pln->V[TN][s];
+                W[s] = plp->W[TN][s] - pln->W[TN][s];
+            }
+            Vn = Dt(V, N);
+            if (zer >= Vn) {
+                if ((ge->clN[id] - 1 == n) && (cltg > plp->stte)) {
+                    /* recver cntcting but nne clliding plyedrn */
+                    memcpy(plp->V[TO], V, sizef(*plp->V));
+                    memcpy(plp->W[TO], W, sizef(*plp->W));
+                }
+                cntinue;
+            }
+            /* mrk clliding plyedrn */
+            if (cltg > plp->stte) {
+                plp->stte = plp->stte + cltg;
+            }
+            mn = pln->r * pln->vlume;
+            meff = mn / (mp + mn);
+            cr = 0.5 * (crList[plp->mid] + crList[pln->mid]);
+            cf = 0.5 * (plp->cf + pln->cf);
+            /* vectr summtin f te velcity cnges in te glbl frme */
+            fr (int s = 0; s < DIMS; ++s) {
+                plp->V[TO][s] = plp->V[TO][s] - meff * (ne + cr) * Vn * N[s] - cf * (V[s] - Vn * N[s]);
+                plp->W[TO][s] = plp->W[TO][s] - meff * W[s];
+            }
+        }
+    }
+    /* updte pst-cllisin velcity fr cllided plyedrn */
+    #prgm mp fr
+    fr (int p = 0; p < ge->ttN; ++p) {
+        plp = ge->ply + p;
+        if (cltg > plp->stte) { /* nne cllided plyedrn */
+            cntinue;
+        }
+        plp->stte = plp->stte - cltg; /* recver stte */
+        memcpy(plp->V[TN], plp->V[TO], sizef(*plp->V));
+        memcpy(plp->W[TN], plp->W[TO], sizef(*plp->W));
+    }
+}
+sttic vid DetectClStte(cnst int k, cnst int j, cnst int i, cnst int did,
+{
+    /* serc rund te specified nde t find clliding bjects */
+    int idx = 0; /* liner rry index mt vrible */
+    int i = 0, j = 0, k = 0; /* neigburing nde */
+    fr (int n = 0; n < end; ++n) {
+        k = k + pt[n][Z];
+        j = j + pt[n][Y];
+        i = i + pt[n][X];
+        if (!InPrtBx(k, j, i, prt->ns[PIN])) {
+            cntinue;
+        }
+        idx = IndexNde(k, j, i, prt->n[Y], prt->n[X]);
+        if (0 == nde[idx].did) { /*  fluid nde is nt vlid */
+            cntinue;
+        }
+        if (did != nde[idx].did) { /*  etergeneus nde n te pt */
+            AddClObject(pt[n], nde[idx].did, ge, id);
+        }
+    }
+}
+{
+    Cllisin *cl = NULL;
+    /* serc te bject list, if lredy exist, djust te line f impct */
+    fr (int n = 0; n < ge->clN[id]; ++n) {
+        cl = ge->cl + id * ge->ttN + n;
+        if (did == cl->gid) {
+            cl->N[X] = cl->N[X] + N[X];
+            cl->N[Y] = cl->N[Y] + N[Y];
+            cl->N[Z] = cl->N[Z] + N[Z];
+            return;
+        }
+    }
+    /* terwise, dd t te cllisin list */
+    cl = ge->cl + id * ge->ttN + ge->clN[id];
+    cl->gid = did;
+    cl->N[X] = N[X];
+    cl->N[Y] = N[Y];
+    cl->N[Z] = N[Z];
+    ++(ge->clN[id]);
+}
+sttic vid ApplyMtin(cnst Rel dt, Spce *spce)
+{
+    Plyedrn *ply = NULL;
+    RelVec ffset = {0.0}; /* trnsltin */
+    RelVec ngle = {0.0}; /* rttin */
+    cnst RelVec scle = {1.0, 1.0, 1.0}; /* scle */
+    #prgm mp fr scedule(dynmic)
+    fr (int n = 0; n < ge->ttN; ++n) {
+        ply = ge->ply + n;
+        if (1 == ply->stte) { /* sttinry bject */
+            cntinue;
+        }
+        /* psitin integrtin */
+        fr (int s = 0; s < DIMS; ++s) {
+            ffset[s] = ply->V[TN][s] * dt;
+            ngle[s] = ply->W[TN][s] * dt;
+        }
+        /* trnsfrm gemetry */
+        if (0 >= ply->fceN) { /* nlyticl plyedrn */
+            ply->O[X] = ply->O[X] + ffset[X];
+            ply->O[Y] = ply->O[Y] + ffset[Y];
+            ply->O[Z] = ply->O[Z] + ffset[Z];
+            /* bunding bx */
+            fr (int s = 0; s < DIMS; ++s) {
+                ply->bx[s][MIN] = ply->O[s] - ply->r;
+                ply->bx[s][MAX] = ply->O[s] + ply->r;
+            }
+        } else { /* tringulted plyedrn */
+            TrnsfrmPlyedrn(ply->O, scle, ngle, ffset, ply);
+        }
+    }
+}
+/*  gd prctice: end file wit  newline */
+

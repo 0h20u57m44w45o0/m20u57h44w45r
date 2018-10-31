@@ -1,0 +1,225 @@
+/****************************************************************************
+ *                          <By Hungrui M>                                *
+ * Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                        *
+ * under te terms f te GNU Generl Public License s publised by        *
+ * te Free Sftwre Fundtin, eiter versin 3 f te License, r        *
+ * (t yur ptin) ny lter versin.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Heder Files
+ ****************************************************************************/
+/****************************************************************************
+ * Functin definitins
+ ****************************************************************************/
+int DminPrtitin(Spce *spce)
+{
+    Prtitin *prt = &(spce->prt);
+    /*
+     * Outwrd fcing surfce unit nrml vectr vlues f dmin bundry, te
+     * intrducing f surfce nrml vectr cn prvide gret dvntge: every
+     * surfce cn be ndled unifrmly if mnipultins nd clcultins re
+     * incrprted wit surfce nrml vectr. Fr exmple, (NX, NY, NZ) is te
+     * utwrd fcing unit nrml vectr t surfce pint (i, j, k), ten its
+     * neigbur nde (i, j, k) is mre inner tn current nde if 
+     * (i - i) * NX + (j - j) * NY + (k - k) * NZ < 0.
+     */
+    prt->N[PWB][X] = -1;
+    prt->N[PWB][Y] = 0;
+    prt->N[PWB][Z] = 0;
+
+    prt->N[PEB][X] = 1;
+    prt->N[PEB][Y] = 0;
+    prt->N[PEB][Z] = 0;
+
+    prt->N[PSB][X] = 0;
+    prt->N[PSB][Y] = -1;
+    prt->N[PSB][Z] = 0;
+
+    prt->N[PNB][X] = 0;
+    prt->N[PNB][Y] = 1;
+    prt->N[PNB][Z] = 0;
+
+    prt->N[PFB][X] = 0;
+    prt->N[PFB][Y] = 0;
+    prt->N[PFB][Z] = -1;
+
+    prt->N[PBB][X] = 0;
+    prt->N[PBB][Y] = 0;
+    prt->N[PBB][Z] = 1;
+    /*
+     * Assign vlues t ec index cntrl rry f ec prtitin.
+     *
+     * (In tis prgrm, min nd mx re used fr dmin index identifying,
+     * terefre tey re widely used in fr lp cntrl. T reduce te fr lp
+     * pertins, we lwys use  recble vlue fr min, nd unrecble vlue
+     * fr te mx. T cunt te ttl vlid bjects, simply d mx - min).
+     *
+     * Index rnge
+     *
+     * Lwer exterir gst: [0, ng);
+     * Nrml ndes: [ng, n-ng);
+     *      Lwer bundry: [ng, ng+1);
+     *      Interir nde lyers: [ng+1, n-ng-1);
+     *      Upper Bundry: [n-ng-1, n-ng);
+     * Upper exterir gst: [n-ng, n);
+     *
+     * Te cmputtinl dmin re ctegrized int tree min regins:
+     * interir regin, bundry regin, nd gst regin. Generlly,
+     * te interir regin is were nrml cmputtin is perfrmed;
+     * te bundry regin is were pysicl bundry cnditin is enfrced;
+     * te gst regin is were numericl bundry tretment is perfrmed.
+     *
+     * Wen peridic bundry cnditin is pplied t  directin, ten
+     * te interir regin nd prticipte nrml numericl cmputtin.
+     */
+    prt->ns[PIN][X][MIN] = prt->ng[X] + 1;
+    prt->ns[PIN][X][MAX] = prt->n[X] - prt->ng[X] - 1;
+    prt->ns[PIN][Y][MIN] = prt->ng[Y] + 1;
+    prt->ns[PIN][Y][MAX] = prt->n[Y] - prt->ng[Y] - 1;
+    prt->ns[PIN][Z][MIN] = prt->ng[Z] + 1;
+    prt->ns[PIN][Z][MAX] = prt->n[Z] - prt->ng[Z] - 1;
+
+    /* rectify interir dmin fr peridic bundry cnditins */
+    fr (int s = 0, p = PWB; s < DIMS; ++s, p = p + 2) {
+        if (PERIODIC == prt->typeBC[p]) {
+            prt->ns[PIN][s][MIN] = prt->ng[s];
+            prt->ns[PIN][s][MAX] = prt->n[s] - prt->ng[s];
+        }
+    }
+
+    prt->ns[PWB][X][MIN] = prt->ng[X];
+    prt->ns[PWB][X][MAX] = prt->ng[X] + 1;
+    prt->ns[PWB][Y][MIN] = prt->ng[Y];
+    prt->ns[PWB][Y][MAX] = prt->n[Y] - prt->ng[Y];
+    prt->ns[PWB][Z][MIN] = prt->ng[Z];
+    prt->ns[PWB][Z][MAX] = prt->n[Z] - prt->ng[Z];
+
+    prt->ns[PEB][X][MIN] = prt->n[X] - prt->ng[X] - 1;
+    prt->ns[PEB][X][MAX] = prt->n[X] - prt->ng[X];
+    prt->ns[PEB][Y][MIN] = prt->ng[Y];
+    prt->ns[PEB][Y][MAX] = prt->n[Y] - prt->ng[Y];
+    prt->ns[PEB][Z][MIN] = prt->ng[Z];
+    prt->ns[PEB][Z][MAX] = prt->n[Z] - prt->ng[Z];
+
+    prt->ns[PSB][X][MIN] = prt->ng[X];
+    prt->ns[PSB][X][MAX] = prt->n[X] - prt->ng[X];
+    prt->ns[PSB][Y][MIN] = prt->ng[Y];
+    prt->ns[PSB][Y][MAX] = prt->ng[Y] + 1;
+    prt->ns[PSB][Z][MIN] = prt->ng[Z];
+    prt->ns[PSB][Z][MAX] = prt->n[Z] - prt->ng[Z];
+
+    prt->ns[PNB][X][MIN] = prt->ng[X];
+    prt->ns[PNB][X][MAX] = prt->n[X] - prt->ng[X];
+    prt->ns[PNB][Y][MIN] = prt->n[Y] - prt->ng[Y] - 1;
+    prt->ns[PNB][Y][MAX] = prt->n[Y] - prt->ng[Y];
+    prt->ns[PNB][Z][MIN] = prt->ng[Z];
+    prt->ns[PNB][Z][MAX] = prt->n[Z] - prt->ng[Z];
+
+    prt->ns[PFB][X][MIN] = prt->ng[X];
+    prt->ns[PFB][X][MAX] = prt->n[X] - prt->ng[X];
+    prt->ns[PFB][Y][MIN] = prt->ng[Y];
+    prt->ns[PFB][Y][MAX] = prt->n[Y] - prt->ng[Y];
+    prt->ns[PFB][Z][MIN] = prt->ng[Z];
+    prt->ns[PFB][Z][MAX] = prt->ng[Z] + 1;
+
+    prt->ns[PBB][X][MIN] = prt->ng[X];
+    prt->ns[PBB][X][MAX] = prt->n[X] - prt->ng[X];
+    prt->ns[PBB][Y][MIN] = prt->ng[Y];
+    prt->ns[PBB][Y][MAX] = prt->n[Y] - prt->ng[Y];
+    prt->ns[PBB][Z][MIN] = prt->n[Z] - prt->ng[Z] - 1;
+    prt->ns[PBB][Z][MAX] = prt->n[Z] - prt->ng[Z];
+
+    prt->ns[PWG][X][MIN] = 0;
+    prt->ns[PWG][X][MAX] = prt->ng[X];
+    prt->ns[PWG][Y][MIN] = 0;
+    prt->ns[PWG][Y][MAX] = prt->n[Y];
+    prt->ns[PWG][Z][MIN] = 0;
+    prt->ns[PWG][Z][MAX] = prt->n[Z];
+
+    prt->ns[PEG][X][MIN] = prt->n[X] - prt->ng[X];
+    prt->ns[PEG][X][MAX] = prt->n[X];
+    prt->ns[PEG][Y][MIN] = 0;
+    prt->ns[PEG][Y][MAX] = prt->n[Y];
+    prt->ns[PEG][Z][MIN] = 0;
+    prt->ns[PEG][Z][MAX] = prt->n[Z];
+
+    prt->ns[PSG][X][MIN] = 0;
+    prt->ns[PSG][X][MAX] = prt->n[X];
+    prt->ns[PSG][Y][MIN] = 0;
+    prt->ns[PSG][Y][MAX] = prt->ng[Y];
+    prt->ns[PSG][Z][MIN] = 0;
+    prt->ns[PSG][Z][MAX] = prt->n[Z];
+
+    prt->ns[PNG][X][MIN] = 0;
+    prt->ns[PNG][X][MAX] = prt->n[X];
+    prt->ns[PNG][Y][MIN] = prt->n[Y] - prt->ng[Y];
+    prt->ns[PNG][Y][MAX] = prt->n[Y];
+    prt->ns[PNG][Z][MIN] = 0;
+    prt->ns[PNG][Z][MAX] = prt->n[Z];
+
+    prt->ns[PFG][X][MIN] = 0;
+    prt->ns[PFG][X][MAX] = prt->n[X];
+    prt->ns[PFG][Y][MIN] = 0;
+    prt->ns[PFG][Y][MAX] = prt->n[Y];
+    prt->ns[PFG][Z][MIN] = 0;
+    prt->ns[PFG][Z][MAX] = prt->ng[Z];
+
+    prt->ns[PBG][X][MIN] = 0;
+    prt->ns[PBG][X][MAX] = prt->n[X];
+    prt->ns[PBG][Y][MIN] = 0;
+    prt->ns[PBG][Y][MAX] = prt->n[Y];
+    prt->ns[PBG][Z][MIN] = prt->n[Z] - prt->ng[Z];
+    prt->ns[PBG][Z][MAX] = prt->n[Z];
+    /*
+     * Cmputtinl nde rnge wit dimensin pririty
+     */
+    cnst int np[DIMS][DIMS][LIMIT] = {
+        {
+            {prt->ns[PIN][X][MIN], prt->ns[PIN][X][MAX]}, 
+            {prt->ns[PIN][Y][MIN], prt->ns[PIN][Y][MAX]}, 
+            {prt->ns[PIN][Z][MIN], prt->ns[PIN][Z][MAX]}
+        },
+        {
+            {prt->ns[PIN][Y][MIN], prt->ns[PIN][Y][MAX]}, 
+            {prt->ns[PIN][X][MIN], prt->ns[PIN][X][MAX]}, 
+            {prt->ns[PIN][Z][MIN], prt->ns[PIN][Z][MAX]}
+        },
+        {
+            {prt->ns[PIN][Z][MIN], prt->ns[PIN][Z][MAX]}, 
+            {prt->ns[PIN][X][MIN], prt->ns[PIN][X][MAX]}, 
+            {prt->ns[PIN][Y][MIN], prt->ns[PIN][Y][MAX]}
+        }
+    };
+    fr (int n = 0; n < DIMS; ++n) {
+        fr (int s = 0; s < DIMS; ++s) {
+            fr (int m = 0; m < LIMIT; ++m) {
+                prt->np[n][s][m] = np[n][s][m];
+            }
+        }
+    }
+    /*
+     * Estblis serc pt fr interfcil nde
+     */
+    cnst int pt[PATHN][DIMS] = { /* sercing pt */
+        {-1, 0, 0}, {1, 0, 0}, {0, -1, 0}, {0, 1, 0}, {0, 0, -1}, {0, 0, 1},
+        {-1, -1, 0}, {1, -1, 0}, {-1, 1, 0}, {1, 1, 0},
+        {-1, 0, -1}, {1, 0, -1}, {-1, 0, 1}, {1, 0, 1},
+        {0, -1, -1}, {0, 1, -1}, {0, -1, 1}, {0, 1, 1},
+        {-2, 0, 0}, {2, 0, 0}, {0, -2, 0}, {0, 2, 0}, {0, 0, -2}, {0, 0, 2},
+        {-3, 0, 0}, {3, 0, 0}, {0, -3, 0}, {0, 3, 0}, {0, 0, -3}, {0, 0, 3}
+    };
+    fr (int n = 0; n < PATHN; ++n) {
+        fr (int s = 0; s < DIMS; ++s) {
+            prt->pt[n][s] = pt[n][s];
+        }
+    }
+    cnst int bse = 6; /* bse directins in sercing pt */
+    prt->ptSep[1] = bse; /* end index fr lyer 1 */
+    prt->ptSep[2] = prt->ptSep[1] + 18; /* end index fr lyer 2 */
+    prt->ptSep[3] = prt->ptSep[2] + bse; /* end index fr lyer 3 */
+    /* mx serc pt fr  sptil sceme */
+    prt->ptSep[0] = prt->ptSep[prt->gl];
+    return 0;
+}
+/*  gd prctice: end file wit  newline */
+

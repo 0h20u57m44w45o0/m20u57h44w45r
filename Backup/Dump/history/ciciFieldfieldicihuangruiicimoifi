@@ -1,0 +1,702 @@
+%---------------------------------------------------------------------------%
+%->> Dcument clss declrtin
+%---------------------------------------------------------------------------%
+\dcumentclss[twclumn]{svjur3}
+%---------------------------------------------------------------------------%
+%->> Dcument settings
+%---------------------------------------------------------------------------%
+\usepckge{micrtype}% imprves generl ppernce f te text
+\usepckge{msmt,mssymb,mstext}% mt supprt
+\usepckge{newtxtext,newtxmt}% fnt supprt
+\usepckge{grpicx}% grpics supprt
+\usepckge{xclr}% clr supprt
+\usepckge[numbers,srt&cmpress]{ntbib}% cittin supprt
+\usepckge{enumitem}% custmizing enumerted lists
+\usepckge{subcptin}% subfigures
+\cptinsetup{cmptibility=flse}
+%\usepckge[sectin]{plceins}% t prevent flts frm being mved ver sectin
+\grpicspt{{./}{./img/}}
+\jurnlnme{Sck Wves}
+\usepckge{yperref}% yperlink supprt
+%---------------------------------------------------------------------------%
+%->> User defined cmmnds
+%---------------------------------------------------------------------------%
+\prvidecmmnd{\Vectr}[1]{\bldsymbl{#1}}% Generl vectrs in bld itlic
+\prvidecmmnd{\unitVectr}[1]{\bldsymbl{\mtbf{#1}}}% Unit vectrs in bld rmn
+\prvidecmmnd{\Tensr}[1]{\bldsymbl{\mtsf{#1}}}% Tensr in sns-serif bld itlic
+\prvidecmmnd{\unitTensr}[1]{\bldsymbl{{\mtsf{#1}}}}% Identity tensr in sns-serif bld
+\prvidecmmnd{\Mtrix}[1]{\bldsymbl{\mtbf{#1}}}% Mtrix in bld rmn
+\prvidecmmnd{\unitMtrix}[1]{\bldsymbl{\mtbf{#1}}}% Identity mtrix in bld rmn
+\prvidecmmnd{\Unit}[1]{\,\mtrm{#1}}% Units in rmn
+\prvidecmmnd{\Cnst}[1]{\mtrm{#1}}% Mt cnstnts, functins
+\prvidecmmnd{\Set}[1]{\mtbb{#1}}% Specil sets (e.g. rel numbers) in blckbrd bld
+\prvidecmmnd{\Des}[1]{\mtrm{#1}}% descriptin
+\prvidecmmnd{\Div}{\pertrnme{div}}% divergence pertr
+\prvidecmmnd{\Order}{\pertrnme{O}}% rder pertr
+\prvidecmmnd{\Trce}{\pertrnme{tr}}% trce pertr
+\prvidecmmnd{\Dig}{\pertrnme{dig}}% dignl
+\prvidecmmnd{\Def}{\pertrnme{def}}% define
+\prvidecmmnd{\Lptr}{\pertrnme{\mtcl{L}}}% sptil pertr
+\prvidecmmnd{\Tptr}{\pertrnme{\mtcl{LL}}}% temprl pertr
+\prvidecmmnd{\Sptr}{\pertrnme{\mtcl{S}}}% slutin pertr
+\prvidecmmnd{\Rev}[1]{\begingrup\clr{blue}{#1}\endgrup}% revisin igligt
+%---------------------------------------------------------------------------%
+%->> Dcument cntent
+%---------------------------------------------------------------------------%
+\begin{dcument}
+
+\title{A simple field functin fr slving cmplex nd dynmic fluid-slid system n Crtesin grid}
+
+\utr{Hungrui M \nd Fue-Sng Lien \nd Fn Zng \nd Dune S. Crnin}
+
+\institute{
+    Hungrui M \nd Fue-Sng Lien \nd Dune S. Crnin
+    \t Deprtment f Mecnicl Engineering, University f Wterl, 200 University Avenue West, Wterl, ON N2L 3G1, Cnd\\ \emil{ungrui.m@uwterl.c $\cdt$ fslien@uwterl.c $\cdt$ dune.crnin@uwterl.c}
+    \nd
+    Fn Zng
+    \t Defence Reserc nd Develpment Cnd, P.O. Bx 4000, Sttin Min, Medicine Ht, AB T1A 8K6, Cnd\\ \emil{fn.zng@drdc-rddc.gc.c}
+}
+
+\dte{Received: dte / Accepted: dte}
+
+\mketitle
+
+\begin{bstrct}
+    Mdeling cmplex nd dynmic fluid-slid systems requires te simultin f cupled multipse interctins. In tis study,  simple field functin is presented fr fcilitting te slutin f fluid-slid systems n Crtesin grids wit interfce-reslved fluid-fluid, fluid-slid, nd slid-slid interctins. Fr  Crtesin-grid-discretized cmputtinl dmin segmented by  set f slid bdies, cmpred wit signed distnce r binry nde-mpping functins tt prduce nde mpping infrmtin using ne field functin per subdmin witut prviding dditinl infrmtin fr differentiting interfcil lyers, te prpsed field functin erein cn uniquely trck ll te subdmins wit multiple lyers f interfcil ndes using nly ne integer field in ttl. As  result, te present field functin enbles single-integer-bsed multidmin nde mpping, efficient nde rempping, liner-time cllisin detectin, nd expedient surfce frce integrtin. Implementtin lgritms fr te field functin nd its sscited functinlities re presented. Equipped wit  deterministic multibdy cllisin mdel, numericl experiments invlving cmplex nd dynmic fluid-slid systems re cnducted t vlidte nd demnstrte te pplicbility f te prpsed field functin.
+\keywrds{Fluid-slid system \nd Crtesin grid \nd Field functin \nd Multidmin nde mpping \nd Fluid-structure interctin \nd Multibdy cllisin}
+\end{bstrct}
+
+\sectin{Intrductin}\lbel{sec:intr}
+
+Mdeling cmplex nd dynmic fluid-slid systems rises in mny pplictins suc s fluidized beds \citep{glwinski2001fictitius, vn2008numericl}, bld flw \citep{peskin1972flw}, prticle-dded explsives \citep{zng2001explsive, m2017numericl}, nd cmputer grpics \citep{guendelmn2003nncnvex, rbinsn2008tw}. Tese multipse systems usully invlve multiscle interctins tt cmprise te cupled mtins f slid nd fluid flw. Wen  predictive mdeling pprc tt reslves te fluid-slid interfces is emplyed, in dditin t ddressing te cupled fluid-fluid, fluid-slid, nd slid-slid interctins, ne dditinl cllenge cn be te numericl discretiztin relted t  set f irregulr nd mving gemetries. Te develpment f Crtesin-grid metds \citep{peskin1972flw, fedkiw1999nn, leveque1997immersed, setin2000structurl, wng2011lgritms} s prvided  fesible wy t simulte tese systems n Crtesin grids. Since te cmputtinl grids d nt need t cnfrm t slid bundries, te grid genertin fr irregulr gemetries nd grid regenertin fr mving gemetries cn terefre be significntly simplified \citep{mittl2005immersed}.
+
+In slving  fluid-slid system invlving multiple irregulr nd mving slid bdies n  Crtesin grid, te slids immersed in te cmputtinl grid cn be described by te STereLitgrpy (STL) representtin, wic pprximtes n bject s  clsed tringulted surfce nd is  stndrd frmt fr rpid prttyping nd cmputer-ided design (CAD) systems. Wen equipped wit  suitble Crtesin grid-bsed numericl frmewrk, te STL represented slids cn be directly inputted int te numericl slver witut te need f CAD/CFD gemetric trnsltins \citep{iccrin2003immersed}. Nneteless, s ec immersed slid ccupies  crrespnding sptil regin, te cmputtinl dmin is terefre segmented int  set f subdmins. Te subsequent implementtin f numericl discretiztin nd bundry cnditins requires  nde mp tt crrectly clssifies te type f cmputtinl ndes nd identifies te dmin bundries. Tis nde clssifictin nd bundry identifictin prcedure regrding multiple slids is referred t s  multidmin nde mpping prblem erein. In dditin, wen te slids re mving in spce, te requirement fr nde rempping ls rises during te slutin prcess.
+
+A binry mp tt distinguises fluid nd slid dmins trug flgging te ndes inside ny slid s $0$ nd ndes utside te slids s $1$, r vice vers, s been ppulrly utilized in te literture \citep{iccrin2003immersed, smbsivn2009gstb, kpi2013tree}, nd wrks prperly fr pplictins witut te need f differentiting  slid dmin frm te ter slid dmins. Hwever, wen tere re interctins suc s cllisins mng slids r different mteril prperties nd/r bundry cnditins fr sme slid dmins, uniquely trcking nd identifying ec slid dmin re ten required.
+
+Wen tere re multiple slids in te system, cllisins mng slids cn exert  strng influence n te stresses in te fluid-slid mixture \citep{wltn1993numericl}. Terefre, cllisin mdeling cn be n essentil element in cmputing  fluid-slid system wit dense slids. Cmpred wit mdels bsed n experimentl crreltins \citep{wltn1993numericl, glwinski1999distributed, mren20123d} r srt-rnge repulsive-frce cllisins \citep{u2001direct, glwinski2001fictitius}, n interfce-reslved cllisin mdel prvides  mre ccurte representtin f te prcticl prblems nd ennces pysicl relity. Hwever, dditinl cllenges frm cllisin detectin nd respnse re intrduced nd need t be ddressed.
+
+
+In cllisin detectin, wen te surfces f slids re explicitly represented by tringulted meses, cecking every slid ginst every ter slid is very inefficient if te number f slids is lrge nd te gemetry is cmplex. Cnsiderble reserc s been devted t ptimizing te prblem wit strtegies fcusing n ierrcicl bject representtin, rienttin-bsed pruning criteri, sptil prtitining scemes, nd distnce cmputtin lgritms \citep{lin1998cllisin, jimenez20013d, guendelmn2003nncnvex, wld2007ry}. A multilevel lgritm tt integrtes temprl cerence explittin, pirwise pruning, nd exct pirwise cllisin-detectin tecniques cn effectively reduce te cllisin-detectin pertins fr  dense slid system wit cnvex spes, but tis lgritm cn still be expensive fr nn-cnvex bjects \citep{jimenez20013d, ericsn2004rel}.
+
+Emplying implicit surfces defined by field functins s swn success in cllisin-relted mdeling \citep{jnes20063d, guendelmn2003nncnvex, kpi2013tree}. In te simultin f nn-cnvex rigid-bdy interctins, \citet{guendelmn2003nncnvex} develped  dul gemetry representtin in wic  slid is described by bt  Lgrngin tringulted surfce nd  signed distnce functin stred n n Eulerin grid. Wile tringulted surfce representtin llws ccurte nrml clcultins nd te subsequent determintin f te line f impct,  signed distnce functin \citep{ser2001level} fr ec bject permits cnvenient pint-inclusin tests. Fr instnce, using te lyer f grid pints tt is nerest t te zer iscntur f  signed distnce functin s smple pints, ne cn determine te cllisin sttus by testing te vlues f te smple pints wit regrd t ter signed distnce functins. Since te surfce reslutin f implicitly defined surfces is prprtinl t te grid reslutin fr field functins, ig ccurcy cn be cieved wen  well-reslved grid is emplyed \citep{guendelmn2003nncnvex}.
+
+In generl, using eiter signed distnce r binry nde-mpping functins fr defining distinguisble implicit surfces f slid bjects requires ne field functin per bject. As ec field functin needs t be stred n n individul grid, tis requirement cnsumes memry tt is prprtinl t te number f represented slids. Wen  lrge set f slids is invlved in te trget system, te develpment f  field functin tt significntly reduces memry requirement cn be n dvntge. Mrever, s te determintin f te line f impct is nter expensive pertin in cllisin detectin, n pprximtin fr te line f impct vi implicit surfces defined by field functins rter tn trug explicit surfces defined by tringulted meses cn nt nly prvide  new perspective but ls imprve te efficiency f cllisin detectin fr rbitrrily sped bjects.
+
+T fcilitte te slutin f cmplex nd dynmic fluid-slid systems n Crtesin grids, n integer-type field functin tt slves multidmin nde mpping is prpsed. Fr  Crtesin-grid-discretized cmputtinl dmin segmented by  set f slid bdies, cmpred wit signed distnce r binry nde-mpping functins tt prduce nde mpping infrmtin using ne field functin per subdmin witut prviding dditinl infrmtin fr differentiting interfcil lyers, te prpsed field functin erein cn uniquely trck ll te subdmins wit multiple lyers f interfcil ndes using nly ne integer field in ttl. As  result, te present field functin enbles single-integer-bsed multidmin nde mpping, efficient nde rempping, liner-time cllisin detectin, nd expedient surfce frce integrtin. Implementtin lgritms fr te field functin nd its sscited functinlities re presented. Equipped wit  deterministic multibdy cllisin mdel tt extends te pplicbility f te mdel in ur previus wrk \citep{m2017numericl}, numericl experiments invlving cmplex nd dynmic fluid-slid systems re cnducted t vlidte nd demnstrte te pplicbility f te prpsed field functin.
+
+\sectin{Metd develpment}
+
+\subsectin{Field functin descriptin}
+
+As illustrted in Fig.~\ref{fig:n_dmin_bsis_dem}, fr  set f slids represented by tringulted plyedrns $\{\Omeg_p: \ p = 1, \dtsc, P\}$ nd distributed in  sptil dmin $\Omeg$, n dditinl subdmin $\Omeg_0$ cn be intrduced s
+\begin{equtin}
+    \Omeg_0 = \{\Vectr{x} \in \Omeg: \Vectr{x} \ntin \cup_{p=1}^P\Omeg_p\}
+\end{equtin}
+\begin{figure}[!tbp]
+    \centering
+    \cptin{A scemtic digrm illustrting  set f plyedrn dmins distributed in  sptil dmin discretized by  Crtesin grid.}
+    \lbel{fig:n_dmin_bsis_dem}
+\end{figure}
+
+Wen  Crtesin grid $I \times J \times K$ is used t discretize te sptil dmin $\Omeg$, it is necessry t build  nde mp fr defining te sptil reltin between cmputtinl ndes nd te individul plyedrl subdmins. In tis study,  tw-cmpnent integer-type field functin is develped t clssify ec nde wit regrd t $\Omeg_m$ nd ls t identify $R$ lyers f interfcil ndes fr ec $\Omeg_m$, $m = 0, \dtsc, P$:
+\begin{equtin}
+    \Vectr{\Pi} = \{(\pi, \vrpi): \pi \in \{0, \dtsc, P\}, \vrpi \in \{0, \dtsc, R\}\}
+\end{equtin}
+in wic $\pi$ is te dmin identifier nd is determined by te pint inclusin stte:
+\begin{equtin} \lbel{eq:picnditin}
+    \pi_{i,j,k} = m, \ \text{if}\ \Vectr{x}_{i,j,k} \in \Omeg_m
+\end{equtin}
+nd $\vrpi$ is te interfcil lyer identifier nd is determined by te existence f  etergeneus nde $(i', j', k')$, tt is,  nde wit  different $\pi$ vlue, in te rnge $L(r)$ surrunding te prcessing nde $(i, j, k)$:
+\begin{equtin} \lbel{eq:vrpicnditin}
+    \vrpi_{i,j,k} = 
+    \begin{cses}
+        \min{\{r\}}, &\ \text{if}\ \exists \, \pi_{i',j',k'} \neq \pi_{i,j,k} \ \text{in rnge}\ $L(r)$\\
+        0, &\ \text{if}\ r > R 
+    \end{cses}
+\end{equtin}
+ere $\Vectr{x}_{i,j,k}$ is te psitin vectr f te nde $(i, j, k)$, nd $R$ represents te mximum lyers f interfcil ndes tt needs t be identified. Te rnge $L(r)$ is te size f numericl stencils used fr te sptil discretiztin f te gverning equtins t te nde $(i, j, k)$. Terefre, te rnge $L(r)$ needs t be dpted ccrding t te invlved differentil pertrs nd sptil scemes. Fr exmple, te discretiztin f nn-mixed nd mixed derivtives requires $L(r)$ t be te line-type stencils in Eq.~\eqref{eq:linetypeq} nd te plne-type stencils in Eq.~\eqref{eq:mixedtypeq}, respectively. Nte tt te determintin f te lst tree criteri in Eq.~\eqref{eq:mixedtypeq} is t mximize te verlp between te first tree criteri nd te lst tree nes.
+\begin{equtin} \lbel{eq:linetypeq}
+    \begin{cses}
+        |i'-i| = r, \, |j'- j| = 0, \, |k'- k| = 0 &\ \text{r}\\
+        |i'-i| = 0, \, |j'- j| = r, \, |k'- k| = 0 &\ \text{r}\\
+        |i'-i| = 0, \, |j'- j| = 0, \, |k'- k| = r
+    \end{cses}
+\end{equtin}
+\begin{equtin} \lbel{eq:mixedtypeq}
+    \begin{cses}
+        |i'-i| = r, \, |j'- j| = 0, \, |k'- k| = 0 &\ \text{r}\\
+        |i'-i| = 0, \, |j'- j| = r, \, |k'- k| = 0 &\ \text{r}\\
+        |i'-i| = 0, \, |j'- j| = 0, \, |k'- k| = r &\ \text{r}\\
+        |i'-i| = r-1, \, |j'- j| = r-1, \, |k'- k| = 0 &\ \text{r}\\
+        |i'-i| = r-1, \, |j'- j| = 0, \, |k'- k| = r-1 &\ \text{r}\\
+        |i'-i| = 0, \, |j'- j| = r-1, \, |k'- k| = r-1
+    \end{cses}
+\end{equtin}
+
+\subsectin{Single-integer-bsed multidmin nde mpping}
+
+Te field functin $\Vectr{\Pi}(\pi,\vrpi)$ cn prduce  cmplete nde mp fr te numericl discretiztin f cmplex fluid-slid systems. As swn in Fig.~\ref{fig:n_dmin_dem}, fr ec nde $(i,j,k)$, $\pi_{i,j,k}$ nd $\vrpi_{i,j,k}$ cn prvide te subdmin nd interfcil stte, respectively.
+
+In generl, wen $\Omeg_m$ is  slutin dmin, tw pprces re vilble t cmpute te slutins in $\Omeg_m$. 1)  nn-gst-cell pprc, in wic $\Vectr{\Pi}_{i,j,k}(\pi=m, \vrpi=0)$ represents  nrml slutin nde, nd $\Vectr{\Pi}_{i,j,k}(\pi=m, \vrpi>0)$ represents  nde lcting t te numericl bundry f $\Omeg_m$. 2)  gst-cell pprc, in wic $\Vectr{\Pi}_{i,j,k}(\pi=m, \vrpi \ge 0)$ represents  nrml slutin nde, nd $\Vectr{\Pi}_{i,j,k}(\pi \neq m, \vrpi>0)$ wit  nde $\Vectr{\Pi}_{i',j',k'}(\pi = m, \vrpi \ge 0)$ existing in te rnge $L(r)$ f te nde $(i,j,k)$ represents  nde lcting t te numericl bundry f $\Omeg_m$.
+
+Wen te spce ccupied by $\Omeg_m$ is cngeble in time, interfcil ndes f nter dmin $\Omeg_n$ cn cnge teir crrespnding dmin nd becme interfcil ndes f $\Omeg_m$. In  nn-gst-cell pprc, te newly jined interfcil ndes f $\Omeg_m$ lwys becme bundry ndes, wse vlues will be cnstructed by bundry tretment. Hwever, in  gst-cell pprc, te newly jined interfcil ndes f $\Omeg_m$ directly becme nrml slutin ndes f te slutin dmin $\Omeg_m$. Terefre,  specil tretment, suc s  recnstructin fr te vlues f te newly jined ndes frm te vlues f te riginl nrml slutin ndes f $\Omeg_m$ \citep{m2018immersed}, is required t del wit tese newly jined ndes.
+
+Fr  cmputtinl dmin segmented by  set f slid bdies, te prpsed field functin $\Vectr{\Pi}(\pi,\vrpi)$ uniquely identifies ll te subdmins wit multiple lyers f interfcil ndes. Terefre, it is strigtfrwrd t pply designted gverning equtins, cnstitutive mdels, numericl scemes, nd bundry cnditins fr ec subdmin. In te prcticl implementtin, te tw-cmpnent $\Vectr{\Pi}(\pi,\vrpi)$ cn be mpped nt  single sclr $\Pi = \pi + \vrpi * (P+1)$, frm wic individul cmpnents cn be extrcted trug $\vrpi = \Pi \Des{\,md\,} (P+1)$ nd $\pi = \Pi - \vrpi * (P+1)$, respectively. As n integer-type field functin tt cn be stred n  single grid, te prpsed field functin erein enbles single-integer-bsed multidmin nde mpping nd cnsumes memry tt is independent frm te number f represented bjects. Fr instnce, ssume tt te number f ndes fr defining  field functin is $M$, te number f represented bjects is $P$, nd te memry size rti f "flt" t "int" is $H$, te estimted memry cnsumptin fr using te prpsed field functin is ten but $1/(HP)$ f tt fr using signed distnce functins r but $1/P$ fr using binry nde-mpping functins. Tis lw-memry requirement cn be prticulrly imprtnt fr pplictins invlving  lrge set f slid bdies, suc s in slving fluid-slid systems wit tusnds f clliding prticles \citep{m2018immersed}.
+\begin{figure}[!tbp]
+    \centering
+    \cptin{A scemtic digrm illustrting te field functin $\Vectr{\Pi}(\pi,\vrpi)$ fr multidmin nde mpping. Te vlue f $\pi$ is represented by \emp{spes}: $\circ = 0$; $\bigtringleup = 1$; $\str = p$; $\squre = P$. Te vlue f $\vrpi$ is represented by \emp{clrs}: ${\clr{gry} \bullet} = 0$; ${\clr{red} \bullet} = 1$. $R = 1$ is dpted ere fr clrifictin.}
+    \lbel{fig:n_dmin_dem}
+\end{figure}
+
+\subsectin{Efficient nde rempping} \lbel{sec:remp}
+
+During te slutin prcess, wen te psitins f te plyedrns re cngeble, te requirement fr nde rempping rises. As illustrted in Fig.~\ref{fig:nde_rempping_dem}, te field functin $\Vectr{\Pi}(\pi,\vrpi)$ enbles efficient nde rempping: Frm time $t^n$ t $t^{n+1}$, suppse te dmin ccupied by $\Omeg_p$ cnging frm $\Omeg_p^n$ t $\Omeg_p^{n+1}$. Wen te cmputtinl time step size is restricted by  stbility cnditin suc s te Curnt--Friedrics--Lewy (CFL) cnditin \citep{curnt1927prtil}, te bundry f $\Omeg_p$ will crrespndingly ve restricted trvelling distnces. If te stbility cnditin restricts te vlue f trvelling distnce t n mre tn ne grid size, nd te mximum number f identified interfcil lyers s $R \ge 2$, it is sfe t ssume tt  nde $(i,j,k)$ wit $\Vectr{\Pi}_{i,j,k}(\pi=p,\vrpi=0)$ in $\Omeg_p^n$ will remin in $\Omeg_p^{n+1}$, nd ten nly te interfcil ndes need t be reset. As  result f tis temprl cerence, ndes wit $\Vectr{\Pi}_{i,j,k}(\pi=p,\vrpi=0)$ cn be exempted frm future pint-inclusin tests. As tese nn-interfcil ndes cnstitute te mjr frctin f te cmputtinl ndes in  prcticl grid, tis exemptin frm te expensive pint-inclusin test cn significntly reduce te csts f nde rempping t btin n ccelertin rte inversely prprtinl t te surfce-t-vlume rti f plyedrns. An efficient nde rempping lgritm dpting te described temprl cerence is prpsed in te present study s te fllwing:
+\begin{figure}[!tbp]
+    \centering
+    \cptin{A scemtic digrm illustrting te field functin $\Vectr{\Pi}(\pi,\vrpi)$ fr efficient nde rempping. Te vlue f $\pi$ is represented by \emp{spes}: $\circ = 0$; $\str = p$. Te vlue f $\vrpi$ is represented by \emp{clrs}: ${\clr{gry} \bullet} = 0$; ${\clr{red} \bullet} = 1$; ${\clr{blue} \bullet} = 2$. $R=2$ is dpted, nd te interfcil ndes f $\Omeg_0$ re nt swn fr clrifictin.}
+    \lbel{fig:nde_rempping_dem}
+\end{figure}
+\begin{enumerte}
+    \item \emp{Initiliztin}. Sweep ec nde $(i,j,k)$ in $I \times J \times K$: if $\vrpi_{i,j,k} > 0$, set $\Vectr{\Pi}_{i,j,k}(\pi,\vrpi) = (0,0)$.
+    \item \emp{Cmpute te dmin identifier $\pi$}. Sweep ec plyedrn $\Omeg_p$ in $\{\Omeg_p: \ p = 1, \dtsc, P\}$:
+        \begin{enumerte}
+            \item Find te bunding bx $B_p=[I_{\Des{min}}, I_{\Des{mx}}] \times [J_{\Des{min}}, J_{\Des{mx}}] \times [K_{\Des{min}}, K_{\Des{mx}}]$. 
+            \item Sweep ec nde $(i,j,k)$ in $B_p$: if $\pi_{i,j,k} = 0$, d pint-in-plyedrn test fr te nde $(i,j,k)$ ver $\Omeg_p$ t determine te vlue f $\pi_{i,j,k}$ using Eq.~\eqref{eq:picnditin}.
+        \end{enumerte}
+    \item \emp{Cmpute te interfcil lyer identifier $\vrpi$}. Sweep ec nde $(i,j,k)$ in $I \times J \times K$: determine te vlue f $\vrpi_{i,j,k}$ using Eq.~\eqref{eq:vrpicnditin}.
+\end{enumerte}
+
+In te described lgritm, te pint-in-plyedrn test fr te nde $(i,j,k)$ ver $\Omeg_p$ is  pint-inclusin test wit regrd t  single plyedrn. A vriety f estblised metds, suc s te ry-crssing metds \citep{1998cmputtinl}, ngulr metds \citep{crvl1995pint}, winding number metds \citep{ines1994pint}, nd signed distnce metds \citep{jnes20063d}, re vilble. Te ngle weigted pseudnrml signed distnce cmputtin metd \citep{berentzen2005signed} is emplyed erein, s it prvides gd blnce between efficiency nd rbustness. Menwile, it finds te clsest pint nd te crrespnding nrml fr  cmputtinl nde, wic is essentil fr implementing  Crtesin grid-bsed bundry tretment metd.
+
+Te prpsed lgritm erein effectively slves te nde clssifictin nd bundry identifictin issues simultneusly fr  Crtesin grid segmented by  set f plyedrns in spce, wic invlves  set f pints tgeter wit  set f plyedrns nd represents  generlized pint-in-plyedrn prblem. In dditin, since $\Vectr{\Pi}(\pi,\vrpi) = (0,0)$ is true initilly, te presented lgritm successfully unifies te prcedures f te initil multidmin nde mpping nd te subsequent nde rempping fr mving bjects. Tis unifictin cn simplify te cde structure nd reduce te cmplexity f implementtin.
+
+\subsectin{Liner-time cllisin detectin}
+
+As cptured in Fig.~\ref{fig:n_dmin_cllide_dem}, emplying te field functin $\Vectr{\Pi}(\pi,\vrpi)$, plyedrns $\{\Omeg_{n}\}$ clliding wit $\Omeg_p$ cn be detected efficiently vi sweeping trug ndes $(i,j,k)$ wit $\Vectr{\Pi}_{i,j,k}(\pi=p,\vrpi=1)$ in te bunding bx f $\Omeg_p$ t detect ndes $(i',j',k')$ wit $\Vectr{\Pi}_{i',j',k'}(\pi \neq p, \vrpi=1)$ in te rnge $|i-i'| \leq 1$, $|j-j'| \leq 1$, nd $|k-k'| \leq 1$. 
+\begin{figure}[!tbp]
+    \centering
+    \cptin{A scemtic digrm illustrting te field functin $\Vectr{\Pi}(\pi,\vrpi)$ fr cllisin detectin. Te vlue f $\pi$ is represented by \emp{spes}: $\circ = 0$; $\bigtringleup = 1$; $\str = n$; $\squre = N$; $\dimnd = p$. Te vlue f $\vrpi$ is represented by \emp{clrs}: ${\clr{gry} \bullet} = 0$; ${\clr{red} \bullet} = 1$. $R=1$ is dpted, nd te interfcil ndes f $\Omeg_0$ re nt swn ere fr clrifictin.}
+    \lbel{fig:n_dmin_cllide_dem}
+\end{figure}
+
+Cmpring t explicit surfces suc s tringulted meses, implicit surfces, suc s te signed distnce functin, binry nde-mpping functin, nd te prpsed integer field functin erein, fr cllisin detectin ve lgritm efficiency nd cmplexity tt re muc less sensitive t gemetric cmplexity. Tis is becuse cllisin detectin fr implicit surfces uses pint-wise dt cmprisn rter tn fcet-wise distnce clcultin s te bsic pertr nd is independent frm te number f fcets nd te level f cncvity.
+
+On  given Crtesin grid, let $\Sptr_{\Des{cd}}$ represent te cllisin detectin pertr fr n interfcil nde $(i,j,k)$ in  plyedrn $\Omeg_p$. $\Sptr_{\Des{cd}}$ bsed n signed distnce r binry nde mpping invlves fetcing nd cmpring f but $P$ flting-pint r integer dt scttered in $P$ field functins, wile $\Sptr_{\Des{cd}}$ bsed n $\Vectr{\Pi}$ requires fetcing nd cmpring f but $2$ integer dt per sptil dimensin lclly lcted n ne Crtesin grid. Terefre, te lgritm cmplexity f cllisin detectin fr $P$ plyedrns cn be $\Order(P^2)$ fr using te signed distnce r binry nde mpping but nly $\Order(P)$ fr using te prpsed field functin $\Vectr{\Pi}$ erein.
+
+During $\Omeg_p$ clliding wit $\Omeg_n$, it is pssible tt severl gemetric elements, suc s vertices, edges, nd fces, f $\Omeg_p$ nd $\Omeg_n$ cn be in cntct simultneusly. In dditin, ne element f $\Omeg_p$ culd cme int cntct wit  few elements f $\Omeg_n$ t te sme time. Tis multicntct issue impses gret cllenges in finding te line f impct fr cllisin mdeling. 
+
+Apprximting te line f impct vi te prpsed field functin $\Vectr{\Pi}(\pi,\vrpi)$ cn ten prvide  new perspective. Suppse $C$ ndes $(i_c,j_c,k_c)$, $c = 1, \dtsc, C$, in $\Omeg_p$ stisfying $\Vectr{\Pi}_{i_c,j_c,k_c}(\pi = p, \vrpi=1)$, nd ec $(i_c,j_c,k_c)$ cmes wit $D$ neigbring ndes $(i'_d,j'_d,k'_d)$, $d = 1, \dtsc, D$, suc tt $\Vectr{\Pi}_{i'_d,j'_d,k'_d}(\pi = n, \vrpi=1)$, te suggested pprximtin f te line f impct between $\Omeg_p$ nd $\Omeg_n$ is defined s
+\begin{equtin}
+    \unitVectr{e}_{pn} = \frc{\sum^{C}_{c=1}\sum^{D}_{d=1} [(i'_d - i_c)\unitVectr{e}_1 + (j'_d - j_c)\unitVectr{e}_2 + (k'_d - k_c)\unitVectr{e}_3]}{|\sum^{C}_{c=1}\sum^{D}_{d=1} [(i'_d - i_c)\unitVectr{e}_1 + (j'_d - j_c)\unitVectr{e}_2 + (k'_d - k_c)\unitVectr{e}_3]|}
+\end{equtin}
+were $\unitVectr{e}_1$, $\unitVectr{e}_2$, $\unitVectr{e}_3$ re te unit vectrs in te $x$, $y$, nd $z$ directins, respectively. Tis pprximtin f te line f impct vi te field functin trets te multicntct prblem wit gret simplicity wile prviding dequte ccurcy, s t be demnstrted in te numericl experiments lter.
+
+\subsectin{Deterministic cllisin respnse}
+
+Assume $N$ plyedrns $\{\Omeg_n\}$, $n=1,\dtsc,N$, clliding wit $\Omeg_p$ simultneusly, te pre- nd pst-cllisin velcity f $\Omeg_p$ s $\Vectr{V}_p$ nd $\Vectr{V}_p'$, respectively, nd te pre-cllisin velcity f $\Omeg_n$ s $\Vectr{V}_n$. A cllisin mdel tt pprximtes multibdy cllisin witut intrducing temprl pririty nd ls extends te pplicbility f te mdel in \citep{m2017numericl} t  wider rnge f multibdy cllisin scenris is emplyed erein:
+\begin{enumerte}
+    \item Cnduct te $n$-t pirwise cllisin $(\Omeg_p, \Omeg_n)$ wit te pre-cllisin velcity $(\Vectr{V}_p,\Vectr{V}_n)$ t slve te crrespnding pst-cllisin velcity $\Vectr{V}_{p,n}'$ nd te velcity cnge $\Delt \Vectr{V}_{p,n}'$ f $\Omeg_p$:
+        \begin{equtin}
+            \begin{ligned}
+                \Delt \Vectr{V}_{p,n}' &= \Vectr{V}_{p,n}' - \Vectr{V}_p = - \frc{m_n}{m_p+m_n} (1+C_{\Des{R}}) (\Vectr{V}_{pn} \cdt \unitVectr{e}_{pn}) \unitVectr{e}_{pn}\\
+                & - C_{\Des{f}} [\Vectr{V}_{pn} - (\Vectr{V}_{pn} \cdt \unitVectr{e}_{pn}) \unitVectr{e}_{pn}]
+            \end{ligned}
+        \end{equtin}
+        in wic $\Vectr{V}_{pn}= (\Vectr{V}_p - \Vectr{V}_n)$, $C_{\Des{R}}$ is te cefficient f restitutin in te nrml directin ($C_{\Des{R}} = 0$, $0 < C_{\Des{R}} < 1$, nd $C_{\Des{R}} = 1$ crrespnds t perfectly inelstic cllisin, prtilly inelstic cllisin, nd elstic cllisin, respectively), $C_{\Des{f}}$ represents te effect f sliding frictin, $m_p$ nd $m_n$ re te mss f $\Omeg_p$ nd $\Omeg_n$, respectively.
+
+    \item Next, pprximte te pst-cllisin velcity f $\Omeg_p$ under te multibdy cllisin vi  vectr summtin f te pre-cllisin velcity nd velcity cnges:
+        \begin{equtin}
+            \Vectr{V}_p' = \Vectr{V}_p + \sum_{n=1}^{N} \Delt \Vectr{V}_{p,n}'
+        \end{equtin}
+
+    \item Apply te bve prcedures t ec $\Omeg_p$, $p=1,\dtsc,P$, in te slid system t btin  pst-cllisin velcity $\Vectr{V}_p'$ fter multibdy cllisin.
+    \item Updte te velcity stte f ec $\Omeg_p$ trug replcing te pre-cllisin velcity $\Vectr{V}_p$ by te pst-cllisin velcity $\Vectr{V}_p'$. 
+\end{enumerte}
+
+Aviding ny temprl pririty in ec plyedrn nd ec cllisin, te prpsed multibdy cllisin lgritm bsed n exct pirwise cllisin is deterministic nd cn be prllelized.
+
+\subsectin{Expedient surfce frce integrtin}
+
+In te interfce-reslved mdeling f fluid-slid interctins, surfce frce integrtin is n essentil prt. Te prpsed field functin $\Vectr{\Pi}(\pi,\vrpi)$ cn expediently fcilittes te surfce frce integrtin fr irregulr slids immersed in  Crtesin grid.
+
+Emplying te prpsed field functin nd its implementtin lgritm, te cmputed tree inner interfcil lyers f n irregulr slid immersed in  Crtesin grid re swn in Fig.~\ref{fig:wll_ser_stress_lyer}. It cn be bserved tt te $\vrpi=1$ lyer cnfrms wit te slid bundry very clsely, in wic te distnce discrepncy reduces wit mes refinement nd is in te intervl $[0, \Delt s)$, were $\Delt s=\mx(\Delt_x, \Delt_y, \Delt_z)$. Terefre, fr  nn-gst-cell pprc, te integrtin f surfce frces cn be cnducted n te $\vrpi=2$ lyer in te fluid dmin, f wic te vlues f flw vribles re knwn nd te distnce discrepncy wit slid bundry is in te intervl $[\Delt s, 2\Delt s)$. Menwile, fr  gst-cell pprc, te integrtin f surfce frces cn be prperly cnducted n te crrespnding pint lyer frmed by te imge pints f te $\vrpi=2$ ndes f te slid.
+
+Here, te surfce frce integrtin in te gst-cell pprc is discussed nd pplied in tis study, s te metd cn be esily trnsfrmed fr  nn-gst-cell pprc, wse surfce frce integrtin is mre strigtfrwrd. By explring te reltin between te gst nde $G$, te bundry pint $O$, nd te imge pint $I$, te surfce frce integrtin in  gst-cell pprc cn be simplified gretly s discussed belw.
+\begin{figure}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.35\textwidt}
+        \cptin{}
+        \lbel{fig:wll_ser_stress_lyer}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.35\textwidt}
+        \cptin{}
+        \lbel{fig:wll_ser_stress_dem}
+    \end{subfigure}%
+    \cptin{Digrms f pplying te field functin $\Vectr{\Pi}(\pi,\vrpi)$ fr surfce frce integrtin ver immersed bundries. () Cmputtinl results swing te interfcil lyer identifier $\vrpi$ fr n irregulr slid immersed in  Crtesin grid. Te vlue f $\vrpi$ is represented by \emp{clrs}: ${\clr{gry} \bullet} = 0$; ${\clr{red} \bullet} = 1$; ${\clr{blue} \bullet} = 2$; ${\clr{blck} \bullet} = 3$. (b) A scemtic digrm illustrting wll ser stress clcultin. [Nmenclture: $G$, gst nde; $O$, bundry pint; $I$, imge pint; $\Omeg_1$, fluid dmin; $\Omeg_2$, slid dmin; $IB$, immersed bundry.]}
+    \lbel{fig:wll_ser_stress}
+\end{figure}
+
+\prgrp{Wll pressure}
+
+Pressure t te wll cn generlly be pprximted vi te zer nrml grdient ssumptin
+\begin{equtin}
+    \left. \frc{\prtil p}{\prtil n} \rigt|_O = 0
+\end{equtin}
+Terefre,
+\begin{equtin}
+    p_O = p_I = p_G
+\end{equtin}
+Tus, te pressure cmpnent in te surfce stress vectr is
+\begin{equtin}
+    -p_G \unitVectr{n}
+\end{equtin}
+
+\prgrp{Wll ser stress}
+
+As illustrted in Fig.~\ref{fig:wll_ser_stress_dem}, suppse  nturl crdinte system, $\et-\xi$, is plced t te bundry pint $O$ nd is lcted in te plne defined by te nrml vectr $(\unitVectr{n} \times \Vectr{V}_{IO})$, were $\Vectr{V}_{IO} = \Vectr{V}_I - \Vectr{V}_O$ is te reltive velcity f te imge pint $I$ t te bundry pint $O$. Ten, te wll ser stress is defined s
+\begin{equtin}
+    \Vectr{\tu}_{\Des{w}} \equiv \Vectr{\tu}(\et =0) = \mu \left. \frc{\prtil \Vectr{V}^{\xi}_{IO}}{\prtil \et}\rigt|_{\et=0}
+\end{equtin}
+A secnd-rder centrl differencing pprximtin gives
+\begin{equtin}
+    \Vectr{\tu}_{\Des{w}} = \mu \frc{\Vectr{V}^{\xi}_{IO} - \Vectr{V}^{\xi}_{GO}}{2||\Vectr{x}_I - \Vectr{x}_O||}
+\end{equtin}
+By using $\Vectr{V}_{IO} = - \Vectr{V}_{GO}$, $||\Vectr{x}_I - \Vectr{x}_O|| = ||\Vectr{x}_G - \Vectr{x}_O||$, nd $\Vectr{V}^{\xi}_{GO} = \Vectr{V}_{GO} - (\Vectr{V}_{GO} \cdt \unitVectr{n}) \unitVectr{n}$, it gives
+\begin{equtin}
+    \Vectr{\tu}_{\Des{w}} = - \mu \frc{\Vectr{V}_{GO} - (\Vectr{V}_{GO} \cdt \unitVectr{n}) \unitVectr{n}}{||\Vectr{x}_G - \Vectr{x}_O||}
+\end{equtin}
+Hence, te surfce stress vectr t te bundry pint $O$ is btined s
+\begin{equtin}
+    \Vectr{T}_{O}^{(\unitVectr{n})} = -p_G \unitVectr{n} + \Vectr{\tu}_{\Des{w}} = -p_G \unitVectr{n} - \mu \frc{\Vectr{V}_{GO} - (\Vectr{V}_{GO} \cdt \unitVectr{n}) \unitVectr{n}}{||\Vectr{x}_G - \Vectr{x}_O||}
+\end{equtin}
+
+By emplying te derived reltins, te surfce frce integrtin fr irregulr slids cn be directly cmputed nd expressed in te glbl Eulerin crdinte system witut invlving crdinte trnsfrmtin. In dditin, bt te wll pressure nd te wll ser stress re explicitly cmputed t te gst nde $G$, wic is  cmputtinl nde wit knwn flw vlues. As  result, te prpsed surfce frce integrtin metd is strigtfrwrd t implement.
+
+\sectin{Gverning equtins nd discretiztin}
+
+\subsectin{Fluid-slid cupling}
+
+Te cupling between fluid nd slid mtins is bsed n Strng splitting \citep{strng1968cnstructin}:
+\begin{equtin}
+    \Vectr{U}^{n+1} = \Sptr_{\Des{s}}(\frc{\Delt t}{2})\Sptr_{\Des{f}}(\frc{\Delt t}{2})\Sptr_{\Des{f}}(\frc{\Delt t}{2})\Sptr_{\Des{s}}(\frc{\Delt t}{2}) \Vectr{U}^n
+\end{equtin}
+were $\Vectr{U}^{n}$ nd $\Vectr{U}^{n+1}$ re te slutin vectrs t time $t^n$ nd $t^{n+1}$, respectively; $\Sptr_{\Des{f}}$ nd $\Sptr_{\Des{s}}$ re te slutin pertrs f fluid nd slid dynmics, respectively.
+
+\subsectin{Fluid dynmics}
+
+Te fluid mtin is gverned by te Euler equtins in Crtesin crdintes: 
+\begin{equtin}
+    \frc{\prtil \Vectr{U}}{\prtil t}+\frc{\prtil \Vectr{F}_i}{\prtil x_i} = 0
+\end{equtin}
+were te vectrs f cnservtive vribles $\Vectr{U}$ nd cnvective fluxes $\Vectr{F}_i$ re s fllws:
+\begin{equtin}
+    \Vectr{U} =
+    \begin{pmtrix}
+        \r\\
+        \r V_j\\
+        \r e_{\Des{T}}
+    \end{pmtrix}
+    ,\,\,
+    \Vectr{F}_i =
+    \begin{pmtrix}
+        \r V_i\\
+        \r V_i V_j + p \delt_{ij}\\
+        (\r e_{\Des{T}}+p) V_i
+    \end{pmtrix}
+\end{equtin}
+in wic $\r$, $\Vectr{V}$, $e_{\Des{T}}$, $p$, $T$, nd $k$ re te density, velcity, specific ttl energy, termdynmic pressure, temperture, nd terml cnductivity, respectively. $i$ is  free index, nd $j$ is n enumertr. Te clsure f te system is trug te perfect gs lw
+\begin{equtin}
+    \begin{gtered}
+        p = \r R T \\
+        e = C_v T
+    \end{gtered}
+\end{equtin}
+ere $R$, $e$, nd $C_v$ re te specific gs cnstnt, specific internl energy, nd specific et cpcity t cnstnt vlume, respectively.
+
+Te temprl integrtin f te Euler equtins is perfrmed using te tird-rder SSP Runge--Kutt metd \citep{su1988efficient, gttlieb2001strng}. Dimensin splitting \citep{strng1968cnstructin} is dpted t tret te system f cnservtin lws in multidimensinl spce. Cnservtive discretiztin is pplied fr te cnvective fluxes t ensure discrete mss cnservtin. Te fift-rder WENO sceme \citep{jing1996efficient} is ten used fr te recnstructin f cnvective fluxes. Te interfce bundry tretment is cnducted vi n immersed bundry metd \citep{m2018immersed} using te gst-cell pprc.
+
+\subsectin{Slid dynmics}
+
+Te gverning equtins f slid mtin cnsist f te Newtn's secnd lw f trnsltinl mtin nd te Euler equtins f rttinl mtin:
+\begin{equtin}
+    \frc{\mtrm{d} \Vectr{U}}{\mtrm{d} t} = \Vectr{\Pi}
+    ,\,\,
+    \Vectr{U} =
+    \begin{pmtrix}
+        \Vectr{V}\\
+        \Vectr{x}_{\Des{c}}\\
+        \Mtrix{I}_{\Des{c}} \Vectr{\meg}\\
+        \Vectr{\tet}
+    \end{pmtrix}
+    ,\,\,
+    \Vectr{\Pi} =
+    \begin{pmtrix}
+        \frc{1}{m}\int\limits_{\prtil\Omeg} \unitVectr{n} \cdt (-p \unitTensr{I}) \, \mtrm{d}S \\
+        \Vectr{V}\\
+        \int\limits_{\prtil\Omeg} (\Vectr{x} - \Vectr{x}_{\Des{c}}) \times [\unitVectr{n} \cdt (-p \unitTensr{I})] \, \mtrm{d}S\\
+        \Vectr{\meg}
+    \end{pmtrix}
+\end{equtin}
+in wic $\Vectr{x}$ is psitin vectr, $\Omeg$ is te sptil dmin ccupied by  slid, $\Vectr{x}_{\Des{c}}$ is te psitin vectr f te slid centrid, $\Vectr{\tet}$ is te rienttin f te slid, $\Vectr{V}$ nd $\Vectr{\meg}$ re te trnsltinl nd ngulr velcities, respectively, $m$ is te mss f te slid, $\Mtrix{I}_{\Des{c}}$ is te mment f inerti mtrix, $\unitVectr{n}$ is te unit utwrd surfce nrml vectr, $p$ is te pressure exerted n te slid surfce vi fluid. Te time integrtin f tis rdinry differentil equtin system is perfrmed vi  secnd-rder Runge--Kutt sceme.
+
+A detiled descriptin f te numericl discretiztin scemes nd te integrtin f numericl tecniques t crete  slver fr fluid-slid systems my be referred t \citep{m2018immersed} nd \citep{m2017numericl}, respectively.
+
+\sectin{Numericl experiments}
+
+\subsectin{A wind tunnel test cnstructed vi field functin}
+
+A numericl wind tunnel test is cnstructed t illustrte te prpsed field functin fr cmplex multidmin nde mpping. As swn in Fig.~\ref{fig:missile_srt_dem_divide_nte}, $8$ tringulted plyedrns $\{\Omeg_p: \ p = 1, \dtsc, 8\}$ nd  sptil dmin $\Omeg$ re used. $\Omeg_1$ is  cne wit n pening ngle $\tet_1 = 30^{\circ}$ nd eigt $_1 = 0.5 \Unit{m}$. $\Omeg_2$ is  cylinder wit lengt $l_2 = _1$ nd rdius $r_2 = _1 \tn{(\tet_1 / 2)}$. $\Omeg_{3-6}$ re fur irregulr plyedrns wit n identicl gemetry, f wic te tickness is $w_3 = 0.02 \Unit{m}$ nd te lengts f te ter five edges cunting frm te srtest ne clckwise re $0.01 \Unit{m}$, $0.1\sqrt{2} \Unit{m}$, $0.1 \Unit{m}$, $0.11 \Unit{m}$, nd $0.2 \Unit{m}$, respectively. $\Omeg_7$ is  spere f rdius $r_7 = r_2$. $\Omeg_8$ is  plyedrn wse uter prfile is  bx f size $l_8 \times _8 \times w_8 = 2.5 \Unit{m} \times 0.6 \Unit{m} \times 0.6 \Unit{m}$ nd inner prfile is  cylindricl cvity wit lengt $l_8$ nd rdius $r_8 = 0.25 \Unit{m}$. Te sptil dmin $\Omeg$ is  bx f size $l \times  \times w = 2.0 \Unit{m} \times 0.55 \Unit{m} \times 0.55 \Unit{m}$.
+\begin{figure*}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.44\textwidt}
+        \cptin{}
+        \lbel{fig:missile_srt_dem_divide_nte}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.44\textwidt}
+        \cptin{}
+        \lbel{fig:missile_srt_dem_ssemble}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.44\textwidt}
+        \cptin{}
+        \lbel{fig:missile_srt_dem_did_min}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.44\textwidt}
+        \cptin{}
+        \lbel{fig:missile_srt_dem_did_ll}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.44\textwidt}
+        \cptin{}
+        \lbel{fig:missile_srt_dem_lid}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.44\textwidt}
+        \cptin{}
+        \lbel{fig:missile_srt_dem_gst}
+    \end{subfigure}%
+    \cptin{Te cnstructin f  numericl wind tunnel test vi te field functin $\Vectr{\Pi}(\pi,\vrpi)$. () Te emplyed plyedrns $\{\Omeg_p: \ p = 1, \dtsc, 8\}$ nd sptil dmin $\Omeg$. (b) Te cnstructed wind tunnel test. (c) Te cmputtinl ndes wit $\Vectr{\Pi}_{i,j,k}(\pi=0, \vrpi)$. (d) Te cmputtinl ndes wit $\Vectr{\Pi}_{i,j,k}(8 \ge \pi \ge 1, \vrpi)$. (e) A slice plne cpturing te lyers f interfcil ndes. (f) A slice plne cpturing te lyers f gst ndes.}
+    \lbel{fig:missile_dem}
+\end{figure*}
+
+In rder t cnstruct te wind tunnel test swn in Fig.~\ref{fig:missile_srt_dem_ssemble}, te centrl xes f $\Omeg_1$, $\Omeg_2$, $\Omeg_8$, nd $\Omeg$ re ll psitined lng te $x$-xis. Te pex f $\Omeg_1$ is t $O=(0, 0, 0)$; te centers f $\Omeg_2$, $\Omeg_8$, nd $\Omeg$ re lcted t $(_1 + l_2/2, 0, 0)$. $\Omeg_{3-6}$ re sifted t lign wit te rer end f $\Omeg_2$ wit te srtest edge being cmpletely immersed int $\Omeg_2$, nd te center f $\Omeg_7$ is t $(_1 + l_2, 0, 0)$ s tt lf f $\Omeg_7$ is immersed int $\Omeg_2$. In dditin, te sptil dmin $\Omeg$ is discretized by Crtesin grids.
+
+Te prpsed field functin $\Vectr{\Pi}(\pi,\vrpi)$ is ten pplied t building  nde mp fr te numericl discretiztin f te ssembled dmin in Fig.~\ref{fig:missile_srt_dem_ssemble}. As swn in Fig.~\ref{fig:missile_srt_dem_did_min} fr ndes in te slutin dmin $\Omeg_0$ nd in Fig.~\ref{fig:missile_srt_dem_did_ll} fr ndes in $\Omeg_p$, $p = 1, \dtsc, 8$, te field functin $\Vectr{\Pi}(\pi,\vrpi)$ cn uniquely trck ll te subdmins. As illustrted vi te slice plne in Fig.~\ref{fig:missile_srt_dem_lid}, te field functin cn ls reslve multiple interfcil lyers fr ec subdmin $\Omeg_p$, $p = 0, \dtsc, 8$. In te multidmin nde mpping lgritm described in Sectin~\ref{sec:remp}, ndes inside te verlpped regins between tw plyedrns will be mpped int te plyedrn tt is indexed erlier fr nde mpping nd ten be exempted frm te pint-in-plyedrn tests fr te ne tt is indexed lter. Fr instnce, te results in Fig.~\ref{fig:missile_srt_dem_did_ll} present te cse tt $\Omeg_2$ is indexed erlier tn $\Omeg_{3-6}$ but lter tn $\Omeg_7$ during nde mpping. Terefre, te field functin $\Vectr{\Pi}(\pi,\vrpi)$ enbles n utmtic blen tretment fr gemetric intersectins. Due t tt $\Omeg_{3-6}$ re reltively very tin bjects, ll ndes inside tem becme interfcil ndes. Since $\Omeg_0$ is te desired slutin dmin, numericl bundry tretment cn be cnducted t te interfcil ndes f $\Omeg_0$ swn in Fig.~\ref{fig:missile_srt_dem_lid} fr  nn-gst-cell pprc r t te gst ndes f $\Omeg_0$ swn in Fig.~\ref{fig:missile_srt_dem_gst} fr  gst-cell pprc. Only relted t te uter prfile f te ssembled bject, bt te interfcil ndes nd gst ndes f $\Omeg_0$ will nt be ffected by te index sequence f plyedrns in nde mpping.
+\begin{figure*}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.32\textwidt}
+        \cptin{$t = 0.02 \Unit{s}$}
+        \lbel{fig:missile_srt_sclieren_vlume_m192_t0d02}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.32\textwidt}
+        \cptin{$t = 0.03 \Unit{s}$}
+        \lbel{fig:missile_srt_sclieren_vlume_m192_t0d03}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.32\textwidt}
+        \cptin{$t = 0.04 \Unit{s}$}
+        \lbel{fig:missile_srt_sclieren_vlume_m192_t0d04}
+    \end{subfigure}%
+    \cptin{Te time evlutin f te wind tunnel test illustrted by te vlume rendering f te numericl Sclieren field slved n te grid $I_2 \times J_2 \times K_2$.}
+    \lbel{fig:missile_evlve}
+\end{figure*}
+\begin{figure*}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.32\textwidt}
+        \cptin{}
+        \lbel{fig:missile_srt_sclieren_slice_m096}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.32\textwidt}
+        \cptin{}
+        \lbel{fig:missile_srt_sclieren_slice_m144}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.32\textwidt}
+        \cptin{}
+        \lbel{fig:missile_srt_sclieren_slice_m192}
+    \end{subfigure}%
+    \cptin{Te predicted cnicl sck ngles n tree different grids t $t = 0.04 \Unit{s}$. () $I_1 \times J_1 \times K_1$. (b) $I_2 \times J_2 \times K_2$. (c) $I_3 \times J_3 \times K_3$. Lines dented by squre mrks represent te nlyticl slutins.}
+    \lbel{fig:missile_sck}
+\end{figure*}
+
+Tree Crtesin grids $I_1 \times J_1 \times K_1 = 350 \times 96 \times 96$, $I_2 \times J_2 \times K_2 = 525 \times 145 \times 145$, nd $I_3 \times J_3 \times K_3 = 700 \times 192 \times 192$ re used t discretize $\Omeg$. Te initil flw cnditin in $\Omeg$ is $(\r_0, u_0, v_0, p_0)=(1.4 \Unit{kg/m^3}, 0, 0, 400 \Unit{P})$ wit te speed f sund being $_0=20 \Unit{m/s}$. A ypersnic inflw wit cnditin $(\r_{\infty}, u_{\infty}, v_{\infty}, p_{\infty})=(\r_0, M_{\infty} _0, 0, p_0)$ nd $M_{\infty} = 5$ is impsed t te frnt end f $\Omeg$, nd n utflw bundry cnditin is used t te rer end f $\Omeg$. Te slip wll cnditin is enfrced n te surfces f $\Omeg_p$, $p = 1, \dtsc, 8$. Te evlutin f te system is slved t $t = 2l/(M_{\infty}_0) = 0.04 \Unit{s}$ nd is illustrted in Fig.~\ref{fig:missile_evlve}. Te btined stedy cnicl scks rund te cne regin n tree grids re cptured in Fig.~\ref{fig:missile_sck} nd re cmpred wit te nlyticl slutin derived by te Tylr-Mccll nlysis \citep{tylr1933ir}. Te predicted sck ngles n $I_n \times J_n \times K_n$, $n=1,2,3$, re but $20.526^{\circ}$, $20.487^{\circ}$, nd $20.118^{\circ}$, respectively, wic gree very well wit te nlyticl slutin $20.051^{\circ}$ nd demnstrte te success f pplying te prpsed field functin fr cnstructing cmplex fluid-slid systems vi multidmin nde mpping.
+
+\subsectin{Supersnic sck-spere interctin}
+
+As illustrted in Fig.~\ref{fig:sck_spere_dem}, te unstedy drg frce nd pressure istry cting n  spere wit rdius $R=0.04 \Unit{m}$ suspended in  $L \times H \times W=0.5 \Unit{m} \times 0.3 \Unit{m} \times 0.3 \Unit{m}$ test regin nd impcted by  Mc $1.22$ plnr incident sck re studied t vlidte te prpsed field functin fr expedient surfce frce integrtin. Te center f te spere verlps wit te center f te test regin nd is t te rigin psitin $O(0,0,0)$, nd te incident sck is initilly psitined t $x=-1.5R$. Te pre-sck nd pst-sck sttes re $(\r_1, u_1, v_1, w_1, p_1)=(1.205 \Unit{kg/m^3}, 0, 0, 0, 101325 \Unit{P})$ nd $(\r_2, u_2, v_2, w_2, p_2)=(1.658 \Unit{kg/m^3}, 114.477 \Unit{m/s}, 0, 0, 159060 \Unit{P})$, respectively. Te drg cefficient is cmputed s $C_{\Des{D}} = F_x / (0.5\r_2 u_2^2 \pi R^2)$, were $F_x$ is te $x$-cmpnent f te ttl frce cting n te spere.
+\begin{figure}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.35\textwidt}
+        \cptin{}
+        \lbel{fig:sck_spere_dem_}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.35\textwidt}
+        \cptin{}
+        \lbel{fig:sck_spere_dem_b}
+    \end{subfigure}%
+    \cptin{Scemtic digrms illustrting te sck-spere interctin prblem. () Te $3D$ prblem dmin. (b) Pressure prbe lctins. [Nmenclture: $L$, dmin lengt; $H$, dmin eigt; $W$, dmin widt; $I$, incident sck; $R$, spere rdius; $P_1$ nd $P_2$, pressure prbes t spere surfce.]}
+    \lbel{fig:sck_spere_dem}
+\end{figure}
+
+\citet{tnn2003interctin} experimentlly mesured te drg cefficient nd pressure istry using  sck tube fcility. In dditin, emplying  $2D$ curviliner grid nd te xisymmetric Nvier--Stkes equtins, tey ls numericlly simulted te flw wit te n-slip wll bundry cnditin nd reprted te btined drg cefficient. In tis study, $3D$ Crtesin grids re used. T reduce cmputtinl cst, te Euler equtins wit te slip-wll bundry cnditin re pplied insted, since te viscus effect is very limited in tis supersnic flw, nd te pressure frce dmintes te sck-spere interctin \citep{tnn2003interctin}. Tree levels f grids, $G_1 = 400\times240\times240$, $G_2 = 600\times360\times360$, nd $G_3 = 800\times480\times480$, re used t test grid cnvergence.
+\begin{figure*}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.24\textwidt}
+        \cptin{$t = 150 \Unit{\mu s}$}
+        \lbel{fig:1_sp_frce_vlume_t15}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.24\textwidt}
+        \cptin{$t = 400 \Unit{\mu s}$}
+        \lbel{fig:1_sp_frce_vlume_t40}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.24\textwidt}
+        \cptin{$t = 500 \Unit{\mu s}$}
+        \lbel{fig:1_sp_frce_vlume_t50}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.24\textwidt}
+        \cptin{$t = 750 \Unit{\mu s}$}
+        \lbel{fig:1_sp_frce_vlume_t75}
+    \end{subfigure}%
+    \cptin{Te time evlutin f sck-spere interctin illustrted by te vlume rendering f te numericl Sclieren field slved n te grid $G_1$.}
+    \lbel{fig:1_sp_frce_scilieren_vl}
+\end{figure*}
+\begin{figure}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.40\textwidt}
+        \cptin{}
+        \lbel{fig:1_sp_frce_p1}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.40\textwidt}
+        \cptin{}
+        \lbel{fig:1_sp_frce_p7}
+    \end{subfigure}%
+    \cptin{Pressure vritin ver time t te prbe lctins. () Prbe $P_1$. (b) Prbe $P_2$.}
+    \lbel{fig:1_sp_frce_p}
+\end{figure}
+\begin{figure}[!tbp]
+    \centering
+    \cptin{Cmprisn f drg cefficient fr sck-spere interctin.}
+    \lbel{fig:1_sp_frce_cd}
+\end{figure}
+
+Te evlutin f te numericl Sclieren field is cptured in Fig.~\ref{fig:1_sp_frce_scilieren_vl}, in wic te reflectin nd diffrctin f te sck wve lng spere surfce nd te frmtin f wke by sck cllisin re clerly illustrted. A cmprisn f te predicted pressure vritin $\Delt p = p - p_1$ t te tw prbe lctins wit te experimentl mesurements in reference \citep{tnn2003interctin} is swn in Fig.~\ref{fig:1_sp_frce_p}. Fr $t \in [0, 160 \Unit{\mu s}]$, sme minr discrepncies re bserved mng te slutins btined frm tree different grids, nd te numericl pressure dt clsely resemble te experimentl ne, including bt te rrivl time nd te vlue f te pek pressure. At te lter stge, te numericl nd experimentl results sw mderte discrepncies. A furter cmprisn f te predicted drg cefficient wit te experimentl nd numericl dt in reference \citep{tnn2003interctin} is depicted in Fig.~\ref{fig:1_sp_frce_cd}. Te btined drg cefficient erein is cnsistent wit te numericl result in \citep{tnn2003interctin} nd grees well wit te experimentl mesurement. It is wrt nting tt, in te reference \citep{tnn2003interctin}, cmpred t te pressure mesurement,  mdel cnfigurtin less ffecting te flw ws used in te drg mesurement, wic migt be ne f te resns leding t te different levels f greement between te numericl nd experimentl dt n pressure nd drg cefficient t te lte stge f evlutin.
+
+\subsectin{A multibdy cntct nd cllisin system}
+
+As illustrted in Fig.~\ref{fig:multibdy_cllisin_dem},  fluid-slid system is emplyed t demnstrte te field functin fr multibdy cntct nd cllisin pplictins. In  $L \times H = [-5D, 5D] \times [-5D, 5D]$ dmin wit n initil flw stte $(\r_0, u_0, v_0, p_0)=(1.4 \Unit{kg/m^3}, 0, 0, 400 \Unit{P})$, five cylindricl slids wit dimeter $D=1 \Unit{m}$ re plced wit te centers being $C_1(-4D,0)$, $C_2(0,4D)$, $C_3(0,0)$, $C_4(2D, -2D)$, nd $C_5(2D+1/\sqrt{2}D, -2D-1/\sqrt{2}D)$, respectively. Cmpred wit te cllisin system first develped in \citep{m2017numericl},  $90^{\circ}$-ngled wll wit te inner crner lcting t $W_6(2.5D+\sqrt{2}D, -2.5D-\sqrt{2}D)$ is intrduced t increse te cmplexity f cllisin scenris nd mke te cllisin system being revertible.
+\begin{figure}[!tbp]
+    \centering
+    \cptin{A fluid-slid system wit nlyticlly slvble multibdy cntct nd cllisins.}
+    \lbel{fig:multibdy_cllisin_dem}
+\end{figure}
+
+Initilly, $C_1$ nd $C_2$ mve wit $V=\Unit{50m/s}$ nd Mc number $M=2.5$. $C_3$, $C_4$, nd $C_5$ re sttinry, nd te wll $W_6$ is fixed in spce. If ll te cllisins re ssumed t be elstic nd fluid frces cting n slids re neglected, ten te mtins f te slids re nlyticlly slvble. Te fluid-slid system is slved t $t=200 \Unit{ms}$ n tree grids $G_1 = 300\times300$, $G_2 = 600\times600$, nd $G_3 = 1200\times1200$, nd te evlutin is cptured in Fig.~\ref{fig:multibdy_cllisin} using results btined n $G_3$. As swn frm Fig.~\ref{fig:multi_cl_wll_m1200_t000ms} t Fig.~\ref{fig:multi_cl_wll_m1200_t060ms}, nce clliding wit $C_3$ simultneusly t $t=60 \Unit{ms}$, $C_1$ nd $C_2$ pss teir mmentum t $C_3$. Frm Fig.~\ref{fig:multi_cl_wll_m1200_t080ms} t Fig.~\ref{fig:multi_cl_wll_m1200_t090ms}, $C_3$ mves wit $(u,v)=(50 \Unit{m/s}, 50 \Unit{m/s})$ nd cllides wit $C_4$ t $t=100 - 10\sqrt{2} \Unit{ms}$. As  result,  clliding cin is frmed between $C_3$, $C_4$, nd $C_5$ t instntly pss mmentum frm $C_3$ t $C_5$. Frm Fig.~\ref{fig:multi_cl_wll_m1200_t096ms} t Fig.~\ref{fig:multi_cl_wll_m1200_t104ms}, $C_5$ cllides wit te wll $W_6$ nd ten bunces bck, cusing te cllisin sequence t be inverted. Frm Fig.~\ref{fig:multi_cl_wll_m1200_t110ms} t Fig.~\ref{fig:multi_cl_wll_m1200_t120ms}, $C_5$ mves wit $(u,v)=(50 \Unit{m/s}, 50 \Unit{m/s})$ nd cllides wit $C_4$ t $t=100 + 10\sqrt{2} \Unit{ms}$ t refrm te clliding cin between $C_5$, $C_4$, nd $C_3$ nd instntly trnsfer te mmentum t $C_3$. Frm Fig.~\ref{fig:multi_cl_wll_m1200_t140ms} t Fig.~\ref{fig:multi_cl_wll_m1200_t200ms}, $C_3$ cllides wit $C_1$ nd $C_2$ simultneusly nd cmpletely trnsfer its $x$-mmentum t $C_1$ nd $y$-mmentum t $C_2$. Ten, $C_1$ nd $C_2$ trvel bck t teir initil psitins.
+\begin{figure*}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.22\textwidt}
+        \cptin{$t = 0 \Unit{ms}$}
+        \lbel{fig:multi_cl_wll_m1200_t000ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.22\textwidt}
+        \cptin{$t = 30 \Unit{ms}$}
+        \lbel{fig:multi_cl_wll_m1200_t030ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.22\textwidt}
+        \cptin{$t = 60 \Unit{ms}$}
+        \lbel{fig:multi_cl_wll_m1200_t060ms}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.22\textwidt}
+        \cptin{$t = 80 \Unit{ms}$}
+        \lbel{fig:multi_cl_wll_m1200_t080ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.22\textwidt}
+        \cptin{$t = 86 \Unit{ms}$}
+        \lbel{fig:multi_cl_wll_m1200_t086ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.22\textwidt}
+        \cptin{$t = 90 \Unit{ms}$}
+        \lbel{fig:multi_cl_wll_m1200_t090ms}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.22\textwidt}
+        \cptin{$t = 96 \Unit{ms}$}
+        \lbel{fig:multi_cl_wll_m1200_t096ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.22\textwidt}
+        \cptin{$t = 100 \Unit{ms}$}
+        \lbel{fig:multi_cl_wll_m1200_t100ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.22\textwidt}
+        \cptin{$t = 104 \Unit{ms}$}
+        \lbel{fig:multi_cl_wll_m1200_t104ms}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.22\textwidt}
+        \cptin{$t = 110 \Unit{ms}$}
+        \lbel{fig:multi_cl_wll_m1200_t110ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.22\textwidt}
+        \cptin{$t = 114 \Unit{ms}$}
+        \lbel{fig:multi_cl_wll_m1200_t114ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.22\textwidt}
+        \cptin{$t = 120 \Unit{ms}$}
+        \lbel{fig:multi_cl_wll_m1200_t120ms}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.22\textwidt}
+        \cptin{$t = 140 \Unit{ms}$}
+        \lbel{fig:multi_cl_wll_m1200_t140ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.22\textwidt}
+        \cptin{$t = 170 \Unit{ms}$}
+        \lbel{fig:multi_cl_wll_m1200_t170ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.22\textwidt}
+        \cptin{$t = 200 \Unit{ms}$}
+        \lbel{fig:multi_cl_wll_m1200_t200ms}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.50\textwidt}
+    \end{subfigure}%
+    \cptin{Numericl slutin f  fluid-slid system wit nlyticlly slvble multibdy cntct nd cllisins.}
+    \lbel{fig:multibdy_cllisin}
+\end{figure*}
+
+Te evlutin prcess invlves multibdy cllisins wit mmentum trnsfer t bt ligned (Fig.~\ref{fig:multi_cl_wll_m1200_t086ms} nd Fig.~\ref{fig:multi_cl_wll_m1200_t114ms}) nd ngled (Fig.~\ref{fig:multi_cl_wll_m1200_t060ms} nd Fig.~\ref{fig:multi_cl_wll_m1200_t140ms}) directins. During te cllisins, slid sttes cn instntly switc between $M=0$ nd $M=5\sqrt{2}$, intrducing cmputtinl cllenges. In dditin, te cllisin between $C_5$ nd $W_6$ swn in Fig.~\ref{fig:multi_cl_wll_m1200_t100ms} s tw cntct regins ccurring simultneusly, wic represents  multicntct cllisin nd, in generl, is  difficult prblem t slve in rigid-bdy dynmics \citep{jimenez20013d}.
+\begin{figure*}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.32\textwidt}
+        \cptin{}
+        \lbel{fig:multi_cl_wll_m030s}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.32\textwidt}
+        \cptin{}
+        \lbel{fig:multi_cl_wll_m060s}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.32\textwidt}
+        \cptin{}
+        \lbel{fig:multi_cl_wll_m1200}
+    \end{subfigure}%
+    \cptin{Grid sensitivity study n te slutin f te fluid-slid system wit multibdy cntct nd cllisins. () $G_1$. (b) $G_2$. (c) $G_3$.}
+    \lbel{fig:multibdy_cllisin_cmpre}
+\end{figure*}
+
+Te slutins btined n $G_n$, $n=1,2,3$, re cmpred in Fig.~\ref{fig:multibdy_cllisin_cmpre}. Te cllisin dynmics, including cllisin detectins, te lines f impcts, nd cllisin velcities re slved exctly n ec grid. Tble~\ref{tb:multibdy_cllisin_ps} presents te predicted psitin errrs f slid centers n $G_n$. Te mximum psitin errrs f te slid centers ppen t $C_1$ nd $C_2$ nd re but $11\%$, $5.7\%$, nd $2.8\%$ reltive t te dimeter $D$ fr $G_1$, $G_2$, nd $G_3$, respectively. Te btined results demnstrte tt te prpsed field functin cn successfully fcilitte te slutin f cmplex nd dynmic fluid-slid system, nd te cllisin detectin nd respnse lgritms bsed n te field functin cn crrectly reslve te multibdy cntct nd cllisins present in te current fluid-slid system. Altug nt being ble t slve multibdy cllisins in generl exctly, te current cllisin mdel prvides  deterministic pprc fr pprximting multibdy cllisin respnse wit prmeterized elsticity nd frictin nd, mre imprtntly, effectively supprts te vlidtin f te cllisin detectin cpbility f te prpsed field functin.
+\begin{tble*}[!tbp]
+    \centering
+    \smll
+    %\ftntesize% fntsize
+    %\setlengt{\tbclsep}{4pt}% clumn seprtin
+    %\renewcmmnd{\rrystretc}{1.5}% rw spce 
+    \begin{tbulr}{lccccc}
+        \line\line
+        %\multiclumn{num_f_cls_t_merge}{lignment}{cntents} \\
+        %\cline{i-j}% prtil line frm clumn i t clumn j
+        & $C_1$ & $C_2$ & $C_3$ & $C_4$ & $C_5$\\
+        \line
+        Exct & $(-4, 0)$ & $(0, 4)$ & $(0, 0)$ & $(2, -2)$ & $(2+\frc{1}{\sqrt{2}}, -2-\frc{1}{\sqrt{2}})$\\
+        $G_1$ Errr & $(-1.1\mtrm{e}{-1}, 0)$ & $(0, 1.1\mtrm{e}{-1})$ & $(-3.6\mtrm{e}{-3}, 3.6\mtrm{e}{-3})$ & $(0, 0)$ & $(1.0\mtrm{e}{-2}, -1.0\mtrm{e}{-2})$\\ 
+        $G_2$ Errr & $(-5.7\mtrm{e}{-2}, 0)$ & $(0, 5.7\mtrm{e}{-2})$ & $(-7.8\mtrm{e}{-4}, 7.8\mtrm{e}{-4})$ & $(3.0\mtrm{e}{-4}, -3.0\mtrm{e}{-4})$ & $(2.9\mtrm{e}{-3}, -2.9\mtrm{e}{-3})$\\ 
+        $G_3$ Errr & $(-2.8\mtrm{e}{-2}, 0)$ & $(0, 2.8\mtrm{e}{-2})$ & $(-6.6\mtrm{e}{-4}, 6.6\mtrm{e}{-4})$ & $(-4.0\mtrm{e}{-5}, 4.0\mtrm{e}{-5})$ & $(4.6\mtrm{e}{-3}, -4.6\mtrm{e}{-3})$\\ 
+        \line\line
+    \end{tbulr}
+    \cptin{Te predicted psitin errrs f slid centers t te end f slutin time fr te fluid-slid system.}
+    \lbel{tb:multibdy_cllisin_ps}
+\end{tble*}
+
+\subsectin{Supersnic wedge penetrting  prticle bed}
+
+A supersnic wedge penetrting  prticle bed is simulted t furter demnstrte te pplicbility f te field functin fr slving cmplex nd dynmic fluid-slid systems. As illustrted in Fig.~\ref{fig:wedge_penetrting_dem}, in  $L \times H = [-0.5D, 13.5D] \times [-3.5D, 3.5D]$ dmin,  wedge wit lengt $D=1 \Unit{m}$ nd deflectin ngle $\tet=15^{\circ}$ is rizntlly psitined in te dmin, nd te frnt vertex f te wedge lctes t $O(12D, 0)$. In dditin, in te $w \times  = [2D, 4D] \times [-1D, 1D]$ regin, $64$ identicl cylindricl prticles wit dimeter $d=0.25D$ re tigtly pcked.
+\begin{figure}[!tbp]
+    \centering
+    \cptin{A scemtic digrm fr te supersnic wedge penetrting  prticle bed prblem. [Nmenclture: $M_{\infty}$, Mc number f te mving wedge; $S$, blique sck; $\tet$, deflectin ngle; $\bet$, sck ngle; $D$, lengt f wedge; $O$, te frnt vertex f wedge; $L$, dmin lengt; $H$, dmin eigt; $w$, prticle bed widt; $$, prticle bed eigt.]}
+    \lbel{fig:wedge_penetrting_dem}
+\end{figure}
+
+Initilly, te gs in te dmin s te stte $(\r_0, u_0, v_0, p_0)=(1.4 \Unit{kg/m^3}, 0, 0, 400 \Unit{P})$, in wic te speed f sund is $_0=20 \Unit{m/s}$. Te wedge s  density $\r_{\Des{s}}=2700 \Unit{kg/m^3}$,  cefficient f restitutin $C_R=0.5$, nd n initil velcity $M_{\Des{\infty}}=3$. Te prticles ve  density $\r_{\Des{s}}$,  cefficient f restitutin $C_R=0.0$, nd zer initil velcity. Te flw inside te dmin is ssumed t be inviscid. Te slip-wll cnditin is impsed t te tp nd bttm dmin bundries s well s t te wedge nd prticle surfces, wile te utflw bundry cnditin is enfrced t te left nd rigt dmin bundries. Te evlutin f tis fluid-slid system is slved t $t=0.25 \Unit{s}$ n  $2800\times1400$ Crtesin grid.
+
+During te slutin prcess, befre te wedge cllides wit te prticle bed (fr $t \le 4/30 \Unit{s}$), te fluid frces cting n te wedge re dectivted suc tt te wedge cn mve wit  cnstnt supersnic speed. As  result, blique sck wves generted t te nse f te mving wedge cn rec  stedy stte wit  cnstnt sck ngle $\bet$. Te simulted time evlutin f te system is cptured in Fig.~\ref{fig:1_wedge_impct_deg15_mc3_cr0d00_t}, in wic te lines dented by squre mrks represent te nlyticl slutins f te blique sck ngles t psitin $(4.5D, 0)$. As swn in Fig.~\ref{fig:1_wedge_impct_deg15_mc3_cr0d00_t125ms}, te predicted blique sck ngle $\bet_n = 32.259^{\circ}$ grees very well wit te nlyticl slutin $\bet_{e}= 32.240^{\circ}$ cmputed frm te $M_{\infty}-\tet-\bet$ reltin \citep{ndersn2010fundmentls, m2018immersed}.
+
+After te wedge cllides wit te prticle bed,  frce cin witin te cntcted prticles is creted due t te penetrting wedge. Tis frce cin ccelertes te prticles nd frctures te prticle bed. Te suddenly destbilized prticle bed genertes strng flw disturbnces t te surrunding re, wic interct wit te wedge generted scks nd wves, frming cmplex wve diffrctin nd interference ptterns in spce. During te wedge penetrting te prticle bed, intensive multibdy cntct nd cllisins re successfully simulted, nd n intuitive dynmic prcess is cptured in te slutin. Tese results illustrte te bility f te prpsed field functin fr fcilitting te slutin f cmplex nd dynmic fluid-slid systems invlving cupled fluid-fluid, fluid-slid, nd slid-slid interctins.
+\begin{figure*}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidt}
+        \cptin{$t = 0 \Unit{ms}$}
+        \lbel{fig:1_wedge_impct_deg15_mc3_cr0d00_t000ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.48\textwidt}
+        \cptin{$t = 50 \Unit{ms}$}
+        \lbel{fig:1_wedge_impct_deg15_mc3_cr0d00_t050ms}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.48\textwidt}
+        \cptin{$t = 125 \Unit{ms}$}
+        \lbel{fig:1_wedge_impct_deg15_mc3_cr0d00_t125ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.48\textwidt}
+        \cptin{$t = 150 \Unit{ms}$}
+        \lbel{fig:1_wedge_impct_deg15_mc3_cr0d00_t150ms}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.48\textwidt}
+        \cptin{$t = 200 \Unit{ms}$}
+        \lbel{fig:1_wedge_impct_deg15_mc3_cr0d00_t200ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.48\textwidt}
+        \cptin{$t = 250 \Unit{ms}$}
+        \lbel{fig:1_wedge_impct_deg15_mc3_cr0d00_t250ms}
+    \end{subfigure}%
+    \cptin{Time evlutin f  supersnic wedge penetrting  prticle bed. Lines dented by squre mrks represent te nlyticl slutins f te blique scks.}
+    \lbel{fig:1_wedge_impct_deg15_mc3_cr0d00_t}
+\end{figure*}
+
+\sectin{Cnclusin}
+
+A new integer-type field functin s been develped t fcilitte te slutin f cmplex nd dynmic fluid-slid systems n Crtesin grids wit interfce-reslved fluid-fluid, fluid-slid, nd slid-slid interctins. Te min cnclusins re summrized s fllws:
+\begin{itemize}
+    \item Fr  Crtesin-grid-discretized cmputtinl dmin segmented by  set f slid bdies, te prpsed field functin cn uniquely trck ll te subdmins wit multiple lyers f interfcil ndes. Emplying te prpsed field functin, it is strigtfrwrd t pply designted gverning equtins, cnstitutive mdels, numericl scemes, nd bundry cnditins fr ec subdmin.
+
+    \item Benefiting frm te bility t uniquely trck ll te subdmins wit multiple lyers f interfcil ndes using nly ne integer field in ttl, te prpsed field functin enbles fur types f useful functinlities. Te first functinlity is t prvide single-integer-bsed multidmin nde mpping t minimize memry usge nd mximize infrmtin set. Fr instnce, in prviding nde mpping infrmtin fr $P$ subdmins, te memry cnsumptin fr using te prpsed field functin cn be but $1/(HP)$ f tt fr using signed distnce functins r but $1/P$ fr using binry nde-mpping functins, in wic $H$ is te memry size rti f "flt" t "int". Te secnd functinlity is t enble efficient nde rempping tt emplys  temprl cerence t btin n ccelertin rte inversely prprtinl t te surfce-t-vlume rti f subdmins. Te tird functinlity is t cieve cllisin detectin fr determining cllisin queues nd lines f impcts wit liner time cmplexity, insted f te qudric time cmplexity required by signed distnce r binry nde-mpping functins. Te furt functinlity is t fcilitte te surfce frce integrtin fr irregulr slids immersed in  Crtesin grid. Esy-t-implement lgritms fr te field functin nd its sscited functinlities re ls presented.
+
+    \item Equipped wit  deterministic multibdy cllisin mdel, te pplicbility f te develped field functin fr slving cmplex nd dynmic fluid-slid systems is vlidted nd demnstrted trug  set f numericl experiments, suc s  wind tunnel test cnstructed vi te field functin t demnstrte multidmin nde mpping, supersnic sck-spere interctin t vlidte surfce frce integrtin,  multibdy cntct nd cllisin system nd  supersnic wedge penetrting  prticle bed t demnstrte cllisin detectin nd nde rempping fr dynmic fluid-slid systems. Te btined numericl results re in clse greement wit te crrespnding publised numericl dt, experimentl bservtins, r nlyticl slutins.
+\end{itemize}
+
+Future reserc will cnsider te pplictin f te prpsed field functin fr slving fluid-slid systems wit defrmble bdies nd frgmenttin bevir.
+
+\begin{cknwledgements}
+Finncil supprt f tis wrk ws prvided by Nturl Sciences nd Engineering Reserc Cuncil f Cnd (NSERC). Tis wrk ws mde pssible by te fcilities f te Sred Hierrcicl Acdemic Reserc Cmputing Netwrk (SHARCNET: www.srcnet.c) nd Cmpute/Clcul Cnd.
+\end{cknwledgements}
+
+\bibligrpystyle{spbsic}
+\bibligrpy{ref}
+
+\end{dcument}
+%---------------------------------------------------------------------------%

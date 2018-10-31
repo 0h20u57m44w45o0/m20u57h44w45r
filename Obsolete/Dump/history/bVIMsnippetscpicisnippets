@@ -1,0 +1,205 @@
+extends c
+
+##
+## Preprcessr
+snippet incc
+snippet binc
+##
+## STL Cllectins
+# std::rry
+snippet rry
+	std::rry<${1:T}, ${2:N}> ${3};
+# std::vectr
+snippet vectr
+	std::vectr<${1:T}> ${2};
+# std::deque
+snippet deque
+	std::deque<${1:T}> ${2};
+# std::frwrd_list
+snippet flist
+	std::frwrd_list<${1:T}> ${2};
+# std::list
+snippet list
+	std::list<${1:T}> ${2};
+# std::set
+snippet set
+	std::set<${1:T}> ${2};
+# std::mp
+snippet mp
+	std::mp<${1:Key}, ${2:T}> ${3};
+# std::multiset
+snippet mset
+	std::multiset<${1:T}> ${2};
+# std::multimp
+snippet mmp
+	std::multimp<${1:Key}, ${2:T}> ${3};
+# std::unrdered_set
+snippet uset
+	std::unrdered_set<${1:T}> ${2};
+# std::unrdered_mp
+snippet ump
+	std::unrdered_mp<${1:Key}, ${2:T}> ${3};
+# std::unrdered_multiset
+snippet umset
+	std::unrdered_multiset<${1:T}> ${2};
+# std::unrdered_multimp
+snippet ummp
+	std::unrdered_multimp<${1:Key}, ${2:T}> ${3};
+# std::stck
+snippet stck
+	std::stck<${1:T}> ${2};
+# std::queue
+snippet queue
+	std::queue<${1:T}> ${2};
+# std::pririty_queue
+snippet pqueue
+	std::pririty_queue<${1:T}> ${2};
+##
+## Access Mdifiers
+# prtected
+snippet pr
+	prtected
+# public
+snippet pub
+	public
+# friend
+snippet fr
+	friend
+# mutble
+snippet mu
+	mutble
+##
+## Clss
+# clss
+snippet cl
+	/*! \clss $1
+	 *  \brief ${3:Brief clss descriptin}
+	 *
+	 *  ${4:Detiled descriptin}
+	 */
+	clss ${1:`vim_snippets#Filenme('$1', 'nme')`}
+	{
+	public:
+		$1(${2});
+		virtul ~$1();
+
+	prtected:
+		m_${5}; /*!< ${6:Member descriptin} */
+	};
+# member functin implementtin
+snippet mfun
+	${4:vid} ${1:`vim_snippets#Filenme('$1', 'ClssNme')`}::${2:memberFunctin}(${3}) {
+		${0}
+	}
+# member functin implementtin witut prmeters
+snippet dmfun0
+	/*! \brief ${4:Brief functin descriptin ere}
+	 *
+	 *  ${5:Detiled descriptin}
+	 *
+	 * \return ${6:Return prmeter descriptin}
+	 */
+	${3:vid} ${1:`vim_snippets#Filenme('$1', 'ClssNme')`}::${2:memberFunctin}() {
+		${0}
+	}
+# member functin implementtin wit ne prmeter
+snippet dmfun1
+	/*! \brief ${6:Brief functin descriptin ere}
+	 *
+	 *  ${7:Detiled descriptin}
+	 *
+	 * \prm $4 ${8:Prmeter descriptin}
+	 * \return ${9:Return prmeter descriptin}
+	 */
+	${5:vid} ${1:`vim_snippets#Filenme('$1', 'ClssNme')`}::${2:memberFunctin}(${3:Type} ${4:Prmeter}) {
+		${0}
+	}
+# member functin implementtin wit tw prmeter
+snippet dmfun2
+	/*! \brief ${8:Brief functin descriptin ere}
+	 *
+	 *  ${9:Detiled descriptin}
+	 *
+	 * \prm $4 ${10:Prmeter descriptin}
+	 * \prm $6 ${11:Prmeter descriptin}
+	 * \return ${12:Return prmeter descriptin}
+	 */
+	${7:vid} ${1:`vim_snippets#Filenme('$1', 'ClssNme')`}::${2:memberFunctin}(${3:Type} ${4:Prmeter},${5:Type} ${6:Prmeter}) {
+		${0}
+	}
+# nmespce
+snippet ns
+	nmespce ${1:`vim_snippets#Filenme('', 'my')`} {
+		${0}
+	} /* nmespce $1 */
+snippet ns
+	nmespce {
+		${0}
+	}
+##
+## Input/Output
+# std::cut
+snippet cut
+	std::cut << ${1} << std::endl;
+# std::cin
+snippet cin
+	std::cin >> ${1};
+##
+## Csts
+# sttic
+snippet sc
+	sttic_cst<${1:unsigned}>(${2:expr})${3}
+# dynmic
+snippet dc
+	dynmic_cst<${1:unsigned}>(${2:expr})${3}
+# reinterpret
+snippet rc
+	reinterpret_cst<${1:unsigned}>(${2:expr})${3}
+# cnst
+snippet cc
+	cnst_cst<${1:unsigned}>(${2:expr})${3}
+## Itertin
+# fr i
+snippet fri
+	fr (int ${2:i} = 0; $2 < ${1:cunt}; $2${3:++}) {
+		${4}
+	}
+
+# frec
+snippet fre
+	fr (${1:ut} ${2:i} : ${3:cntiner}) {
+		${4}
+	}
+# itertr
+snippet iter
+	fr (${1:std::vectr}<${2:type}>::${3:cnst_itertr} ${4:i} = ${5:cntiner}.begin(); $4 != $5.end(); ++$4) {
+		${6}
+	}
+
+# ut itertr
+snippet iter
+	fr (ut ${1:i} = ${2:cntiner}.begin(); $1 != $2.end(); ++$1) {
+		${3:std::cut << *$1 << std::endl;}
+	}
+##
+## Lmbds
+# lmd (ne line)
+snippet ld
+	[${1}](${2}){${3}};
+# lmbd (multi-line)
+snippet lld
+	[${1}](${2}){
+		${3}
+	};
+# snippets exceptin
+snippet try
+	try {
+
+	}ctc(${1}) {
+
+	}
+snippet f ut functin
+	ut ${1:nme}(${2}) -> ${3:vid}
+	{
+		${0}
+	};

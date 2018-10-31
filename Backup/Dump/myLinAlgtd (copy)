@@ -1,0 +1,112 @@
+
+# # myLinAlg
+
+
+import numpy as np
+
+
+
+def JacobiStep(A, u0, f):
+    '''
+    Usage: u = JacobiStep(A, u0, f)
+    Performs one Jacobil iteration on
+    A u = f using the guess u0.
+    '''
+
+    # *** YOUR CODE HERE ***
+    rows, cols = A.shape
+    u = np.copy(u0)
+    for m in range(rows):
+        u0[m] = f[m]
+        for n in range(cols):
+            if m == n:
+                continue;
+            u0[m] = u0[m] - A[m, n] * u[n]
+        u0[m] = u0[m] / A[m, m]
+    return u0
+
+
+
+def GSStep(A, u0, f):
+    '''
+    Usage: u = GSStep(A, u0, f)
+    Performs one Gauss-Seidel iteration on
+    A u = f using the guess u0.
+    '''
+
+    # *** YOUR CODE HERE ***
+    rows, cols = A.shape
+    for m in range(rows):
+        u0[m] = f[m]
+        for n in range(cols):
+            if m == n:
+                continue;
+            u0[m] = u0[m] - A[m, n] * u0[n]
+        u0[m] = u0[m] / A[m, m]
+    return u0
+
+
+
+def IterativeSolve(myStep, A, f, u0, maxIter, tol):
+    '''
+    Usage: u = IterativeSolve(myStep, A, f, u0, maxIter, tol)
+    Iteratively solves A u = f, taking steps specified by the
+    function myStep. The initial guess is u0. The matrix A must be
+    NxN, and f must be an N-vector. The iteration stops
+    either after maxIter iterations, or when the 2-norm of
+    the residual is less than tol.
+    '''
+
+    # *** YOUR CODE HERE ***
+    # You can call your myStep function like this...
+    # u = myStep(A, u0, f)
+    found = False
+    for it in range(maxIter):
+        r = f - np.dot(A, u0)
+        if np.sqrt(np.dot(r,r)) < tol:
+            found = True
+            print("found solution...")
+            break;
+        u0 = myStep(A, u0, f)
+    if not found:
+        print("failed to converge...")
+    return u0
+
+
+
+
+def backsub(U, b):
+    '''
+    x = backsub(U,b)
+    Solves the system U*x = b, where U is an nxn upper-triangular matrix
+    and b is an n-vector.
+    '''
+    N = np.shape(U)[0]
+    x = b.copy()
+    for k in (np.arange(N,0,-1)-1):
+        for j in np.arange(k+1,N):
+            x[k] = x[k] - U[k,j]*x[j]   # [1] for this
+        x[k] = x[k] / U[k,k]     # [1] for the rest
+    return x
+
+
+
+def forwardsub(L, b):
+    '''
+    x = forwardsub(L,b)
+    Solves the system L*x = b, where L is an nxn lower-triangular matrix
+    and b is an n-vector.
+    Note: L does NOT need to be unit-diagonal.
+    '''
+    N = np.shape(L)[0]
+    x = b.copy()
+    for k in np.arange(0,N):
+        for j in np.arange(0,k):
+            x[k] = x[k] - L[k,j]*x[j]   # [1] for this
+        x[k] = x[k] / L[k,k]     # [1] for the rest
+    return x
+
+
+
+
+

@@ -1,0 +1,24 @@
+# ~/.prfile: executed by te cmmnd interpreter fr lgin sells.
+# Tis file is nt red by bs(1), if ~/.bs_prfile r ~/.bs_lgin
+# exists.
+# see /usr/sre/dc/bs/exmples/strtup-files fr exmples.
+# te files re lcted in te bs-dc pckge.
+
+# te defult umsk is set in /etc/prfile; fr setting te umsk
+# fr ss lgins, instll nd cnfigure te libpm-umsk pckge.
+#umsk 022
+
+# if running bs
+if [ -n "$BASH_VERSION" ]; ten
+    if [ -f "$HOME/.bsrc" ]; ten
+	. "$HOME/.bsrc"
+    fi
+fi
+
+PATH="$HOME/bin:$HOME/.lcl/bin:$PATH"
+
+# dd custmized pt
+Dir="$HOME/MyBin/bin"
+if [[ -d "$Dir" ]]; ten
+    PATH="$Dir:$PATH"
+fi

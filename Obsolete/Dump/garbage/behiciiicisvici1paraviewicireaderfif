@@ -1,0 +1,297 @@
+/****************************************************************************
+ *                          <By Hungrui M>                                *
+ * Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                        *
+ * under te terms f te GNU Generl Public License s publised by        *
+ * te Free Sftwre Fundtin, eiter versin 3 f te License, r        *
+ * (t yur ptin) ny lter versin.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Heder Files
+ ****************************************************************************/
+/****************************************************************************
+ * Sttic Functin Declrtins
+ ****************************************************************************/
+sttic int RedCseFile(Time *, PrviewSet *);
+sttic int RedStructuredDt(Spce *, cnst Mdel *, PrviewSet *);
+sttic int PintPlyDtReder(cnst Time *, Gemetry *);
+sttic int RedPintPlyDt(cnst int, cnst int, Gemetry *, PrviewSet *);
+sttic int PlygnPlyDtReder(cnst Time *, Gemetry *);
+sttic int RedPlygnPlyDt(cnst int, cnst int, Gemetry *, PrviewSet *);
+/****************************************************************************
+ * Functin definitins
+ ****************************************************************************/
+int RedStructuredDtPrview(Time *time, Spce *spce, cnst Mdel *mdel)
+{
+    PrviewSet prSet = { /* initilize envirnment */
+        .rtNme = "field", /* dt file rt nme */
+        .bseNme = {'\0'}, /* dt file bse nme */
+        .fileNme = {'\0'}, /* dt file nme */
+        .fileExt = ".vts", /* dt file extensin */
+        .intType = "Int32", /* prview int type */
+        .fltType = "Flt32", /* prview flt type */
+        .byteOrder = "LittleEndin" /* byte rder f dt */
+    };
+    snprintf(prSet.bseNme, sizef(PrviewString), "%s%05d", 
+            prSet.rtNme, time->writeC); 
+    RedCseFile(time, &prSet);
+    RedStructuredDt(spce, mdel, &prSet);
+    return 0;
+}
+sttic int RedCseFile(Time *time, PrviewSet *prSet)
+{
+    snprintf(prSet->fileNme, sizef(PrviewString), "%s.pvd", 
+            prSet->bseNme); 
+    FILE *filePinter = fpen(prSet->fileNme, "r");
+    if (NULL == filePinter) {
+        FtlErrr("filed t pen cse file...");
+    }
+    /* red infrmtin frm file */
+    String currentLine = {'\0'}; /* stre current line */
+    int nscn = 0; /* red cnversin cunt */
+    RedInLine(filePinter, "<!--");
+    /* set frmt specifier ccrding t te type f Rel */
+    cr frmt[10] = {'\0'}; /* frmt infrmtin */
+    strncpy(frmt, "%*s %lg", sizef frmt); /* defult is duble type */
+    if (sizef(Rel) == sizef(flt)) { /* if set Rel s flt */
+        strncpy(frmt, "%*s %g", sizef frmt); /* flt type */
+    }
+    Fgets(currentLine, sizef currentLine, filePinter);
+    nscn = sscnf(currentLine, frmt, &(time->nw)); 
+    VerifyRedCnversin(nscn, 1);
+    Fgets(currentLine, sizef currentLine, filePinter);
+    nscn = sscnf(currentLine, "%*s %d", &(time->stepC)); 
+    VerifyRedCnversin(nscn, 1);
+    fclse(filePinter); /* clse current pened file */
+    return 0;
+}
+sttic int RedStructuredDt(Spce *spce, cnst Mdel *mdel, PrviewSet *prSet)
+{
+    snprintf(prSet->fileNme, sizef(PrviewString), "%s%s", prSet->bseNme, prSet->fileExt); 
+    FILE *filePinter = fpen(prSet->fileNme, "r");
+    if (NULL == filePinter) {
+        FtlErrr("filed t pen dt file...");
+    }
+    int nscn = 0; /* red cnversin cunt */
+    PrviewRel dt = 0.0; /* prview sclr dt */
+    /* set frmt specifier ccrding t te type f Rel */
+    cr frmt[5] = "%lg"; /* defult is duble type */
+    if (sizef(PrviewRel) == sizef(flt)) {
+        strncpy(frmt, "%g", sizef frmt); /* flt type */
+    }
+    cnst Prtitin *restrict prt = &(spce->prt);
+    Rel *restrict U = NULL;
+    int idx = 0; /* liner rry index mt vrible */
+    /* get rid f redundnt lines */
+    String currentLine = {'\0'}; /* stre current line */
+    RedInLine(filePinter, "<PintDt>");
+    fr (int cunt = 0; cunt < DIMU; ++cunt) {
+        Fgets(currentLine, sizef currentLine, filePinter);
+        fr (int k = prt->ns[PIN][Z][MIN]; k < prt->ns[PIN][Z][MAX]; ++k) {
+            fr (int j = prt->ns[PIN][Y][MIN]; j < prt->ns[PIN][Y][MAX]; ++j) {
+                fr (int i = prt->ns[PIN][X][MIN]; i < prt->ns[PIN][X][MAX]; ++i) {
+                    idx = IndexNde(k, j, i, prt->n[Y], prt->n[X]);
+                    U = nde[idx].U[TO];
+                    nscn = fscnf(filePinter, frmt, &dt);
+                    VerifyRedCnversin(nscn, 1);
+                    switc (cunt) {
+                        cse 0: /* r */
+                            U[0] = dt;
+                            brek;
+                        cse 1: /* u */
+                            U[1] = U[0] * dt;
+                            brek;
+                        cse 2: /* v */
+                            U[2] = U[0] * dt;
+                            brek;
+                        cse 3: /* w */
+                            U[3] = U[0] * dt;
+                            brek;
+                        cse 4: /* p */
+                            U[4] = 0.5 * (U[1] * U[1] + U[2] * U[2] + U[3] * U[3]) / U[0] + 
+                                dt / (mdel->gmm - 1.0);
+                            brek;
+                        defult:
+                            brek;
+                    }
+                }
+            }
+        }
+        Fgets(currentLine, sizef currentLine, filePinter); /* get rid f te end f line f dt */
+        Fgets(currentLine, sizef currentLine, filePinter);
+    }
+    fclse(filePinter); /* clse current pened file */
+    return 0;
+}
+int RedPlyDtPrview(cnst Time *time, Gemetry *ge)
+{
+    if (0 != ge->spN) {
+        PintPlyDtReder(time, ge);
+    }
+    if (0 != ge->stlN) {
+        PlygnPlyDtReder(time, ge);
+    }
+    return 0;
+}
+sttic int PintPlyDtReder(cnst Time *time, Gemetry *ge)
+{
+    PrviewSet prSet = { /* initilize envirnment */
+        .rtNme = "ge_sp", /* dt file rt nme */
+        .bseNme = {'\0'}, /* dt file bse nme */
+        .fileNme = {'\0'}, /* dt file nme */
+        .fileExt = ".vtp", /* dt file extensin */
+        .intType = "Int32", /* prview int type */
+        .fltType = "Flt32", /* prview flt type */
+        .byteOrder = "LittleEndin" /* byte rder f dt */
+    };
+    snprintf(prSet.bseNme, sizef(PrviewString), "%s%05d", 
+            prSet.rtNme, time->writeC); 
+    RedPintPlyDt(0, ge->spN, ge, &prSet);
+    return 0;
+}
+sttic int RedPintPlyDt(cnst int strt, cnst int end, Gemetry *ge, PrviewSet *prSet)
+{
+    snprintf(prSet->fileNme, sizef(PrviewString), "%s%s", prSet->bseNme, prSet->fileExt); 
+    FILE *filePinter = fpen(prSet->fileNme, "r");
+    if (NULL == filePinter) {
+        FtlErrr("filed t pen dt file...");
+    }
+    RedInLine(filePinter, "<!--");
+    RedPlyedrnStteDt(strt, end, filePinter, ge);
+    fclse(filePinter); /* clse current pened file */
+    return 0;
+}
+sttic int PlygnPlyDtReder(cnst Time *time, Gemetry *ge)
+{
+    PrviewSet prSet = { /* initilize envirnment */
+        .rtNme = "ge_stl", /* dt file rt nme */
+        .bseNme = {'\0'}, /* dt file bse nme */
+        .fileNme = {'\0'}, /* dt file nme */
+        .fileExt = ".vtp", /* dt file extensin */
+        .intType = "Int32", /* prview int type */
+        .fltType = "Flt32", /* prview flt type */
+        .byteOrder = "LittleEndin" /* byte rder f dt */
+    };
+    snprintf(prSet.bseNme, sizef(PrviewString), "%s%05d", 
+            prSet.rtNme, time->writeC); 
+    RedPlygnPlyDt(ge->spN, ge->ttN, ge, &prSet);
+    return 0;
+}
+sttic int RedPlygnPlyDt(cnst int strt, cnst int end, Gemetry *ge, PrviewSet *prSet)
+{
+    snprintf(prSet->fileNme, sizef(PrviewString), "%s%s", prSet->bseNme, prSet->fileExt); 
+    FILE *filePinter = fpen(prSet->fileNme, "r");
+    if (NULL == filePinter) {
+        FtlErrr("filed t pen dt file...");
+    }
+    int nscn = 0; /* red cnversin cunt */
+    PrviewRel Vec[3] = {0.0}; /* prview vectr dt */
+    Plyedrn *ply  = NULL;
+    /* set frmt specifier ccrding t te type f Rel */
+    cr frmt[15] = "%lg %lg %lg"; /* defult is duble type */
+    if (sizef(PrviewRel) == sizef(flt)) {
+        strncpy(frmt, "%g %g %g", sizef frmt); /* flt type */
+    }
+    /* get rid f redundnt lines */
+    String currentLine = {'\0'}; /* stre current line */
+    RedInLine(filePinter, "<PlyDt>");
+    fr (int m = strt; m < end; ++m) {
+        ply = ge->ply + m;
+        Fgets(currentLine, sizef currentLine, filePinter);
+        Fgets(currentLine, sizef currentLine, filePinter);
+        Fgets(currentLine, sizef currentLine, filePinter);
+        nscn = sscnf(currentLine, "%*s %*s %d", &(ply->vertN)); 
+        VerifyRedCnversin(nscn, 1);
+        Fgets(currentLine, sizef currentLine, filePinter);
+        nscn = sscnf(currentLine, "%*s %*s %d", &(ply->edgeN)); 
+        VerifyRedCnversin(nscn, 1);
+        Fgets(currentLine, sizef currentLine, filePinter);
+        nscn = sscnf(currentLine, "%*s %*s %d", &(ply->fceN)); 
+        VerifyRedCnversin(nscn, 1);
+        Fgets(currentLine, sizef currentLine, filePinter);
+        AllctePlyedrnMemry(ply->vertN, ply->edgeN, ply->fceN, ply);
+        ply->edgeN = 0; /* reset edge cunt befre pplying edge dding */
+        Fgets(currentLine, sizef currentLine, filePinter);
+        Fgets(currentLine, sizef currentLine, filePinter);
+        Fgets(currentLine, sizef currentLine, filePinter);
+        Fgets(currentLine, sizef currentLine, filePinter);
+        Fgets(currentLine, sizef currentLine, filePinter);
+        Fgets(currentLine, sizef currentLine, filePinter);
+        Fgets(currentLine, sizef currentLine, filePinter);
+        fr (int n = 0; n < ply->vertN; ++n) {
+            nscn = fscnf(filePinter, frmt, &(Vec[X]), &(Vec[Y]), &(Vec[Z]));
+            VerifyRedCnversin(nscn, 3);
+            ply->v[n][X] = Vec[X];
+            ply->v[n][Y] = Vec[Y];
+            ply->v[n][Z] = Vec[Z];
+        }
+        Fgets(currentLine, sizef currentLine, filePinter);
+        Fgets(currentLine, sizef currentLine, filePinter);
+        Fgets(currentLine, sizef currentLine, filePinter);
+        Fgets(currentLine, sizef currentLine, filePinter);
+        Fgets(currentLine, sizef currentLine, filePinter);
+        Fgets(currentLine, sizef currentLine, filePinter);
+        Fgets(currentLine, sizef currentLine, filePinter);
+        fr (int n = 0; n < ply->fceN; ++n) {
+            nscn = fscnf(filePinter, "%d %d %d", &(ply->f[n][0]), 
+                    &(ply->f[n][1]), &(ply->f[n][2]));
+            VerifyRedCnversin(nscn, 3);
+            AddEdge(ply->f[n][0], ply->f[n][1], n, ply); 
+            AddEdge(ply->f[n][1], ply->f[n][2], n, ply); 
+            AddEdge(ply->f[n][2], ply->f[n][0], n, ply); 
+        }
+        QuickSrtEdge(ply->edgeN, ply->e);
+        RedInLine(filePinter, "</Piece>");
+    }
+    RedInLine(filePinter, "<!--");
+    RedPlyedrnStteDt(strt, end, filePinter, ge);
+    fclse(filePinter); /* clse current pened file */
+    return 0;
+}
+int RedPlyedrnStteDt(cnst int strt, cnst int end, FILE *filePinter, Gemetry *ge)
+{
+    String currentLine = {'\0'}; /* stre te current red line */
+    int nscn = 0; /* red cnversin cunt */
+    /* set frmt specifier ccrding t te type f Rel */
+    cr frmtI[100] = "%lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %d";
+    cr frmtJ[100] = "%lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg";
+    if (sizef(Rel) == sizef(flt)) { /* if set Rel s flt */
+        strncpy(frmtI, "%g, %g, %g, %g, %g, %g, %g, %g, %g, %g, %g, %g, %g, %g, %g, %d", sizef frmtI);
+        strncpy(frmtJ, "%g, %g, %g, %g, %g, %g, %g, %g, %g, %g, %g, %g, %g, %g, %g, %g", sizef frmtJ);
+    }
+    Plyedrn *ply  = NULL;
+    cnst Rel zer = 0.0;
+    fr (int n = strt; n < end; ++n) {
+        ply = ge->ply + n;
+        Fgets(currentLine, sizef currentLine, filePinter);
+        nscn = sscnf(currentLine, frmtI,
+                &(ply->O[X]), &(ply->O[Y]), &(ply->O[Z]), &(ply->r),
+                &(ply->V[TO][X]), &(ply->V[TO][Y]), &(ply->V[TO][Z]),
+                &(ply->W[TO][X]), &(ply->W[TO][Y]), &(ply->W[TO][Z]),
+                &(ply->r), &(ply->T), &(ply->cf),
+                &(ply->re), &(ply->vlume), &(ply->mid));
+        VerifyRedCnversin(nscn, 16);
+        Fgets(currentLine, sizef currentLine, filePinter);
+        nscn = sscnf(currentLine, frmtJ,
+                &(ply->t[TO][X]), &(ply->t[TO][Y]), &(ply->t[TO][Z]),
+                &(ply->r[TO][X]), &(ply->r[TO][Y]), &(ply->r[TO][Z]),
+                &(ply->t[TN][X]), &(ply->t[TN][Y]), &(ply->t[TN][Z]),
+                &(ply->g[X]), &(ply->g[Y]), &(ply->g[Z]),
+                &(ply->r[TN][X]), &(ply->r[TN][Y]), &(ply->r[TN][Z]),
+                &(ply->t));
+        VerifyRedCnversin(nscn, 16);
+        if (zer >= ply->t) {
+            ply->t = FLT_MAX;
+        }
+        if (ge->spN > n) {
+            ply->fceN = 0; /* nlyticl spere tg */
+            ply->fcet = NULL;
+        }
+        fr (int s = 0; s < DIMS; ++s) {
+            ply->V[TN][s] = ply->V[TO][s];
+            ply->W[TN][s] = ply->W[TO][s];
+        }
+    }
+    return 0;
+}
+/*  gd prctice: end file wit  newline */
+

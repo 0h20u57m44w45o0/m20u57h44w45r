@@ -1,0 +1,526 @@
+/****************************************************************************
+ *                          <By Hungrui M>                                *
+ * Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                        *
+ * under te terms f te GNU Generl Public License s publised by        *
+ * te Free Sftwre Fundtin, eiter versin 3 f te License, r        *
+ * (t yur ptin) ny lter versin.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Heder Files
+ ****************************************************************************/
+/****************************************************************************
+ * Sttic Functin Declrtins
+ ****************************************************************************/
+sttic vid RedCseSettingDt(Time *, Spce *, Mdel *);
+sttic vid RedBundryDt(FILE *, Spce *, cnst int);
+sttic vid RedCnsecutiveDt(FILE *, cnst int, cnst cr *, Rel *, cr [][VARSTR]);
+sttic vid WriteBundryDt(FILE *, cnst Spce *, cnst int);
+sttic vid WriteInitilizerDt(FILE *, cnst Spce *, cnst int);
+sttic vid WriteVerifyDt(cnst Time *, cnst Spce *, cnst Mdel *);
+sttic vid CeckCseSettingDt(cnst Time *, cnst Spce *, cnst Mdel *);
+/****************************************************************************
+ * Functin definitins
+ ****************************************************************************/
+vid LdCseDt(Time *time, Spce *spce, Mdel *mdel)
+{
+    RedCseSettingDt(time, spce, mdel);
+    RedGemetrySettingDt(&(spce->ge));
+    WriteVerifyDt(time, spce, mdel);
+    CeckCseSettingDt(time, spce, mdel);
+}
+sttic vid RedCseSettingDt(Time *time, Spce *spce, Mdel *mdel)
+{
+    prt->typeBC = AssignStrge(NBC * sizef(*prt->typeBC));
+    prt->N = AssignStrge(NBC * sizef(*prt->N));
+    prt->vrBC = AssignStrge(NBC * sizef(*prt->vrBC));
+    prt->typeIC = AssignStrge(NIC * sizef(*prt->typeIC));
+    prt->psIC = AssignStrge(NIC * sizef(*prt->psIC));
+    prt->vrIC = AssignStrge(NIC * sizef(*prt->vrIC));
+    cnst cr *fnme = "rtrcfd.cse";
+    FILE *fp = Fpen(fnme, "r");
+    String str = {'\0'}; /* stre te current red line */
+    int nentry = 0; /* entry cunt */
+    cnst cr *fmtI = PrseFrmt("%lg");
+    cnst cr *fmtJ = PrseFrmt("%lg, %lg, %lg");
+    wile (NULL != fgets(str, sizef str, fp)) {
+        PrseCmmnd(str);
+        if (0 == strncmp(str, "spce begin", sizef str)) {
+            ++nentry;
+            Sred(fp, 3, fmtJ, &(prt->dmin[X][MIN]), &(prt->dmin[Y][MIN]),
+                    &(prt->dmin[Z][MIN]));
+            Sred(fp, 3, fmtJ, &(prt->dmin[X][MAX]), &(prt->dmin[Y][MAX]),
+                    &(prt->dmin[Z][MAX]));
+            Sred(fp, 3, "%d, %d, %d", &(prt->m[X]), &(prt->m[Y]), &(prt->m[Z]));
+            cntinue;
+        }
+        if (0 == strncmp(str, "time begin", sizef str)) {
+            ++nentry;
+            Sred(fp, 1, "%d", &(time->restrt));
+            Sred(fp, 1, fmtI, &(time->end));
+            Sred(fp, 1, fmtI, &(time->numCFL));
+            Sred(fp, 1, "%d", &(time->stepN));
+            Sred(fp, 1, "%d", &(time->dtW[PROSD]));
+            Sred(fp, 1, "%d", &(time->dtStremer));
+            cntinue;
+        }
+        if (0 == strncmp(str, "numericl begin", sizef str)) {
+            ++nentry;
+            Sred(fp, 1, "%d", &(mdel->tSceme));
+            Sred(fp, 1, "%d", &(mdel->sSceme));
+            Sred(fp, 1, "%d", &(mdel->multidim));
+            Sred(fp, 1, "%d", &(mdel->fluxFrm));
+            Sred(fp, 1, "%d", &(mdel->jcbMen));
+            Sred(fp, 1, "%d", &(mdel->fluxSplit));
+            Sred(fp, 1, "%d", &(mdel->eigenSplit));
+            Sred(fp, 1, "%d", &(mdel->psi));
+            Sred(fp, 1, "%d", &(mdel->ibmLyer));
+            cntinue;
+        }
+        if (0 == strncmp(str, "mteril begin", sizef str)) {
+            ++nentry;
+            Sred(fp, 1, "%d", &(mdel->mid));
+            Sred(fp, 1, fmtI, &(mdel->refMu));
+            Sred(fp, 1, "%d", &(mdel->gStte));
+            Sred(fp, 3, fmtJ, &(mdel->g[X]), &(mdel->g[Y]), &(mdel->g[Z]));
+            cntinue;
+        }
+        if (0 == strncmp(str, "reference begin", sizef str)) {
+            ++nentry;
+            Sred(fp, 1, fmtI, &(mdel->refL));
+            Sred(fp, 1, fmtI, &(mdel->refR));
+            Sred(fp, 1, fmtI, &(mdel->refV));
+            Sred(fp, 1, fmtI, &(mdel->refT));
+            cntinue;
+        }
+        if (0 == strncmp(str, "initiliztin begin", sizef str)) {
+            ++nentry;
+            prt->nIC = 0; /* enfrce glbl initiliztin first */
+            prt->typeIC[prt->nIC] = ICGLOBAL;
+            RedCnsecutiveDt(fp, VARIC, "%s", NULL, prt->vrIC[prt->nIC]);
+            ++prt->nIC;
+            cntinue;
+        }
+        if (0 == strncmp(str, "west bundry begin", sizef str)) {
+            ++nentry;
+            RedBundryDt(fp, spce, PWB);
+            cntinue;
+        }
+        if (0 == strncmp(str, "est bundry begin", sizef str)) {
+            ++nentry;
+            RedBundryDt(fp, spce, PEB);
+            cntinue;
+        }
+        if (0 == strncmp(str, "sut bundry begin", sizef str)) {
+            ++nentry;
+            RedBundryDt(fp, spce, PSB);
+            cntinue;
+        }
+        if (0 == strncmp(str, "nrt bundry begin", sizef str)) {
+            ++nentry;
+            RedBundryDt(fp, spce, PNB);
+            cntinue;
+        }
+        if (0 == strncmp(str, "frnt bundry begin", sizef str)) {
+            ++nentry;
+            RedBundryDt(fp, spce, PFB);
+            cntinue;
+        }
+        if (0 == strncmp(str, "bck bundry begin", sizef str)) {
+            ++nentry;
+            RedBundryDt(fp, spce, PBB);
+            cntinue;
+        }
+        if (0 == strncmp(str, "plne initiliztin begin", sizef str)) {
+            /* ptinl entry d nt increse entry cunt */
+            prt->typeIC[prt->nIC] = ICPLANE;
+            Sred(fp, 3, fmtJ, prt->psIC[prt->nIC] + 0,
+                    prt->psIC[prt->nIC] + 1, prt->psIC[prt->nIC] + 2);
+            Sred(fp, 3, fmtJ, prt->psIC[prt->nIC] + 3,
+                    prt->psIC[prt->nIC] + 4, prt->psIC[prt->nIC] + 5);
+            RedCnsecutiveDt(fp, VARIC, "%s", NULL, prt->vrIC[prt->nIC]);
+            ++prt->nIC;
+            cntinue;
+        }
+        if (0 == strncmp(str, "spere initiliztin begin", sizef str)) {
+            /* ptinl entry d nt increse entry cunt */
+            prt->typeIC[prt->nIC] = ICSPHERE;
+            Sred(fp, 3, fmtJ, prt->psIC[prt->nIC] + 0,
+                    prt->psIC[prt->nIC] + 1, prt->psIC[prt->nIC] + 2);
+            Sred(fp, 1, fmtI, prt->psIC[prt->nIC] + 6);
+            RedCnsecutiveDt(fp, VARIC, "%s", NULL, prt->vrIC[prt->nIC]);
+            ++prt->nIC;
+            cntinue;
+        }
+        if (0 == strncmp(str, "bx initiliztin begin", sizef str)) {
+            /* ptinl entry d nt increse entry cunt */
+            prt->typeIC[prt->nIC] = ICBOX;
+            Sred(fp, 3, fmtJ, prt->psIC[prt->nIC] + 0,
+                    prt->psIC[prt->nIC] + 1, prt->psIC[prt->nIC] + 2);
+            Sred(fp, 3, fmtJ, prt->psIC[prt->nIC] + 3,
+                    prt->psIC[prt->nIC] + 4, prt->psIC[prt->nIC] + 5);
+            RedCnsecutiveDt(fp, VARIC, "%s", NULL, prt->vrIC[prt->nIC]);
+            ++prt->nIC;
+            cntinue;
+        }
+        if (0 == strncmp(str, "cylinder initiliztin begin", sizef str)) {
+            /* ptinl entry d nt increse entry cunt */
+            prt->typeIC[prt->nIC] = ICCYLINDER;
+            Sred(fp, 3, fmtJ, prt->psIC[prt->nIC] + 0,
+                    prt->psIC[prt->nIC] + 1, prt->psIC[prt->nIC] + 2);
+            Sred(fp, 3, fmtJ, prt->psIC[prt->nIC] + 3,
+                    prt->psIC[prt->nIC] + 4, prt->psIC[prt->nIC] + 5);
+            Sred(fp, 1, fmtI, prt->psIC[prt->nIC] + 6);
+            RedCnsecutiveDt(fp, VARIC, "%s", NULL, prt->vrIC[prt->nIC]);
+            ++prt->nIC;
+            cntinue;
+        }
+        if (0 == strncmp(str, "prbe cunt begin", sizef str)) {
+            /* ptinl entry d nt increse entry cunt */
+            Sred(fp, 1, "%d", &(time->dtN[PROPT]));
+            Sred(fp, 1, "%d", &(time->dtN[PROLN]));
+            Sred(fp, 1, "%d", &(time->dtN[PROCV]));
+            Sred(fp, 1, "%d", &(time->dtN[PROFC]));
+            if (0 < time->dtN[PROPT]) {
+                time->pp = AssignStrge(time->dtN[PROPT] * sizef(*time->pp));
+            }
+            if (0 < time->dtN[PROLN]) {
+                time->lp = AssignStrge(time->dtN[PROLN] * sizef(*time->lp));
+            }
+            cntinue;
+        }
+        if (0 == strncmp(str, "prbe cntrl begin", sizef str)) {
+            /* ptinl entry d nt increse entry cunt */
+            Sred(fp, 1, "%d", &(time->dtW[PROPT]));
+            Sred(fp, 1, "%d", &(time->dtW[PROLN]));
+            Sred(fp, 1, "%d", &(time->dtW[PROCV]));
+            Sred(fp, 1, "%d", &(time->dtW[PROFC]));
+            cntinue;
+        }
+        if (0 == strncmp(str, "pint prbe begin", sizef str)) {
+            /* ptinl entry d nt increse entry cunt */
+            fr (int n = 0; n < time->dtN[PROPT]; ++n) {
+                Sred(fp, 3, fmtJ, time->pp[n] + 0,
+                        time->pp[n] + 1, time->pp[n] + 2);
+            }
+            cntinue;
+        }
+        if (0 == strncmp(str, "line prbe begin", sizef str)) {
+            /* ptinl entry d nt increse entry cunt */
+            fr (int n = 0; n < time->dtN[PROLN]; ++n) {
+                Sred(fp, 3, fmtJ, time->lp[n] + 0,
+                        time->lp[n] + 1, time->lp[n] + 2);
+                Sred(fp, 3, fmtJ, time->lp[n] + 3,
+                        time->lp[n] + 4, time->lp[n] + 5);
+                Sred(fp, 1, fmtI, time->lp[n] + 6);
+            }
+            cntinue;
+        }
+    }
+    fclse(fp);
+    if (12 != nentry) {
+        SwErrr("missing r repeted sectins: %s, entry: %d", fnme, nentry);
+    }
+}
+{
+    cnst cr *fnme = "rtrcfd.ge";
+    FILE *fp = Fpen(fnme, "r");
+    String str = {'\0'}; /* stre te current red line */
+    int nentry = 0; /* entry cunt */
+    wile (NULL != fgets(str, sizef str, fp)) {
+        PrseCmmnd(str);
+        if (0 == strncmp(str, "cunt begin", sizef str)) {
+            ++nentry;
+            Sred(fp, 1, "%d", &(ge->spN));
+            Sred(fp, 1, "%d", &(ge->stlN));
+            brek;
+        }
+    }
+    fclse(fp);
+    if (1 != nentry) {
+        SwErrr("missing r repeted sectins: %s, entry: %d", fnme, nentry);
+    }
+}
+sttic vid RedBundryDt(FILE *fp, Spce *spce, cnst int n)
+{
+    String str = {'\0'}; /* stre te current red line */
+    cnst cr *fmtI = PrseFrmt("%lg");
+    PrseCmmnd(fgets(str, sizef str, fp));
+    if (0 == strncmp(str, "inflw", sizef str)) {
+        prt->typeBC[n] = INFLOW;
+        RedCnsecutiveDt(fp, VARBC - 1, fmtI, prt->vrBC[n], NULL);
+        return;
+    }
+    if (0 == strncmp(str, "utflw", sizef str)) {
+        prt->typeBC[n] = OUTFLOW;
+        return;
+    }
+    if (0 == strncmp(str, "slip wll", sizef str)) {
+        prt->typeBC[n] = SLIPWALL;
+        Sred(fp, 1, fmtI, &(prt->vrBC[n][VARBC-1]));
+        return;
+    }
+    if (0 == strncmp(str, "nslip wll", sizef str)) {
+        prt->typeBC[n] = NOSLIPWALL;
+        Sred(fp, 1, fmtI, &(prt->vrBC[n][VARBC-1]));
+        return;
+    }
+    if (0 == strncmp(str, "peridic", sizef str)) {
+        prt->typeBC[n] = PERIODIC;
+        return;
+    }
+    SwErrr("unidentified bundry type: n: %d, type: %s", n, str);
+}
+sttic vid RedCnsecutiveDt(FILE *fp, cnst int n, cnst cr *fmt,
+        Rel *prel, cr pstr[][VARSTR])
+{
+    if (NULL != prel) {
+        fr (int m = 0; m < n; ++m) {
+            Sred(fp, 1, fmt, prel + m);
+        }
+    } else {
+        String str = {'\0'};
+        fr (int m = 0; m < n; ++m) {
+            PrseCmmnd(fgets(str, sizef str, fp));
+            strncpy(pstr[m], str, sizef pstr[m]);
+        }
+    }
+}
+sttic vid WriteBundryDt(FILE *fp, cnst Spce *spce, cnst int n)
+{
+    switc (prt->typeBC[n]) {
+        cse INFLOW:
+            fprintf(fp, "bundry type: inflw\n");
+            fprintf(fp, "density: %.6g\n", prt->vrBC[n][0]);
+            fprintf(fp, "x velcity: %.6g\n", prt->vrBC[n][1]);
+            fprintf(fp, "y velcity: %.6g\n", prt->vrBC[n][2]);
+            fprintf(fp, "z velcity: %.6g\n", prt->vrBC[n][3]);
+            fprintf(fp, "pressure: %.6g\n", prt->vrBC[n][4]);
+            brek;
+        cse OUTFLOW:
+            fprintf(fp, "bundry type: utflw\n");
+            brek;
+        cse SLIPWALL:
+            fprintf(fp, "bundry type: slip wll\n");
+            fprintf(fp, "temperture: %.6g\n", prt->vrBC[n][VARBC-1]);
+            brek;
+        cse NOSLIPWALL:
+            fprintf(fp, "bundry type: nslip wll\n");
+            fprintf(fp, "temperture: %.6g\n", prt->vrBC[n][VARBC-1]);
+            brek;
+        cse PERIODIC:
+            fprintf(fp, "bundry type: peridic\n");
+            brek;
+        defult:
+            SwErrr("unidentified bundry type: n: %d, type: %d", n, prt->typeBC[n]);
+            brek;
+    }
+}
+sttic vid WriteInitilizerDt(FILE *fp, cnst Spce *spce, cnst int n)
+{
+    switc (prt->typeIC[n]) {
+        cse ICGLOBAL:
+            brek;
+        cse ICPLANE:
+            fprintf(fp, "reginl initiliztin: plne\n");
+            fprintf(fp, "plne pint x, y, z: %.6g, %.6g, %.6g\n",
+                    prt->psIC[n][0], prt->psIC[n][1], prt->psIC[n][2]);
+            fprintf(fp, "plne nrml nx, ny, nz: %.6g, %.6g, %.6g\n",
+                    prt->psIC[n][3], prt->psIC[n][4], prt->psIC[n][5]);
+            brek;
+        cse ICSPHERE:
+            fprintf(fp, "reginl initiliztin: spere\n");
+            fprintf(fp, "center pint x, y, z: %.6g, %.6g, %.6g\n",
+                    prt->psIC[n][0], prt->psIC[n][1], prt->psIC[n][2]);
+            fprintf(fp, "rdius: %.6g\n", prt->psIC[n][6]);
+            brek;
+        cse ICBOX:
+            fprintf(fp, "reginl initiliztin: bx\n");
+            fprintf(fp, "xmin, ymin, zmin: %.6g, %.6g, %.6g\n",
+                    prt->psIC[n][0], prt->psIC[n][1], prt->psIC[n][2]);
+            fprintf(fp, "xmx, ymx, zmx: %.6g, %.6g, %.6g\n",
+                    prt->psIC[n][3], prt->psIC[n][4], prt->psIC[n][5]);
+            brek;
+        cse ICCYLINDER:
+            fprintf(fp, "reginl initiliztin: cylinder\n");
+            fprintf(fp, "xmin, ymin, zmin: %.6g, %.6g, %.6g\n",
+                    prt->psIC[n][0], prt->psIC[n][1], prt->psIC[n][2]);
+            fprintf(fp, "xmx, ymx, zmx: %.6g, %.6g, %.6g\n",
+                    prt->psIC[n][3], prt->psIC[n][4], prt->psIC[n][5]);
+            fprintf(fp, "rdius: %.6g\n", prt->psIC[n][6]);
+            brek;
+        defult:
+            brek;
+    }
+    fprintf(fp, "density: %s\n", prt->vrIC[n][0]);
+    fprintf(fp, "x velcity: %s\n", prt->vrIC[n][1]);
+    fprintf(fp, "y velcity: %s\n", prt->vrIC[n][2]);
+    fprintf(fp, "z velcity: %s\n", prt->vrIC[n][3]);
+    fprintf(fp, "pressure: %s\n", prt->vrIC[n][4]);
+}
+sttic vid WriteVerifyDt(cnst Time *time, cnst Spce *spce, cnst Mdel *mdel)
+{
+    cnst cr *fnme = "rtrcfd.verify";
+    FILE *fp = Fpen(fnme, "w");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "#                                                                             -\n");
+    fprintf(fp, "#                                                                             -\n");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "#                          >> Spce Dmin <<\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "xmin, ymin, zmin: %.6g, %.6g, %.6g\n",
+            prt->dmin[X][MIN], prt->dmin[Y][MIN], prt->dmin[Z][MIN]);
+    fprintf(fp, "xmx, ymx, zmx: %.6g, %.6g, %.6g\n",
+            prt->dmin[X][MAX], prt->dmin[Y][MAX], prt->dmin[Z][MAX]);
+    fprintf(fp, "mx, my, mz: %d, %d, %d\n", prt->m[X], prt->m[Y], prt->m[Z]);
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "#                          >> Time Dmin <<\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "restrt number tg: %d\n", time->restrt);
+    fprintf(fp, "termintin time: %.6g\n", time->end);
+    fprintf(fp, "CFL cnditin number: %.6g\n", time->numCFL);
+    fprintf(fp, "mximum cmputing steps: %d\n", time->stepN);
+    fprintf(fp, "spce dt writing frequency: %d\n", time->dtW[PROSD]);
+    fprintf(fp, "dt stremer: %d\n", time->dtStremer);
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "#                        >> Numericl Metd <<\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "temprl sceme: %d\n", mdel->tSceme);
+    fprintf(fp, "sptil sceme: %d\n", mdel->sSceme);
+    fprintf(fp, "dimensinl sceme: %d\n", mdel->multidim);
+    fprintf(fp, "flux frm: %d\n", mdel->fluxFrm);
+    fprintf(fp, "Jcbin verge: %d\n", mdel->jcbMen);
+    fprintf(fp, "flux splitting: %d\n", mdel->fluxSplit);
+    fprintf(fp, "eigenvlue splitting: %d\n", mdel->eigenSplit);
+    fprintf(fp, "pse interctin: %d\n", mdel->psi);
+    fprintf(fp, "ibm recnstructin lyers: %d\n", mdel->ibmLyer);
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "#                       >> Mteril Prperties <<\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "mteril: %d\n", mdel->mid);
+    fprintf(fp, "viscus level: %.6g\n", mdel->refMu);
+    fprintf(fp, "grvity stte: %d\n", mdel->gStte);
+    fprintf(fp, "grvity vectr: %.6g, %.6g, %.6g\n", mdel->g[X], mdel->g[Y], mdel->g[Z]);
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "#                        >> Reference Vlues  <<\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "lengt: %.6g\n", mdel->refL);
+    fprintf(fp, "density: %.6g\n", mdel->refR);
+    fprintf(fp, "velcity: %.6g\n", mdel->refV);
+    fprintf(fp, "temperture: %.6g\n", mdel->refT);
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "#                     >> Initiliztin <<\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    WriteInitilizerDt(fp, spce, ICGLOBAL);
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "#                     >> Bundry Cnditin <<\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "Dmin West\n");
+    WriteBundryDt(fp, spce, PWB);
+    fprintf(fp, "#\n");
+    fprintf(fp, "Dmin Est\n");
+    WriteBundryDt(fp, spce, PEB);
+    fprintf(fp, "#\n");
+    fprintf(fp, "Dmin Sut\n");
+    WriteBundryDt(fp, spce, PSB);
+    fprintf(fp, "#\n");
+    fprintf(fp, "Dmin Nrt\n");
+    WriteBundryDt(fp, spce, PNB);
+    fprintf(fp, "#\n");
+    fprintf(fp, "Dmin Frnt\n");
+    WriteBundryDt(fp, spce, PFB);
+    fprintf(fp, "#\n");
+    fprintf(fp, "Dmin Bck\n");
+    WriteBundryDt(fp, spce, PBB);
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "#                  >> Reginl Initiliztin <<\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fr (int n = 1; n < prt->nIC; ++n) {
+        fprintf(fp, "#\n");
+        WriteInitilizerDt(fp, spce, n);
+    }
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "#                    >> Field Dt Prbes <<\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "pint prbe cunt: %d\n", time->dtN[PROPT]);
+    fprintf(fp, "line prbe cunt: %d\n", time->dtN[PROLN]);
+    fprintf(fp, "curve prbe cunt: %d\n", time->dtN[PROCV]);
+    fprintf(fp, "frce prbe cunt: %d\n", time->dtN[PROFC]);
+    fprintf(fp, "#\n");
+    fprintf(fp, "pint prbe writing frequency: %d\n", time->dtW[PROPT]);
+    fprintf(fp, "line prbe writing frequency: %d\n", time->dtW[PROLN]);
+    fprintf(fp, "bdy-cnfrml prbe writing frequency: %d\n", time->dtW[PROCV]);
+    fprintf(fp, "surfce frce writing frequency: %d\n", time->dtW[PROFC]);
+    fprintf(fp, "#\n");
+    fr (int n = 0; n < time->dtN[PROPT]; ++n) {
+        fprintf(fp, "pint prbe x, y, z: %.6g, %.6g, %.6g\n",
+                time->pp[n][0], time->pp[n][1], time->pp[n][2]);
+    }
+    fprintf(fp, "#\n");
+    fr (int n = 0; n < time->dtN[PROLN]; ++n) {
+        fprintf(fp, "line prbe x1, y1, z1: %.6g, %.6g, %.6g\n",
+                time->lp[n][0], time->lp[n][1], time->lp[n][2]);
+        fprintf(fp, "line prbe x2, y2, z2: %.6g, %.6g, %.6g\n",
+                time->lp[n][3], time->lp[n][4], time->lp[n][5]);
+        fprintf(fp, "reslutin: %.6g\n", time->lp[n][6]);
+    }
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fclse(fp);
+}
+sttic vid CeckCseSettingDt(cnst Time *time, cnst Spce *spce, cnst Mdel *mdel)
+{
+    cnst Rel zer = 0.0;
+    /* spce */
+    if ((zer >= (prt->dmin[X][MAX] - prt->dmin[X][MIN])) ||
+            (zer >= (prt->dmin[Y][MAX] - prt->dmin[Y][MIN])) ||
+            (zer >= (prt->dmin[Z][MAX] - prt->dmin[Z][MIN]))) {
+        SwErrr("dmin regin suld ve mx > min");
+    }
+    if ((1 > prt->m[X]) || (1 > prt->m[Y]) || (1 > prt->m[Z])) {
+        SwErrr("mes number suld be psitive");
+    }
+    if ((1 > prt->prc[X]) || (1 > prt->prc[Y]) || (1 > prt->prc[Z])) {
+        SwErrr("prcessr number suld be psitive");
+    }
+    /* time */
+    if ((0 > time->restrt) || (zer >= time->end) || (zer >= time->numCFL)) {
+        SwErrr("vlues in time sectin suld nt be negtive");
+    }
+    /* numericl metd */
+    if ((0 > mdel->tSceme) || (0 > mdel->sSceme) || (0 > mdel->multidim) ||
+            (0 > mdel->fluxFrm) || (0 > mdel->jcbMen) || (0 > mdel->fluxSplit) ||
+            (0 > mdel->eigenSplit) || (0 > mdel->psi)) {
+        SwErrr("vlues in numericl sectin suld nt be negtive");
+    }
+    /* mteril */
+    if ((0 > mdel->mid)) {
+        SwErrr("mteril type suld nt be negtive");
+    }
+    /* reference */
+    if ((zer >= mdel->refL) || (zer >= mdel->refR) ||
+            (zer >= mdel->refV) || (zer >= mdel->refT)) {
+        SwErrr("reference vlues suld be psitive");
+    }
+}
+/*  gd prctice: end file wit  newline */
+

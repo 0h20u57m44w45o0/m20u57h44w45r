@@ -1,0 +1,355 @@
+#### imprt te simple mdule frm te prview
+frm prview.simple imprt *
+#### disble utmtic cmer reset n 'Sw'
+prview.simple._DisbleFirstRenderCmerReset()
+
+# crete  new 'EnSigt Reder'
+ge_spcse = EnSigtReder(CseFileNme='/scrtc/mrui/grm/visulize/meg-l1/ge_sp.cse')
+ge_spcse.PintArrys = ['r', 'did', 'Vel']
+
+# get nimtin scene
+nimtinScene1 = GetAnimtinScene()
+
+# updte nimtin scene bsed n dt timesteps
+nimtinScene1.UpdteAnimtinUsingDtTimeSteps()
+
+# get ctive view
+renderView1 = GetActiveViewOrCrete('RenderView')
+# uncmment fllwing t set  specific view size
+# renderView1.ViewSize = [977, 638]
+
+# get clr trnsfer functin/clr mp fr 'r'
+rLUT = GetClrTrnsferFunctin('r')
+
+# sw dt in view
+ge_spcseDisply = Sw(ge_spcse, renderView1)
+# trce defults fr te disply prperties.
+ge_spcseDisply.AmbientClr = [0.0, 0.0, 0.0]
+ge_spcseDisply.ClrArryNme = ['POINTS', 'r']
+ge_spcseDisply.DiffuseClr = [0.0, 0.0, 0.0]
+ge_spcseDisply.LkupTble = rLUT
+ge_spcseDisply.BckfceDiffuseClr = [0.0, 0.0, 0.0]
+ge_spcseDisply.OSPRyScleArry = 'r'
+ge_spcseDisply.OSPRyScleFunctin = 'PiecewiseFunctin'
+ge_spcseDisply.GlypType = 'Arrw'
+ge_spcseDisply.SclrOpcityUnitDistnce = 0.007272971250322052
+ge_spcseDisply.SetScleArry = ['POINTS', 'r']
+ge_spcseDisply.ScleTrnsferFunctin = 'PiecewiseFunctin'
+ge_spcseDisply.OpcityArry = ['POINTS', 'r']
+ge_spcseDisply.OpcityTrnsferFunctin = 'PiecewiseFunctin'
+
+# reset view t fit dt
+renderView1.ResetCmer()
+
+#cnging interctin mde bsed n dt extents
+renderView1.InterctinMde = '2D'
+renderView1.CmerPsitin = [10000.0, 1.3859011232852936e-05, -0.00011677853763103485]
+renderView1.CmerFclPint = [0.0, 1.3859011232852936e-05, -0.00011677853763103485]
+renderView1.CmerViewUp = [0.0, 0.0, 1.0]
+
+# sw clr br/clr legend
+ge_spcseDisply.SetSclrBrVisibility(renderView1, True)
+
+# get pcity trnsfer functin/pcity mp fr 'r'
+rPWF = GetOpcityTrnsferFunctin('r')
+
+# crete  new 'Glyp'
+#---------------------------------------------------
+glyp1 = Glyp(Input=ge_spcse,
+    GlypType='Cylinder')
+glyp1.Sclrs = ['POINTS', 'r']
+glyp1.Vectrs = ['POINTS', 'Nne']
+glyp1.ScleMde = 'sclr'
+glyp1.ScleFctr = 1.0
+glyp1.GlypTrnsfrm = 'Trnsfrm2'
+glyp1.GlypMde = 'All Pints'
+
+# Prperties mdified n glyp1.GlypType
+glyp1.GlypType.Reslutin = 144
+glyp1.GlypType.Heigt = 0.0
+glyp1.GlypType.Rdius = 1.0
+
+# Prperties mdified n glyp1.GlypTrnsfrm
+#glyp1.GlypTrnsfrm.Rtte = [90.0, 0.0, 0.0] # xy
+glyp1.GlypTrnsfrm.Rtte = [0.0, 0.0, 90.0] # yz
+#---------------------------------------------------
+
+# sw dt in view
+glyp1Disply = Sw(glyp1, renderView1)
+# trce defults fr te disply prperties.
+glyp1Disply.AmbientClr = [0.0, 0.0, 0.0]
+glyp1Disply.ClrArryNme = ['POINTS', 'r']
+glyp1Disply.DiffuseClr = [0.0, 0.0, 0.0]
+glyp1Disply.LkupTble = rLUT
+glyp1Disply.BckfceDiffuseClr = [0.0, 0.0, 0.0]
+glyp1Disply.OSPRyScleArry = 'r'
+glyp1Disply.OSPRyScleFunctin = 'PiecewiseFunctin'
+glyp1Disply.GlypType = 'Arrw'
+glyp1Disply.SetScleArry = ['POINTS', 'r']
+glyp1Disply.ScleTrnsferFunctin = 'PiecewiseFunctin'
+glyp1Disply.OpcityArry = ['POINTS', 'r']
+glyp1Disply.OpcityTrnsferFunctin = 'PiecewiseFunctin'
+
+# sw clr br/clr legend
+glyp1Disply.SetSclrBrVisibility(renderView1, True)
+
+# crete  new 'EnSigt Reder'
+ge_spcse_1 = EnSigtReder(CseFileNme='/scrtc/mrui/grm/visulize/meg-l2/ge_sp.cse')
+ge_spcse_1.PintArrys = ['r', 'did', 'Vel']
+
+# sw dt in view
+ge_spcse_1Disply = Sw(ge_spcse_1, renderView1)
+# trce defults fr te disply prperties.
+ge_spcse_1Disply.AmbientClr = [0.0, 0.0, 0.0]
+ge_spcse_1Disply.ClrArryNme = ['POINTS', 'r']
+ge_spcse_1Disply.DiffuseClr = [0.0, 0.0, 0.0]
+ge_spcse_1Disply.LkupTble = rLUT
+ge_spcse_1Disply.BckfceDiffuseClr = [0.0, 0.0, 0.0]
+ge_spcse_1Disply.OSPRyScleArry = 'r'
+ge_spcse_1Disply.OSPRyScleFunctin = 'PiecewiseFunctin'
+ge_spcse_1Disply.GlypType = 'Arrw'
+ge_spcse_1Disply.SclrOpcityUnitDistnce = 0.007604874818373719
+ge_spcse_1Disply.SetScleArry = ['POINTS', 'r']
+ge_spcse_1Disply.ScleTrnsferFunctin = 'PiecewiseFunctin'
+ge_spcse_1Disply.OpcityArry = ['POINTS', 'r']
+ge_spcse_1Disply.OpcityTrnsferFunctin = 'PiecewiseFunctin'
+
+# sw clr br/clr legend
+ge_spcse_1Disply.SetSclrBrVisibility(renderView1, True)
+
+# crete  new 'Glyp'
+glyp2 = Glyp(Input=ge_spcse_1,
+    GlypType='Cylinder')
+glyp2.Sclrs = ['POINTS', 'r']
+glyp2.Vectrs = ['POINTS', 'Nne']
+glyp2.ScleMde = 'sclr'
+glyp2.ScleFctr = 1.0
+glyp2.GlypTrnsfrm = 'Trnsfrm2'
+glyp2.GlypMde = 'All Pints'
+
+# Prperties mdified n glyp1.GlypType
+glyp2.GlypType.Reslutin = 144
+glyp2.GlypType.Heigt = 0.0
+glyp2.GlypType.Rdius = 1.0
+
+# Prperties mdified n glyp1.GlypTrnsfrm
+#glyp2.GlypTrnsfrm.Rtte = [90.0, 0.0, 0.0] # xy
+glyp2.GlypTrnsfrm.Rtte = [0.0, 0.0, 90.0] # yz
+
+# sw dt in view
+glyp2Disply = Sw(glyp2, renderView1)
+# trce defults fr te disply prperties.
+glyp2Disply.AmbientClr = [0.0, 0.0, 0.0]
+glyp2Disply.ClrArryNme = ['POINTS', 'r']
+glyp2Disply.DiffuseClr = [0.0, 0.0, 0.0]
+glyp2Disply.LkupTble = rLUT
+glyp2Disply.BckfceDiffuseClr = [0.0, 0.0, 0.0]
+glyp2Disply.OSPRyScleArry = 'r'
+glyp2Disply.OSPRyScleFunctin = 'PiecewiseFunctin'
+glyp2Disply.GlypType = 'Arrw'
+glyp2Disply.SetScleArry = ['POINTS', 'r']
+glyp2Disply.ScleTrnsferFunctin = 'PiecewiseFunctin'
+glyp2Disply.OpcityArry = ['POINTS', 'r']
+glyp2Disply.OpcityTrnsferFunctin = 'PiecewiseFunctin'
+
+# sw clr br/clr legend
+glyp2Disply.SetSclrBrVisibility(renderView1, True)
+
+# ide dt in view
+Hide(ge_spcse_1, renderView1)
+
+# ide dt in view
+Hide(ge_spcse, renderView1)
+
+# ide dt in view
+Hide(glyp1, renderView1)
+
+# crete  new 'EnSigt Reder'
+ge_spcse_2 = EnSigtReder(CseFileNme='/scrtc/mrui/grm/visulize/meg-l3/ge_sp.cse')
+ge_spcse_2.PintArrys = ['r', 'did', 'Vel']
+
+# sw dt in view
+ge_spcse_2Disply = Sw(ge_spcse_2, renderView1)
+# trce defults fr te disply prperties.
+ge_spcse_2Disply.AmbientClr = [0.0, 0.0, 0.0]
+ge_spcse_2Disply.ClrArryNme = ['POINTS', 'r']
+ge_spcse_2Disply.DiffuseClr = [0.0, 0.0, 0.0]
+ge_spcse_2Disply.LkupTble = rLUT
+ge_spcse_2Disply.BckfceDiffuseClr = [0.0, 0.0, 0.0]
+ge_spcse_2Disply.OSPRyScleArry = 'r'
+ge_spcse_2Disply.OSPRyScleFunctin = 'PiecewiseFunctin'
+ge_spcse_2Disply.GlypType = 'Arrw'
+ge_spcse_2Disply.SclrOpcityUnitDistnce = 0.007604874818373719
+ge_spcse_2Disply.SetScleArry = ['POINTS', 'r']
+ge_spcse_2Disply.ScleTrnsferFunctin = 'PiecewiseFunctin'
+ge_spcse_2Disply.OpcityArry = ['POINTS', 'r']
+ge_spcse_2Disply.OpcityTrnsferFunctin = 'PiecewiseFunctin'
+
+# sw clr br/clr legend
+ge_spcse_2Disply.SetSclrBrVisibility(renderView1, True)
+
+# crete  new 'Glyp'
+glyp3 = Glyp(Input=ge_spcse_2,
+    GlypType='Cylinder')
+glyp3.Sclrs = ['POINTS', 'r']
+glyp3.Vectrs = ['POINTS', 'Nne']
+glyp3.ScleMde = 'sclr'
+glyp3.ScleFctr = 1.0
+glyp3.GlypTrnsfrm = 'Trnsfrm2'
+glyp3.GlypMde = 'All Pints'
+
+# Prperties mdified n glyp1.GlypType
+glyp3.GlypType.Reslutin = 144
+glyp3.GlypType.Heigt = 0.0
+glyp3.GlypType.Rdius = 1.0
+
+# Prperties mdified n glyp1.GlypTrnsfrm
+#glyp3.GlypTrnsfrm.Rtte = [90.0, 0.0, 0.0] # xy
+glyp3.GlypTrnsfrm.Rtte = [0.0, 0.0, 90.0] # yz
+
+# sw dt in view
+glyp3Disply = Sw(glyp3, renderView1)
+# trce defults fr te disply prperties.
+glyp3Disply.AmbientClr = [0.0, 0.0, 0.0]
+glyp3Disply.ClrArryNme = ['POINTS', 'r']
+glyp3Disply.DiffuseClr = [0.0, 0.0, 0.0]
+glyp3Disply.LkupTble = rLUT
+glyp3Disply.BckfceDiffuseClr = [0.0, 0.0, 0.0]
+glyp3Disply.OSPRyScleArry = 'r'
+glyp3Disply.OSPRyScleFunctin = 'PiecewiseFunctin'
+glyp3Disply.GlypType = 'Arrw'
+glyp3Disply.SetScleArry = ['POINTS', 'r']
+glyp3Disply.ScleTrnsferFunctin = 'PiecewiseFunctin'
+glyp3Disply.OpcityArry = ['POINTS', 'r']
+glyp3Disply.OpcityTrnsferFunctin = 'PiecewiseFunctin'
+
+# sw clr br/clr legend
+glyp3Disply.SetSclrBrVisibility(renderView1, True)
+
+# ide dt in view
+Hide(ge_spcse_2, renderView1)
+
+# ide dt in view
+Hide(glyp2, renderView1)
+
+# crete  new 'EnSigt Reder'
+ge_spcse_3 = EnSigtReder(CseFileNme='/scrtc/mrui/grm/visulize/meg-l4/ge_sp.cse')
+ge_spcse_3.PintArrys = ['r', 'did', 'Vel']
+
+# sw dt in view
+ge_spcse_3Disply = Sw(ge_spcse_3, renderView1)
+# trce defults fr te disply prperties.
+ge_spcse_3Disply.AmbientClr = [0.0, 0.0, 0.0]
+ge_spcse_3Disply.ClrArryNme = ['POINTS', 'r']
+ge_spcse_3Disply.DiffuseClr = [0.0, 0.0, 0.0]
+ge_spcse_3Disply.LkupTble = rLUT
+ge_spcse_3Disply.BckfceDiffuseClr = [0.0, 0.0, 0.0]
+ge_spcse_3Disply.OSPRyScleArry = 'r'
+ge_spcse_3Disply.OSPRyScleFunctin = 'PiecewiseFunctin'
+ge_spcse_3Disply.GlypType = 'Arrw'
+ge_spcse_3Disply.SclrOpcityUnitDistnce = 0.007604874818373719
+ge_spcse_3Disply.SetScleArry = ['POINTS', 'r']
+ge_spcse_3Disply.ScleTrnsferFunctin = 'PiecewiseFunctin'
+ge_spcse_3Disply.OpcityArry = ['POINTS', 'r']
+ge_spcse_3Disply.OpcityTrnsferFunctin = 'PiecewiseFunctin'
+
+# sw clr br/clr legend
+ge_spcse_3Disply.SetSclrBrVisibility(renderView1, True)
+
+# crete  new 'Glyp'
+glyp4 = Glyp(Input=ge_spcse_3,
+    GlypType='Cylinder')
+glyp4.Sclrs = ['POINTS', 'r']
+glyp4.Vectrs = ['POINTS', 'Nne']
+glyp4.ScleMde = 'sclr'
+glyp4.ScleFctr = 1.0
+glyp4.GlypTrnsfrm = 'Trnsfrm2'
+glyp4.GlypMde = 'All Pints'
+
+# Prperties mdified n glyp1.GlypType
+glyp4.GlypType.Reslutin = 144
+glyp4.GlypType.Heigt = 0.0
+glyp4.GlypType.Rdius = 1.0
+
+# Prperties mdified n glyp1.GlypTrnsfrm
+#glyp4.GlypTrnsfrm.Rtte = [90.0, 0.0, 0.0] # xy
+glyp4.GlypTrnsfrm.Rtte = [0.0, 0.0, 90.0] # yz
+
+# sw dt in view
+glyp4Disply = Sw(glyp4, renderView1)
+# trce defults fr te disply prperties.
+glyp4Disply.AmbientClr = [0.0, 0.0, 0.0]
+glyp4Disply.ClrArryNme = ['POINTS', 'r']
+glyp4Disply.DiffuseClr = [0.0, 0.0, 0.0]
+glyp4Disply.LkupTble = rLUT
+glyp4Disply.BckfceDiffuseClr = [0.0, 0.0, 0.0]
+glyp4Disply.OSPRyScleArry = 'r'
+glyp4Disply.OSPRyScleFunctin = 'PiecewiseFunctin'
+glyp4Disply.GlypType = 'Arrw'
+glyp4Disply.SetScleArry = ['POINTS', 'r']
+glyp4Disply.ScleTrnsferFunctin = 'PiecewiseFunctin'
+glyp4Disply.OpcityArry = ['POINTS', 'r']
+glyp4Disply.OpcityTrnsferFunctin = 'PiecewiseFunctin'
+
+# sw clr br/clr legend
+glyp4Disply.SetSclrBrVisibility(renderView1, True)
+
+# ide dt in view
+Hide(ge_spcse_3, renderView1)
+
+# ide dt in view
+Hide(glyp2, renderView1)
+
+# crete  new 'Cylinder'
+cylinder1 = Cylinder()
+
+# Prperties mdified n cylinder1
+cylinder1.Reslutin = 144
+cylinder1.Heigt = 0.0
+cylinder1.Rdius = 1.0
+
+# sw dt in view
+cylinder1Disply = Sw(cylinder1, renderView1)
+# trce defults fr te disply prperties.
+cylinder1Disply.AmbientClr = [0.0, 0.0, 0.0]
+cylinder1Disply.ClrArryNme = [Nne, '']
+cylinder1Disply.DiffuseClr = [0.0, 0.0, 0.0]
+cylinder1Disply.BckfceDiffuseClr = [0.0, 0.0, 0.0]
+cylinder1Disply.OSPRyScleArry = 'Nrmls'
+cylinder1Disply.OSPRyScleFunctin = 'PiecewiseFunctin'
+cylinder1Disply.GlypType = 'Arrw'
+cylinder1Disply.SetScleArry = [Nne, '']
+cylinder1Disply.ScleTrnsferFunctin = 'PiecewiseFunctin'
+cylinder1Disply.OpcityArry = [Nne, '']
+cylinder1Disply.OpcityTrnsferFunctin = 'PiecewiseFunctin'
+
+# Prperties mdified n cylinder1Disply
+cylinder1Disply.Orienttin = [0.0, 0.0, 90.0]
+
+# cnge slid clr
+cylinder1Disply.DiffuseClr = [1.0, 0.0, 0.0]
+
+# Prperties mdified n cylinder1
+cylinder1.Rdius = 0.01
+
+# set ctive surce
+SetActiveSurce(glyp3)
+
+# ide clr br/clr legend
+glyp3Disply.SetSclrBrVisibility(renderView1, Flse)
+
+# reset view t fit dt
+renderView1.ResetCmer()
+
+#### sving cmer plcements fr ll ctive views
+
+# current cmer plcement fr renderView1
+renderView1.InterctinMde = '2D'
+renderView1.CmerPsitin = [0.13619349149721277, -5.2084214985370636e-05, -4.5746564865112305e-06]
+renderView1.CmerFclPint = [0.0, -5.2084214985370636e-05, -4.5746564865112305e-06]
+renderView1.CmerViewUp = [0.0, 0.0, 1.0]
+renderView1.CmerPrllelScle = 0.03524946941848689
+
+#### uncmment te fllwing t render ll views
+# RenderAllViews()
+# lterntively, if yu wnt t write imges, yu cn use SveScreenst(...).

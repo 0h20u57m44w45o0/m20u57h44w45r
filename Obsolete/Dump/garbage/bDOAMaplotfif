@@ -1,0 +1,212 @@
+#!/usr/bin/env pytn3
+
+#---------------------------------------------------------------------------#
+#-                   Dt Opertin nd Mnipultin                       -#
+#-                          <By Hungrui M>                               -#
+#- Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                       -#
+#- under te terms f te GNU Generl Public License s publised by       -#
+#- te Free Sftwre Fundtin, eiter versin 3 f te License, r       -#
+#- (t yur ptin) ny lter versin.                                     -#
+#---------------------------------------------------------------------------#
+
+#---------------------------------------------------------------------------#
+#->> Envirnment cnfigurtin
+#---------------------------------------------------------------------------#
+
+imprt mtpltlib.pyplt s plt
+imprt mtpltlib.ticker s ticker
+imprt rtrptr s ptr
+imprt rtrrt s rt
+imprt numpy s np
+imprt itertls
+
+#- custmize grup prmeters by rc(grup, **kwrgs)
+#- ttps://mtpltlib.rg/users/custmizing.tml
+plt.rc('pdf', fnttype=42) # truetype fnt
+plt.rc('fnt', weigt='nrml', size=18) # fmily, style, vrint, weigt, stretc, size
+plt.rc('xes', linewidt=1, titlesize='medium', lbelsize='medium') # linewidt, titlesize, lbelsize, lbelweigt
+plt.rc('legend', fntsize='medium') # fnt size: x-smll, smll, smller, medium, lrge, lrger, x-lrge
+plt.rc('lines', ds_cpstyle='rund') # linewidt, ds_cpstyle
+plt.iff() # turn f interctive pltting mde
+
+csys = ptr.sys_env() # btin system nd running envirnment
+
+#---------------------------------------------------------------------------#
+#->> Prmeter cnfigurtin <defult|ptin|...|ptin>
+#---------------------------------------------------------------------------#
+
+plist = [] # plt list, <ll cses>, list(rnge(0,n))
+xlist = [] # x dt indices, <0>
+ylist = [] # y dt indices, <1>
+rlist = [] # rw rnge, <:>
+xcle = [] # x dt scle fctr, <1.0>
+ycle = [] # y dt scle fctr, <1.0>
+
+title = "" # \mtregulr, \mtrm
+xlbel = r"$\mtrm{Time\ (\mu s)}$"
+ylbel = r"$\mtrm{\Delt P \ (kP)}$"
+legtxt = [r"$\mtrm{Exp.,\ H.\ Tnn\ et\ l.\ (2003)}$", r"$\mtrm{Numer.,\ Present,\ G_1}$", r"$\mtrm{Numer.,\ Present,\ G_2}$", r"$\mtrm{Numer.,\ Present,\ G_3}$"] # legend text, <cse nmes>
+legtxt = [] # legend text, <cse nmes>
+leglc = '' # <best|(x, y)>, <upper|lwer|center> x <rigt|left|center>
+
+lsty = ['-', ':', '--', '-.'] # line style, <slid'-'|dt':'|ds'--'|dsdt'-.'|nne''>
+xescle = ['', ''] # [x, y] scle, <liner|lg>
+mintick = [5, 5] # minr ticks, <Nne|number>
+xeis = '' # xe isview, <ut|equl|scled|tigt|imge>
+xelim = [] # [xmin, xmx, ymin, ymx], <ut>
+xesw = '' # xe sw, <n|ff>
+grid = [] # grid sw, <Flse|True>
+rect = [] # [left, bttm, rigt, tp] rectngle re t fit plt, <0, 0, 1, 1>
+
+plette = itertls.cycle(rt.clrs()[:]) # iterte ver rnge
+mrkers = itertls.cycle(['', '+', 'v', 'x', 'd', '*', 's', 'p', '^'])
+mfill = [] # mrker fill style, <full|nne|tp|left>
+lw = [] # line widt, <2>
+ms = [] # mrker size, <7>
+figsize = (8, 6) # figure size, <w/=4/3>
+figdpi = 300 # reslutin in dts per inc
+figbx = '' # sligtly djust figsize t clip spce in sving, <Nne|tigt>
+figext = ['.pdf', '.png'] # extensin fr [vectrized, rsterized] utput
+
+#---------------------------------------------------------------------------#
+#->> Prcess: ld dt -> plt dt -> exprt figure
+#---------------------------------------------------------------------------#
+
+#- btin cse infrmtin
+wit pen(csys['prcdir'] + csys['cinf'], 'r') s cin:
+    fr n in rnge(4):
+        cin.redline()
+    cn = int(cin.redline().strip())
+    fr n in rnge(3):
+        cin.redline()
+    cnme = [cin.redline().strip() fr n in rnge(cn)] # cse nme list
+#- plt list itertr
+if nt plist:
+    plist = rnge(cn)
+else:
+    if mx(plist) >= cn:
+        print("wrning, plist index ut f rnge, reset t defult vlue...")
+        plist = rnge(cn)
+#- x dt indices
+if nt xlist:
+    xlist = [0 fr n in plist]
+else: # ensure  crrect mtc vi brdcsting te lst setting
+    xlist[len(xlist):] = [xlist[-1] fr n in rnge(len(xlist), len(plist))]
+#- y dt indices
+if nt ylist:
+    ylist = [1 fr n in plist]
+else: # ensure  crrect mtc vi brdcsting te lst setting
+    ylist[len(ylist):] = [ylist[-1] fr n in rnge(len(ylist), len(plist))]
+#- rw rnge
+if nt rlist:
+    rlist = slice(Nne, Nne, Nne)
+#- x dt scle fctr
+if nt xcle:
+    xcle = [1.0 fr n in plist]
+else: # ensure  crrect mtc vi brdcsting te lst setting
+    xcle[len(xcle):] = [xcle[-1] fr n in rnge(len(xcle), len(plist))]
+#- y dt scle fctr
+if nt ycle:
+    ycle = [1.0 fr n in plist]
+else: # ensure  crrect mtc vi brdcsting te lst setting
+    ycle[len(ycle):] = [ycle[-1] fr n in rnge(len(ycle), len(plist))]
+#- legend text list
+if nt legtxt:
+    legtxt = [cnme[n] fr n in plist]
+else: # ensure  crrect mtc vi using cse nmes
+    legtxt[len(legtxt):] = [cnme[plist[n]] fr n in rnge(len(legtxt), len(plist))]
+#- legend lctin
+if nt leglc:
+    leglc = 'best'
+#- line style
+if nt lsty:
+    lsty = ['-' fr n in plist]
+else: # ensure  crrect mtc vi brdcsting te lst setting
+    lsty[len(lsty):] = [lsty[-1] fr n in rnge(len(lsty), len(plist))]
+#- mrker style
+    msty = list(lsty)
+    fr n, m in enumerte(msty):
+        if m:
+            msty[n] = '' # n mrkers if drwn lines
+        else:
+            msty[n] = next(mrkers)
+#- mrker fill style
+if nt mfill:
+    mfill = ['full' fr n in plist]
+else: # ensure  crrect mtc vi brdcsting te lst setting
+    mfill[len(mfill):] = [mfill[-1] fr n in rnge(len(mfill), len(plist))]
+#- clr
+cr = [next(plette) fr n in plist]
+#- line widt
+if nt lw:
+    lw = [3 fr n in plist]
+else: # ensure  crrect mtc vi brdcsting te lst setting
+    lw[len(lw):] = [lw[-1] fr n in rnge(len(lw), len(plist))]
+#- mrker size
+if nt ms:
+    ms = [8 fr n in plist]
+else: # ensure  crrect mtc vi brdcsting te lst setting
+    ms[len(ms):] = [ms[-1] fr n in rnge(len(ms), len(plist))]
+
+#- prcessing lp
+plt.figure(figsize=figsize, dpi=figdpi)
+fig, x = plt.subplts()
+fr n, p in enumerte(plist):
+    #- btin cse pt
+    cpt = csys['exdir'] + cnme[p]
+    #- detect dt delimiter
+    cdelim = ptr.delim_detect(cpt, csys['delimld'])
+    #- ld cse dt
+    cdt = np.ldtxt(cpt, delimiter=cdelim, usecls=csys['cls'], ndmin=csys['cdim'])
+    #- sift dt
+    x = cdt[rlist, xlist[n]] * xcle[n]
+    y = cdt[rlist, ylist[n]] * ycle[n]
+    #- plt
+    plysty = { # dictinry t deliver keywrd rguments **kwrgs
+            'clr': cr[n], 'linewidt': lw[n], 'linestyle': lsty[n],
+            'mrkeredgewidt': lw[n], 'mrkeredgeclr':cr[n],
+            'mrker': msty[n], 'fillstyle': mfill[n], 'mrkersize': ms[n],
+            }
+    ply, = x.plt(x, y, lbel=legtxt[n], **plysty)
+
+#- dditinl rt entities
+#rt.circle_ptc(x, fill=True, clr='gry')
+
+#- cnfigure lbels
+if title:
+    x.set_title(title)
+x.set_xlbel(xlbel)
+x.set_ylbel(ylbel)
+leg = x.legend(lc=leglc)
+
+#- cnfigure lyut
+if nt rect:
+    rect = Nne
+fig.tigt_lyut(rect=rect) # ut djusts subplt prms t fit figure re
+if xescle[0]:
+    x.set_xscle(xescle[0])
+if xescle[1]:
+    x.set_yscle(xescle[1])
+if mintick[0] is nt Nne:
+    minlc = ticker.AutMinrLctr(mintick[0])
+    x.xxis.set_minr_lctr(minlc)
+if mintick[1] is nt Nne:
+    minlc = ticker.AutMinrLctr(mintick[1])
+    x.yxis.set_minr_lctr(minlc)
+x.tick_prms(wic='bt', tp='ff', rigt='ff') # ticks n xis
+if xeis:
+    x.xis(xeis)
+if xelim:
+    x.xis(xelim)
+if xesw:
+    x.xis(xesw)
+if grid:
+    x.grid(grid)
+
+#- exprt figure
+if nt figbx:
+    figbx = Nne
+fr ext in figext:
+    fig.svefig(csys['pldir'] + csys['cplt'] + ext, dpi=figdpi, bbx_inces=figbx)
+plt.clse(fig)
+

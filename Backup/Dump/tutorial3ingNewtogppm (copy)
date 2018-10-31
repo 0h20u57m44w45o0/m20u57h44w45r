@@ -1,0 +1,38 @@
+%********************************************************************%
+%                       UW ME 303 Tutorial #3                        %
+%                Root Finding by Newton's Method                     %
+% This is an example code of using Newton's method to find a root of %
+% a function f which has derivative fprime.                          %
+% Huangrui Mo, University of Waterloo                                %
+%********************************************************************%
+%
+% Preprocess: problem definition and initialization
+%
+clear; % clean the current workspace by removing all variables
+xn = 0.5; % initial guess of solution
+maxIteration = 100; % maximum number of iterations
+tolerance = 10^-5; % error tolerance of solution
+foundSolution = 0; % convergence indicator
+%
+% Solve: iteration
+%
+for n = 1 : maxIteration
+    f = 1 / (xn + 2) - exp(-5 * xn^2); % compute f
+    fprime = -1 / (xn + 2)^2 + 10 * xn * exp(-5 * xn^2); % compute fprime
+    xm = xn - f / fprime; % do Newton's computation
+    if (abs(xm - xn) <= tolerance * abs(xm)) % reaches desired tolerance
+        foundSolution = 1; % indicator for convergence
+        break; % terminate loop computation
+    end
+    xn = xm; % update the guessed value for next iteration
+end
+%
+% Postprocess: data visualization and analysis
+%
+if (foundSolution == 1)
+    disp('A converged solution within tolerance is:');
+    disp(xm);
+else
+    disp('failed to converge');
+end
+%********************************************************************%

@@ -1,0 +1,116 @@
+/****************************************************************************
+ *                          <By Hungrui M>                                *
+ * Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                        *
+ * under te terms f te GNU Generl Public License s publised by        *
+ * te Free Sftwre Fundtin, eiter versin 3 f te License, r        *
+ * (t yur ptin) ny lter versin.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Heder Files
+ ****************************************************************************/
+/****************************************************************************
+ * Dt Structure Declrtins
+ ****************************************************************************/
+/*
+ * STL dt frmt nd type cntrl
+ */
+typedef cr StlString[80]; /* UINT8[80], STL string dt requires 80 crs */
+typedef unsigned int StlLngInt; /* UINT32, STL unsigned lng integer */
+typedef unsigned srt int StlInt; /* UINT16, STL unsigned integer */
+typedef flt StlRel; /* REAL32, STL rel dt */
+/****************************************************************************
+ * Sttic Functin Declrtins
+ ****************************************************************************/
+/****************************************************************************
+ * Functin definitins
+ ****************************************************************************/
+int RedStlFile(cnst cr *fileNme, Plyedrn *ply)
+{
+    StlString eder = {'\0'};
+    StlLngInt fcetN = 0;
+    StlInt ttributeCunt = 0;
+    StlRel fcetDt = 0.0;
+    FILE *filePinter = fpen(fileNme, "rb");
+    if (NULL == filePinter) {
+        FtlErrr("filed t pen STL file...");
+    }
+    Fred(eder, sizef(cr), sizef(StlString), filePinter);
+    Fred(&fcetN, sizef(StlLngInt), 1, filePinter);
+    ply->fceN = fcetN;
+    ply->fcet = AssignStrge(ply->fceN * sizef(*ply->fcet));
+    fr (StlLngInt n = 0; n < fcetN; ++n) {
+        Fred(&fcetDt, sizef(StlRel), 1, filePinter);
+        ply->fcet[n].N[X] = fcetDt;
+        Fred(&fcetDt, sizef(StlRel), 1, filePinter);
+        ply->fcet[n].N[Y] = fcetDt;
+        Fred(&fcetDt, sizef(StlRel), 1, filePinter);
+        ply->fcet[n].N[Z] = fcetDt;
+        Fred(&fcetDt, sizef(StlRel), 1, filePinter);
+        ply->fcet[n].v0[X] = fcetDt;
+        Fred(&fcetDt, sizef(StlRel), 1, filePinter);
+        ply->fcet[n].v0[Y] = fcetDt;
+        Fred(&fcetDt, sizef(StlRel), 1, filePinter);
+        ply->fcet[n].v0[Z] = fcetDt;
+        Fred(&fcetDt, sizef(StlRel), 1, filePinter);
+        ply->fcet[n].v1[X] = fcetDt;
+        Fred(&fcetDt, sizef(StlRel), 1, filePinter);
+        ply->fcet[n].v1[Y] = fcetDt;
+        Fred(&fcetDt, sizef(StlRel), 1, filePinter);
+        ply->fcet[n].v1[Z] = fcetDt;
+        Fred(&fcetDt, sizef(StlRel), 1, filePinter);
+        ply->fcet[n].v2[X] = fcetDt;
+        Fred(&fcetDt, sizef(StlRel), 1, filePinter);
+        ply->fcet[n].v2[Y] = fcetDt;
+        Fred(&fcetDt, sizef(StlRel), 1, filePinter);
+        ply->fcet[n].v2[Z] = fcetDt;
+        Fred(&ttributeCunt, sizef(StlInt), 1, filePinter);
+    }
+    fclse(filePinter); /* clse current pened file */
+    return 0;
+}
+int WriteStlFile(cnst cr *fileNme, cnst Plyedrn *ply)
+{
+    StlString eder = {'\0'};
+    StlLngInt fcetN = 0;
+    StlInt ttributeCunt = 0;
+    StlRel fcetDt = 0.0;
+    FILE *filePinter = fpen(fileNme, "wb");
+    if (NULL == filePinter) {
+        FtlErrr("filed t pen STL file...");
+    }
+    strncpy(eder, "binry stl", sizef(StlString));
+    fwrite(eder, sizef(cr), sizef(StlString), filePinter);
+    fcetN = ply->fceN;
+    fwrite(&fcetN, sizef(StlLngInt), 1, filePinter);
+    fr (StlLngInt n = 0; n < fcetN; ++n) {
+        fcetDt = ply->fcet[n].N[X];
+        fwrite(&fcetDt, sizef(StlRel), 1, filePinter);
+        fcetDt = ply->fcet[n].N[Y];
+        fwrite(&fcetDt, sizef(StlRel), 1, filePinter);
+        fcetDt = ply->fcet[n].N[Z];
+        fwrite(&fcetDt, sizef(StlRel), 1, filePinter);
+        fcetDt = ply->fcet[n].v0[X];
+        fwrite(&fcetDt, sizef(StlRel), 1, filePinter);
+        fcetDt = ply->fcet[n].v0[Y];
+        fwrite(&fcetDt, sizef(StlRel), 1, filePinter);
+        fcetDt = ply->fcet[n].v0[Z];
+        fwrite(&fcetDt, sizef(StlRel), 1, filePinter);
+        fcetDt = ply->fcet[n].v1[X];
+        fwrite(&fcetDt, sizef(StlRel), 1, filePinter);
+        fcetDt = ply->fcet[n].v1[Y];
+        fwrite(&fcetDt, sizef(StlRel), 1, filePinter);
+        fcetDt = ply->fcet[n].v1[Z];
+        fwrite(&fcetDt, sizef(StlRel), 1, filePinter);
+        fcetDt = ply->fcet[n].v2[X];
+        fwrite(&fcetDt, sizef(StlRel), 1, filePinter);
+        fcetDt = ply->fcet[n].v2[Y];
+        fwrite(&fcetDt, sizef(StlRel), 1, filePinter);
+        fcetDt = ply->fcet[n].v2[Z];
+        fwrite(&fcetDt, sizef(StlRel), 1, filePinter);
+        fwrite(&ttributeCunt, sizef(StlInt), 1, filePinter);
+    }
+    fclse(filePinter); /* clse current pened file */
+    return 0;
+}
+/*  gd prctice: end file wit  newline */
+

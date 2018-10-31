@@ -1,0 +1,815 @@
+\cpter{An Immersed Bundry Metd fr Treting Arbitrrily Irregulr nd Mving Bundries}
+\lbel{c:ibm}
+
+\sectin{Intrductin}
+
+T slve flw invlving irregulr nd mving gemetries, ne f te min cllenges is relted t enfrcing bundry cnditins. In tis cpter, n immersed bundry metd is develped, vlidted, nd pplied. Trug devising  secnd-rder tree-step flw recnstructin sceme, te prpsed metd is ble t enfrce te Diriclet, Neumnn, Rbin, nd Cucy bundry cnditins in  strigtfrwrd nd cnsistent mnner. Equipped wit  fluid-slid cupling frmewrk tt integrtes ig-rder temprl nd sptil discretiztin scemes, numericl experiments cncerning flw invlving sttinry nd mving bjects, cnvex nd cncve gemetries, n-slip nd slip wll bundry cnditins, s well s subsnic nd supersnic mtins re cnducted t vlidte te metd. Using nlyticl slutins, experimentl bservtins, publised numericl results, nd Glilen trnsfrmtins, it is demnstrted tt te prpsed metd cn prvide efficient, ccurte, nd rbust bundry tretment fr slving flw wit rbitrrily irregulr nd mving gemetries n Crtesin grids. On te bsis f te prpsed metd, te develpment f  slver tt unifies 1D, 2D, nd 3D cmputtins nd te genertin f cmplex gemetric bjects vi simply psitining cmpnents re described. In dditin,  surfce-nrmlized bslute flux is prpsed fr interfce srpness mesurement, nd n nlyticlly slvble mdified vrtex preservtin prblem is develped fr  cnvergence study cncerning smt flw wit irregulr gemetries.
+
+\sectin{Metd develpment}\lbel{sec:frmewrk}
+
+\subsectin{A generlized frmewrk}
+
+Tw- nd tree-dimensinl Crtesin grid-bsed cmputtinl dmins wit immersed bundries re illustrted in Fig.~\ref{fig:gcibm_dem}, in wic $G$ dentes  gst nde,  cmputtinl nde tt is utside te pysicl dmin nd lctes t te numericl bundries, $O$ dentes  bundry pint wit $\Vectr{GO}$ s te utwrd nrml vectr, nd $I$ is te imge pint f te gst nde $G$ reflected by te pysicl bundry.
+\begin{figure}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidt}
+        \cptin{}
+        \lbel{fig:gcibm_dem_2D}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.48\textwidt}
+        \cptin{}
+        \lbel{fig:gcibm_dem_3D}
+    \end{subfigure}%
+    \cptin{Scemtic digrms f Crtesin grid-bsed cmputtinl dmins wit immersed bundries. () 2D spce. (b) 3D Spce. [Nmenclture: $G$, gst nde; $O$, bundry pint; $I$, imge pint; $\Omeg_{\Des{D}}$, dmin f dependence; $N$, neigbring fluid ndes in te dmin f dependence; $\Omeg_1$, fluid dmin; $\Omeg_2$, slid dmin; $IB$, immersed bundry.]}
+    \lbel{fig:gcibm_dem}
+\end{figure}
+
+In  direct frcing immersed bundry metd, bundry tretment is minly but cnstructing te flw t numericl bundries. T btin  prper gst flw wit te existence f pysicl bundries effectively dmitted, n interpltin pprc incrprting te metd f imges is cmmnly dpted:
+\begin{subequtins} \lbel{eq:gcibm}
+    \begin{lign}
+        \psi_G &= 2\psi_O - \psi_I \lbel{eq:gcibm} \\
+        \psi_I &= f(x_I, y_I, z_I) \lbel{eq:gcibmb}
+    \end{lign}
+\end{subequtins}
+were $\psi$ dentes  generic flw vrible, $f(x, y, z)$ is  lcl recnstructin functin f $\psi$ t te imge pint $I$. 
+
+As te lcl recnstructin functin will lrgely determine te numericl prperties f te resulting immersed bundry metd,  tree-step flw recnstructin sceme is develped t cieve efficient, ccurte, nd rbust bundry tretment fr rbitrrily irregulr nd mving bundries. 
+
+\subsectin{A tree-step flw recnstructin sceme}
+
+In tis study, te lcl recnstructin functin is estblised n te pysicl bundry cnditins t te bundry pint $O$ nd te knwn vlues f $\psi$ t nerby fluid ndes:
+\begin{equtin} \lbel{eq:gcibmbnter}
+    \psi_I = f(\{\psi_N\}, \psi_O) 
+\end{equtin}
+were $\psi_O$ is te vlue f $\psi$ t te bundry pint $O$, t wic te pysicl bundry cnditins re enfrced. Except fr  Diriclet bundry cnditin, te vlue f $\psi_O$ is unknwn nd implicitly subject t different types f mtemticl cnstrints, wic re te min cllenges in develping  lcl recnstructin functin. $\{\psi_N\}$ represents te vlues f $\psi$ t fluid ndes $\{N\}$ tt stisfy
+\begin{equtin} \lbel{eq:dmin}
+    d_N = ||\Vectr{x}_I - \Vectr{x}_N|| \le R_I
+\end{equtin}
+in wic $\Vectr{x}_I$ nd $\Vectr{x}_N$ re te psitin vectrs f te pint $I$ nd $N$, respectively. $R_I$, referred t s te dmin f dependence f te pint $I$ nd illustrted in Fig.~\ref{fig:gcibm_dem}, is te mximum distnce frm te pint $I$ t nerby fluid ndes tt re emplyed fr flw recnstructin. 
+
+Te incrprtin f pysicl bundry cnditins in te lcl recnstructin functin f $\psi_I$ gives
+\begin{equtin} \lbel{eq:limit}
+    \begin{ligned}
+        \lim_{||\Vectr{x}_G - \Vectr{x}_O|| \t 0}\psi_G
+        &= 2\psi_O - \lim_{||\Vectr{x}_G - \Vectr{x}_O|| \t 0}\psi_I\\
+        &= 2\psi_O - \lim_{||\Vectr{x}_I - \Vectr{x}_O|| \t 0}\psi_I\\
+        &= 2\psi_O - \lim_{||\Vectr{x}_I - \Vectr{x}_O|| \t 0}f(\{\psi_N\}, \psi_O)\\
+        &= \psi_O
+    \end{ligned}
+\end{equtin}
+Terefre, te cnstructed $\psi_G$ cnverges t te exct pysicl bundry cnditins wen te gst nde $G$ cnverges t te bundry pint $O$.
+
+Fr $\psi$ representing  generic field vrible, t cnstruct $\psi_I=f(\{\psi_N\}, \psi_O)$ regrding te Diriclet, Neumnn, Rbin, nd Cucy bundry cnditins in  strigtfrwrd nd cnsistent mnner,  tree-step flw recnstructin sceme is prpsed.
+
+\prgrp{Predictin step}
+
+Pre-estimte te vlue f $\psi_I$ by pplying inverse distnce weigting n te fluid ndes tt lcte in te dmin f dependence f te imge pint $I$:
+\begin{equtin}\lbel{eq:predicitn}
+    \psi_I^* = \frc{\sum w(d_N) \psi_N}{\sum w(d_N)},\ d_N = \mx(d_N, d_{\Des{tiny}})\ \text{nd}\ \ d_N \le R_I
+\end{equtin}
+were $\psi_I^*$ dentes te predicted vlue f $\psi_I$, te weigting functin $w(d)$ emplys n inverse-pwer lw $1/d^q$ wit $q \in \Set{N}$, $d_N$ is te distnce frm te nde $N$ t te imge pint $I$, $d_{\Des{tiny}} = \vrepsiln \min(\Delt_x, \Delt_y, \Delt_z)$ is  psitive rel number t vid  zer denmintr, $\Delt_x, \Delt_y, \Delt_z$ re te mes sizes in $x$, $y$, $z$ directins, respectively. Te pwer $q=2$, te cnstnt $\vrepsiln=10^{-6}$, nd te dmin f dependence $R_I =2 \mx(\Delt_x, \Delt_y, \Delt_z)$ re dpted in te test cses erein, wic re swn t be well dequte fr  vriety f flw prblems, s demnstrted in te numericl experiments.
+
+\prgrp{Pysicl bundry cnditin enfrcement step}
+
+Determine te vlue f $\psi_O$ vi te pysicl bundry cnditins tt $\psi$ needs t stisfy t te bundry pint $O$ nd te vlues f $\psi$ t interir pysicl dmin.
+
+\subprgrp{Diriclet bundry cnditin}
+
+If $\psi$ stisfies te Diriclet bundry cnditin, te vlue f $\psi_O$ is exctly determined by te specified bundry cnditin:
+\begin{equtin} \lbel{eq:diriclet}
+    \psi_O = g
+\end{equtin}
+were $g$ is  given vlue r functin.
+
+\subprgrp{Neumnn bundry cnditin}
+
+$\psi$ is required t stisfy
+\begin{equtin} \lbel{eq:neumnn}
+    \left. \frc{\prtil \psi}{\prtil n} \rigt|_O = \frc{\prtil \psi_O}{\prtil n}
+\end{equtin}
+were ${\prtil \psi_O}/{\prtil n}$ is  given vlue r functin.
+
+In ter wrds,
+\begin{equtin} \lbel{eq:reneumnn}
+    \lim_{l \t 0} \frc{\psi(\Vectr{x}_O + l \unitVectr{n}) - \psi(\Vectr{x}_O)}{l} = \frc{\prtil \psi_O}{\prtil n}
+\end{equtin}
+were $\Vectr{x}_O$ nd $\unitVectr{n}$ re te psitin vectr nd te unit utwrd surfce nrml vectr t te bundry pint $O$, respectively.
+
+Since pint $I$ is n te nrml directin f pint $O$, it gives
+\begin{equtin} \lbel{eq:directin}
+    \unitVectr{n} = \frc{\Vectr{x}_I - \Vectr{x}_O}{||\Vectr{x}_I - \Vectr{x}_O||}
+\end{equtin}
+
+Terefre,
+\begin{equtin} \lbel{eq:pprxneumnn}
+    \frc{\psi_I - \psi_O}{||\Vectr{x}_I - \Vectr{x}_O||} - \left. \frc{\prtil^2 \psi}{\prtil n^2} \rigt|_O ||\Vectr{x}_I - \Vectr{x}_O|| + \Order(||\Vectr{x}_I - \Vectr{x}_O||^2)= \frc{\prtil \psi_O}{\prtil n}
+\end{equtin}
+
+Due t Eq.~\eqref{eq:gcibm}, te secnd-rder derivtive term s
+\begin{equtin} \lbel{eq:secndderivtive}
+    \left. \frc{\prtil^2 \psi}{\prtil n^2} \rigt|_O = \frc{\psi_I + \psi_G - 2\psi_O}{2||\Vectr{x}_I - \Vectr{x}_O||^2} + \Order(||\Vectr{x}_I - \Vectr{x}_O||^2) = \Order(||\Vectr{x}_I - \Vectr{x}_O||^2)
+\end{equtin}
+
+Hence,  secnd-rder ccurte pprximtin f $\psi_O$ cn be given s
+\begin{equtin} \lbel{eq:resultneumnn}
+    \psi_O = \psi_I - ||\Vectr{x}_I - \Vectr{x}_O||\frc{\prtil \psi_O}{\prtil n}
+\end{equtin}
+
+\subprgrp{Rbin bundry cnditin}
+
+A liner cmbintin f te vlue f $\psi$ nd its nrml derivtive n te bundry pint $O$ is specified:
+\begin{equtin} \lbel{eq:rbin}
+    \lp \psi_O + \bet \left. \frc{\prtil \psi}{\prtil n} \rigt|_O = g
+\end{equtin}
+were $\lp$ nd $\bet$ re te liner cmbintin cefficients, $g$ is  given vlue r functin.
+
+After pprximting te nrml derivtive wit secnd-rder ccurcy, it gives
+\begin{equtin} \lbel{eq:pprxrbin}
+    \lp \psi_O + \bet \frc{\psi_I - \psi_O}{||\Vectr{x}_I - \Vectr{x}_O||} = g
+\end{equtin}
+
+Ten,
+\begin{equtin} \lbel{eq:resultrbin}
+    \psi_O = \frc{\bet \psi_I - ||\Vectr{x}_I - \Vectr{x}_O|| g}{\bet - ||\Vectr{x}_I - \Vectr{x}_O|| \lp}
+\end{equtin}
+
+\subprgrp{Cucy bundry cnditin}
+
+Fr illustrtin purpse, $\psi$ is replced by te velcity vectr $\Vectr{V}=(u,v,w)$ tt stisfies te slip-wll bundry cnditin:
+\begin{equtin} \lbel{eq:slipwll}
+    \begin{ligned}
+        \left. (\Vectr{V} \cdt \unitVectr{n}) \rigt|_{\Vectr{x}=\Vectr{x}_O} &= \Vectr{V}_{S} \cdt \unitVectr{n} \\
+        \left. \frc{\prtil (\Vectr{V} \cdt \t{\Vectr{t}})}{\prtil n} \rigt|_{\Vectr{x}=\Vectr{x}_O} &= 0 \\
+        \left. \frc{\prtil (\Vectr{V} \cdt \tilde{\Vectr{t}})}{\prtil n} \rigt|_{\Vectr{x}=\Vectr{x}_O} &= 0
+    \end{ligned}
+\end{equtin}
+were $\unitVectr{n}$, $\t{\unitVectr{t}}$, nd $\tilde{\unitVectr{t}}$ re te unit nrml vectr, unit tngent vectr, nd unit bitngent vectr t te bundry pint $O$, respectively. $\Vectr{V}_{S}$ is te velcity f te bundry surfce t te pint $O$.
+
+After pprximting te nrml derivtive wit secnd-rder ccurcy, it gives
+\begin{equtin} \lbel{eq:velcity}
+    \begin{ligned}
+        u_O n_x + v_O n_y + w_O n_z &= u_{S} n_x + v_{S} n_y + w_{S} n_z \\
+        u_O \t{t}_x + v_O \t{t}_y + w_O \t{t}_z &= u_I \t{t}_x + v_I \t{t}_y + w_I \t{t}_z \\
+        u_O \tilde{t}_x + v_O \tilde{t}_y + w_O \tilde{t}_z &= u_I \tilde{t}_x + v_I \tilde{t}_y + w_I \tilde{t}_z
+    \end{ligned}
+\end{equtin}
+
+Using te rtgnlity f te cefficient mtrix, $\Vectr{V}_O$ is determined s 
+\begin{equtin} \lbel{eq:determined}
+    \begin{pmtrix}
+        u_O \\
+        v_O \\
+        w_O
+    \end{pmtrix}
+    =
+    \begin{bmtrix}
+        n_x & n_y & n_z \\
+        \t{t}_x & \t{t}_y & \t{t}_z \\
+        \tilde{t}_x & \tilde{t}_y & \tilde{t}_z
+    \end{bmtrix}^{\Des{T}}
+    \begin{pmtrix}
+        u_{S} n_x + v_{S} n_y + w_{S} n_z \\
+        u_I \t{t}_x + v_I \t{t}_y + w_I \t{t}_z \\
+        u_I \tilde{t}_x + v_I \tilde{t}_y + w_I \tilde{t}_z
+    \end{pmtrix}
+\end{equtin}
+
+Te slutin equtins f $\psi_O$ fr different types f bundry cnditins nw cn be unified s
+\begin{equtin} \lbel{eq:unified}
+    \psi_O = C \psi_I + \Des{RRHS}
+\end{equtin}
+were te vlues f te cefficient $C$ nd te rest rigt-nd side $\Des{RRHS}$ re summrized in Tble~\ref{tb:bcmp}.
+\begin{tble}[!tbp]
+    \centering
+    \cptin{Vlue mp f $C$ nd $\Des{RRHS}$ fr different types f bundry cnditins.}
+    \lbel{tb:bcmp}
+    \scriptsize
+    \setlengt{\tbclsep}{3pt}
+    \renewcmmnd{\rrystretc}{1.15}
+    \begin{tbulr}{lccc}
+        \line
+        Type & Exmple frm & $C$ & $\Des{RRHS}$\\
+        \line
+        Diriclet & $\psi_O = g$ & $0$ & $g$ \\[8pt]
+        Neumnn & $\left. \frc{\prtil \psi}{\prtil n} \rigt|_O = \frc{\prtil \psi_O}{\prtil n}$ & $1$ & $- ||\Vectr{x}_I - \Vectr{x}_O||\frc{\prtil \psi_O}{\prtil n}$ \\[8pt]
+        Rbin & $\lp \psi_O + \bet \left. \frc{\prtil \psi}{\prtil n} \rigt|_O = g$ & $\frc{\bet}{\bet - ||\Vectr{x}_I - \Vectr{x}_O|| \lp}$ & $\frc{- ||\Vectr{x}_I - \Vectr{x}_O|| g}{\bet - ||\Vectr{x}_I - \Vectr{x}_O|| \lp}$ \\[8pt]
+        Cucy & $\begin{ligned} \left. (\Vectr{V} \cdt \unitVectr{n}) \rigt|_{\Vectr{x}=\Vectr{x}_O} &= \Vectr{V}_{S} \cdt \unitVectr{n} \\ \left. \frc{\prtil (\Vectr{V} \cdt \t{\Vectr{t}})}{\prtil n} \rigt|_{\Vectr{x}=\Vectr{x}_O} &= 0 \\ \left. \frc{\prtil (\Vectr{V} \cdt \tilde{\Vectr{t}})}{\prtil n} \rigt|_{\Vectr{x}=\Vectr{x}_O} &= 0 \end{ligned}$ & $\begin{bmtrix} n_x & n_y & n_z \\ \t{t}_x & \t{t}_y & \t{t}_z \\ \tilde{t}_x & \tilde{t}_y & \tilde{t}_z \end{bmtrix}^{\Des{T}} \begin{bmtrix} 0 & 0 & 0 \\ \t{t}_x & \t{t}_y & \t{t}_z \\ \tilde{t}_x & \tilde{t}_y & \tilde{t}_z \end{bmtrix}$ & $\begin{bmtrix} n_x & n_y & n_z \\ \t{t}_x & \t{t}_y & \t{t}_z \\ \tilde{t}_x & \tilde{t}_y & \tilde{t}_z \end{bmtrix}^{\Des{T}} \begin{bmtrix} n_x & n_y & n_z \\ 0 & 0 & 0 \\ 0 & 0 & 0 \end{bmtrix} \cdt \Vectr{V}_S$\\
+        \line
+    \end{tbulr}
+\end{tble}
+
+\prgrp{Crrectin step}
+
+Slve te vlue f $\psi_I$ by dding te bundry pint $O$ s  stencil nde fr te inverse distnce weigting f $\psi_I$:
+\begin{equtin}\lbel{eq:crrectin}
+    \psi_I = \frc{\sum w(d_N) \psi_N + w(d_O) \psi_O}{\sum w(d_N) + w(d_O)} = \frc{\psi_I^* + \frc{w(d_O)}{\sum w(d_N)}\psi_O}{1+\frc{w(d_O)}{\sum w(d_N)}}
+\end{equtin}
+in wic te repetitin f clcultins n fluid ndes cn be vided, since te sum f weigts nd sum f weigted vlues re lredy btined in te predictin step.
+
+Due t te unknwn $\psi_I$ in Eq.~\eqref{eq:unified}, te slutin equtin f $\psi_O$ is cupled wit te slutin equtin f $\psi_I$ in te crrectin step. T slve tis prblem, ne metd is  syncrnus slving pprc t slve $\psi_O$ nd $\psi_I$ simultneusly:
+\begin{equtin} \lbel{eq:syncrnus}
+    \begin{cses}
+        \psi_O = \ C \psi_I + \Des{RRHS} \\
+        \psi_I = \ \frc{\psi_I^* + \frc{w(d_O)}{\sum w(d_N)}\psi_O}{1+\frc{w(d_O)}{\sum w(d_N)}}
+    \end{cses}
+\end{equtin}
+
+Te ter is n syncrnus slving pprc: first, slve $\psi_O$ vi pprximting te unknwn $\psi_I$ wit te pre-estimted $\psi_I^*$; ten, slve $\psi_I$ in te crrectin step.
+\begin{equtin} \lbel{eq:syncrnus}
+    \begin{cses}
+        \psi_O = C \psi_I^* + \Des{RRHS} \\
+        \psi_I = \frc{\psi_I^* + \frc{w(d_O)}{\sum w(d_N)}\psi_O}{1+\frc{w(d_O)}{\sum w(d_N)}}
+    \end{cses}
+\end{equtin}
+
+Te enfrcement f te Diriclet nd trivil Neumnn bundry cnditins is equivlent in tese tw pprces. Fr te ter types f bundry cnditins, wen te syncrnus slving pprc is used, te pysicl bundry cnditin enfrcement step nd te crrectin step cn be itertively implemented. Hwever, numericl tests suggest tt te effects f itertive implementtin n te verll slutin ccurcy re insignificnt.
+
+Te syncrnus slving pprc witut itertive implementtin is dpted nd exmined erein, since te vlidity f te syncrnus slving pprc is estblised wen te vlidity f te syncrnus slving pprc is prved.
+
+\subsectin{Metd discussin}
+
+\subsubsectin{Advntges f tree-step design}
+
+As  mtrix inversin-free metd, te prpsed tree-step flw recnstructin sceme erein exempts frm te ptentil numericl singulrities invlved in slving liner systems, wic is  cllenging issue fr plynmil recnstructin-bsed metds wen stencil ndes re nt well distributed due t igly irregulr r clliding gemetries. Menwile, te lgritm cmplexity f mtrix inversin fr  $n \times n$ mtrix, wic is ne f te prcedures in  plynmil recnstructin-bsed metd, is usully $\Order(n^3)$, were $n$ is te number f stencil ndes. Te number f flting pint pertins f te prpsed sceme fr recnstructing  field vrible is but fur multiplictins, ne divisin, nd seven dditins/subtrctins per stencil nde, in wic te bundry pint cn ve dditinlly but eigteen multiplictins nd twelve dditins in te cse f Cucy bundry cnditin. Terefre, te lgritm cmplexity is $\Order(n)$, nd te prpsed sceme is  liner-time lgritm.
+
+In dditin t functining s  flw recnstructin metd fr te imge pints, te prpsed sceme ls effectively slves te pysicl quntities t te bundry pint fr bundry cnditins wit unknwn bundry vlues, suc s te nn-trivil Neumnn, Rbin, nd Cucy bundry cnditins. Te tree-step design ten furter enbles  cnsistent tretment fr te Diriclet, Neumnn, Rbin, nd Cucy bundry cnditins wit sred weigts. As te clcultin f weigt ccupies fur multiplictins, ne divisin, nd five dditins/subtrctins, tis cnsistency nt nly simplifies implementtin but ls brings efficiency trug treting velcity, pressure, nd temperture fields wit unified lgritm nd sred weigts, wile plynmil recnstructin-bsed metds usully require cnstructing nd slving  designted liner system fr ec type f bundry cnditins.
+
+\subsubsectin{Autmtic dpttin t gemetric irregulrity}
+
+Te dmin f dependence f te prpsed tree-step flw recnstructin sceme is slely distnce-bsed, nd n sptil dimensin-relted prmeters re invlved, s well s n stencil structures re impsed in te sceme. Tese prperties cn esily fcilitte te develpment f  slver tt unifies 1D, 2D, nd 3D cmputtins, viding te necessity f mintining seprte versins f cdes.
+\begin{figure}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.44\textwidt}
+        \cptin{}
+        \lbel{fig:nc_dem_2d}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.44\textwidt}
+        \cptin{}
+        \lbel{fig:nc_dem_3d}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.44\textwidt}
+        \cptin{}
+        \lbel{fig:nc_dem_3d_multi}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.44\textwidt}
+        \cptin{}
+        \lbel{fig:nc_dem_2d_multi}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.44\textwidt}
+        \cptin{}
+        \lbel{fig:nc_dem_2d_tip}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.44\textwidt}
+        \cptin{}
+        \lbel{fig:nc_dem_2d_jint}
+    \end{subfigure}%
+    \cptin{Digrms illustrting ides relted t utmtic dpttin t gemetric irregulrity. () A 2D gemetry represented by n NACA $0012$ irfil. (b) A 3D gemetry generted by extrusin. (c) A 3D cmplex gemetric bject generted by cmpnent-bsed ssembling nd  single cmputtinl nde lyer n te cllpsed dimensin. Te ter numericl bundry lyers re nt swn. (d) Te 2D cutting plne fr immersed bundry tretment. (e) Te nde mp t te tip regin. (f) Te nde mp t te jint regin. \emp{Clrs} represent te type f ndes: \emp{red}, $1$st lyer gst ndes; \emp{blue}, $2$nd lyer gst ndes; \emp{blck}, $3$rd lyer gst ndes; \emp{gry}, fluid r slid ndes fr ndes inside te fluid nd slid regin, respectively. Te irfil prfiles re swn in slid curves.}
+    \lbel{fig:nc_dem}
+\end{figure}
+
+T better illustrte te ide, te genertin f te rtr fr te subsnic rttinl flw in te numericl experiments is swn in Fig.~\ref{fig:nc_dem}. Te slver develped erein emplys te equivlence between  2D spce nd  3D spce wit te zer grdient cnditin n te cllpsed dimensin. As swn in Fig.~\ref{fig:nc_dem_2d},  2D gemetry is extruded wit unit tickness n te tird dimensin t frm  3D gemetry in Fig.~\ref{fig:nc_dem_3d}. Te unit tickness prvides te fesibility f directly deriving te perimeter nd re f te 2D gemetry frm te surfce re nd vlume f te 3D gemetry.
+
+Benefiting frm te rbustness f te prpsed tree-step flw recnstructin sceme,  cmplex gemetric bject suc s te ne in Fig.~\ref{fig:nc_dem_3d_multi} cn be generted trug ssembling its multiple cmpnents vi psitining wile llwing verlpped surfces, wic vids te cst nd cumbersme f prducing  single tplgy. In dditin, ne cmputtinl lyer nd s mny s needed numericl bundry lyers, suc s tree numericl bundry lyers n ec side fr  $7$-pint-stencil sptil discretiztin sceme, n te cllpsed dimensin re used t estblis  3D numericl spce, in wic te 3D gverning equtins nd te prpsed immersed bundry metd wit 3D spericl dmin f dependence re implemented.
+
+Wen te zer grdient cnditin is pplied t te numericl bundry lyers n te cllpsed dimensin, te 3D gverning equtins will be cmputtinlly equivlent t 2D equtins. Since immersed bundry tretment suld nly be pplied t te cmputtinl dmin, nd tere is nly ne cmputtinl lyer fr  3D spce wit  cllpsed dimensin, te implemented 3D spericl dmin f dependence fr te prpsed immersed bundry tretment erein will utmticlly cllpse t  2D circle. Hence, te metd utmticlly cnducts 2D immersed bundry tretment fr te 2D cutting plne swn in Fig.~\ref{fig:nc_dem_2d_multi}. Similrly,  1D spce is equivlent t  3D spce wit tw cllpsed dimensins. As  summry, ll cmputtins re unified in  3D spce wit 3D gemetries. Te number f cmputtinl lyers nd te pplied bundry cnditins re used t cntrl te cllpse f  specific dimensin witut mdifying te underlying numericl discretiztin.
+
+Te tip nd te jint dented in Fig.~\ref{fig:nc_dem_2d_multi} represent cnvex nd cncve regins, respectively. A nde mp clssifying te types f cmputtinl ndes is generted using lgritms develped in te reference \citep{m2017field} fr fcilitting te numericl discretiztin n  $1200 \times 1200$ Crtesin grid. Te zmed tip nd jint regins re ten swn in Fig.~\ref{fig:nc_dem_2d_tip} nd Fig.~\ref{fig:nc_dem_2d_jint}, respectively.
+
+As swn in Fig.~\ref{fig:nc_dem_2d_tip}, fr n under-reslved cnvex regin, ndes inside te slid gemetry will lrgely be clssified s gst ndes. In generl, due t te cnvex feture, tere will be sufficient neigbring fluid ndes fr te crrespnding imge pints, wic reduces stencil-relted difficulties in flw recnstructin. Te tip nd te Crtesin grid swn erein re rrnged t illustrte  dilemm cncerning gst ndes t te medin f  cnvex ngle: ec gst nde s tw bundry pints in 2D spce r infinitely mny bundry pints in 3D spce wit equl distnce but cn nly stre ne set f gst flw. On n under-reslved grid, tis dilemm cn be llevited wen te medin line is nt ligned wit  nde line but plced centrlly between tw nde lines s tt tere re n sred gst ndes. Since te underlying cuse is te insufficient grid reslutin, nd tis dilemm will be utmticlly ddressed by imprving grid reslutin, n specil tretment is incrprted int te prpsed bundry tretment metd erein.
+
+As swn in Fig.~\ref{fig:nc_dem_2d_jint}, gst ndes t  cncve regin re less ffected by tt dilemm. Hwever, due t te cncve feture, tere cn be  very limited number f neigbring fluid ndes fr te crrespnding imge pints witin te dmin f dependence. Tis issue impses cllenges fr  plynmil recnstructin-bsed metd, s  fixed number f stencil ndes is needed t vid under-determined liner systems. On te cntrry, te prpsed tree-step flw recnstructin sceme erein is sclble t te number f stencil ndes nd cn utmticlly dpt t  vrying number f stencil ndes. Even in te wrst situtin, in wic nly ne fluid nde exists in te dmin f dependence f n imge pint, te prpsed metd cn still be cnsistently pplied. Tis stencil sclbility prvides rbustness fr slving flw wit strngly irregulr nd mving gemetries tt invlve multibdy cntct nd cllisins, s demnstrted in te numericl experiment cncerning te explsive dispersl f dense prticles, in wic  significnt number f cnvex nd cncve regins exist, frm, nd destry in te slutin prcess.
+
+\subsubsectin{Fres nde tretment}
+
+In slving flw wit mving gemetries,  gst nde will becme  fres nde in te fluid dmin wen te gst nde mves ut frm te slid dmin fter updting te mtins f te slids. Terefre, vlid field quntities suld be recnstructed fr tese fres ndes. An ide tt cnsistently trets te imge pints nd fres ndes is used erein. Tt is, suppse $\psi$ being  generic flw vrible t  fres nde, te prpsed tree-step flw recnstructin sceme is ls pplied fr te fres nde t recnstruct $\psi$ frm te pysicl bundry cnditins t te crrespnding bundry pint $O$ nd te knwn vlues f $\psi$ t nerby nn-fres fluid ndes t te sme time level. In te numericl experiment invlving  supersnic trnslting wedge, te effectiveness f tis pprc is demnstrted trug cmpring te slved slutin functinls wit nlyticl slutins s well s vi exmining te entire slutin field using Glilen trnsfrmtin. 
+
+\sectin{Numericl experiments} \lbel{sec:vlidity}
+
+\subsectin{Supersnic flw ver  wedge}
+
+As illustrted in Fig.~\ref{fig:flw_wedge_dem_}, wen  supersnic flw wit Mc number $M_{\infty}$ psses ver  wedge wit n dequte deflectin ngle $\tet$, sttinry blique sck wves wit  sck ngle $\bet$ cn be creted t te nse f te wedge. Te $M_{\infty}-\tet-\bet$ reltin cn be nlyticlly btined vi  cntrl vlume nlysis bsed n cnservtin lws nd s te fllwing frm \citep{ndersn2010fundmentls}:
+\begin{equtin}
+    \tn \tet = \frc{2}{\tn \bet} \frc{M_{\infty}^2 \sin^2 \bet - 1}{M_{\infty}^2 (\gmm + \cs(2\bet)) + 2}
+\end{equtin}
+were $\gmm$ is te et cpcity rti.
+\begin{figure}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.4\textwidt}
+        \cptin{}
+        \lbel{fig:flw_wedge_dem_}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.4\textwidt}
+        \cptin{}
+        \lbel{fig:flw_wedge_dem_b}
+    \end{subfigure}%
+    \cptin{Scemtic digrms fr te supersnic flw ver  wedge prblem. () Oblique sck reltin. (b) Cmputtinl cnfigurtin. [Nmenclture: $M_{\infty}$, Mc number f te pprcing flw; $S$, blique sck; $\tet$, deflectin ngle; $\bet$, sck ngle; $D$, lengt f wedge; $O$, te frnt vertex f wedge; $L$, dmin lengt; $H$, dmin eigt.] Te scemtic digrms re dpted frm te wrk f \citet{ndersn2010fundmentls}.}
+    \lbel{fig:flw_wedge_dem}
+\end{figure}
+
+T vlidte te prpsed metd, tis supersnic flw ver  wedge prblem is slved. As illustrted in Fig.~\ref{fig:flw_wedge_dem_b}, in  $L \times H = [-0.5D, 9.5D] \times [-2.5D, 2.5D]$ dmin wit n initil flw stte f $(\r_0, u_0, v_0, p_0)=(1.4 \Unit{kg/m^3}, 40 \Unit{m/s}, 0, 400 \Unit{P})$, in wic te speed f sund is $_0=20 \Unit{m/s}$,  sttinry wedge wit $D=1 \Unit{m}$ is psitined t $O(0,0)$ nd s te slip-wll bundry cnditin. Te rigt dmin bundry s te utflw cnditin, nd te tp nd bttm bundries re treted s slip wlls. Te left dmin bundry s n inflw cnditin $(\r_{\infty}, u_{\infty}, v_{\infty}, p_{\infty})=(\r_0, M_{\infty} _0, 0, p_0)$, nd te inviscid flw is slved t $t=4L/(M_{\infty}_0)$ fr btining  stedy stte.
+
+In rder t simplify te discussin, nttin $M_{\infty}(\t{M})-\tet(\t{\tet})-\bet_e(\t{\bet}_e)-\bet_n(\t{\bet}_n)-G(\t{G})$ is used t dente  cse wit Mc number $\t{M}$, deflectin ngle $\t{\tet}$, nlyticl sck ngle $\t{\bet}_e$, nd numericl sck ngle $\t{\bet}_n$ slved n grid $\t{G}$. It is wrt mentining tt te mesurement f numericl sck ngles is trug mnully picking up tw pints t te center f te cmputed blique sck line nd ten cmputing te slpe ngle f tt line. Terefre, te presented numericl sck ngles erein re subject t smpling errrs. T better fcilitte te cmprisn f numericl nd nlyticl slutins, strigt lines wit slpe ngles being equl t te nlyticl sck ngles re visulized in te figures f results.
+
+A grid sensitivity study is cnducted fr cse $M_{\infty}(2)-\tet(15^{\circ})-\bet_e(45.344^{\circ})$ n  series f successively refined grids, nd te results n fur csen grids re swn in Fig.~\ref{fig:1_wedge_nmv_deg15_mc2_mes}. As te grid reslutin increses, te srpness f te cmputed scks imprves ccrdingly, nd te perturbtins in te wkes re less dissipted. Te genertin f scillting wkes in te inviscid flw my be prtilly due t te numericl viscsity in te numericl scemes. Nneteless, te predicted blique sck ngles re in excellent greement wit te nlyticl slutin ver  wide rnge f grid reslutin, nd Prndtl-Meyer expnsin wves re ls pysiclly reslved t ec rer crner f te wedge. Since gd numericl ccurcy nd sck srpness cn be cieved n te $1200\times600$ grid, tis grid is emplyed fr te investigtin f ter cses.
+\begin{figure}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidt}
+        \cptin{}
+        \lbel{fig:1_wedge_nmv_deg15_mc2_m0600_lined}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.48\textwidt}
+        \cptin{}
+        \lbel{fig:1_wedge_nmv_deg15_mc2_m1200_lined}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.48\textwidt}
+        \cptin{}
+        \lbel{fig:1_wedge_nmv_deg15_mc2_m1800_lined}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.48\textwidt}
+        \cptin{}
+        \lbel{fig:1_wedge_nmv_deg15_mc2_m2400_lined}
+    \end{subfigure}%
+    \cptin{Grid sensitivity study f supersnic flw ver  wedge fr cse $M_{\infty}(2)-\tet(15^{\circ})-\bet_e(45.344^{\circ})$. Lines dented by squre mrks represent te nlyticl slutins. () $\bet_n(44.927^{\circ})-G(600\times300)$. (b) $\bet_n(45.198^{\circ})-G(1200\times600)$. (c) $\bet_n(45.726^{\circ})-G(1800\times900)$. (d) $\bet_n(45.352^{\circ})-G(2400\times1200)$.}
+    \lbel{fig:1_wedge_nmv_deg15_mc2_mes}
+\end{figure}
+
+Te predictin cpbility n blique sck reltin ver different deflectin ngles nd Mc numbers re illustrted in Fig.~\ref{fig:1_wedge_nmv_deg} nd Fig.~\ref{fig:1_wedge_nmv_mc}, respectively. Under te sme Mc number,  iger deflectin ngle leds t  iger sck ngle. Fr  fixed deflectin ngle, s te Mc number increses, te sck ngle decreses. Due t te finite lengt f te wedge, blique scks wit lw sck ngles my strngly interfere wit te Prndtl-Meyer expnsin wves nd incline twrd te rer crners f te wedge. Fr te blique sck ngles, te excellent greement between te numericl nd nlyticl slutins is cnsistently presented mng ll te cses, demnstrting te ig vlidity f te prpsed metd.
+\begin{figure}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.65\textwidt}
+        \cptin{}
+        \lbel{fig:1_wedge_nmv_deg10_mc4_m1200_lined}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.65\textwidt}
+        \cptin{}
+        \lbel{fig:1_wedge_nmv_deg15_mc4_m1200_lined}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.65\textwidt}
+        \cptin{}
+        \lbel{fig:1_wedge_nmv_deg20_mc4_m1200_lined}
+    \end{subfigure}%
+    \cptin{Oblique sck reltin f supersnic flw ver  wedge fr cse $M_{\infty}(4)-G(1200\times600)$ ver different deflectin ngles. Lines dented by squre mrks represent te nlyticl slutins. () $\tet(10^{\circ})-\bet_e(22.234^{\circ})-\bet_n(22.227^{\circ})$. (b) $\tet(15^{\circ})-\bet_e(27.063^{\circ})-\bet_n(27.325^{\circ})$. (c) $\tet(20^{\circ})-\bet_e(32.464^{\circ})-\bet_n(32.293^{\circ})$.}
+    \lbel{fig:1_wedge_nmv_deg}
+\end{figure}
+\begin{figure}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.65\textwidt}
+        \cptin{}
+        \lbel{fig:1_wedge_nmv_deg15_mc6_m1200_lined}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.65\textwidt}
+        \cptin{}
+        \lbel{fig:1_wedge_nmv_deg15_mc8_m1200_lined}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.65\textwidt}
+        \cptin{}
+        \lbel{fig:1_wedge_nmv_deg15_mc10_m1200_lined}
+    \end{subfigure}%
+    \cptin{Oblique sck reltin f supersnic flw ver  wedge fr cse $\tet(15^{\circ})-G(1200\times600)$ ver different Mc numbers. Lines dented by squre mrks represent te nlyticl slutins. () $M_{\infty}(6)-\bet_e(22.672^{\circ})-\bet_n(22.585^{\circ})$. (b) $M_{\infty}(8)-\bet_e(20.860^{\circ})-\bet_n(20.595^{\circ})$. (c) $M_{\infty}(10)-\bet_e(19.942^{\circ})-\bet_n(18.930^{\circ})$.}
+    \lbel{fig:1_wedge_nmv_mc}
+\end{figure}
+
+\subsectin{Supersnic trnslting wedge}
+
+In rder t test te prpsed metd fr slving flw invlving mving gemetries, te supersnic trnslting wedge prblem is slved, wic is  Glilen trnsfrmtin f te supersnic flw ver  wedge prblem. As illustrted in Fig.~\ref{fig:wedge_flw_dem}, in  $L \times H = [-0.5D, 9.5D] \times [-2.5D, 2.5D]$ dmin wit n initil flw stte f $(\r_0, u_0, v_0, p_0)=(1.4 \Unit{kg/m^3}, 0, 0, 400 \Unit{P})$, in wic te speed f sund is $_0=20 \Unit{m/s}$,  wedge wit $D=1 \Unit{m}$ nd $M_{\infty}=2$ is initilly psitined t $O(8D,0)$ nd s te slip-wll bundry cnditin. Te utflw cnditin is enfrced t te left nd rigt dmin bundries, wile te slip-wll cnditin is impsed t te tp nd bttm bundries. T limit te required size f te cmputtinl dmin, te evlutin is slved t $t=0.8L/(M_{\infty}_0)$. Altug te mst prts f te flw regin re still in n unstedy stte, nd te trnsient perturbtins generted frm te sudden mtin f te wedge in te initil sttinry flw re nt dvected ut f te dmin, te blique scks re well-develped witin te given cmputtinl time.
+\begin{figure}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.4\textwidt}
+        \cptin{}
+        \lbel{fig:flw_wedge_dem_c}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.4\textwidt}
+        \cptin{}
+        \lbel{fig:flw_wedge_dem_d}
+    \end{subfigure}%
+    \cptin{Scemtic digrms fr te supersnic trnslting wedge prblem. () Oblique sck reltin. (b) Cmputtinl cnfigurtin. [Nmenclture: $M_{\infty}$, Mc number f te mving wedge; $S$, blique sck; $\tet$, deflectin ngle; $\bet$, sck ngle; $D$, lengt f wedge; $O$, te frnt vertex f wedge; $L$, dmin lengt; $H$, dmin eigt.] Te scemtic digrms re dpted frm te wrk f \citet{ndersn2010fundmentls}.}
+    \lbel{fig:wedge_flw_dem}
+\end{figure}
+
+Te time evlutin f bt te supersnic flw ver  wedge nd te supersnic trnslting wedge under te cnditin $M_{\infty}(2)-\tet(15^{\circ})-G(1200\times600)$ is cptured in Fig.~\ref{fig:1_wedge_nmv_vs_mv_deg15_mc2_m1200}, in wic te dynmic prcess f blique sck frmtin t te wedge nse nd Prndtl-Meyer expnsin wve genertin t te rer crners is clerly depicted.
+
+Min flw fetures exempted frm te extr interpltin errr f fres nde tretment, suc s te blique scks, reflected scks, nd Prndtl-Meyer expnsin wves, re well greed in tis Glilen trnsfrmtin pir. In dditin, te predicted wkes re ls igly cmprble. Tese well greed results f tis supersnic Glilen trnsfrmtin pir demnstrte te success f te prpsed tree-step flw recnstructin sceme fr fres nde tretment nd te cpbility f te tree-step flw recnstructin-bsed immersed bundry metd erein fr slving flw wit mving gemetries.
+
+T furter verify te slutin f te supersnic trnslting wedge prblem,  cmprisn f te numericl nd nlyticl slutins fr different deflectin ngles is swn in Fig.~\ref{fig:1_wedge_mv_deg}. Te excellent greement in numericl nd nlyticl slutins demnstrtes te vlidity nd ccurcy f te metd in slving flw wit mving gemetries.
+\begin{figure}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidt}
+        \cptin{$t = 0.05 \Unit{s}$}
+        \lbel{fig:1_wedge_nmv_deg15_mc2_m1200_t050ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.48\textwidt}
+        \cptin{$t = 0.05 \Unit{s}$}
+        \lbel{fig:1_wedge_mv_deg15_mc2_m1200_t050ms}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.48\textwidt}
+        \cptin{$t = 0.10 \Unit{s}$}
+        \lbel{fig:1_wedge_nmv_deg15_mc2_m1200_t100ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.48\textwidt}
+        \cptin{$t = 0.10 \Unit{s}$}
+        \lbel{fig:1_wedge_mv_deg15_mc2_m1200_t100ms}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.48\textwidt}
+        \cptin{$t = 0.15 \Unit{s}$}
+        \lbel{fig:1_wedge_nmv_deg15_mc2_m1200_t150ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.48\textwidt}
+        \cptin{$t = 0.15 \Unit{s}$}
+        \lbel{fig:1_wedge_mv_deg15_mc2_m1200_t150ms}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.48\textwidt}
+        \cptin{$t = 0.20 \Unit{s}$}
+        \lbel{fig:1_wedge_nmv_deg15_mc2_m1200_t200ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.48\textwidt}
+        \cptin{$t = 0.20 \Unit{s}$}
+        \lbel{fig:1_wedge_mv_deg15_mc2_m1200_t200ms}
+    \end{subfigure}%
+    \cptin{Time evlutin f slutin fr cse $M_{\infty}(2)-\tet(15^{\circ})-G(1200\times600)$. (), (c), (e), (g) Te supersnic flw ver  wedge prblem. (b), (d), (f), () Te supersnic trnslting wedge prblem.}
+    \lbel{fig:1_wedge_nmv_vs_mv_deg15_mc2_m1200}
+\end{figure}
+\begin{figure}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.65\textwidt}
+        \cptin{}
+        \lbel{fig:1_wedge_mv_deg10_mc2_m1200_lined}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.65\textwidt}
+        \cptin{}
+        \lbel{fig:1_wedge_mv_deg15_mc2_m1200_lined}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.65\textwidt}
+        \cptin{}
+        \lbel{fig:1_wedge_mv_deg20_mc2_m1200_lined}
+    \end{subfigure}%
+    \cptin{Oblique sck reltin f supersnic trnslting wedge fr cse $M_{\infty}(2)-G(1200\times600)$ ver different deflectin ngles. Lines dented by squre mrks represent te nlyticl slutins. () $\tet(10^{\circ})-\bet_e(39.314^{\circ})-\bet_n(39.313^{\circ})$. (b) $\tet(15^{\circ})-\bet_e(45.344^{\circ})-\bet_n(45.034^{\circ})$. (c) $\tet(20^{\circ})-\bet_e(53.423^{\circ})-\bet_n(53.425^{\circ})$.}
+    \lbel{fig:1_wedge_mv_deg}
+\end{figure}
+
+\subsectin{Sck diffrctin ver  cylinder} \lbel{cse:1_cyn}
+
+A Mc $2.81$ plnr sck intercting wit  sttinry circulr cylinder is studied t furter evlute te vlidity f te develped metd. Tis clssicl sck diffrctin prblem s been widely investigted in te literture, including bt experimentl bservtins \citep{brysn1961diffrctin, bzenv1984unstedy, kc1988interfermetric} nd numericl studies \citep{kc1988interfermetric,ripley2006numericl, smbsivn2009gstb}.
+\begin{figure}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.4\textwidt}
+        \cptin{}
+        \lbel{fig:sck_cylinder_dem_}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.4\textwidt}
+        \cptin{}
+        \lbel{fig:sck_cylinder_dem_b}
+    \end{subfigure}%
+    \cptin{Scemtic digrms fr  plnr sck intercting wit  sttinry circulr cylinder. () Initil stte. (b) Well-develped diffrctin. [Nmenclture: $I$, incident sck; $R$, reflected sck; $M$, Mc stem (diffrcted sck); $S$, slip line (cntct discntinuity); $T$, triple pint.] Te scemtic digrms re dpted frm te wrk f \citet{kc1988interfermetric}.}
+    \lbel{fig:sck_cylinder_dem}
+\end{figure}
+
+As  time-dependent prcess, te interctin between te incident sck nd cylinder encmpsses cmplex cmpressible flw fetures suc s scks nd cntct discntinuities. As illustrted in Fig.~\ref{fig:sck_cylinder_dem}, te incident sck initilly prpgtes freely twrd te cylinder. Once clliding wit te cylinder, te sck reflects s well s diffrcts ver te cnvex slid surfce wit te frmtin f  curved Mc stem nd  slip line t ec side f te plne f symmetry. During te evlutin, triple pints re prduced trug te intersectin f te incident sck, reflected sck, nd diffrcted sck. At te lter stge f evlutin, te tw diffrcting Mc stems cllide nd frm  sck-induced wke t te rer f te cylinder.
+
+In te numericl cnfigurtin,  circulr cylinder wit dimeter $D = 1 \Unit{m}$ is psitined t te center f  $6D \times 6D$ squre dmin wile n initil sck is psitined $0.5D$ upstrem f te cylinder. Tis cmputtinl cnfigurtin is similr t \citet{ripley2006numericl} except tt  full dmin size witut symmetric bundry ssumptin is used erein. Te flw is ssumed t be inviscid, nd te slip-wll bundry cnditin is enfrced t te cylinder surfce. Te evlutin prcess is slved t $t=1.0 \Unit{s}$.
+\begin{figure}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.24\textwidt}
+        \cptin{}
+        \lbel{fig:1_cyn_nmv_invis_m0150_density_cntur}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.24\textwidt}
+        \cptin{}
+        \lbel{fig:1_cyn_nmv_invis_m0300_density_cntur}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.24\textwidt}
+        \cptin{}
+        \lbel{fig:1_cyn_nmv_invis_m0600_density_cntur}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.24\textwidt}
+        \cptin{}
+        \lbel{fig:1_cyn_nmv_invis_m1200_density_cntur}
+    \end{subfigure}%
+    \cptin{Density cntur f sck diffrctin ver  cylinder slved n different grid sizes. () $150\times150$. (b) $300\times300$. (c) $600\times600$. (d) $1200\times1200$.}
+    \lbel{fig:1_cyn_nmv_invis_density_cntur}
+\end{figure}
+\begin{figure}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.24\textwidt}
+        \cptin{}
+        \lbel{fig:1_cyn_nmv_invis_m0150_sclieren}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.24\textwidt}
+        \cptin{}
+        \lbel{fig:1_cyn_nmv_invis_m0300_sclieren}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.24\textwidt}
+        \cptin{}
+        \lbel{fig:1_cyn_nmv_invis_m0600_sclieren}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.24\textwidt}
+        \cptin{}
+        \lbel{fig:1_cyn_nmv_invis_m1200_sclieren}
+    \end{subfigure}%
+    \cptin{Numericl Sclieren f sck diffrctin ver  cylinder slved n different grid sizes. () $150\times150$. (b) $300\times300$. (c) $600\times600$. (d) $1200\times1200$.}
+    \lbel{fig:1_cyn_nmv_invis_sclieren}
+\end{figure}
+
+Te cmputed density cnturs ver  series f grids re swn in Fig.~\ref{fig:1_cyn_nmv_invis_density_cntur}. An cceptble sck curvture prfile cn be bserved even n te $150\times150$ grid, wic s  grid reslutin f but $0.04D$ ($25$ ndes per dimeter). In dditin, te plne f symmetry is well preserved ver ll te emplyed grids. Te numericl Sclieren fields re presented in Fig.~\ref{fig:1_cyn_nmv_invis_sclieren}. Cmpred t te Sclieren ptgrp mesured by \citet{brysn1961diffrctin} nd te interfermetric mesurements by \citet{kc1988interfermetric} s well s te numericl results in references \citep{smbsivn2009gstb, ripley2006numericl, ji2010numericl}, te slip line, reflected sck, nd diffrcted sck ver te immersed bundry re lredy reslved very well n te $600\times600$ grid, wic illustrtes te ig ccurcy f te develped metd.
+\begin{figure}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.24\textwidt}
+        \cptin{}
+        \lbel{fig:1_cyn_nmv_invis_m0150_verlp}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.24\textwidt}
+        \cptin{}
+        \lbel{fig:1_cyn_nmv_invis_m0300_verlp}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.24\textwidt}
+        \cptin{}
+        \lbel{fig:1_cyn_nmv_invis_m0600_verlp}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.24\textwidt}
+        \cptin{}
+        \lbel{fig:1_cyn_nmv_invis_m1200_verlp}
+    \end{subfigure}%
+    \cptin{Superimpsitin f density cnturs swing te predicted prpgtin pt f te triple pint (Te tw strigt lines re te $33^{\circ}$ tngent lines f te cylinder). () $150\times150$. (b) $300\times300$. (c) $600\times600$. (d) $1200\times1200$.}
+    \lbel{fig:1_cyn_nmv_invis_verlp}
+\end{figure}
+
+As illustrted in Fig.~\ref{fig:sck_cylinder_dem_b}, te intersectin f te incident sck, reflected sck, nd diffrcted sck frms  triple pint. During te time-dependent evlutin prcess, tis triple pint trvels in spce nd prduces  triple-pint pt, s cptured in Fig.~\ref{fig:1_cyn_nmv_invis_verlp}. Te interfermetric mesurements f \citet{kc1988interfermetric} predict tt tis triple-pint pt is tngent t te cylinder t n ngle f $33^{\circ}$ fr Mc numbers in te rnge f $1.42 - 5.96$.
+\begin{figure}[!tbp]
+    \centering
+    \cptin{Cmprisn f te predicted triple-pint pts wit experimentl crreltin.}
+    \lbel{fig:1_cyn_nmv_invis_triple_pt}
+\end{figure}
+
+Te predicted triple-pint pts re extrcted nd pltted in Fig.~\ref{fig:1_cyn_nmv_invis_triple_pt}. Te lest squres liner regressins f te predicted triple-pint pts n te grids f $150\times150$, $300\times300$, $600\times600$, nd $1200\times1200$ ndes re but $28.2^{\circ}$, $29.8^{\circ}$, $30.3^{\circ}$, nd $30.9^{\circ}$, respectively. Tese results, wic gree well wit te experimentl crreltin f \citet{kc1988interfermetric} nd very well wit te plynmil recnstructin-bsed results f \citet{smbsivn2009gstb}, cut-cell metd-bsed results f \citet{ji2010numericl}, nd unstructured mes-bsed results f \citet{ripley2006numericl}, furter demnstrte te vlidity f te develped metd.
+
+\subsectin{A mdified vrtex preservtin prblem}
+
+One f te cllenges in testing te rder f ccurcy fr n immersed bundry metd is te lck f nlyticlly slvble smt flw wit irregulr gemetries. In rder t prtilly ddress tis cllenge,  mdified vrtex preservtin prblem dpted frm te reference \citep{blsr2000mntnicity} is develped. As swn in Fig.~\ref{fig:vrtex_preserve_dem}, in  $L \times H = [-2.5R, 2.5R] \times [-R, R]$ dmin wit  unifrm inviscid bckgrund flw $(\r_{\infty}, u_{\infty}, v_{\infty}, p_{\infty}) = (1,1,1,1)$, n isentrpic vrtex initilly centered t $O(0,0)$ wit rdius $R=5$ is creted by dding te fllwing perturbtin t te men flw
+\begin{figure}[!tbp]
+    \centering
+    \cptin{A scemtic digrm fr te mdified vrtex preservtin prblem. [Nmenclture: $O$, vrtex center; $R$, vrtex rdius; $\tet$, pt ngle; $L$, dmin lengt; $H$, dmin eigt.]}
+    \lbel{fig:vrtex_preserve_dem}
+\end{figure}
+\begin{equtin}
+    \begin{ligned}
+        (\delt u, \delt v) &= \frc{\Gmm}{2\pi}e^{0.5(1-r^2)}(-y,x)\\
+        \delt T &= - \frc{(\gmm - 1)\Gmm^2}{8\gmm \pi^2}e^{(1-r^2)}
+    \end{ligned}
+\end{equtin}
+were te vrtex strengt $\Gmm = 5$, te rti f specific et $\gmm = 1.4$, $r^2=x^2 + y^2 \le R^2$. Under te isentrpic flw cnditin, te temperture nd entrpy re defined s $T=p/\r$ nd $s=p/\r^\gmm$, respectively. Wen $s=1$ nd $\delt s=0$ re ssumed fr te flw, te initil cnditins re ten tken s fllws
+\begin{equtin}
+    u = u_{\infty} + \delt u, \ v = v_{\infty} + \delt v, \ T = p_{\infty} / \r_{\infty} + \delt T, \ \r = T^{\frc{1}{\gmm - 1}}, p = T^{\frc{\gmm}{\gmm - 1}} 
+\end{equtin}
+Since te perturbtin induced by te vrtex is wek enug t vid prducing  strngly nnliner effect, te exct slutin f te prblem wit  specific initil stte is te pssive cnvectin f te vrtex wit te men velcity \citep{blsr2000mntnicity}.
+
+In rder t incrprte te effects f bundry tretment, tw reltively lrge tringles re psitined t te tw rizntl ends f te dmin t spe te cmputtinl dmin int  prllelgrm wit te lengt f ec edge being $2\sqrt{2}R$. Te slip wll bundry cnditin is enfrced n te tringles. Te number f mes cells fr ec directin is csen t ensure tt $(H/m_y)/(L/m_x) \neq \tn{\tet}$. Terefre, te tw slip wlls re nt ligned wit te grid t mnifest te effects f immersed bundry tretment. In dditin, ec slip wll is tngent t te vrtex edge t furter mnifest te bundry effects. Cnvected by te csen bckgrund flw, te vrtex will prpgte t $\tet=45^{\circ}$ wile slipping lng wit te tw slip wlls. Wen te peridic bundry cnditin wit trnsltin pt $(2R, 2R)$ is enfrced n te tw verticl ends f te dmin, nd te flw is slved t $t=10$, te slutin suld remin uncnged s te time evlves t  cmplete perid f vrtex cnvectin, s demnstrted by te cmputed results swn in Fig.~\ref{fig:vrtex_preserve_ge}.
+\begin{figure}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.30\textwidt}
+        \cptin{$t=0$}
+        \lbel{fig:vrtex_preserve_ge_t00}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.30\textwidt}
+        \cptin{$t=5$}
+        \lbel{fig:vrtex_preserve_ge_t05}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.30\textwidt}
+        \cptin{$t=10$}
+        \lbel{fig:vrtex_preserve_ge_t10}
+    \end{subfigure}%
+    \cptin{Density cntur f te prpgting isentrpic vrtex slved n  $320\times160$ grid.}
+    \lbel{fig:vrtex_preserve_ge}
+\end{figure}
+
+In rder t better exmine te rder f ccurcy f bundry tretment vi sptil cnvergence bevir, te discretiztin f cnvective fluxes fr tis prblem is switced t te secnd-rder centrl difference sceme. Te tird-rder Runge--Kutt sceme wit  smll CFL cefficient $C_{\Des{CFL}}=0.2$ is used t reduce te influence frm temprl discretiztin errrs. Te glbl sptil cnvergence f te slutins ver successively refined grids is swn in Tble~\ref{tb:vrtex_preserve_ge_cnverge}. As cptured by te results, te slutin lgritm is perting clsely t its designed rder f ccurcy mesured in $L_1$, $L_2$, nd $L_{\infty}$ nrms. As te slutin f tis prblem invlves te dibtic cnditin fr te temperture field, zer nrml grdient cnditin fr te pressure field, nd te slip wll cnditin, te mst cmplicted type f bundry cnditins, fr te velcity field, te develped immersed bundry metd cn terefre preserve te designed secnd-rder ccurcy fr slving flw wit irregulr gemetries nd cmplex bundry cnditins.
+\begin{tble}[!tbp]
+    \centering
+    \ftntesize
+    %\setlengt{\tbclsep}{4pt}
+    %\renewcmmnd{\rrystretc}{1.5}
+    \begin{tbulr}{lcccccc}
+        \line\line
+        %\multiclumn{2}{c}{Item} \\
+        %\cline{1-2}
+        $m_x \times m_y$ & $L_1$ errr & $L_1$ rder & $L_{2}$ errr & $L_{2}$ rder & $L_{\infty}$ errr & $L_{\infty}$ rder\\
+        \line
+        $40\times20$ & $3.536\mtrm{e}{-2}$ & $-$ & $6.097\mtrm{e}{-2}$ & $-$ & $4.105\mtrm{e}{-1}$ & $-$\\
+        $80\times40$ & $9.113\mtrm{e}{-3}$ & $1.956$ & $2.497\mtrm{e}{-2}$ & $1.288$ & $1.997\mtrm{e}{-1}$ & $1.039$\\
+        $160\times80$ & $2.034\mtrm{e}{-3}$ & $2.163$ & $6.548\mtrm{e}{-3}$ & $1.931$ & $5.236\mtrm{e}{-2}$ & $1.931$\\
+        $320\times160$ & $5.114\mtrm{e}{-4}$ & $1.992$ & $1.640\mtrm{e}{-3}$ & $1.997$ & $1.278\mtrm{e}{-2}$ & $2.035$\\
+        $640\times320$ & $1.287\mtrm{e}{-4}$ & $1.990$ & $4.097\mtrm{e}{-4}$ & $2.001$ & $3.119\mtrm{e}{-3}$ & $2.034$\\
+        $1280\times640$ & $3.233\mtrm{e}{-5}$ & $1.993$ & $1.024\mtrm{e}{-4}$ & $2.000$ & $7.818\mtrm{e}{-4}$ & $1.996$\\
+        \line\line
+    \end{tbulr}
+    \cptin{Glbl slutin errr nd cnvergence rte fr te mdified vrtex preservtin prblem.}
+    \lbel{tb:vrtex_preserve_ge_cnverge}
+\end{tble}
+
+\subsectin{Mss flux exmintin}
+
+Due t using nn-bdy cnfrml Crtesin grids, mss flux ver immersed bundry is  fundmentl issue in immersed bundry metds \citep{mittl2005immersed}, nd effrts suc s dpting cut-cell pprces ve been devted in existing studies \citep{ji2008rbust, mrk2008derivtin, se2011srp} in n ttempt t llevite tis issue. Tis sectin exmines te mss flux prduced by te prpsed metd erein n generic Crtesin grids wit prcticl grid sizes.
+
+Te stremlines f  Mc $2.81$ sck diffrcting ver different types f prticles re presented in Fig.~\ref{fig:strem_trce}. Te slved stremlines by te develped immersed bundry metd re clsely ligned wit te gemetry surfces, even in te tree-dimensinl prblem were  crse grid is emplyed.
+\begin{figure}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.32\textwidt}
+        \cptin{}
+        \lbel{fig:1_cyn_nmv_vis_m0600_stremline}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.32\textwidt}
+        \cptin{}
+        \lbel{fig:1_cyn_nmv_invis_m0600_stremline}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.32\textwidt}
+        \cptin{}
+        \lbel{fig:2_sp_nmv_vis_m0250_stremline}
+    \end{subfigure}%
+    \cptin{Stremlines f  Mc $2.81$ sck diffrcting ver different types f prticles wit crrespnding nlyticl gemetry bundries presented. () Sck diffrctin ver  cylinder slved n  $6D\times6D$ dmin discretized by  $600\times600$ grid, n-slip wll. (b) Sck diffrctin ver  cylinder slved n  $6D\times6D$ dmin discretized by  $600\times600$ grid, slip wll. (c) Sck diffrctin ver tw prtilly verlpped speres slved n  $6D\times6D\times6D$ dmin discretized by  $250\times250\times250$ grid, n-slip wll.}
+    \lbel{fig:strem_trce}
+\end{figure}
+
+Fr te purpse f quntittively exmining te unpysicl flux, te surfce-nrmlized bslute flux ver te immersed bundry
+\begin{equtin} \lbel{eq:bslute_flux}
+    f_{\Des{ibm}} = \frc{1}{S}\int\limits_{S} |(\Vectr{V} - \Vectr{V}_{S})\ \cdt \ \unitVectr{n}| \, \mtrm{d}S
+\end{equtin}
+r in  discrete frm
+\begin{equtin}
+    f_{\Des{ibm}} = \frc{1}{N}\sum_{n=1}^{N} |(\Vectr{V}_n - \Vectr{V}_{S})\ \cdt \ \unitVectr{n}_n|
+\end{equtin}
+is emplyed s  quntittive mesure, in wic, $N$ is te number f te first lyer gst ndes, $\Vectr{V}$ is te flw velcity t te gst nde, $\Vectr{V}_S$ is te velcity f te gemetry, $\unitVectr{n}$ is te lcl unit utwrd surfce nrml vectr.
+
+Te prpsed $f_{\Des{ibm}}$ mesures te flux t but ne grid distnce wy frm te pysicl bundry witut invlving interpltin nd will verestimte te flux trug te gemetry. Terefre, $f_{\Des{ibm}}$ cn be  relible mesure f te unpysicl flux nd ence te interfce srpness.
+\begin{tble}[!tbp]
+    \centering
+    \cptin{Te surfce-nrmlized bslute flux $f_{\Des{ibm}}$ fr te supersnic flw ver  wedge prblem.}
+    \lbel{tb:1_wedge_nmv_flux}
+    %\scriptsize
+    \begin{tbulr}{lcc}
+        \line
+        Grid & $f_{\Des{ibm}}$ ($\Unit{m/s}$) & $f_{\Des{ibm}}/(M_{\infty})$ \\
+        \line
+        $600\times300$ & $1.825\mtrm{e}{-1}$ & $0.456\%$\\
+        $900\times450$ & $1.213\mtrm{e}{-1}$ & $0.303\%$\\
+        $1200\times600$ & $9.126\mtrm{e}{-2}$ & $0.228\%$\\
+        $1800\times900$ & $6.099\mtrm{e}{-2}$ & $0.152\%$\\
+        $2400\times1200$ & $4.557\mtrm{e}{-2}$ & $0.114\%$\\
+        \line
+    \end{tbulr}
+\end{tble}
+
+As  prblem invlves  stedy supersnic flw pssing  reltively strng cnvex gemetry wit te intricte slip-wll bundry cnditin, te $f_{\Des{ibm}}$ f te supersnic flw ver  wedge prblem fr te cse $M_{\infty}(2)-\tet(15^{\circ})-\bet_e(45.344^{\circ})$ is exmined nd is swn in Tble~\ref{tb:1_wedge_nmv_flux}. Fr  wide rnge f grids under te presence f cmplex sck interctins ner te gemetry bundry, te prpsed metd genertes very lw surfce-nrmlized bslute fluxes ver te immersed bundry. Fr instnce, te vlue f $f_{\Des{ibm}}/(M_{\infty}_0)$ is but $0.456\%$ fr te $600\times300$ grid. Accrding t te discussed qulittive nd quntittive results, te develped immersed bundry metd erein retins  very srp interfce nd is ble t effectively llevite unpysicl flux ver pysicl bundries wen grid reslutin is imprved.
+
+\subsectin{Subsnic rttinl flw}
+
+A subsnic rttinl flw generted by n ccelerting rtr is slved t demnstrte te pplicbility f te metd fr fluid-slid systems invlving cmplex gemetries. As swn in Fig.~\ref{fig:trns_rt_w5n_vrt_000s}, te $2$D rtr cnsists f tree bldes wit ec blde being te spe f NACA $0012$ irfil, wse crd is $l_c = 1 \Unit{m}$. Te rtr is centered in  $6 l_c \times 6 l_c$ dmin discretized by  $1200\times1200$ grid. Te rtr rttes wit n initil ngulr velcity $\meg(t=0)=0 \Unit{rd/s}$ nd  cnstnt ngulr ccelertin $\lp = 10\pi \Unit{rd/s^2}$. Te initil mbient flw stte is $(\r_0, u_0, v_0, p_0)=(1.2047 \Unit{kg/m^3}, 0, 0, 101325 \Unit{P})$, nd te n-slip wll bundry cnditin is enfrced n te bldes.
+
+Te predicted vrticity iscntur t  series f time instnts is cptured in Fig.~\ref{fig:trns_rt_w5n_vrt}, in wic n interesting vrtex-induced vrtex sedding bevir is bserved. As te rtr ccelertes, vrtices pper t te tips f bldes s well s t te sides f te bldes. Te ccelerting tips stretc nd defrm te generted vrtices, cusing vrtices sedding. Te detced vrtices sn re entrined by te flw driven by te cming blde, eiter being merged int te tip vrtices f te cming blde r being dvected t te frnt side vrtices f te cming blde. Te entrined vrtices ten destbilize te vrtex structures tey prpgte twrd, inducing nd ccelerting te vrtex sedding. Te bve interctin prcess, cmbining wit te ccelertin f te bldes, prduces  cmplex nd dynmic vrtex field swing in te figures.
+
+In te emplyed cse setting, te gemetry f te rtr is generted by psitining tree independent NACA $0012$ irfils t  cmmn center. Te rtting system is cieved by specifying te sme rttinl ccelertin fr te tree bldes. Terefre, in simulting flw wit cmplex gemetries, emplying  rbust immersed bundry metd enbles gret simplifictin fr te mdel genertin prcess. Fr instnce, ne cn btin n engineering structure by ssembling its cmpnents vi psitining wile llwing verlpped surfces, wic vids te cst f prducing  single tplgy, s required by mny mes genertrs suc s ANSYS ICEM CFD. In dditin, te current grid reslutin f te dmin is $200$ ndes per $l_c$. Menwile, te lrgest widt f te blde is nly $0.12 l_c$, nd te tip f blde is very tin. Cnsequently, tere is nly  line f ndes in te regin ner te tip, wse lengt is but $5\%$ f te crd. Nneteless, te prpsed metd reslves te tin tip regin wit resnble srpness. Te verll success f simulting te trnsient rttinl flw illustrtes te cpbility f te presented metd fr slving generl fluid-slid systems. 
+\begin{figure}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.30\textwidt}
+        \cptin{$t = 0.00 \Unit{s}$, $V_{\Des{tip}} = 0 \Unit{m/s}$}
+        \lbel{fig:trns_rt_w5n_vrt_000s}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.30\textwidt}
+        \cptin{$t = 0.25 \Unit{s}$, $V_{\Des{tip}} = 2.5\pi \Unit{m/s}$}
+        \lbel{fig:trns_rt_w5n_vrt_025s}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.30\textwidt}
+        \cptin{$t = 0.50 \Unit{s}$, $V_{\Des{tip}} = 5.0\pi \Unit{m/s}$}
+        \lbel{fig:trns_rt_w5n_vrt_050s}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.30\textwidt}
+        \cptin{$t = 0.75 \Unit{s}$, $V_{\Des{tip}} = 7.5\pi \Unit{m/s}$}
+        \lbel{fig:trns_rt_w5n_vrt_075s}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.30\textwidt}
+        \cptin{$t = 1.00 \Unit{s}$, $V_{\Des{tip}} = 10.0\pi \Unit{m/s}$}
+        \lbel{fig:trns_rt_w5n_vrt_100s}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.30\textwidt}
+        \cptin{$t = 1.50 \Unit{s}$, $V_{\Des{tip}} = 15.0\pi \Unit{m/s}$}
+        \lbel{fig:trns_rt_w5n_vrt_150s}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.58\textwidt}
+    \end{subfigure}%
+    \cptin{Vrticity iscntur t  series f time instnts generted by n ccelerting rtr. [Nmenclture: $V_{\Des{tip}}$, velcity mgnitude f te tip f  blde.]}
+    \lbel{fig:trns_rt_w5n_vrt}
+\end{figure}
+
+\subsectin{Explsive dispersl f dense prticles}
+
+T furter demnstrte te rbustness f te presented metd fr slving prblems wit strngly irregulr, mving, nd clliding gemetries under cllenging flw cnditins,  dense prticle system dispersed by  ig-density nd ig-pressure gs driver is studied.
+
+As swn in Fig.~\ref{fig:3d_jet_l5_nf24_dem}, in  $L^3 = [-0.5 \Unit{m}, 0.5 \Unit{m}]^3$ cmputtinl dmin,  spericl five-lyer prticulte pyld wit $2130$ prticles is initilly centered t $O(0,0)$. Te rdius f te $0^{\circ}$ ltitude f te inner-mst lyer is $0.1 \Unit{m}$, nd te number f prticles centered n tis $0^{\circ}$ ltitude is $24$. Te entire prticulte pyld is ten generted trug vrying te rdius f prticles in ec lyer suc tt neigbring prticles in ec spericl lyer re tngent wit ec ter, nd neigbring prticles in neigbring lyers re ls tngent wit ec ter s muc s pssible. A flw stte $(\r_c, u_c, v_c, p_c)=(1000 \Unit{kg/m^3}, 0, 0, 1.01325\times10^6 \Unit{P})$ is initilly filled in te center f te prticulte pyld. Te flw stte t te rest f te regin is set t $(\r_0, u_0, v_0, p_0)=(1.2047 \Unit{kg/m^3}, 0, 0, 1.01325\times10^5 \Unit{P})$. In rder t reduce te discrepncy f te timescles between sck prpgtin nd prticle ccelertin, reltively ligt prticles wit  density f $27 \Unit{kg/m^3}$ re used.
+\begin{figure}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.35\textwidt}
+        \cptin{}
+        \lbel{fig:3d_jet_l5_nf24_dmin_dem}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.35\textwidt}
+        \cptin{}
+        \lbel{fig:3d_jet_l5_nf24_slice_dem}
+    \end{subfigure}%
+    \cptin{Cnfigurtin fr explsive dispersl f dense prticles. () Cmputtinl dmin. (b) A clip view f te prticulte pyld.}
+    \lbel{fig:3d_jet_l5_nf24_dem}
+\end{figure}
+\begin{figure}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.24\textwidt}
+        \cptin{$t = 1 \Unit{ms}$}
+        \lbel{fig:3d_jet_l5_nf24_t01_1ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.24\textwidt}
+        \cptin{$t = 3 \Unit{ms}$}
+        \lbel{fig:3d_jet_l5_nf24_t01_3ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.24\textwidt}
+        \cptin{$t = 5 \Unit{ms}$}
+        \lbel{fig:3d_jet_l5_nf24_t01_5ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.24\textwidt}
+        \cptin{$t = 7 \Unit{ms}$}
+        \lbel{fig:3d_jet_l5_nf24_t01_7ms}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.4\textwidt}
+    \end{subfigure}%
+    \cptin{Te cmputed dispersl prcess f te prticle system.}
+    \lbel{fig:3d_jet_l5_nf24_t}
+\end{figure}
+
+Tis fluid-slid system is slved t $t=7 \Unit{ms}$ n  $800^3$ grid. In te develpment f te flw slver, ne design principle is t stre  minimum set f infrmtin nd t clculte derived quntities n-te-fly. Fr instnce, nly five cnservtive vribles t tree time levels re stred fr te time integrtin f te gverning equtins trug  tird-rder Runge--Kutt sceme, nd ll te ter quntities suc s cnvective fluxes re clculted in prgress.
+
+In dditin t fifteen flt vribles, fur integers relted t multidmin nde mpping, gst nde identifictin, fres nde trcking, nd te clsest fcet linking, respectively, re stred. Te purpse f te clsest fcet linking vrible is ls t reduce te stred infrmtin set. Implementing n immersed bundry metd t  gst nde $G$ requires  set f infrmtin t te bundry pint $O$ suc s crdintes, surfce velcity, nrml nd tngent vectrs. Insted f string multiple expensive flts, using n integer vrible t link ec gst nde $G$ t its clsest gemetric fcet, wic is  by-prduct f te pint-in-plyedrn test cnducted t te preprcessing step, cn sve  significnt munt f memry wile being efficient t derive ll te required infrmtin trug n-te-fly pint-t-fcet clcultins. Furtermre, in rder t mintin dt lclity,  cmpund dt type is used t pck ll te flt nd integer field vribles fr ec nde. Using te defined cmpund dt type s element dt type,  single liner rry is used s te min dt structure fr imprving cce perfrmnce. As  result f using  Crtesin grid nd te described design principles, te ctul runtime memry llctin f tis prblem wit duble-precisin cmputtin is but $67$ gigbytes, wile te tereticl requirement f string fifteen flts nd fur integers fr $807^3 \pprx 5.255 \times 10^8$ ndes tking ccunt fr te glbl numericl bundries is $66.567$ gigbytes.
+
+Te cmputed dispersl prcess f te prticle system is presented in Fig.~\ref{fig:3d_jet_l5_nf24_t}, wic depicts te develpment f instbilities in te prticulte pyld under explsive dispersl nd te frmtin f cerent prticle clustering nd jetting structures. In te slutin prcess,  significnt number f cnvex nd cncve regins exist, frm, nd destry. Tese successful slutins f te explsive dispersl f  densely pcked prticle system furter demnstrte tt te prpsed flw recnstructin sceme effectively vids ptentil numericl singulrities nd preserves ig rbustness in slving flw wit strngly irregulr, mving, nd clliding gemetries.
+
+\sectin{Cnclusin} \lbel{sec:cnclusin}
+
+An immersed bundry metd s been develped, vlidted, nd pplied. Te effectiveness f te metd in slving flw wit rbitrrily irregulr nd mving gemetries n Crtesin grids s been illustrted trug numericl experiments cncerning  vriety f flw prblems. Te min prperties f te presented metd nd te primry cnclusins frm te numericl experiments re summrized belw.
+
+\prgrp{Cnvergence nd ccurcy}
+
+Te ccurcy f te metd is estblised trug trug studies f te supersnic flw ver  wedge prblem, te supersnic trnslting wedge prblem, nd te sck diffrctin ver  cylinder prblem. Emplying te nlyticl $M_{\infty}-\tet-\bet$ reltin f blique scks, different cses cnsidering te deflectin ngle rnging frm $\tet = 10^{\circ}$ t $\tet = 20^{\circ}$ nd te Mc number rnging frm $M_{\infty} = 2$ t $M_{\infty} = 10$ re tested, nd excellent greement between te numericl nd nlyticl slutins is btined. In dditin, te ccurcy f te metd fr slving flw wit mving gemetry is demnstrted trug cmpring te blique scks wit nlyticl slutins s well s vi exmining te entire slutin field using Glilen trnsfrmtin. Fr te sck diffrctin ver  cylinder prblem, gd greement between te btined numericl results nd experimentl bservtins s well s ter publised numericl results is cieved. Te successful slutins f tese test cses demnstrte te vlidity nd ccurcy f te prpsed metd in slving flw invlving irregulr nd mving gemetries under cllenging flw cnditins. In dditin, n nlyticlly slvble mdified vrtex preservtin prblem s been develped fr  cnvergence study cncerning smt flw wit irregulr gemetries, nd te cnvergence test in $L_1$, $L_2$, nd $L_{\infty}$ nrms suggests tt te develped metd cn preserve te designed secnd-rder ccurcy fr slving flw wit irregulr gemetries nd cmplex bundry cnditins.
+
+Te incrprtin f pysicl bundry cnditins in te prpsed tree-step flw recnstructin sceme leds t te prperty tt te cnstructed $\psi_G$ cnverges t te exct pysicl bundry cnditins wen te gst nde $G$ cnverges t te bundry pint $O$. Fr nn-bdy cnfrml Crtesin grids, tis prperty is elpful in lleviting te unpysicl flux ver immersed bundries. Tw- nd tree-dimensinl stremlines f sck-prticle interctins wit slip nd n-slip bundry cnditins ve qulittively illustrted tt te develped metd mintins  very srp interfce. Trug n exmintin f te surfce-nrmlized bslute flux f te supersnic flw ver  wedge prblem, it s been quntittively swn tt, under te presence f  reltively strng cnvex gemetry wit te intricte slip-wll bundry cnditin nd cmplex sck interctins ner immersed bundries, te develped metd prduces surfce-nrmlized bslute flux in very lw quntities fr  wide rnge f grids.
+
+\prgrp{Unifrmity nd efficiency}
+
+Te prpsed metd enfrces te Diriclet, Neumnn, Rbin, nd Cucy bundry cnditins in  strigtfrwrd nd cnsistent mnner nd cmpletely vids te necessity t slve liner systems. As  result, n rbitrry number f field vribles tt stisfy different types f bundry cnditins, suc s velcity, pressure, nd temperture, cn be efficiently nd unifrmly treted. In dditin, te prpsed metd esily fcilittes te develpment f  slver tt unifies 1D, 2D, nd 3D cmputtins s well s te genertin f  cmplex gemetric bject trug ssembling its multiple cmpnents vi psitining wile llwing verlpped surfces t vid te cst f prducing  single tplgy. Te unifrmity f te metd s been illustrted vi te slutin f tw- nd tree-dimensinl flw prblems wit n-slip nd slip wll bundry cnditins. Benefiting frm te use f generic Crtesin grids nd te liner-time lgritm cmplexity s well s te mtrix inversin-free prperty f te prpsed immersed bundry metd, except te explsive dispersl f dense prticle prblem, ll te ter presented test cses erein were slved using  single prcessr.
+
+\prgrp{Rbustness nd stbility}
+
+Te prpsed metd emplys  tree-step flw recnstructin sceme tt is sclble t te number f stencil ndes nd is unifrmly vlid under  vrying number f stencils, even in te wrst situtin, in wic nly ne fluid nde exists in te dmin f dependence f n imge pint. In dditin, s demnstrted by te implementtin f te $7$-pint-stencil WENO sceme, wic requires $3$ gst nde lyers, te metd cn be pplied t multiple lyers f gst ndes witut impsing extr cnstrints. Tis prperty cn gretly fcilitte te pplictin f ig-rder sptil scemes t flw wit cmplex gemetries.
+
+Utilizing te tree-step recnstructin s well s te cnvex nd extrem-preserving prperties f te inverse distnce weigting, te prpsed metd presents strng numericl stbility, s demnstrted in te numericl experiments invlving cllenging flw cnditins nd dynmic gemetries, suc s te supersnic trnslting wedge flw, te subsnic rttinl flw, nd te explsive dispersl f dense prticles. Equipped wit suitble discretiztin scemes, te develped immersed bundry metd enbles fesible slutins f prblems wit engineering level f cmplexity nd ence ennces te understnding f pysicl prblems.

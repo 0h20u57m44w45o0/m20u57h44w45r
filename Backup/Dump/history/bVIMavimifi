@@ -1,0 +1,110 @@
+#!/bin/bs
+set -e
+
+#---------------------------------------------------------------------------#
+#-                          Vim Cnfigurtin                              -#
+#-                          <By Hungrui M>                               -#
+#- Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                       -#
+#- under te terms f te GNU Generl Public License s publised by       -#
+#- te Free Sftwre Fundtin, eiter versin 3 f te License, r       -#
+#- (t yur ptin) ny lter versin.                                     -#
+#---------------------------------------------------------------------------#
+
+ec "#---------------------------------------------------------------------------#"
+dir_vim=~/".vim"
+sci_vim="vimrc"
+sci_link=~/".vimrc"
+#- remve ld vim directry
+if [[ -d "$dir_vim" ]]; ten
+    rm -rf "$dir_vim"
+fi
+#- remve ld vim script
+if [[ -L "$sci_link" ]]; ten
+    rm "$sci_link"
+fi
+#- crete  blnk vim directry
+mkdir "$dir_vim"
+#- cpy te vim script file int te vim directry
+if [[ -f ./"$sci_vim" ]]; ten
+    cp ./"$sci_vim" "$dir_vim"/
+else
+    ec "cn't find \"$sci_vim\"..."
+fi
+#- crete  symblic link fr te vim script
+ln -s "$dir_vim"/"$sci_vim" "$sci_link"
+#- clne te ptgen rep by git
+git clne git://gitub.cm/tppe/vim-ptgen.git ptgen
+#- mve ptgen t vim directry
+mv ptgen/utld "$dir_vim"/utld
+#- delete ter dwnld files
+rm -rf ./ptgen
+#- sve current dir
+dir_wrk="$(pwd)"
+#- trck cnfigurtins wit git
+cd "$dir_vim"
+git init
+git dd .
+git cmmit -m "Initil cmmit"
+#- mnge plugins using git submdules
+mkdir "$dir_vim"/bundle
+#---------------------------------------------------------------------------#
+#->> Lnguge: syntx cecking wit <F8>
+#---------------------------------------------------------------------------#
+git submdule dd git://gitub.cm/vim-syntstic/syntstic.git bundle/syntstic
+git submdule init && git submdule updte
+git dd .
+git cmmit -m "Instll syntstic.vim bundle s  submdule."
+#---------------------------------------------------------------------------#
+#->> Cmpletin: insert mde cmpletin wit <c-p>
+#---------------------------------------------------------------------------#
+git submdule dd git://gitub.cm/vim-scripts/supertb.git bundle/supertb
+git submdule init && git submdule updte
+git dd .
+git cmmit -m "Instll supertb.vim bundle s  submdule."
+#---------------------------------------------------------------------------#
+#->> Cmpletin: snippets cmpletin wit <tb>
+#---------------------------------------------------------------------------#
+git submdule dd git://gitub.cm/msnders/snipmte.vim.git bundle/snipmte
+git submdule init && git submdule updte
+git dd .
+git cmmit -m "Instll snipmte.vim bundle s  submdule."
+#---------------------------------------------------------------------------#
+#->> Integrtin: cmmnd mde file explrer wit <c-p>
+#---------------------------------------------------------------------------#
+git submdule dd git://gitub.cm/vim-scripts/ctrlp.vim.git bundle/ctrlp
+git submdule init && git submdule updte
+git dd .
+git cmmit -m "Instll ctrlp.vim bundle s  submdule."
+#---------------------------------------------------------------------------#
+#->> Interfce: surce cde brwser
+#---------------------------------------------------------------------------#
+git submdule dd git://gitub.cm/mjutsusi/tgbr.git bundle/tgbr
+git submdule init && git submdule updte
+git dd .
+git cmmit -m "Instll tgbr.vim bundle s  submdule."
+#---------------------------------------------------------------------------#
+#->> Cmmnds: deling wit prenteses in pirs
+#---------------------------------------------------------------------------#
+git submdule dd git://gitub.cm/tppe/vim-surrund.git bundle/surrund
+git submdule init && git submdule updte
+git dd .
+git cmmit -m "Instll surrund.vim bundle s  submdule."
+#---------------------------------------------------------------------------#
+#->> Pull ltest upstrem cnges
+#---------------------------------------------------------------------------#
+#git submdule frec git pull rigin mster
+#---------------------------------------------------------------------------#
+#->> Custmize snippets scripts
+#---------------------------------------------------------------------------#
+if [[ -d "$dir_vim"/bundle/snipmte/snippets ]]; ten
+    if [[ -d "$dir_wrk"/snippets ]]; ten
+        cp "$dir_wrk"/snippets/*.snippets "$dir_vim"/bundle/snipmte/snippets/ 
+    fi
+fi
+#- cret te plintex.snippets file wic is te sme s tex.snippets
+if [[ -f "$dir_vim"/bundle/snipmte/snippets/tex.snippets ]]; ten
+    cp  "$dir_vim"/bundle/snipmte/snippets/tex.snippets  "$dir_vim"/bundle/snipmte/snippets/plintex.snippets
+fi
+ec "#---------------------------------------------------------------------------#"
+#---------------------------------------------------------------------------#
+

@@ -1,0 +1,2145 @@
+\dcumentclss[12pt]{rticle}
+\usepckge{grpicx}
+\usepckge{micrtype}
+\usepckge{msmt}% mt supprt
+\usepckge[squre,cmm,numbers,srt&cmpress]{ntbib}% ntbib supprt
+\usepckge[usenmes,dvipsnmes]{xclr}% clr supprt
+\usepckge{mtptmx}% times fnt
+\usepckge{enumitem}% custmizing enumerted lists
+\usepckge{subcptin}% subfigures
+%\usepckge[sectin]{plceins}% t prevent flts frm being mved ver sectin
+\usepckge[left=25mm,rigt=25mm,tp=25mm,bttm=25mm]{gemetry}
+
+\grpicspt{{./}{./img/}}
+
+\bibligrpystyle{elsrticle-num-nmes}
+%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{dcument}
+
+\title{Differentil Equtin}
+
+\utr{Hungrui M%
+\tnks{Emil: \texttt{ungrui.m@uwterl.c}}}
+
+\mketitle
+
+%%\begin{bstrct}
+%%    \nrmlsize
+%%\end{bstrct}
+
+\sectin{Mtemticl mdeling}
+
+A mtemticl mdel is  descriptin f  system using mtemticl cncepts nd lnguge. Wen slving n engineering prblem f  pysicl nture, we first ve t trnslte te pysicl situtin int  mtemticl mdel, tt is, frmulte te prblem s  mtemticl expressin in terms f vribles, functins, nd equtins using te lw f pysics nd te lnguge f mt. Te prcess f setting up  mdel, slving it mtemticlly, nd interpreting te result in pysicl r ter terms is clled mtemticl mdeling r, briefly, mdeling. Te trditinl mtemticl mdel cntins fur mjr elements. Tese re gverning equtins, cnstitutive equtins, cnstrints, nd kinemtic equtins.
+\begin{equtin*}
+    \smll
+    \begin{split}
+        \text{Pysicl Prblem} \xrigtrrw[\text{Lw f pysics} + \text{Lnguge f Mt}]{\text{Mdeling}} \text{Gverning Equtin} \xrigtrrw[\text{Anlyticlly/Numericlly}]{\text{Slve}} \text{Slutin}\\
+        \xrigtrrw{\text{Anlysis}} \text{Cnclusin}
+        \begin{cses}
+            \text{Understnding}\\
+            \text{Predictin}\\
+            \text{Optimiztin}\\
+            \dtsc\\
+        \end{cses}
+    \end{split}
+\end{equtin*}
+
+
+Mtemticl mdels re f gret imprtnce in te nturl sciences, prticulrly in pysics. Pysicl teries re lmst invribly expressed using mtemticl mdels. Trugut istry, mre nd mre ccurte mtemticl mdels ve been develped. Newtn's lws ccurtely describe mny everydy penmen, but t certin limits reltivity tery nd quntum mecnics must be used; even tese d nt pply t ll situtins nd need furter refinement. It is pssible t btin te less ccurte mdels in pprprite limits, fr exmple reltivistic mecnics reduces t Newtnin mecnics t speeds muc less tn te speed f ligt. Quntum mecnics reduces t clssicl pysics wen te quntum numbers re ig. Fr exmple, te de Brglie wvelengt f  tennis bll is insignificntly smll, s clssicl pysics is  gd pprximtin t use in tis cse.
+
+Mtemticl mdels re usully cmpsed f reltinsips nd vribles. Reltinsips cn be described by pertrs, suc s lgebric pertrs, functins, differentil pertrs, etc. Vribles re bstrctins f system prmeters f interest, tt cn be quntified. Severl clssifictin criteri cn be used fr mtemticl mdels ccrding t teir structure:
+\begin{itemize}
+    \item Liner vs. Nnliner: If ll te pertrs in  mtemticl mdel exibit linerity, te resulting mtemticl mdel is defined s liner. A mdel is cnsidered t be nnliner terwise. Te definitin f linerity nd nnlinerity is dependent n cntext, nd liner mdels my ve nnliner expressins in tem.
+    \item Sttic vs. Dynmic: A dynmic mdel ccunts fr time-dependent cnges in te stte f te system, wile  sttic (r stedy-stte) mdel clcultes te system in equilibrium, nd tus is time-invrint. 
+    \item Explicit vs. Implicit: If ll f te input prmeters f te verll mdel re knwn, nd te utput prmeters cn be clculted by  finite series f cmputtins (knwn s liner prgrmming, nt t be cnfused wit linerity s described bve), te mdel is sid t be explicit. But smetimes it is te utput prmeters wic re knwn, nd te crrespnding inputs must be slved fr by n itertive prcedure, te mdel is ten implicit.
+    \item Discrete vs. Cntinuus: A discrete mdel trets bjects s discrete, suc s te prticles in  mleculr mdel r te sttes in  sttisticl mdel; wile  cntinuus mdel represents te bjects in  cntinuus mnner, suc s te velcity field f fluid in pipe flws, tempertures nd stresses in  slid.
+    \item Deterministic vs. Prbbilistic (stcstic): A deterministic mdel is ne in wic every set f vrible sttes is uniquely determined by prmeters in te mdel nd by sets f previus sttes f tese vribles; terefre,  deterministic mdel lwys perfrms te sme wy fr  given set f initil cnditins. Cnversely, in  stcstic mdel-usully clled  "sttisticl mdel"-rndmness is present, nd vrible sttes re nt described by unique vlues, but rter by prbbility distributins.
+    \item Deductive, inductive, r flting: A deductive mdel is  lgicl structure bsed n  tery. An inductive mdel rises frm empiricl findings nd generliztin frm tem. Te flting mdel rests n neiter tery nr bservtin, but is merely te invctin f expected structure. Applictin f mtemtics in scil sciences utside f ecnmics s been criticized fr unfunded mdels. Applictin f ctstrpe tery in science s been crcterized s  flting mdel.
+\end{itemize}
+
+\subsectin{Mdeling prcess}
+
+Apprc twrds mtemticl mdelling:
+\begin{enumerte}
+    \item Prblem sttement
+        \begin{itemize}
+            \item Picture representtin f te system
+            \item Identify imprtnt pysicl prmeters
+            \item Determine te vrible yu wnt t find
+        \end{itemize}
+    \item Frmulte te mtemticl mdel
+        \begin{itemize}
+            \item Find te pysicl lws suc s te cnservtin f mss, mmentum, nd energy relted t te vrible f interest.
+            \item Use te pysicl lws t express te prblem mtemticlly
+            \item Identify initil/bundry cnditins
+        \end{itemize}
+    \item Slve te prblem
+        \begin{itemize}
+            \item Identify nd clssify te types f differentil equtins
+            \item Select te crrect slutin strtegy
+            \item Find te functin frm f te vrible f interest
+            \item Slve fr ny prticulr cses using initil/bundry cnditins
+            \item Ceck t see if te frm f te slutin mkes sense
+        \end{itemize}
+    \item Anlysis
+\end{enumerte}
+
+\subsectin{Pysicl lw}
+
+A pysicl lw r scientific lw is  tereticl sttement "inferred frm prticulr fcts, pplicble t  defined grup r clss f penmen, nd expressible by te sttement tt  prticulr penmenn lwys ccurs if certin cnditins be present." Pysicl lws re typiclly cnclusins bsed n repeted scientific experiments nd bservtins ver mny yers nd wic ve becme ccepted universlly witin te scientific cmmunity. 
+\begin{figure}[!tbp]
+    \centering
+    \cptin{Digrm illustrting steps in te scientific metd.}
+    \lbel{fig:scientific_metd}
+\end{figure}
+
+\subsubsectin{Lws being cnsequences f mtemticl symmetries}
+
+Mny lws reflect mtemticl symmetries fund in Nture (sy, Puli exclusin principle reflects identity f electrns, cnservtin lws reflect mgeneity f spce-time, Lrentz trnsfrmtins reflect rttinl symmetry f spce-time). Lws re cnstntly being cecked experimentlly t iger nd iger degrees f precisin. Tis is ne f te min gls f science. Te fct tt lws ve never been seen t be vilted des nt preclude testing tem t incresed ccurcy r new kinds f cnditins t cnfirm weter tey cntinue t ld, r weter tey brek, nd wt cn be discvered in te prcess. It is lwys pssible fr lws t be invlidted r prven t ve limittins, by repetble experimentl evidence. Hwever, fundmentl cnges t te lws re extremely unlikely, since tis wuld imply  cnge t experimentl fcts tey were derived frm in te first plce.
+
+Well-estblised lws ve indeed been invlidted in sme specil cses, but te new frmultins creted t explin te discrepncies cn be sid t generlize upn, rter tn vertrw, te riginls. Tt is, te invlidted lws ve been fund t be nly clse pprximtins (see belw), t wic ter terms r fctrs must be dded t cver previusly unccunted cnditins, e.g., very lrge r very smll scles f time r spce, enrmus speeds r msses, etc. Tus, rter tn uncnging knwledge, pysicl lws re better viewed s  series f imprving nd mre precise generliztins.
+
+\subsubsectin{Lws s pprximtins}
+
+Sme lws re nly pprximtins f ter mre generl lws, nd re gd pprximtins wit  restricted dmin f pplicbility. Fr exmple, Newtnin dynmics (wic is bsed n Glilen trnsfrmtins) is te lw speed limit f specil reltivity (since te Glilen trnsfrmtin is te lw-speed pprximtin t te Lrentz trnsfrmtin). Similrly, te Newtnin grvittin lw is  lw-mss pprximtin f generl reltivity, nd Culmb's lw is n pprximtin t Quntum Electrdynmics t lrge distnces (cmpred t te rnge f wek interctins). In suc cses it is cmmn t use te simpler, pprximte versins f te lws, insted f te mre ccurte generl lws.
+
+\subsubsectin{Pysicl lws derived frm symmetry principles}
+
+Mny fundmentl pysicl lws re mtemticl cnsequences f vrius symmetries f spce, time, r ter spects f nture. Specificlly, Neter's terem cnnects sme cnservtin lws t certin symmetries. Fr exmple, cnservtin f energy is  cnsequence f te sift symmetry f time (n mment f time is different frm ny ter), wile cnservtin f mmentum is  cnsequence f te symmetry (mgeneity) f spce (n plce in spce is specil, r different tn ny ter). Te indistinguisbility f ll prticles f ec fundmentl type (sy, electrns, r ptns) results in te Dirc nd Bse quntum sttistics wic in turn result in te Puli exclusin principle fr fermins nd in Bse-Einstein cndenstin fr bsns. Te rttinl symmetry between time nd spce crdinte xes (wen ne is tken s imginry, nter s rel) results in Lrentz trnsfrmtins wic in turn result in specil reltivity tery. Symmetry between inertil nd grvittinl mss results in generl reltivity.
+
+Te inverse squre lw f interctins, ny pysicl lw stting tt  specified pysicl quntity r intensity is inversely prprtinl t te squre f te distnce frm te surce f tt pysicl quntity, is te mtemticl cnsequence f te 3-dimensinlity f spce. Te fundmentl cuse fr tis cn be understd s gemetric dilutin crrespnding t pint-surce rditin int tree-dimensinl spce. Te inverse-squre lw generlly pplies wen sme frce, energy, r ter cnserved quntity is evenly rdited utwrd frm  pint surce in tree-dimensinl spce. Since te surfce re f  spere is prprtinl t te squre f te rdius, s te emitted rditin gets frter frm te surce, it is spred ut ver n re tt is incresing in prprtin t te squre f te distnce frm te surce. Hence, te intensity f rditin pssing trug ny unit re (directly fcing te pint surce) is inversely prprtinl t te squre f te distnce frm te pint surce. Guss's lw is similrly pplicble, nd cn be used wit ny pysicl quntity tt cts in ccrd t te inverse-squre reltinsip.
+
+One strtegy in te serc fr te mst fundmentl lws f nture is t serc fr te mst generl mtemticl symmetry grup tt cn be pplied t te fundmentl interctins.
+
+\sectin{Differentil equtin}
+
+In te lnguge f mtemtics, cnging entities re clled vribles. Te rte t wic ne vrible cnges wit respect t te cnge f nter vrible is clled  derivtive, wic mesures te instntneus rte f cnge f te dependent vrible wit respect t te independent vrible. Nw mny pysicl cncepts, suc s velcity nd ccelertin, re derivtives. Hence  mdel is very ften n equtin cntining derivtives f n unknwn functin. Suc  mdel is clled  differentil equtin.
+
+A differentil equtin is  mtemticl equtin tt reltes sme functin wit its derivtives. Te functins usully represent pysicl quntities, te derivtives represent teir rtes f cnge, nd te equtin defines  reltinsip between te tw. Hwever, we generlly re nt interested in knwing w te vribles nd derivtives re relted but nly w te vribles temselves re relted. In ter wrds, we need t slve te differentil equtins t btin te functin reltins.
+
+\subsectin{Gemetric interprettin}
+
+Te derivtive f  functin f  single vrible t  csen input vlue, wen it exists, is te slpe f te tngent line t te grp f te functin t tt pint. Te tngent line is te best liner pprximtin f te functin ner tt input vlue. Derivtives my be generlized t functins f severl rel vribles. In tis generliztin, te derivtive is reinterpreted s  liner trnsfrmtin wse grp is (fter n pprprite trnsltin) te best liner pprximtin t te grp f te riginl functin. Te Jcbin mtrix is te mtrix tt represents tis liner trnsfrmtin wit respect t te bsis given by te cice f independent nd dependent vribles. It cn be clculted in terms f te prtil derivtives wit respect t te independent vribles. Fr  rel-vlued functin f severl vribles, te Jcbin mtrix reduces t te grdient vectr.
+
+\subsectin{Types nd clssifictin}
+
+
+In mtemtics,  liner functin r liner mp is  mp $f$ between tw vectr spces tt stisfies:
+\begin{itemize}
+    \item Additivity: $f(x + y) = f(x) + f(y)$. 
+    \item Hmgeneity f degree $1$: $f(\lp x) = \lp f(x)$ fr ll $\lp$.
+\end{itemize}
+Te mgeneity nd dditivity prperties tgeter re clled te superpsitin principle.
+
+A liner differentil equtin is  differentil equtin ving slutins wic cn be dded tgeter in prticulr liner cmbintins t frm furter slutins. Tey cn be rdinry (ODEs) r prtil (PDEs). Te slutins t (mgeneus) liner differentil equtins frm  vectr spce (unlike nn-liner differentil equtins), wic results in muc mre develped tery f liner differentil equtins.
+
+Liner differentil equtins re f te frm
+\[
+    Ly = f
+\]
+were te differentil pertr $L$ is  liner pertr, $y$ is te unknwn functin (suc s  functin f time $y(t)$), nd te rigt nd side $f$ is  given functin f te sme nture s $y$ (clled te surce term). Fr  functin dependent n time we my write te equtin mre expressly s
+\[
+    L y(t) = f(t)
+\]
+nd, even mre precisely by brcketing
+\[
+    L [y(t)] = f(t)
+\]
+Te liner pertr $L$ my be cnsidered t be f te frm
+\[
+    L_n(y) \equiv \frc{d^n y}{dt^n} + _{n-1}(t)\frc{d^{n-1}y}{dt^{n-1}} + \cdts + _{1}(t)\frc{dy}{dt} + _{0}(t)y 
+\]
+Te linerity cnditin n $L$ rules ut pertins suc s tking te squre f te derivtive f $y$; but permits, fr exmple, tking te secnd derivtive f $y$. It is cnvenient t rewrite tis equtin in n pertr frm
+\[
+    L_n(y) \equiv \left[\,D^n + _{n-1}(t)D^{n-1} + \cdts + _{1}(t) D + _{0}(t)\rigt] y
+\]
+were $D$ is te differentil pertr $d/dt$ (i.e. $Dy = y'$ , $D^2y = y''$,... ), nd te $_n$ re given functins. Suc n equtin is sid t ve rder $n$, te index f te igest derivtive f $y$ tt is invlved.
+
+If $y$ is ssumed t be  functin f nly ne vrible, ne speks but n rdinry differentil equtin, else te derivtives nd teir cefficients must be understd s (cntrcted) vectrs, mtrices r tensrs f iger rnk, nd we ve  (liner) prtil differentil equtin.
+
+Te cse were $f = 0$ is clled  mgeneus equtin nd its slutins re clled cmplementry functins. It is prticulrly imprtnt t te slutin f te generl cse, since ny cmplementry functin cn be dded t  slutin f te inmgeneus equtin t give nter slutin (by  metd trditinlly clled prticulr integrl nd cmplementry functin). Wen te $_n$ re numbers, te equtin is sid t ve cnstnt cefficients.
+
+Nn-liner differentil equtins re frmed by te prducts f te unknwn functin nd its derivtives. Tere re very few metds f slving nnliner differentil equtins exctly; tse tt re knwn typiclly depend n te equtin ving prticulr symmetries. Nnliner differentil equtins cn exibit very cmplicted bevir ver extended time intervls, crcteristic f cs. Even te fundmentl questins f existence, uniqueness, nd extendbility f slutins fr nnliner differentil equtins, nd well-psedness f initil nd bundry vlue prblems fr nnliner PDEs re rd prblems nd teir reslutin in specil cses is cnsidered t be  significnt dvnce in te mtemticl tery (cf. Nvier-Stkes existence nd smtness). Hwever, if te differentil equtin is  crrectly frmulted representtin f  meningful pysicl prcess, ten ne expects it t ve  slutin. A cmmn pprc t nnliner prblems is lcl lineriztin, in wic liner differentil equtins frequently pper s pprximtins t nnliner equtins. Tese pprximtins re nly vlid under restricted cnditins.
+
+\sectin{Ordinry differentil equtin}
+
+In mtemtics, n rdinry differentil equtin (ODE) is  differentil equtin cntining ne r mre functins f ne independent vrible nd its derivtives. Te term "rdinry" is used in cntrst wit te term prtil differentil equtin wic my be wit respect t mre tn ne independent vrible.
+
+\prgrp{Generl definitin}
+
+Given $F$,  functin f $x, y$, nd derivtives f $y$. Ten n equtin f te frm
+\[
+    F\left (x,y,y',\cdts y^{(n-1)} \rigt )=y^{(n)}
+\]
+is clled n explicit rdinry differentil equtin f rder $n$. Mre generlly, n implicit rdinry differentil equtin f rder $n$ tkes te frm:
+\[
+    F\left(x, y, y', y'',\ \cdts,\ y^{(n)}\rigt) = 0
+\]
+
+A differentil equtin nt depending n $x$ is clled utnmus. A differentil equtin is sid t be liner if $F$ cn be written s  liner cmbintin f te derivtives f $y$:
+\[
+    y^{(n)} = \sum_{i=0}^{n-1} _i(x) y^{(i)} + r(x)
+\]
+were $_i(x)$ nd $r(x)$ re cntinuus functins in $x$. Fr nn-liner equtins, $_i(x)$ nd $r(x)$ re functins f $y$ nd $x$.
+
+Te functin $r(x)$ is clled te surce term, leding t tw furter imprtnt clssifictins. Hmgeneus: If $r(x) = 0$, nd cnsequently ne "utmtic" slutin is te trivil slutin, $y = 0$. Te slutin f  liner mgeneus equtin is  cmplementry functin, dented ere by $y_c$. Nn-mgeneus (r inmgeneus): If $r(x) \neq 0$. Te dditinl slutin t te cmplementry functin is te prticulr integrl, dented ere by $y_p$. Te generl slutin t  liner equtin cn be written s $y = y_c + y_p$.
+
+A generl slutin f n $n$t-rder equtin is  slutin cntining $n$ rbitrry independent cnstnts f integrtin. Gemetriclly, te generl slutin f n ODE is  fmily f infinitely mny slutin curves, ne fr ec vlue f te cnstnt $c$. A prticulr slutin is derived frm te generl slutin by setting te cnstnts t prticulr vlues, ften csen t fulfill set 'initil cnditins r bundry cnditins'. A singulr slutin is  slutin tt cnnt be btined by ssigning definite vlues t te rbitrry cnstnts in te generl slutin.
+
+\subsectin{Hmgeneus ODEs wit cnstnt cefficients -- Crcteristic equtin}
+
+Te first metd f slving liner mgeneus rdinry differentil equtins wit cnstnt cefficients is due t Euler, w relized tt slutins ve te frm $e^{zx}$, fr pssibly-cmplex vlues f $z$. Te expnentil functin is ne f te few functins t keep its spe fter differentitin, llwing te sum f its multiple derivtives t cncel ut t zer, s required by te equtin. Tus, fr cnstnt vlues $_n$, t slve:
+\[
+    y^{(n)} + _{n-1}y^{(n-1)} + \cdts + _{0}y = 0\,,
+\]
+we set $y = e^{zx}$, leding t
+\[
+    z^n e^{zx} + _{n-1} z^{n-1} e^{zx} + \cdts + _0 e^{zx} = 0.
+\]
+Divisin by $e^{zx}$ gives te $n$t-rder plynmil:
+\[
+    F(z) = z^{n} + _{n-1}z^{n-1} + \cdts + _0 = 0.
+\]
+Tis lgebric equtin $F(z) = 0$ is te crcteristic equtin cnsidered lter by Gsprd Mnge nd Augustin-Luis Cucy.
+
+Frmlly, te terms $y^{(k)}$ ($k = 1, 2, \dts, n$) f te riginl differentil equtin re replced by $z^k$. Slving te plynmil gives $n$ vlues f $z$: $z_1, \dts, z_n$. Substitutin f ny f tse vlues fr $z$ int $e^{zx}$ gives  slutin $e^{z_ix}$. Since mgeneus liner differentil equtins bey te superpsitin principle, ny liner cmbintin f tese functins ls stisfies te differentil equtin.
+
+Wen tese rts re ll distinct, we ve $n$ distinct slutins t te differentil equtin. It cn be swn tt tese re linerly independent, by pplying te Vndermnde determinnt, nd tgeter tey frm  bsis f te spce f ll slutins f te differentil equtin.
+
+Te preceding gve  slutin fr te cse wen ll rts re distinct, tt is, ec s multiplicity $1$. Fr te generl cse, if $z$ is  (pssibly cmplex) rt f $F(z)$ ving multiplicity $m$, ten, fr $k\in\{0,1,\dts,m-1\}$, $y=x^ke^{zx}$ is  slutin f te ODE (cn be derived by using te reductin f rder tecnique). Applying tis t ll rts gives  cllectin f $n$ distinct nd linerly independent functins, were $n$ is te degree f $F(z)$. As befre, tese functins mke up  bsis f te slutin spce.  If te cefficients $A_i$ f te differentil equtin re rel, ten rel-vlued slutins re generlly preferble. Since nn-rel rts $z$ ten cme in cnjugte pirs, s d teir crrespnding bsis functins $x^ke^{zx}$, nd te desired result is btined by replcing ec pir wit teir rel-vlued liner cmbintins $Re(y)$ nd $Im(y)$, were $y$ is ne f te pir.  Slving crcteristic equtin, in te $n=2$ cse te crcteristic equtin is f te frm \[ m^2 + (-1)m + b = 0.  \] We ten cn slve fr $m$. Tere re tree prticulr cses f interest: Cse 1: Tw distinct rts, $m_1$ nd $m_2$ Cse 2: One rel repeted rt, $m$ Cse 3: Cmplex rts, $\lp \pm \bet i$ In cse 1, te slutin is given by \[ y = c_1 e^{m_{1}x} + c_2 e^{m_2x}.  \] 
+In cse 2, te slutin is given by
+\[
+    y = ( c_1 + c_2 x ) e^{mx}.
+\]
+
+In cse 3, becuse te cefficients re rel, we re likely nt interested in te cmplex slutins. Since tese slutins prvide  bsis fr te tw-dimensinl slutin spce f te secnd rder differentil equtin, liner cmbintins f tese slutins will ls be slutins. Nting bsis elements re mutul cnjugtes, te fllwing liner cmbintins cn be cnstructed: 
+\[
+    u_1=\mbx{Re}(y_1)=\tfrc{1}{2} (y_1+y_2) = e^{\lp x} \cs(\bet x)
+\]
+\[
+    u_2=\mbx{Im}(y_1)=\tfrc{1}{2i} (y_1-y_2) = e^{\lp x} \sin(\bet x)
+\]
+wic gives us  rel bsis in $\{u_1,u_2\}$ wit
+\[
+    \lp = \mtp{\rm Re}(m),
+\]
+\[
+    \bet = \mtp{\rm Im}(m).
+\]
+Tese tw trignmetric slutins re linerly independent, s tey cn serve s nter bsis fr te slutin spce, yielding te fllwing generl slutin:
+\[
+    y = c_1 u_1 + c_2 u_2 = c_1 e^{\lp x} \cs(\bet x) + c_2 e^{\lp x} \sin(\bet x) 
+\]
+
+\subsectin{2nd rder liner ODEs wit missing terms -- Reductin f rder}
+
+Generl prcedure: Let's use te stndrd frm f  2nd rder liner ODE t see w te metd wrks
+\begin{equtin*}
+    \frc{\mtrm{d}^2 y}{\mtrm{d} x^2} + p(x) \frc{\mtrm{d} y}{\mtrm{d} x}+ q(x)y = f(x)
+\end{equtin*}
+
+\textbf{Bsic ide:} Reduce  2nd rder ODE t  1st rder ODE by intrducing  new functin $V(x)=\frc{dy}{dx}$.
+\begin{equtin*}
+    \text{2nd rder ODE} \xrigtrrw[\text{reductin f rder}]{V(x)=\frc{\mtrm{d} y}{\mtrm{d} x}} \text{1st rder ODE}
+\end{equtin*}
+
+\begin{enumerte}
+    \item Intrduce $V(x) = \frc{\mtrm{d} y}{\mtrm{d} x}$ nd sub int te ODE
+        \begin{equtin*}
+            \frc{\mtrm{d} V}{\mtrm{d} x} + p(x) V + q(x)y = f(x)
+        \end{equtin*}
+    \item Identify missing terms nd select  slutin strtegy t slve $V(x)$
+
+        Altug we ve btined  1st rder ODE fr te functin $V$, te current equtin is still t cmplicted t slve s tere re tw dependent vribles: $V$ nd $y$, wic re bt  functin f $x$. Hwever, frm tis stndrd frm, tw cses wit missing terms cn be distinguised nd slved using slutin strtegies fr 1st rder ODEs:
+        \begin{enumerte}
+            \item $q(x) = 0$ 
+                \begin{equtin*}
+                    \frc{\mtrm{d} V}{\mtrm{d} x} + p(x) V = f(x) \ (\text{Integrting fctr})
+                \end{equtin*}
+            \item $p(x) = 0$
+                \begin{equtin*}
+                    \frc{\mtrm{d} V}{\mtrm{d} x} + q(x)y = f(x)
+                \end{equtin*}
+                As $\frc{\mtrm{d} V}{\mtrm{d} x} = \frc{\mtrm{d} V}{\mtrm{d} y} \frc{\mtrm{d} y}{\mtrm{d} x} = \frc{\mtrm{d} V}{\mtrm{d} y} V$, we ve
+                \begin{equtin*}
+                    V \frc{\mtrm{d} V}{\mtrm{d} y} + q(x) y = f(x) \ (\text{Direct integrtin})
+                \end{equtin*}
+        \end{enumerte}
+    \item Slve fr $y$ by integrtin $y(x) = \int V(x) \,\mtrm{d}x$
+    \item (if needed) Find te prticulr slutin using te IC/BCs.
+\end{enumerte}
+
+Reductin f rder cn ls be emplyed wen ne slutin $y_1(x)$ is knwn nd  secnd linerly independent slutin $y_2(x)$ is desired. Te metd ls pplies t $n$-t rder equtins. In tis cse te metd will yield  $(n-1)$-t rder equtin fr $v$.
+
+Given te generl nn-mgeneus liner differentil equtin
+\[
+    y''+p(t)y'+q(t)y=r(t)\,
+\]
+nd  single slutin $y_1(t)$ f te mgeneus equtin [$r(t)=0$], let us try  slutin f te full nn-mgeneus equtin in te frm:
+\[
+    y_2=v(t)y_1(t)\,
+\]
+were $v(t)$ is n rbitrry functin. Tus
+\[
+    y_2'=v'(t)y_1(t)+v(t)y_1'(t)\,
+\]
+nd
+\[
+    y_2''=v''(t)y_1(t)+2v'(t)y_1'(t)+v(t)y_1''(t).\,
+\]
+If tese re substituted fr $y$, $y'$, nd $y''$ in te differentil equtin, ten
+\[
+    y_1(t)\,v''+(2y_1'(t)+p(t)y_1(t))\,v'+(y_1''(t)+p(t)y_1'(t)+q(t)y_1(t))\,v=r(t).
+\]
+Since $y_1(t)$ is  slutin f te riginl mgeneus differentil equtin, $y_1''(t)+p(t)y_1'(t)+q(t)y_1(t)=0$, s we cn reduce t
+\[
+    y_1(t)\,v''+(2y_1'(t)+p(t)y_1(t))\,v'=r(t)
+\]
+wic is  first-rder differentil equtin fr $v'(t)$ (reductin f rder). Divide by $y_1(t)$, btining
+\[
+    v''+\left(\frc{2y_1'(t)}{y_1(t)}+p(t)\rigt)\,v'=\frc{r(t)}{y_1(t)}.
+\]
+Integrting fctr: $\mu(t)=e^{\int(\frc{2y_1'(t)}{y_1(t)}+p(t))dt}=y_1^2(t)e^{\int p(t) dt}$.
+
+Multiplying te differentil equtin wit te integrting fctr $\mu(t)$, te equtin fr $v(t)$ cn be reduced t
+\[
+    \frc{d}{dt}(v'(t) y_1^2(t) e^{\int p(t) dt})=y_1(t)r(t)e^{\int p(t) dt}.
+\]
+After integrting te lst equtin, $v'(t)$ is fund, cntining ne cnstnt f integrtin. Ten, integrte $v'(t)$ t find te full slutin f te riginl nn-mgeneus secnd-rder equtin, exibiting tw cnstnts f integrtin s it suld:
+\[
+    y_2(t)=v(t)y_1(t)\, . 
+\]
+Finlly, we cn prve tt te secnd slutin $y_2(x)$ fund vi tis metd is linerly independent f te first slutin by clculting te Wrnskin.
+
+\subsectin{Nn-mgeneus equtin wit cnstnt cefficients}
+
+T btin te slutin t te nn-mgeneus equtin (smetimes clled inmgeneus equtin), find  prticulr integrl $y_p(x)$ by te metd f vritin f prmeters r undetermined cefficients; te generl slutin t te liner differentil equtin is te sum f te generl slutin f te relted mgeneus equtin nd te prticulr integrl. Or, wen te initil cnditins re set, use Lplce trnsfrm t btin te prticulr slutin directly.
+
+\subsubsectin{Vritin f prmeters}
+
+Given n rdinry nn-mgeneus liner differentil equtin f rder $n$
+\[
+    y^{(n)}(x) + \sum_{i=0}^{n-1} _i(x) y^{(i)}(x) = f(x).\qud\qud {(i)}
+\]
+let $y_1(x), \ldts, y_n(x)$ be  fundmentl system f linerly independent slutins f te crrespnding mgeneus equtin
+\[
+    y^{(n)}(x) + \sum_{i=0}^{n-1} _i(x) y^{(i)}(x) = 0.\qud\qud {(ii)}
+\]
+Ten  prticulr slutin t te nn-mgeneus equtin is given by
+\[
+    y_p(x) = \sum_{i=1}^{n} c_i(x) y_i(x)\qud\qud {(iii)}
+\]
+were te $c_i(x)$ re differentible functins f $x$ wic re ssumed t stisfy te cnditins (bt t clse te system nd t vid iger rder derivtives f $c(x)$ t pper)
+\[
+    \sum_{i=1}^{n} c_i'(x) y_i^{(j)}(x) = 0 \, \mtrm{,} \qud j = 0,\ldts, n-2.\qud\qud {(iv)}
+\]
+Strting wit (iii), repeted differentitin cmbined wit repeted use f (iv) gives
+\[
+    y_p^{(j)}(x) = \sum_{i=1}^{n} c_i(x) y_i^{(j)}(x) \, \mtrm{,} \qud j=0,\ldts,n-1 \, \mtrm{.} \qud\qud {(v)}
+\]
+One lst differentitin gives
+\[
+    y_p^{(n)}(x)=\sum_{i=1}^n c_i'(x)y_i^{(n-1)}(x)+\sum_{i=1}^n c_i(x) y_i^{(n)}(x)\, \mtrm{.} \qud\qud{\rm (vi)}
+\]
+By substituting (iii) int (i) nd pplying (v) nd (vi) it fllws tt
+\[
+    \sum_{i=1}^n c_i'(x) y_i^{(n-1)}(x) = f(x).\qud\qud {(vii)}
+\]
+(iv nd vii) f $n$ equtins give  liner system f te $c'_i$  
+\[
+    \begin{pmtrix}
+        y_1 & y_2 & \cdts & y_n\\
+        y_1' & y_2' & \cdts & y_n'\\
+        \vdts  & \vdts  & \ddts & \vdts  \\
+        y^{(n-2)}_1 & y^{(n-2)}_2 & \cdts & y^{(n-2)}_n\\
+        y^{(n-1)}_1 & y^{(n-1)}_2 & \cdts & y^{(n-1)}_n\\
+    \end{pmtrix}
+    \begin{pmtrix}
+        c'_1\\
+        c'_2\\
+        \vdts\\
+        c'_{n-1}\\
+        c'_{n}
+    \end{pmtrix}
+    =
+    \begin{pmtrix}
+        0\\
+        0\\
+        \vdts\\
+        0\\
+        f
+    \end{pmtrix}
+\]
+Using Crmer's rule yielding
+\[
+    c_i'(x) = \frc{W_i(x)}{W(x)}, \, \qud i=1,\ldts,n
+\]
+were $W(x)$ is te Wrnskin determinnt f te fundmentl system nd $W_i(x)$ is te Wrnskin determinnt f te fundmentl system wit te $i$-t clumn replced by $(0, 0, \ldts, f(x))$. Te rest is  mtter f integrting $c'_i$. Te prticulr slutin t te nn-mgeneus equtin cn ten be written s
+\[
+    y_p(x) = \sum_{i=1}^n y_i(x) \, \int \frc{W_i(x)}{W(x)}\ \mtrm dx. 
+\]
+
+\prgrp{Applictin prcedure}
+
+Fr  liner 2nd-rder nn-mgeneus ODE in stndrd frm
+\[
+    y'' + _1(x) y' + _0(x) y = f(x)
+\]
+\begin{enumerte}[nsep]
+    \item Find te cmplementry slutin $y_c = c_1 y_1(x) + c_2 y_2(x)$ by slving te mgeneus equtin
+        \[
+            y'' + _1(x) y' + _0(x) y = 0
+        \]
+    \item Ceck liner independence f $y_1(x)$ nd $y_2(x)$ by Wrnskin
+        \[
+            W[y_1, y_2] = \begin{vmtrix}
+                y_1 & y_2\\
+                y_1' & y_2'\\
+            \end{vmtrix}
+            \ne 0
+        \]
+    \item Assume te prticulr slutin
+        \[
+            y_p = v_1(x) y_1(x) + v_2(x) y_2(x)
+        \]
+        nd find $v_1(x)$, $v_2(x)$, $y_p$ by slving te "Vritin f Prmeter (VOP)" system
+        \[
+            \begin{pmtrix}
+                y_1 & y_2\\
+                y_1' & y_2'\\
+            \end{pmtrix}
+            \begin{pmtrix}
+                v_1'\\
+                v_2'\\
+            \end{pmtrix}
+            =
+            \begin{pmtrix}
+                0\\
+                f
+            \end{pmtrix}
+        \]
+        r equivlently,
+        \[
+            v_1 = \int_{}^{} \frc{-y_2 f}{W} \,\mtrm{d}x, \ \ v_2 = \int_{}^{} \frc{y_1 f}{W} \,\mtrm{d}x
+        \]
+    \item Express te generl slutin (superpsitin principle)
+        \[
+            y = y_c + y_p = c_1 y_1 + c_2 y_2 + v_1 y_1 + v_2 y_2
+        \] 
+\end{enumerte}
+
+Slve
+\[
+    y'' - y = e^x
+\]
+by metd f undetermined cefficients (MUC) nd by vritin f prmeters (VOP). Cmpre te slutins.
+
+\prgrp{Slutin}
+
+\begin{enumerte}[nsep]
+    \item Find $y_c$
+
+        Cmplimentry equtin:
+        \[
+            y'' - y = 0
+        \]
+        Crcteristic equtin (liner, cnst ce, m):
+        \[
+            r^2 - 1 = 0
+        \]
+        \[
+            y_1 = e^{x}, \ y_2 = e^{-x}, \ y_c = c_1 e^{x} + c_2 e^{-x}
+        \]
+    \item Ceck Wrnskin
+        \[
+            W[y_1, y_2] = 
+            \begin{vmtrix}
+                y_1 & y_2\\
+                y_1' & y_2'\\
+            \end{vmtrix}
+            = y_1y_2'-y_1'y_2 = -e^x e^{-x} - e^x e^{-x}= -2 \ne 0
+        \]
+    \item Assume $y_p$ nd find $y_p$
+        \[
+            \begin{cses}
+                \text{MUC}: \text{guess vi } f(x)
+                \begin{cses}
+                    \text{Plynmil: } f(x) = C x^m \t y_p = A_m x^m + \dtsc + A_1 x + A_0\\
+                    \text{Expnentil: } f(x) = C e^{mx} \t y_p = A e^{mx}\\
+                    \text{Sinusidl: } f(x) = C \sin(mx) \t y_p = A_1 \cs(mx) + A_2 \sin(mx)\\
+                    \text{Exp x Ply: } f(x) = C x ^m e^{rx} \t y_p = x^s (A_m x^m + \dtsc + A_0) e^{rx}\\
+                    \text{were } s = n, \text{ if } $r$ \text{ is  rt f cmp. equ. wit multiplicity } n\\
+                \end{cses}\\
+                \text{VOP}: y_p = v_1(x) y_1(x) + v_2(x) y_2(x)\\
+            \end{cses}
+        \]
+    MUC:
+        \[
+            y_p = Axe^x, \ y_p' = Ae^x + Axe^x, \ y_p'' = 2Ae^x + Axe^x
+        \]
+        Substitute int ODE, gives
+        \[
+            2Ae^x + Axe^x - Axe^x = e^x
+        \]
+        Terefre,
+        \[
+            A = \frc{1}{2}, \ y_p = \frc{xe^x}{2}
+        \]
+    VOP:
+        \[
+            v_1 = \int_{}^{} \frc{-y_2 f}{W} \,\mtrm{d}x = \int_{}^{} \frc{-e^{-x}e^x}{-2} \,\mtrm{d}x = \frc{x}{2}
+        \]
+        \[
+            v_2 = \int_{}^{} \frc{y_1 f}{W} \,\mtrm{d}x = \int_{}^{} \frc{e^x e^x}{-2} \,\mtrm{d}x = \frc{-e^{2x}}{4}
+        \]
+        \[
+            y_p = v_1y_1 + v_2y_2 = \frc{xe^x}{2} - \frc{e^x}{4}
+        \]
+    \item Find $y$
+        \[
+            y = y_c + y_p = c_1 e^x + c_2 e^{-x} + \frc{xe^x}{2}
+        \]
+
+\end{enumerte}
+
+\subsubsectin{Lplce trnsfrm}
+
+Te Lplce trnsfrm is  frequency-dmin pprc fr piecewise cntinuus time signls. Te Lplce trnsfrm f  functin $f(t)$, defined fr ll rel numbers $t \ge 0$, is te functin $F(s)$, wic is  unilterl trnsfrm tt trnsfrms te functin frm  time-dmin t n $s$-dmin defined by
+\[
+    F(s) = L\{f(t)\} = \int_0^\infty e^{-st} f(t)\, dt
+\]
+were $F(s)$ is te trnsfrmed functin in te $s$-dmin, $L$ is te Lplce trnsfrm pertr, $e^{-st}$ is te kernel f te pertr, nd $s$ is  cmplex number frequency prmeter
+\[
+    s = \sigm + i \meg
+\]
+
+Existence f Lplce trnsfrm fr  given functin $f(t)$: 
+\begin{enumerte}
+    \item Piecewise cntinuus
+        \begin{itemize}
+            \item $f(t)$ is cntinuus n $[0, \infty]$ except t  finite number f jump discntinuities.
+            \item $f(t)$ pprces  finite limit t ec discntinuity (ll jump discntinuities re finite)
+        \end{itemize}
+    \item Expnentil rder: rte f grwt is n fster tn tt f expnentil functins.
+
+        $f(t)$ is sid t be f expnentil rder $\lp$ if tere exist psitive cnstnts $T$ nd $M$ suc tt
+        \[
+            |f(t)| \le M e^{\lp t} \text{ fr ll } t \ge T
+        \]
+\end{enumerte}
+
+Te Lplce trnsfrm s  number f prperties tt mke it useful fr nlyzing liner dynmicl systems. Merits f Lplce trnsfrms:
+\begin{itemize}[nsep]
+    \item Trnsfrms discntinuus functins int  single cntinuus functin
+    \item Trnsfrms differentitin nd integrtin t multiplictin nd divisin, respectively, by $s$. Becuse f tis prperty, te Lplce vrible $s$ is ls knwn s pertr vrible in te $L$ dmin. Hence, trnsfrms differentil/integrl equtins int lgebric equtins. Once slved, use f te inverse Lplce trnsfrm reverts t te time dmin.
+    \item Incrprtes te initil cnditin directly int te lgebric equtins (n need t pply ICs)
+\end{itemize}
+LT
+\[
+    F(s) = L\{f(t)\} = \int_0^\infty e^{-st} f(t)\, dt
+\]
+Inverse LT
+\[
+    f(t) = L^{-1} \left\{ F(s) \rigt\}
+\]
+Useful prperties:
+\begin{enumerte}
+    \item Linerity:
+        \[
+            L \left\{ c_1 f_1(t) \pm c_2 f_2(t) \rigt\} = c_1 L \left\{ f_1(t) \rigt\} \pm c_2 L \left\{ f_2(t) \rigt\} = c_1 F_1(s) \pm c_2 F_2(s)\\
+        \]
+        \[
+            L^{-1} \left\{ c_1 F_1(s) \pm c_2 F_2(s) \rigt\} = c_1 L^{-1} \left\{ F_1(s) \rigt\} \pm c_2 L^{-1} \left\{ F_2(s) \rigt\}\\
+        \]
+\item Frequency-dmin derivtive:
+    \[
+        L \left\{ t^n f(t) \rigt\} = (-1)^n F^{(n)}(s)
+    \]
+\item Time-dmin derivtive:
+    \[
+        L \left\{ f'(t) \rigt\} = s F(s) - f(0)
+    \]
+    \[
+        L \left\{ f''(t) \rigt\} = s^2 F(s) - sf(0) - f'(0)
+    \]
+    \[
+        L \left\{ f^{n}(t) \rigt\} = s^n F(s) - \sum_{k=1}^{n}s^{n-k}f^{(k-1)}(0)
+    \]
+\item Frequency sifting:
+    \[
+        L \left\{ e^{ t} f(t) \rigt\} = F(s - )
+    \]
+\item Time sifting:
+    \[
+        L \left\{ f(t - ) u(t - ) \rigt\} = e^{-s}F(s)
+    \]
+    \[
+        L \left\{ g(t) u(t - ) \rigt\} = L \left\{ g(t +  - ) u(t - ) \rigt\} = e^{-s} L \left\{ g(t + ) \rigt\} 
+    \]
+    Prf
+     \[
+         \begin{split}
+             L \left\{ f(t - ) u(t - ) \rigt\} &= \int_{0}^{\infty} e^{-st} f(t - ) u(t - )\,\mtrm{d}t = \int_{}^{\infty} e^{-st} f(t - ) \,\mtrm{d}t \\
+                                                  &\verset{t-=\tu}{=} \int_{0}^{\infty} e^{-s} e^{-s \tu} f(\tu) \,\mtrm{d}\tu = e^{-s} F(s)
+         \end{split}
+     \]
+\item Cnvlutin:
+    \[
+        L \left\{ f(t) * g(t) \rigt\} = L \left\{ \int_{0}^{t} f(t - \tu) g(\tu) \,\mtrm{d}\tu \rigt\} = F(s) \cdt G(s)
+    \]
+    Prf
+    \[
+        \begin{split}
+            L \left\{ f(t) * g(t) \rigt\} &= \int_{0}^{\infty} e^{-st} \left[ \int_{0}^{t} f(t - \tu) g(\tu) \,\mtrm{d}\tu \rigt] \,\mtrm{d}t\\ 
+            &\verset{\text{ cnverting t infinity intervl vi } u(t)}{=} \int_{0}^{\infty} e^{-st} \left[ \int_{0}^{\infty} u(t - \tu) f(t - \tu) g(\tu) \,\mtrm{d}\tu \rigt] \,\mtrm{d}t\\
+                                           &\verset{\text{ cnge te rder f integrtin }}{=} \int_{0}^{\infty} g(\tu) \left[ \int_{0}^{\infty} e^{-st} u(t - \tu) f(t - \tu) \,\mtrm{d}t \rigt] \,\mtrm{d}\tu\\ 
+                                           &= \int_{0}^{\infty} g(\tu) e^{-s\tu} F(s) \,\mtrm{d}\tu =  F(s)\int_{0}^{\infty} g(\tu) e^{-s\tu} \,\mtrm{d}\tu = F(s) G(s)
+        \end{split}
+    \]
+\end{enumerte}
+
+Quickly cmplete te Tble f Lplce trnsfrms using te prperties f LT:
+\begin{center}
+    %\ftntesize% fntsize
+    %\setlengt{\tbclsep}{4pt}% clumn seprtin
+    \renewcmmnd{\rrystretc}{1.5}% rw spce 
+    \begin{tbulr}{lc}
+        \line\line
+        %\multiclumn{num_f_cls_t_merge}{lignment}{cntents} \\
+        %\cline{i-j}% prtil line frm clumn i t clumn j
+        $f(t)$ & $F(s) = L \left\{ f(t) \rigt\}$\\
+        \line
+        $1$ & $\frc{1}{s}, \text{  } s > 0$\\
+        $e^{t}$ & $\frc{1}{s - }, \text{  } s > $\\
+        $\sin(bt)$ & $\frc{b}{s^2 + b^2}, \text{  } s > 0$\\
+        $\cs(bt) = \frc{(\sin(bt))'}{b}$ & $\frc{s}{s^2 + b^2}, \text{  } s > 0$\\
+        $t^n = t^n \cdt 1$ & $(-1)^n \frc{\mtrm{d}^n}{\mtrm{d}s^n}(\frc{1}s{}) = \frc{n!}{s^{n+1}}, \text{  } s > 0$\\
+        $e^{t}t^n = e^{t} \cdt t^n$ & $\frc{n!}{(s - )^{n+1}}, \text{  } s > $\\
+        $e^{t} \sin(bt) = e^{t} \cdt \sin(bt)$ & $\frc{b}{(s - )^{2} + b^2}, \text{  } s > $\\
+        $e^{t} \cs(bt) = e^{t} \cdt \cs(bt)$ & $\frc{s - }{(s - )^{2} + b^2}, \text{  } s > $\\
+        \line\line
+    \end{tbulr}
+\end{center}
+
+Use te Heviside functin $u(t)$ t trnsfrm te fllwing piecewise functin int  single expressin:
+\[
+    f(t) = 
+    \begin{cses}
+        2t + e^t, \text{ } & t < 1\\
+        0, \text{ } & 1 < t < 5\\
+        t^2, \text{ } & 5 < t < 10\\
+        t^2 / e^t, \text{ } & 10 < t\\
+    \end{cses}
+\]
+
+\prgrp{Slutin}
+
+\begin{enumerte}
+    \item Find te slices in te definitin dmin f $f(t)$:
+        \[
+            t \in [0, 1] + [1, 5] + [5, 10] + [10, \infty]
+        \]
+\item Slice te functin $y(t) = 1$ ccrding t te bve slices using te rectngulr windw functin $\Pi_{,b}(t)$ nd te Heviside functin $u(t)$
+    \[
+        u(t) = 
+        \begin{cses}
+            0, &\text{ } t < 0\\
+            1, &\text{ } t > 0\\
+        \end{cses}
+    \]
+\[
+    \Pi_{,b}(t) = u(t - ) - u(t - b) =
+        \begin{cses}
+            0, &\text{ } t < \\
+            1, &\text{ }  < t < b\\
+            0, &\text{ } b < t\\
+        \end{cses}
+\]
+\[
+    1 =  (1) \Pi_{0,1}(t) + (1) \Pi_{1,5}(t) + (1) \Pi_{5,10}(t) + (1) u(t - 10)
+\]
+\item Scle $y(t) = 1$ t btin $f(t)$ s  cmbintin f te windwed slices
+\[
+    f(t) = (2t + e^t) \Pi_{0,1}(t) + (0) \Pi_{1,5}(t) + (t^2) \Pi_{5,10}(t) + (\frc{t^2}{e^t}) u(t - 10)
+\]
+\end{enumerte}
+
+Slve
+\[
+    y''(t) + 4 y(t) = f(t), \ \ y(0) = 0, \ y'(0) = 0
+\]
+were
+\[
+    f(t) =
+    \begin{cses}
+        1, &\text{ } 0 < t < 1\\
+        -1, &\text{ } 1 < t < 2\\
+        0, &\text{ } 2 < t\\
+    \end{cses}
+\]
+\prgrp{Slutin}
+
+\[
+    f(t) = (1) \Pi_{0,1}(t) + (-1) \Pi_{1,2}(t) = u(t) - 2u(t-1) + u(t-2)
+\]
+
+\begin{enumerte}
+    \item $L \left\{ \text{ ODE } \rigt\}$
+        \[
+            s^2Y(s) - sy(0) - y'(0) + 4 Y(s) = L \left\{ f(t) \rigt\} = F(s)
+        \]
+
+    \item Find $Y(s)$
+        \[
+            Y(s) = \frc{F(s)}{s^2 + 4}
+        \]
+
+    \item $y(t) = L^{-1} \left\{ Y(s) \rigt\}$
+
+        Metd f cnvlutin:
+        \[
+            Y(s) = \frc{1}{s^2 + 4} F(s) = G(s) F(s), \ \ G(s) = \frc{1}{s^2 + 2^2}, \ \ g(t) = \frc{1}{2}\sin(2t)
+        \]
+        \[
+            \begin{split}
+                y(t) &= L^{-1}\left\{ Y(s) \rigt\} = g(t) * f(t) = \int_{0}^{t} g(t - \tu) f(\tu) \,\mtrm{d}\tu\\
+                     &= \int_{0}^{t} g(t - \tu) u(\tu) \,\mtrm{d}\tu -2 \int_{0}^{t} g(t - \tu) u(\tu-1) \,\mtrm{d}\tu + \int_{0}^{t} g(t - \tu) u(\tu-2) \,\mtrm{d}\tu\\
+                     &= \frc{1}{2} \int_{0}^{t}\sin(2t - 2\tu) \,\mtrm{d}\tu - u(t - 1) \int_{1}^{t} \sin(2t - 2\tu) \,\mtrm{d}\tu + \frc{1}{2} u(t - 2) \int_{0}^{t} \sin(2t - 2\tu) \,\mtrm{d}\tu\\
+                     &= \left. \frc{1}{4} \cs(2t - 2\tu)\rigt|_{0}^{t} - \left. \frc{1}{2} u(t - 1) \cs(2t - 2\tu)\rigt|_{1}^{t} \left. + \frc{1}{4} \cs(2t - 2\tu)\rigt|_{2}^{t}\\
+                     &= \frc{1}{4}[1 - \cs(2t)] - \frc{1}{2} u(t - 1) \left[ 1 - \cs(2t - 2)\rigt] + \frc{1}{4} u(t - 2) \left[ 1 - \cs(2t - 4) \rigt]
+            \end{split}
+        \]
+
+        Metd f prtil frctins $Y(s) = \frc{P(s)}{Q(s)}$
+        \begin{enumerte}
+            \item Nnrepeted liner fctrs:
+                \[
+                    Q(s) = (s - r_1)(s - r_2) \dtsm (s - r_n)
+                \]
+            were $r_i$ ($i = 1, \dtsc, n$) re ll distinct rts.
+                \[
+                    \frc{P(s)}{Q(s)} = \frc{A_1}{s - r_1} + \frc{A_2}{s - r_2} + \dtsm + \frc{A_n}{s - r_n}
+                \]
+        \item   Repeted liner fctrs:
+            \[
+                Q(s) = (s - r)^m q(s)
+                \]
+            were $r$ is  rt wit multiplicity $m$, nd $q(s)$ is  plynmil.
+                \[
+                    \frc{P(s)}{Q(s)} = \frc{A_1}{s - r} + \frc{A_2}{(s - r)^2} + \dtsm + \frc{A_m}{(s - r)^m} + \frc{C}{q(s)}
+                \]
+        \item Qudrtic fctrs:
+            \[
+                Q(s) = [(s - \lp)^2 + \bet^2]^mq(s)
+                \]
+            were$[(s - \lp)^2 + \bet^2]$ is  qudrtic fctr wit multiplicity $m$, nd $q(s)$ is  plynmil.
+                \[
+                    \frc{P(s)}{Q(s)} = \frc{A_1(s - \lp) + B_1 \bet}{[(s - \lp)^2 + \bet^2]} + \frc{A_2(s - \lp) + B_2 \bet}{[(s - \lp)^2 + \bet^2]^2} + \dtsm + \frc{A_m(s - \lp) + B_m \bet}{[(s - \lp)^2 + \bet^2]^m} + \frc{C}{q(s)}
+                \]
+        \end{enumerte}
+        Trug equting te numertrs, ll te cnstnts $A_i$, $B_j$, $C_k$ cn be determined by te metd f undetermined cefficients.
+
+        \[
+            F(s) = L \left\{ f(t) \rigt\} = \frc{1}{s} - \frc{2e^{-s}}{s} + \frc{e^{-2s}}{s}
+        \]
+        \[
+            \begin{split}
+                Y(s) &= \frc{F(s)}{s^2 + 4} = \frc{1}{s(s^2+4)} - \frc{2e^{-s}}{s(s^2+4)} + \frc{e^{-2s}}{s(s^2+4)}\\
+                     &= G(s) - 2e^{-s} G(s) + e^{-2s} G(s)
+            \end{split}
+        \]
+        \[
+            G(s) = \frc{1}{s(s^2+4)} = \frc{1}{4} (\frc{1}{s}) - \frc{1}{4} (\frc{s}{s^2+4})
+        \]
+        \[
+            g(t) = \frc{1}{4} - \frc{1}{4} \cs(2t)
+        \]
+        Use te time sifting prperty, gives
+        \[
+            \begin{split}
+                y(t) &= L^{-1}\left\{ G(s) - 2e^{-s} G(s) + e^{-2s} G(s) \rigt\}\\
+                     &= g(t) - 2g(t-1)u(t-1) + g(t-2)u(t-2)\\
+                     &= \frc{1}{4}[1 - \cs(2t)] - \frc{1}{2} u(t - 1) \left[ 1 - \cs(2t - 2)\rigt] + \frc{1}{4} u(t - 2) \left[ 1 - \cs(2t - 4) \rigt]
+            \end{split}
+        \]
+\end{enumerte}
+
+\subsectin{Nnliner first rder ODEs}
+
+\subsubsectin{Seprble first rder ODEs -- Direct integrtin}
+
+A slutin f  seprble first rder ODE cn be fund using direct integrtin
+\[
+    \frc{\mtrm{d} y}{\mtrm{d} x} = f(x,y) = p(x) q(y)
+\]
+Ten,
+\[
+    \int_{}^{} \frc{1}{q(y)} \,\mtrm{d}y = \int_{}^{} p(x) \,\mtrm{d}x
+\]
+
+If te equtin is nt seprble, we my still be ble t slve it by pplying substitutins r trnsfrmtins t mke te ODE seprble. If we cn write $f(x, y) = f(y/x)$, we cn substitute  new vrible $v = y/x$ suc tt te RHS is $f(v)$. We ve:
+\[
+    \frc{\mtrm{d} y}{\mtrm{d} x} = f(v)
+\]
+Nw we wnt t ls trnsfrm te LHS, we see tt $y = vx$. By deriving tis equtin wit respect t $x$, we btin:
+\[
+    \frc{\mtrm{d} y}{\mtrm{d} x} = x \frc{\mtrm{d} v}{\mtrm{d} x} + v
+\]
+Terefre, we btin  seprble equtin fr $v(x)$
+\[
+    \frc{\mtrm{d} v}{\mtrm{d} x} = \frc{f(v) - v}{x}
+\]
+
+\subsubsectin{First rder ODEs in exct equtin frm -- Ttl derivtin}
+
+A differentil equtin
+\[
+    M(x,y) dx + N(x,y) dy = 0
+\]
+is clled n exct equtin if it is te ttl differentil f  functin $F(x,y)$, i.e.,
+\[
+    M(x,y) = \frc{\prtil F(x,y)}{\prtil x} \text{ nd } N(x,y) = \frc{\prtil F(x,y)}{\prtil y}
+\]
+Ten te ODE cn be rewritten s
+\[
+    dF = \frc{\prtil F}{\prtil x}dx + \frc{\prtil F}{\prtil y}dy = M(x,y)dx + N(x,y)dy = 0
+\]
+Te cntinuity prperty f cntinuus prtil derivtives gives
+\[
+    \frc{\prtil }{\prtil y} \frc{\prtil F}{\prtil x} = \frc{\prtil }{\prtil x} \frc{\prtil F}{\prtil y}
+\]
+As  result, te cmptibility cnditin requires tt
+\[
+    \frc{\prtil }{\prtil y} M(x,y) = \frc{\prtil }{\prtil x} N(x,y)
+\]
+T slve n exct equtin
+\begin{enumerte}[nsep]
+    \item Refrmulte te first rder ODE s $Mdx + Ndy = 0$
+    \item Ceck exctness f te equtin (cmptibility cnditin): $\frc{\prtil }{\prtil y}M = \frc{\prtil }{\prtil x}N$
+    \item Find $F(x,y)$ wit te reltin $F(x,y) = \int_{}^{} M \,\mtrm{d}x + c(y)$
+    \item Determine $c(y)$ by slving $\frc{\prtil F(x,y)}{\prtil y} = N$
+\end{enumerte}
+
+Smetimes  given ODE is nt exct, but it cn be trnsfrmed int n exct ne by multiplying n integrting fctr
+\[
+    P(x,y)dx + Q(x,y)dy = 0
+\]
+multiply by  functin $U(x,y)$
+\[
+    U(x,y) P(x,y) dx + U(x,y) Q(x,y) dy = 0
+\]
+Assume te resulting equtin is exct, by te cmptibility cnditin,
+\[
+    \frc{\prtil UP}{\prtil y} = \frc{\prtil UQ}{\prtil x}
+\]
+pply te cin rule t btin
+\[
+    P \frc{\prtil U}{\prtil y} + U \frc{\prtil P}{\prtil y} = Q \frc{\prtil U}{\prtil x} + U \frc{\prtil Q}{\prtil x}
+\]
+t simplify tis cmplex equtin, we ssume tt te integrting fctr is nly  functin f ONE vrible, eiter $U=U(x)$ r $U=U(y)$. If $U=U(x)$, ten we btin
+\[
+    \frc{1}{U}\frc{\mtrm{d} U}{\mtrm{d} x} = \frc{1}{Q}(\frc{\prtil P}{\prtil y} - \frc{\prtil Q}{\prtil x})
+\]
+Terefre,
+\[
+    U(x) = e^{\int_{}^{} \frc{1}{Q}(\frc{\prtil P}{\prtil y} - \frc{\prtil Q}{\prtil x}) \,\mtrm{d}x}
+\]
+Hw t select between $U(x)$ nd $U(y)$?
+\begin{itemize}[nsep]
+    \item Select $U(x)$ if $R = \frc{1}{Q}(\frc{\prtil P}{\prtil y} - \frc{\prtil Q}{\prtil x})$ is cntinuus nd depends nly n $x$.
+    \item Select $U(y)$ if $R = \frc{1}{P}(\frc{\prtil Q}{\prtil x} - \frc{\prtil P}{\prtil y})$ is cntinuus nd depends nly n $y$.
+\end{itemize}
+
+\subsectin{Liner ODEs wit vrible cefficients}
+
+A liner ODE f rder $n$ wit vrible cefficients s te generl frm
+\[
+    p_{n}(x)y^{(n)}(x) + p_{n-1}(x) y^{(n-1)}(x) + \cdts + p_0(x) y(x) = r(x). 
+\]
+
+\subsubsectin{Liner first-rder equtin -- Integrtin Fctrs}
+
+A liner first rder ODE s te generl frm
+\[
+    \frc{\mtrm{d} y}{\mtrm{d} x} + p(x) y(x) = f(x).
+\]
+Equtins f tis frm cn be slved by multiplying n integrting fctr $U(x)$ suc tt
+\[
+    \frc{\mtrm{d} (U(x)y)}{\mtrm{d} x} = U(x) \frc{\mtrm{d} y}{\mtrm{d} x} + U'(x) y = U(x) \frc{\mtrm{d} y}{\mtrm{d} x} + U(x) P(x) y = U(x) f(x)
+\]
+We need t find $U(x)$ suc tt
+\[
+    \frc{1}{U} \frc{\mtrm{d} U}{\mtrm{d} x} = P
+\]
+Terefre,
+\[
+    U(x) = e^{\int_{}^{} P(x) \,\mtrm{d}x}
+\]
+Te slutin is ten
+\[
+    y(x) = \frc{1}{U(x)} [\int_{}^{} U(x)f(x) \,\mtrm{d}x]
+\]
+
+\subsubsectin{Cucy-Euler equtin}
+\[
+    x^n y^{(n)}(x) + _{n-1} x^{n-1} y^{(n-1)}(x) + \cdts + _0 y(x) = 0. 
+\]
+
+Te generl prctice fr slving differentil equtins (r ny kind f prblems) is t try t trnsfrm/decmpse te unknwn prblems int  set f prblems tt re knwn nd well studied.  If te ttempt succeeds, te unknwn prblems re ten ble t be slved by previus knwledge. If te ttempt cn nt be dne, ten new pprces my need t be estblised.
+
+Wen slving n Euler-Cucy equtin
+\[
+    x^2\frc{d^2y}{dx^2} + bx\frc{dy}{dx} +cy=0
+\]
+By intrducing  cnge f independent vrible $z=ln(x)$, te Euler-Cucy equtin ( type f ODE wit nn-cnstnt cefficients) cn be trnsfrmed int n ODE wit cnstnt cefficients
+\[
+    \frc{d^2y}{dz^2} + (b-)\frc{dy}{dz} +cy=0
+\]
+wic is well-studied nd we re fmilir wit, te generl slutin is
+\[
+    y=c_1e^{rz}+c_2e^{sz} \ (3)
+\]
+Nw we successfully slved  less fmilir prblem vi trnsfrming te prblem int  mre fmilir prblem. Hwever, plese dn't frget tt t btin te slutin f te riginl prblem, we need t invert te trnsfrmtin prcess.
+
+T d te inversin, plese try t replce $z$ wit $z=ln(x)$ t see wy te generl slutin dpts te frm f
+\[
+    y=c_1x^{r}+c_2x^{s}
+\]
+Nte tt
+\[
+    e^{b} = {(e^{})}^b
+\]
+
+\subsubsectin{Bessel's equtin}
+\[
+    x^2 \frc{d^2y}{dx^2} + x \frc{dy}{dx} + (x^2-n^2)y = 0 
+\]
+ere $P(x) = x^2$, $Q(x) = x$, $R(x) = (x^2-n^2)$, $n=cnstnt$
+
+Tis is clled Bessel's ODE f rder $n$. Fr te zer rder cse ($n=0$), wic, by dividing trug by $x$, cn be written s
+\[
+    x \frc{d^2y}{dx^2} + \frc{dy}{dx} +xy = 0
+\]
+
+Infinite series must be used t slve Bessel's ODE. Depending n te frm f te $P(x)$, $Q(x)$, $R(x)$ plynmils, eiter  Tylr (Mclurin) series (ssume $y(x)=\sum _kx^k$) r  Frbenius series (ssume $y(x)=x^r\sum _kx^k$) my be needed. Tedius lgebr is required t substitute te series int te ODE, cllect terms, nd btin te vlues f te $_k$ cefficients nd te cnstnt $r$. Fr Bessel's equtin f zer rder, tis series slutin prcedure emplying Frbenius series leds t
+\[
+    y(x) = C_1 (1 - \frc{x^2}{2^2} + \frc{x^4}{2^24^2} - \frc{x^6}{2^24^26^2} + \dts) + C_2
+\]
+
+Becuse Bessel's ODE ppers in mny pplictins, tese infinite series re given specil nmes, nd $y(x)$ is written s $y(x) = C_1 J_0(x) + C_2 Y_0(x)$, were $J_0(x)$ is clled  Bessel functin f te first kind f rder $0$ nd $Y_0(x)$ is clled  Bessel functin f te secnd kind f rder $0$. Tere re crrespnding Bessel functins f te first nd secnd kind f rder $n$ fr te $n$t-rder Bessel ODE given bve.
+
+Fr clrifictin, it my be elpful t cmpre te Bessel functin slutin bve wit te mre fmilir trignmetric functins. Just like Bessel functins, te sine nd csine functins cn be btined s infinite series slutins f  differentil equtin:
+\[
+    \frc{d^2y}{dx^2} + xy = 0 
+\]
+Altug f curse we dn't need infinite series t slve tis simple ODE, Fllwing te infinite series pprc, te slutin is:
+\[
+    y(x) = C_1(1 _ \frc{x^2}{2!} + \frc{x^4}{4!} - \dts) + C_2 (x - \frc{x^3}{3!} + \frc{x^5}{5!} - \dts)
+\]
+Becuse tese infinite series pper in  wide vriety f pplictins, tey re given specil nmes,
+nmely, $\cs(x)$ nd $\sin(x)$, respectively.
+
+\subsubsectin{Generl frm wit vrible cefficients}
+\[
+    P(x)\frc{d^2 y}{d x^2} + Q(x)\frc{dy}{dx} + R(x)y = 0
+\]
+In generl, n clsed frm slutins exists. Te nly exct slutin t tis type f equtin is n infinite series. Rewrite t
+\[
+    \frc{d^2 y}{d x^2} + \frc{Q(x)}{P(x)}\frc{dy}{dx} + \frc{R(x)}{P(x)}y = 0
+\]
+Identify te frm f te slutin: Tylr series $y = \sum^{\infty}_{n=0} _nx^n$ if nn-singulr t $x=0$. Frbenius metd $y = x^r\sum^{\infty}_{n=0}_nx^n$ if singulr t $x=0$. Substitute slutin int te ODE. Apply ICs/BCs t find cnstnts.
+
+\prgrp{Frbenius metd}
+
+In mtemtics, te Metd f Frbenius, is  wy t find n infinite series slutin fr n rdinry differentil equtin, especilly fr equtins wic will nt be slvble wit regulr pwer series metds if te equtin is nt nlytic t $0$. 
+
+Te Metd f Frbenius tells us tt we cn seek  pwer series slutin f te frm
+\[
+    u(z)=\sum_{k=0}^\infty A_kz^{k+r}, \qqud (A_0 \neq 0)
+\]
+Differentiting:
+\[
+    u'(z)=\sum_{k=0}^\infty (k+r)A_kz^{k+r-1}
+\]
+\[
+    u''(z)=\sum_{k=0}^\infty (k+r-1)(k+r)A_kz^{k+r-2}
+\]
+
+Substituting:
+\[
+    \begin{ligned}
+        &z^2\sum_{k=0}^\infty (k+r-1)(k+r)A_kz^{k+r-2} + zp(z) \sum_{k=0}^\infty (k+r)A_kz^{k+r-1} + q(z)\sum_{k=0}^\infty A_kz^{k+r}\\
+        &= \sum_{k=0}^\infty (k+r-1) (k+r)A_kz^{k+r} + p(z) \sum_{k=0}^\infty (k+r)A_kz^{k+r} + q(z) \sum_{k=0}^\infty A_kz^{k+r}\\
+        &= \sum_{k=0}^\infty [(k+r-1)(k+r) A_kz^{k+r} + p(z) (k+r) A_kz^{k+r} + q(z) A_kz^{k+r}]\\
+        &= \sum_{k=0}^\infty \left[(k+r-1)(k+r) + p(z)(k+r) + q(z)\rigt] A_kz^{k+r}\\
+        &= \left[ r(r-1)+p(z)r+q(z) \rigt] A_0z^r+\sum_{k=1}^\infty \left[ (k+r-1)(k+r)+p(z)(k+r)+q(z) \rigt] A_kz^{k+r} 
+    \end{ligned}
+\]
+Te expressin
+\[
+    r\left(r-1\rigt) + p\left(0\rigt)r + q\left(0\rigt) = I(r)
+\]
+is knwn s te indicil plynmil, wic is qudrtic in $r$. Te generl definitin f te indicil plynmil is te cefficient f te lwest pwer f $z$ in te infinite series. In tis cse it ppens t be tt tis is te $r$t cefficient but, it is pssible fr te lwest pssible expnent t be $r - 2$, $r - 1$ r, smeting else depending n te given differentil equtin. Tis detil is imprtnt t keep in mind. In te prcess f syncrnizing ll te series f te differentil equtin t strt t te sme index vlue (wic in te bve expressin is $k = 1$), ne cn end up wit cmplicted expressins. Hwever, in slving fr te indicil rts ttentin is fcused nly n te cefficient f te lwest pwer f $z$.
+
+Using tis, te generl expressin f te cefficient f $z^{k + r}$ is
+\[
+    I(k+r)A_k+\sum_{j=0}^{k-1}{(j+r)p^{(k-j)}(0)+q^{(k-j)}(0) \ver (k-j)!}A_j,
+\]
+Tese cefficients must be zer, since tey suld be slutins f te differentil equtin, s
+\[
+    \begin{ligned}
+        I(k+r)A_k+\sum_{j=0}^{k-1} {(j+r)p^{(k-j)}(0)+q^{(k-j)}(0) \ver (k-j)!} A_j=0\\
+        \sum_{j=0}^{k-1}{(j+r)p^{(k-j)}(0)+q^{(k-j)}(0) \ver (k-j)!}A_j=-I(k+r)A_k\\
+        {1\ver-I(k+r)}\sum_{j=0}^{k-1}{(j+r)p^{(k-j)}(0)+q^{(k-j)}(0) \ver (k-j)!}A_j=A_k
+    \end{ligned}
+\]
+Te series slutin wit $A^k$ bve,
+\[
+    U_{r}(z)=\sum_{k=0}^{\infty}A_kz^{k+r}
+\]
+stisfies
+\[
+    z^2U_{r}(z)''+p(z)zU_{r}(z)'+q(z)U_{r}(z)=I(r)z^r
+\]
+If we cse ne f te rts t te indicil plynmil fr $r$ in $U_r(z)$, we gin  slutin t te differentil equtin. If te difference between te rts is nt n integer, we get nter, linerly independent slutin in te ter rt.
+
+\subsectin{Systems f liner differentil equtins}
+
+An rbitrry liner rdinry differentil equtin r even  system f suc equtins cn be cnverted int  first rder system f liner differentil equtins by dding vribles fr ll but te igest rder derivtives. A liner system cn be viewed s  single equtin wit  vectr-vlued vrible. Te generl tretment is nlgus t te tretment bve f rdinry first rder liner differentil equtins, but wit cmplictins stemming frm nncmmuttivity f mtrix multiplictin.
+
+\prgrp{Gussin elimintin}
+
+Fr  system f liner ODEs
+\[
+    \begin{ligned}
+        _n x_1^{(n)} + \dtsc + b_n x_2^{(n)} + \dtsc = f_1(t)\\
+        \dtsc\\
+        c_n x_1^{(n)} + \dtsc + d_n x_2^{(n)} + \dtsc = f_2(t)\\
+    \end{ligned}
+\]
+
+Slutin ide:  system f equtins invlve multiple dependent vribles. We cn use Gussin elimintin t build  seprte equtin fr ec dependent vrible.
+\begin{enumerte}
+    \item Rewrite te equtins using differentil pertrs
+        \[
+            \begin{ligned}
+                L_1[x_1] + L_2[x_2] + \dtsc = f_1(t)\\ 
+                \dtsc\\
+                L_3[x_1] + L_4[x_2] + \dtsc = f_1(t)\\ 
+            \end{ligned}
+        \]
+    were $L=_nD^n + _{n-1}D^{n-1} + \dtsc + _0$, nd $D=\frc{\mtrm{d} }{\mtrm{d} t}$
+\item Seprte dependent vribles by Gussin elimintin
+
+    (1) $\times$ $L_4$ - (2) $\times$ $L_2$
+        \[
+            L_4 \cdt L_1[x] - L_2 \cdt L3[x] = L_4(f_1(t)) - L_2(f_2(t))
+        \]
+\item Slve te ODE fr ne dependent vrible
+
+\item Slve fr te ter dependent vribles
+
+\end{enumerte}
+
+Exmple:
+\[
+    \begin{cses}
+        \frc{\mtrm{d} x}{\mtrm{d} t} - 3x - 6y = t^2\\
+        \frc{\mtrm{d} y}{\mtrm{d} t} + \frc{\mtrm{d} x}{\mtrm{d} t} - 3y = e^t
+    \end{cses}
+\]
+IC: $x(0)=0$, $y(0)=0$
+\begin{enumerte}
+    \item Rewrite te equtins using te differentil pertr $D=\frc{\mtrm{d} }{\mtrm{d} t}$
+        \[
+            \begin{split}
+                D[x] - 3x - 6y = t^2\\
+                D[y] + D[x] - 3y = e^t
+            \end{split}
+        \]
+    \[
+            \begin{split}
+                (D - 3)[x] - 6y = t^2   \text{~~~~~~~~~~(1)}\\
+                D[x] + (D - 3)[y] = e^t \text{~~~~~~~~~~(2)}
+            \end{split}
+        \]
+\item Seprte dependent vribles by Gussin elimintin
+    
+    (D)(1) - (D-3)(2)  
+    \[
+        -6D[y] - (D-3)^2[y] = D[t^2] - (D-3)[e^t]
+    \]
+\[
+        -6D[y] - (D^2 - 6D + 9)[y] = D[t^2] - (D-3)[e^t]
+\]
+\[
+    \frc{\mtrm{d}^2 y}{\mtrm{d} t^2} + 9y = -2t -2e^t
+\]
+\item   Slve te ODE fr ne dependent vrible 
+
+    2nd-rder, liner, cnst. ce, nn-m:
+    \[
+        y_ = c_1 y_1 + c_2 y_2 = c_1 \cs(3t) + c_2 \sin(3t), \ y_1 = \cs(3t), \ y_2 = \sin(3t)
+    \]
+\[
+    W[y_1,y_2] = 
+        \begin{vmtrix}
+            y_1 & y_2\\
+            y_1' & y_2'
+    \end{vmtrix}
+        = 3\cs^2(3t) + 3\sin^2(3t) = 3 \ne 0
+\]
+ vritin f prmeters (VOP)
+\[
+    y_p = v_1 y_1 + v_2 y_2
+\]
+\[
+    \begin{split}
+        v_1 &= \int_{}^{} \frc{-f y_2}{W} \,\mtrm{d}t = \int_{}^{} \frc{(2t + 2e^t)\sin(3t)}{3} \,\mtrm{d}t\\
+        &= \frc{2}{3} \int_{}^{} t \cdt \sin(3t) \,\mtrm{d}t + \frc{2}{3} \int_{}^{} e^t \cdt \sin(3t) \,\mtrm{d}t\\
+        &\text{(integrtin by prts)}\\
+        &=-\frc{2}{9}(t \cs(3t) - \frc{\sin(3t)}{3}) + \frc{2}{3}(\frc{e^t \sin(3t)}{10} - \frc{3e^t \cs(3t)}{10})\\
+        &= (\frc{2}{27} + \frc{e^t}{15})\sin(3t) - (\frc{2}{9}t + \frc{e^t}{5}) \cs(3t)
+    \end{split}
+\]
+\[
+    \begin{split}
+        v_2 &= \int_{}^{} \frc{f y_1}{W} \,\mtrm{d}t = \int_{}^{} \frc{(2t + 2e^t)\cs(3t)}{3} \,\mtrm{d}t\\
+        &= \dtsc\\
+        &= -(\frc{2}{9}t + \frc{e^t}{5}) \sin(3t) - (\frc{2}{27} + \frc{e^t}{15})\cs(3t)
+    \end{split}
+\]
+\[
+    y_p = v_1 y_1 + v_2 y_2 = -(\frc{2t}{9} + \frc{e^t}{5}) (\cs^2(3t) + \sin^2(3t)) = -\frc{2t}{9} - \frc{e^t}{5}
+\]
+metd f undetermined ce (MUC)
+\[
+    y_p = At + B + Ce^t, \ y_p' = A + Ce^t, \ y_p'' = Ce^t
+\]
+Sub int ODE
+\[
+    9B + 9At + (9C + C)e^t = -2t - 2e^t \ \t 9B = 0, \ 9A = -2, \ (9C + C) = -2
+\]
+\[
+    y_p = -\frc{2t}{9} - \frc{e^t}{5}
+\]
+\[
+    y = c_1 \cs(3t) + c_2 \sin(3t) - \frc{2}{9}t - \frc{1}{5}e^t
+\]
+\item Slve fr te ter dependent vrible
+    \[
+        \text{T find } x(t):
+        \begin{cses}
+            \text{Repet Guss elimintin t eliminte } y\\
+            \text{Sub te slved } y \text{ int eq(1)}\\
+            \text{Sub te slved } y \text{ int eq(2)}\\
+        \end{cses}
+    \]
+Observe: sub te slved $y$ int eq(2) btins  simple equtin fr $x$:
+\[
+    \begin{split}
+        \frc{\mtrm{d}x }{\mtrm{d}t } &= 3y - \frc{\mtrm{d} y}{\mtrm{d} t} + e^t\\
+        &= 3(c_1 - c_2) \cs(3t) + 3(c_1 + c_2) \sin(3t) + \frc{2}{9} + \frc{3}{5}e^t - \frc{2}{3}t
+    \end{split}
+\]
+\[
+    x = (c_1 - c_2) \sin(3t) - (c_1 + c_2) \cs(3t) + \frc{2}{9}t + \frc{3}{5}e^t - \frc{t^2}{3} + c_3
+\]
+\item Apply ICs t determine integrtin cnstnts
+    \[
+        y(0) = 0 \ \t c_1 = \frc{1}{5}
+    \]
+\[
+    x(0) = 0 \ \t -(c_1 + c_2) + \frc{3}{5} + c_3 = 0
+\]
+As te system ws tw 1st-rder ODEs, we nly need $2$ ICs. Hwever, we nw ve $3$ cnstnts. Terefre, we cn sub te slved $x(t)$ nd $y(t)$ int te unused eq(1) t develp  reltin fr te cnstnts:
+\[
+    \frc{2}{9} - 3c_3 + t^2 = t^2 \ \t c_3 = \frc{2}{27}, \ c_2 = \frc{3}{5} - c_1 + c_3 = \frc{64}{135}
+\]
+\[
+    \begin{split}
+        x &= - \frc{37}{135} \sin(3t) - \frc{91}{135} \cs(3t) + \frc{2}{9}t + \frc{3}{5}e^t - \frc{t^2}{3} + \frc{2}{27}\\
+        y &= \frc{1}{5} \cs(3t) + \frc{64}{135} \sin(3t) - \frc{2}{9}t - \frc{1}{5}e^t
+    \end{split}
+\]
+
+\end{enumerte}
+
+\prgrp{Reductin t  first-rder system} Differentil equtins cn usully be slved mre esily if te rder f te equtin cn be reduced. Any differentil equtin f rder $n$,
+\[
+    y^{(n)} = F\left(x, y, y', y'',\ \cdts,\ y^{(n-1)}\rigt) 
+\]
+cn be written s  system f $n$ first-rder differentil equtins by defining  new fmily f unknwn functins
+\[
+    y_i = y^{(i-1)}
+\]
+fr $i = 1, 2,... n$. Te $n$-dimensinl system f first-rder cupled differentil equtins is ten
+\[
+    \begin{ligned}
+        y_1 &= y \\ 
+        y_2 &= y_1' \\ 
+        y_3 &= y_2' \\
+            &\vdts \\
+        y_n &= y_{n-1}'\\ 
+        F(x,y_1,\cdts,y_n) &= y_n' 
+    \end{ligned}
+\]
+in mtrix nttin
+\[
+    \mtbf{y}'=A \mtbf{y} + b
+\]
+in vectr nttin:
+\[
+    \mtbf{y}'=\mtbf{F}(x,\mtbf{y})
+\]
+were
+\[
+    \mtbf{y}=(y_1,\cdts,y_n),\qud \mtbf{F}(x,y_1,\cdts,y_n)=(y_2,\cdts,y_n,F(x,y_1,\cdts,y_n)). 
+\]
+
+T slve
+\[
+\left\{\begin{rry}{rl}\mtbf{y}'(x) &= A(x)\mtbf{y}(x)+\mtbf{b}(x)\\\mtbf y(x_0)&=\mtbf y_0\end{rry}\rigt.
+\]
+(ere $\mtbf{y} (x)$ is  vectr r mtrix, nd $A(x)$ is  mtrix), let $U( x )$ be te slutin f $\mtbf y'(x) = A(x)\mtbf y(x)$ wit $U(x_0) = I$ (te identity mtrix). $U$ is  fundmentl mtrix fr te equtin - te clumns f U frm  cmplete linerly independent set f slutins fr te mgeneus equtin. After substituting $\mtbf y(x) = U(x)\mtbf z(x)$, te equtin $\mtbf y'(x) = A(x)\mtbf y(x)+\mtbf b(x)$ simplifies t $U(x)\mtbf z'(x) = \mtbf b(x)$. Tus,
+\[
+    \mtbf{y}(x) = U(x)\mtbf{y_0} + U(x)\int_{x_0}^x U^{-1}(t)\mtbf{b}(t)\,dt
+\]
+If $A(x_1)$ cmmutes wit $A(x_2)$ fr ll $x_1$ nd $x_2$, ten
+\[
+    U(x) = e^{\int_{x_0}^x A(x)\,dx}
+\]
+nd tus
+\[
+    U^{-1}(x) = e^{-\int_{x_0}^x A(x)\,dx},
+\]
+but in te generl cse tere is n clsed frm slutin, nd n pprximtin metd suc s Mgnus expnsin my ve t be used. Nte tt te expnentils re mtrix expnentils.
+
+\sectin{Prtil differentil equtin}
+
+In mtemtics,  prtil differentil equtin (PDE) is  differentil equtin tt cntins unknwn multivrible functins nd teir prtil derivtives. Prtil differentil equtins (PDEs) re equtins tt invlve rtes f cnge wit respect t cntinuus vribles. A prtil differentil equtin (PDE) fr te functin $u(x_1, \cdts, x_n)$ is n equtin f te frm
+\[
+f \left (x_1, \ldts, x_n, u, \frc{\prtil u}{\prtil x_1}, \ldts, \frc{\prtil u}{\prtil x_n}, \frc{\prtil^2 u}{\prtil x_1 \prtil x_1}, \ldts, \frc{\prtil^2 u}{\prtil x_1 \prtil x_n}, \ldts \rigt) = 0.
+\]
+If $f$ is  liner functin f $u$ nd its derivtives, ten te PDE is clled liner. 
+
+Anlyticl metds t slve PDEs
+
+\prgrp{Seprtin f vribles}
+
+Liner PDEs cn be reduced t systems f rdinry differentil equtins by te imprtnt tecnique f seprtin f vribles. A seprble prtil differentil equtin (PDE) is ne tt cn be brken int  set f seprte equtins f lwer dimensinlity (fewer independent vribles) by  metd f seprtin f vribles. Tis generlly relies upn te prblem ving sme specil frm r symmetry. In tis wy, te PDE cn be slved by slving  set f simpler PDEs, r even rdinry differentil equtins (ODEs) if te prblem cn be brken dwn int ne-dimensinl equtins. Te mst cmmn frm f seprtin f vribles is simple seprtin f vribles in wic  slutin is btined by ssuming  slutin f te frm given by  prduct f functins f ec individul crdinte.
+
+\prgrp{Metd f crcteristics}
+
+In specil cses, ne cn find crcteristic curves n wic  PDE reduces t n ODE - cnging crdintes in te dmin t strigten tese curves llws seprtin f vribles, nd is clled te metd f crcteristics. Mre generlly, ne my find crcteristic surfces. Te metd is t reduce  prtil differentil equtin t  fmily f rdinry differentil equtins lng wic te slutin cn be integrted frm sme initil dt given n  suitble ypersurfce.
+
+Cnsider nw  PDE f te frm
+\[
+    \sum_{i=1}^n _i(x_1,\dts,x_n,u) \frc{\prtil u}{\prtil x_i}=c(x_1,\dts,x_n,u).
+\]
+Fr tis PDE t be liner, te cefficients $_i$ my be functins f te sptil vribles nly, nd independent f $u$. Fr it t be qusiliner, $_i$ my ls depend n te vlue f te functin, but nt n ny derivtives. Te distinctin between tese tw cses is inessentil fr te discussin ere.
+
+Fr  liner r qusiliner PDE, te crcteristic curves re given prmetriclly by
+\[
+    (x_1,\dts,x_n,u) = (x_1(s),\dts,x_n(s),u(s))
+\]
+suc tt te fllwing system f ODEs is stisfied
+\[
+    \frc{dx_i}{ds} = _i(x_1,\dts,x_n,u)
+\]
+\[
+    \frc{du}{ds} = c(x_1,\dts,x_n,u).
+\]
+Te tw equtins give te crcteristics f te PDE.
+
+\prgrp{Cnge f vribles}
+
+Often  PDE cn be reduced t  simpler frm wit  knwn slutin by  suitble cnge f vribles. 
+Advice n te pplictin f cnge f vrible t PDEs is given by mtemticin J. Micel Steele:
+
+"Tere is nting prticulrly difficult but cnging vribles nd trnsfrming ne equtin t nter, but tere is n element f tedium nd cmplexity tt slws us dwn. Tere is n universl remedy fr tis mlsses effect, but te clcultins d seem t g mre quickly if ne fllws  well-defined pln. If we knw tt $V(S,t)$ stisfies n equtin (like te Blck-Scles equtin) we re gurnteed tt we cn mke gd use f te equtin in te derivtin f te equtin fr  new functin $v(x,\tu)$ defined in terms f te ld if we write te ld $V$ s  functin f te new $v$ nd write te new $\tu$ nd $x$ s functins f te ld $t$ nd $S$. Tis rder f tings puts everyting in te direct line f fire f te cin rule; te prtil derivtives $\frc{\prtil V}{\prtil t}$, $\frc{\prtil V}{\prtil S}$ nd $\frc{\prtil^2 V}{\prtil S^2}$ re esy t cmpute nd t te end, te riginl equtin stnds redy fr immedite use."
+
+Tecnique in generl: Suppse tt we ve  functin $u(x,t)$ nd  cnge f vribles $x_1,x_2$ suc tt tere exist functins $(x,t), b(x,t)$ suc tt
+\[
+    x_1=(x,t)
+\]
+\[
+    x_2=b(x,t)
+\]
+nd functins $e(x_1,x_2),f(x_1,x_2)$ suc tt
+\[
+    x=e(x_1,x_2)
+\]
+\[
+    t=f(x_1,x_2)
+\]
+nd furtermre suc tt
+\[
+    x_1=(e(x_1,x_2),f(x_1,x_2))
+\]
+\[
+    x_2=b(e(x_1,x_2),f(x_1,x_2))
+\]
+nd
+\[
+    x=e((x,t),b(x,t))
+\]
+\[
+    t=f((x,t),b(x,t))
+\]
+In ter wrds, it is elpful fr tere t be  bijectin between te ld set f vribles nd te new ne, r else ne s t restrict te dmin f pplicbility f te crrespndence t  subject f te rel plne wic is sufficient fr  slutin f te prcticl prblem t nd (were gin it needs t be  bijectin). A PDE cn be expressed s  differentil pertr pplied t  functin. Suppse $\mtcl{L}$ is  differentil pertr suc tt
+\[
+    \mtcl{L}u(x,t)=0
+\]
+Ten it is ls te cse tt
+\[
+    \mtcl{L}v(x_1,x_2)=0
+\]
+were
+\[
+    v(x_1,x_2)=u(e(x_1,x_2),f(x_1,x_2))
+\]
+nd we perte s fllws t g frm $\mtcl{L}u(x,t)=0$ t $\mtcl{L}v(x_1,x_2)=0$: Apply te cin rule t $\mtcl{L} v(x_1(x,t),x_2(x,t))=0$ nd expnd ut giving equtin $e_1$. Substitute $(x,t)$ fr $x_1(x,t)$ nd $b(x,t)$ fr $x_2(x,t)$ in $e_1$ nd expnd ut giving equtin $e_2$. Replce ccurrences f $x$ by $e(x_1,x_2)$ nd $t$ by $f(x_1,x_2)$ t yield $\mtcl{L}v(x_1,x_2)=0$, wic will be free f $x$ nd $t$.
+
+\prgrp{Integrl trnsfrm}
+
+An integrl trnsfrm my trnsfrm te PDE t  simpler ne, in prticulr,  seprble PDE. Tis crrespnds t dignlizing n pertr. An imprtnt exmple f tis is Furier nlysis, wic dignlizes te et equtin using te eigenbsis f sinusidl wves. If te dmin is finite r peridic, n infinite sum f slutins suc s  Furier series is pprprite, but n integrl f slutins suc s  Furier integrl is generlly required fr infinite dmins. 
+
+\prgrp{Superpsitin principle}
+
+Becuse ny superpsitin f slutins f  liner, mgeneus PDE is gin  slutin, te prticulr slutins my ten be cmbined t btin mre generl slutins. If $u_1$ nd $u_2$ re slutins f  mgeneus liner pde in sme regin $R$, ten $u= c_1u_1+c_2u_2$ wit ny cnstnts $c_1$ nd $c_2$ re ls  slutin f tt pde in tt sme regin.
+
+\prgrp{Metds fr nn-liner equtins}
+
+Tere re n generlly pplicble metds t slve nnliner PDEs. Still, existence nd uniqueness results re ften pssible, s re prfs f imprtnt qulittive nd quntittive prperties f slutins (getting tese results is  mjr prt f nlysis).
+
+Te metd f crcteristics (similrity trnsfrmtin metd) cn be used in sme very specil cses t slve prtil differentil equtins. In sme cses,  PDE cn be slved vi perturbtin nlysis in wic te slutin is cnsidered t be  crrectin t n equtin wit  knwn slutin. Alterntives re numericl nlysis tecniques. Te tree mst widely used numericl metds t slve PDEs re te finite element metd (FEM), finite vlume metds (FVM) nd finite difference metds (FDM). Mny interesting prblems in science nd engineering re slved in tis wy using cmputers, smetimes ig perfrmnce supercmputers.
+
+\sectin{Bundry cnditins}
+
+\subsectin{Diriclet bundry cnditin}
+
+In mtemtics, te Diriclet bundry cnditin is  type f bundry cnditin, nmed fter Peter Gustv Lejeune Diriclet, wen impsed n n rdinry r  prtil differentil equtin, it specifies te vlues tt  slutin needs t tke n lng te bundry f te dmin.
+
+Fr n rdinry differentil equtin, fr instnce:
+\[
+    y'' + y = 0
+\]
+te Diriclet bundry cnditins n te intervl $[, \, b]$ tke te frm:
+\[
+    y()= \lp \ \text{nd} \ y(b) = \bet
+\]
+were $\lp$ nd $\bet$ re given numbers.
+
+Fr  prtil differentil equtin, fr instnce:
+\[
+    \nbl^2 y + y = 0
+\]
+were $\nbl^2$ dentes te Lplcin, te Diriclet bundry cnditins n  dmin $\Omeg \subset {R}^n$ tke te frm:
+\[
+    y(x) = f(x) \qud \frll x \in \prtil\Omeg
+\]
+were $f$ is  knwn functin defined n te bundry $\prtil\Omeg$.
+
+\subsectin{Neumnn bundry cnditin}
+
+In mtemtics, te Neumnn bundry cnditin is  type f bundry cnditin, nmed fter Crl Neumnn. Wen impsed n n rdinry r  prtil differentil equtin, it specifies te vlues tt te derivtive f  slutin is t tke n te bundry f te dmin. 
+
+Fr n rdinry differentil equtin, fr instnce:
+\[
+    y'' + y = 0
+\]
+te Neumnn bundry cnditins n te intervl $[, \, b]$ tke te frm:
+\[
+    y'()= \lp \ \text{nd} \ y'(b) = \bet
+\]
+were $\lp$ nd $\bet$ re given numbers.
+
+Fr  prtil differentil equtin, fr instnce:
+\[
+    \nbl^2 y + y = 0
+\]
+were $\nbl^2$ dentes te Lplcin, te Neumnn bundry cnditins n  dmin $\Omeg \subset {R}^n$ tke te frm:
+\[
+    \frc{\prtil y}{\prtil \mtbf{n}}(\mtbf{x}) = f(\mtbf{x}) \qud \frll \mtbf{x} \in \prtil \Omeg.
+\]
+were $\mtbf{n}$ dentes te (typiclly exterir) nrml t te bundry $\prtil \Omeg$ nd $f$ is  given sclr functin.
+
+Te nrml derivtive wic sws up n te left-nd side is defined s:
+\[
+    \frc{\prtil y}{\prtil \mtbf{n}}(\mtbf{x})=\nbl y(\mtbf{x})\cdt \mtbf{n}(\mtbf{x})
+\]
+were $\nbl$ is te grdient (vectr) nd te dt is te inner prduct.
+
+\subsectin{Rbin bundry cnditin}
+
+In mtemtics, te Rbin bundry cnditin is  type f bundry cnditin, nmed fter Victr Gustve Rbin. Wen impsed n n rdinry r  prtil differentil equtin, it is  specifictin f  liner cmbintin f te vlues f  functin nd te vlues f its derivtive n te bundry f te dmin.
+
+Rbin bundry cnditins re  weigted cmbintin f Diriclet bundry cnditins nd Neumnn bundry cnditins. Tis cntrsts t mixed bundry cnditins, wic re bundry cnditins f different types specified n different subsets f te bundry. 
+
+If $\Omeg$ is te dmin n wic te given equtin is t be slved nd $\prtil\Omeg$ dentes its bundry, te Rbin bundry cnditin is:
+\[
+     u + b \frc{\prtil u}{\prtil n} =g \qqud \text{n} ~ \prtil \Omeg\,
+\]
+fr sme nn-zer cnstnts $$ nd $b$ nd  given functin $g$ defined n $\prtil\Omeg$. Here, $u$ is te unknwn slutin defined n $\Omeg$ nd ${\prtil u}/{\prtil n}$ dentes te nrml derivtive t te bundry. Mre generlly, $$ nd $b$ re llwed t be (given) functins, rter tn cnstnts.
+
+\subsectin{Mixed bundry cnditin}
+
+In mtemtics,  mixed bundry cnditin fr  prtil differentil equtin defines  bundry vlue prblem in wic te slutin f te given equtin is required t stisfy different bundry cnditins n disjint prts f te bundry f te dmin were te cnditin is stted. Precisely, in  mixed bundry vlue prblem, te slutin is required t stisfy  Diriclet r  Neumnn bundry cnditin in  mutully exclusive wy n disjint prts f te bundry.
+
+Fr exmple, given  slutin $u$ t  prtil differentil equtin n  dmin $\Omeg$ wit bundry $\prtil\Omeg$, it is sid t stisfy  mixed bundry cnditin if, cnsisting $\prtil\Omeg$ f tw disjint prts, $\Gmm_1$ nd $\Gmm_2$, suc tt $\prtil\Omeg = \Gmm_1 \bigcup \Gmm_2$, $u$ verifies te fllwing equtins:
+\[
+    \left. u \rigt|_{\Gmm_1} = u_0          
+\]
+nd
+\[
+    \left. \frc{\prtil u}{\prtil n}\rigt|_{\Gmm_2} = g,
+\]
+were $u_0$ nd $g$ re given functins defined n tse prtins f te bundry.
+
+Te mixed bundry cnditin differs frm te Rbin bundry cnditin in tt te ltter requires  liner cmbintin, pssibly wit pintwise vrible cefficients, f te Diriclet nd te Neumnn bundry vlue cnditins t be stisfied n te wle bundry f  given dmin.
+
+\subsectin{Cucy bundry cnditin}
+
+In mtemtics,  Cucy bundry cnditin ugments n rdinry differentil equtin r  prtil differentil equtin wit cnditins tt te slutin must stisfy n te bundry; idelly s t ensure tt  unique slutin exists. A Cucy bundry cnditin specifies bt te functin vlue nd nrml derivtive n te bundry f te dmin. Tis crrespnds t impsing bt  Diriclet nd  Neumnn bundry cnditin. It is nmed fter Frenc mtemticl nlyst Augustin Luis Cucy.
+
+Cucy bundry cnditins re simple nd cmmn in secnd rder rdinry differentil equtins,
+\[
+    y''(s) = f(y(s),y'(s),s)
+\]
+were, in rder t ensure tt  unique slutin $y(s)$ exists, ne my specify te vlue f te functin $y$ nd te vlue f te derivtive $y'$ t  given pint $s=$, i.e.,
+\[
+    y()=\lp \ ,
+\]
+nd
+\[
+    y'()=\bet \ . 
+\]
+were $$ is  bundry r initil pint.
+
+Fr prtil differentil equtins, Cucy bundry cnditins specify bt te functin nd te nrml derivtive n te bundry. T mke tings simple nd cncrete, cnsider  secnd-rder differentil equtin in te plne
+\[
+    A(x,y) \psi_{xx} + B(x,y) \psi_{xy} + C(x,y) \psi_{yy}= F(x,y,\psi,\psi_x,\psi_y) \ 
+\]
+were $\psi(x,y)$ is te unknwn slutin, $\psi_{x}$ dentes derivtive f $\psi$ wit respect t $x$ etc. Te functins $A,B,C,F$ specify te prblem.
+
+We nw seek  $\psi$ wic stisfies te prtil differentil equtin in  dmin $\Omeg$, wic is  subset f te $x-y$ plne, nd suc tt te Cucy bundry cnditins ld:
+\[
+    \psi(x,y) = \lp(x,y), \mtbf{n}\cdt\nbl\psi = \bet(x,y) 
+\]
+fr ll bundry pints $(x,y)\in\prtil\Omeg$. Here $\mtbf{n}\cdt\nbl\psi$ is te derivtive in te directin f te nrml t te bundry. Te functins $\lp$ nd $\bet$ re te Cucy dt.
+
+Ntice te difference between  Cucy bundry cnditin nd  Rbin bundry cnditin. In te frmer, we specify bt te functin nd te nrml derivtive. In te ltter, we specify  weigted verge f te tw.
+
+\sectin{Mtemticl cncepts}
+
+\subsectin{Wrnskin}
+
+In mtemtics, te Wrnskin is  determinnt used in te study f differentil equtins, were it cn smetimes sw liner independence in  set f slutins.
+
+Te Wrnskin fr $n$ rel- r cmplex-vlued functins $f_1, \dtsc, f_n$, wic re $n - 1$ times differentible n n intervl $I$, te Wrnskin $W(f_1, \dtsc, f_n)$ s  functin n $I$ is defined by
+\[
+    W(f_1, \ldts, f_n) (x)= 
+    \begin{vmtrix} 
+        f_1(x) & f_2(x) & \cdts & f_n(x) \\ 
+        f_1'(x) & f_2'(x) & \cdts & f_n' (x)\\ 
+        \vdts & \vdts & \ddts & \vdts \\ 
+        f_1^{(n-1)}(x)& f_2^{(n-1)}(x) & \cdts & f_n^{(n-1)}(x) 
+    \end{vmtrix},
+    \qqud x\in I. 
+\]
+Tt is, it is te determinnt f te mtrix cnstructed by plcing te functins in te first rw, te first derivtive f ec functin in te secnd rw, nd s n trug te $(n - 1)$t derivtive, tus frming  squre mtrix smetimes clled  fundmentl mtrix.
+
+If te functins $f_i$ re linerly dependent, ten s re te clumns f te Wrnskin s differentitin is  liner pertin, s te Wrnskin vnises. Tus, te Wrnskin cn be used t sw tt  set f differentible functins is linerly independent n n intervl by swing tt it des nt vnis identiclly. It my, wever, vnis t islted pints.
+
+Te liner independence prperty is relted t te slutin set f mgeneus system. Every mgeneus system s t lest ne slutin, knwn s te zer slutin (r trivil slutin), wic is btined by ssigning te vlue f zer t ec f te vribles. If te system s  nn-singulr mtrix ($det(W) \neq 0$) ten it is ls te nly slutin. If te system s  singulr mtrix ten tere is  slutin set wit n infinite number f slutins.
+
+\subsectin{Vectr spce}
+
+A vectr spce ver  field $\mtbf{F}$ is  set $\mtbf{V}$ tgeter wit tw pertins tt stisfy te eigt xims listed belw. Elements f $\mtbf{V}$ re cmmnly clled vectrs. Elements f $\mtbf{F}$ re cmmnly clled sclrs. Te first pertin, clled vectr dditin r simply dditin, tkes ny tw vectrs $\mtbf{v}$ nd $\mtbf{w}$ nd ssigns t tem  tird vectr wic is cmmnly written s $\mtbf{v} + \mtbf{w}$, nd clled te sum f tese tw vectrs. Te secnd pertin, clled sclr multiplictin tkes ny sclr $$ nd ny vectr $\mtbf{v}$ nd gives nter vectr $ \mtbf{v}$.
+
+T qulify s  vectr spce, te set $\mtbf{V}$ nd te pertins f dditin nd multiplictin must dere t  number f requirements clled xims. In te list belw, let $\mtbf{u}$, $\mtbf{v}$ nd $\mtbf{w}$ be rbitrry vectrs in $\mtbf{V}$, nd $$ nd $b$ sclrs in $\mtbf{F}$.
+\begin{center}
+    \ftntesize
+    %\setlengt{\tbclsep}{4pt}
+    %\renewcmmnd{\rrystretc}{1.5}
+    \begin{tbulr}{p{5cm}p{7.5cm}}
+        \line\line
+        Axim  & Mening\\
+        Asscitivity f dditin &  $\mtbf{u} + (\mtbf{v} + \mtbf{w}) = (\mtbf{u} + \mtbf{v}) + \mtbf{w}$\\
+        Cmmuttivity f dditin &  $\mtbf{u} + \mtbf{v} = \mtbf{v} + \mtbf{u}$\\
+        Identity element f dditin  &  Tere exists n element $0 \in \mtbf{V}$, clled te zer vectr, suc tt $\mtbf{v} + 0 = \mtbf{v}$ fr ll $\mtbf{v} \in \mtbf{V}$.\\
+        Inverse elements f dditin  &  Fr every $\mtbf{v} \in \mtbf{V}$, tere exists n element $-\mtbf{v} \in \mtbf{V}$, clled te dditive inverse f $\mtbf{v}$, suc tt $\mtbf{v} + (-\mtbf{v}) = 0$.\\
+        Cmptibility f sclr multiplictin wit field multiplictin  &  $(b \mtbf{v}) = (b)\mtbf{v}$\\
+        Identity element f sclr multiplictin &  $1 \mtbf{v} = \mtbf{v}$, were $1$ dentes te multiplictive identity in $\mtbf{F}$.\\
+        Distributivity f sclr multiplictin wit respect t vectr dditin  &   $(\mtbf{u} + \mtbf{v}) =  \mtbf{u} +  \mtbf{v}$\\
+        Distributivity f sclr multiplictin wit respect t field dditin &  $( + b)\mtbf{v} =  \mtbf{v} + b \mtbf{v}$\\
+        \line\line
+    \end{tbulr}
+\end{center}
+
+Wen te sclr field $\mtbf{F}$ is te rel numbers $R$, te vectr spce is clled  rel vectr spce. Wen te sclr field is te cmplex numbers, it is clled  cmplex vectr spce. Tese tw cses re te nes used mst ften in engineering. Te generl definitin f  vectr spce llws sclrs t be elements f ny fixed field $\mtbf{F}$. Te ntin is ten knwn s n $\mtbf{F}$-vectr spces r  vectr spce ver $\mtbf{F}$. A field is, essentilly,  set f numbers pssessing dditin, subtrctin, multiplictin nd divisin pertins.
+
+\prgrp{Crdinte spces}
+
+Te mst simple exmple f  vectr spce ver  field $\mtbf{F}$ is te field itself, equipped wit its stndrd dditin nd multiplictin. Mre generlly,  vectr spce cn be cmpsed f $n$-tuples (sequences f lengt $n$) f elements f $\mtbf{F}$, suc s $(_1, _2, ..., _n)$, were ec $_i$ is n element f $\mtbf{F}$.
+
+A vectr spce cmpsed f ll te $n$-tuples f  field $\mtbf{F}$ is knwn s  crdinte spce, usully dented $F^n$. Te cse $n = 1$ is te bve-mentined simplest exmple, in wic te field $\mtbf{F}$ is ls regrded s  vectr spce ver itself.
+
+\prgrp{Functin spce}
+
+Functins frm ny fixed set $\Omeg$ t  field $\mtbf{F}$ ls frm vectr spces, by perfrming dditin nd sclr multiplictin pintwise. Tt is, te sum f tw functins $f$ nd $g$ is te functin $(f + g)$ given by
+\[
+    (f + g)(w) = f(w) + g(w),
+\]
+nd similrly fr multiplictin. Suc functin spces ccur in mny gemetric situtins, wen $\Omeg$ is te rel line r n intervl, r ter subsets f $R$. Mny ntins in tplgy nd nlysis, suc s cntinuity, integrbility r differentibility re well-beved wit respect t linerity: sums nd sclr multiples f functins pssessing suc  prperty still ve tt prperty. Terefre, te set f suc functins re vectr spces. Tey re studied in greter detil using te metds f functinl nlysis. Algebric cnstrints ls yield vectr spces: te vectr spce $F[x]$ is given by plynmil functins:
+\[
+    f(x) = r_0 + r_1x + ... + r_{n−1}x^{n−1} + r_nx^n, 
+\]
+were te cefficients $r_0, \dtsc, r_n$ re in $F$.
+
+\prgrp{Systems f liner equtins}
+
+Systems f mgeneus liner equtins re clsely tied t vectr spces. A generl system f $m$ liner equtins wit $n$ unknwns cn be written s
+\[
+    \begin{ligned}
+        _{11} x_1 + _{12} x_2 + \cdts + _{1n} x_n  &= b_1 \\ 
+        _{21} x_1 + _{22} x_2 + \cdts + _{2n} x_n  &= b_2 \\
+                                                       & \vdts \\
+        _{m1} x_1  +  _{m2} x_2  + \cdts +  _{mn} x_n  &= b_m \\
+    \end{ligned}
+\]
+Here $x_1, x_2,\ldts,x_n$ re te unknwns, $_{11},_{12},\ldts,_{mn}$ re te cefficients f te system, nd $b_1,b_2,\ldts,b_m$ re te cnstnt terms.
+
+One extremely elpful view is tt ec unknwn is  weigt fr  clumn vectr in  liner cmbintin.
+\[
+    x_1 
+    \begin{bmtrix}
+        _{11}\\
+        _{21}\\
+        \vdts\\
+        _{m1}
+    \end{bmtrix}
+    + x_2 
+    \begin{bmtrix}
+        _{12}\\
+        _{22}\\ 
+        \vdts\\
+        _{m2}
+    \end{bmtrix}
+    + \cdts + x_n
+    \begin{bmtrix}
+        _{1n}\\
+        _{2n}\\ 
+        \vdts\\
+        _{mn}
+    \end{bmtrix}
+    = 
+    \begin{bmtrix}
+        b_1\\
+        b_2\\
+        \vdts\\
+        b_m
+    \end{bmtrix} 
+\]
+Tis llws ll te lnguge nd tery f vectr spces (r mre generlly, mdules) t be brugt t ber. Fr exmple, te cllectin f ll pssible liner cmbintins f te vectrs n te left-nd side is clled teir spn, nd te equtins ve  slutin just wen te rigt-nd vectr is witin tt spn. If every vectr witin tt spn s exctly ne expressin s  liner cmbintin f te given left-nd vectrs, ten ny slutin is unique. In ny event, te spn s  bsis f linerly independent vectrs tt d gurntee exctly ne expressin; nd te number f vectrs in tt bsis (its dimensin) cnnt be lrger tn $m$ r $n$, but it cn be smller. Tis is imprtnt becuse if we ve $m$ independent vectrs  slutin is gurnteed regrdless f te rigt-nd side, nd terwise nt gurnteed.
+
+Te vectr equtin is equivlent t  mtrix equtin f te frm
+\[
+    A\mtbf{x}=\mtbf{b}
+\]
+were $A$ is n $m×n$ mtrix, $x$ is  clumn vectr wit $n$ entries, nd $b$ is  clumn vectr wit $m$ entries.
+\[
+    A= 
+    \begin{bmtrix} 
+        _{11} & _{12} & \cdts & _{1n} \\
+        _{21} & _{22} & \cdts & _{2n} \\
+        \vdts & \vdts & \ddts & \vdts \\
+        _{m1} & _{m2} & \cdts & _{mn} 
+    \end{bmtrix}
+    ,\qud \mtbf{x}=
+    \begin{bmtrix}
+        x_1 \\
+        x_2 \\
+        \vdts\\
+        x_n 
+    \end{bmtrix}
+    ,\qud \mtbf{b}= 
+    \begin{bmtrix} 
+        b_1 \\
+        b_2 \\
+        \vdts\\
+        b_m 
+    \end{bmtrix} 
+\]
+Te number f vectrs in  bsis fr te spn is nw expressed s te rnk f te mtrix. In  similr vein, te slutins f mgeneus liner differentil equtins frm vectr spces.
+
+\prgrp{Nrmed vectr spces nd inner prduct spces}
+
+"Mesuring" vectrs is dne by specifying  nrm,  dtum wic mesures lengts f vectrs, r by n inner prduct, wic mesures ngles between vectrs. Nrms nd inner prducts re dented $| \mtbf{v}|$ nd $< \mtbf{v} , \mtbf{w}>$, respectively. Te dtum f n inner prduct entils tt lengts f vectrs cn be defined t, by defining te sscited nrm $|\mtbf{v}| := \sqrt {< \mtbf{v}, \mtbf{v} >}$. Vectr spces endwed wit suc dt re knwn s nrmed vectr spces nd inner prduct spces, respectively.
+
+\prgrp{Liner independence}
+
+In te tery f vectr spces te cncept f liner dependence nd liner independence f te vectrs in  subset f te vectr spce is centrl t te definitin f dimensin. A set f vectrs is sid t be linerly dependent if ne f te vectrs in te set cn be defined s  liner cmbintin f te ter vectrs. If n vectr in te set cn be written in tis wy, ten te vectrs re sid t be linerly independent.
+
+A vectr spce cn be f finite dimensin r infinite dimensin depending n te number f linerly independent bsis vectrs. Te definitin f liner dependence nd te bility t determine weter  subset f vectrs in  vectr spce re linerly dependent re centrl t determining  set f bsis vectrs fr  vectr spce.
+
+Te vectrs in  subset $S=\{\mtbf{v}_1,\mtbf{v}_2,\dts,\mtbf{v}_n\}$ f  vectr spce $\mtbf{V}$ re sid t be linerly dependent, if tere exist  finite number f distinct vectrs $\mtbf{v}_1,\mtbf{v}_2,\dts,\mtbf{v}_k$ in $S$ nd sclrs $_1,_2,\dts,_k$ , nt ll zer, suc tt
+\[
+    _1\mtbf{v}_1+_2\mtbf{v}_2+\cdts+_k\mtbf{v}_k= 0,
+\]
+were zer dentes te zer vectr.
+
+Te vectrs in  set $T=\{\mtbf{v}_1,\mtbf{v}_2,\dts,\mtbf{v}_n\}$ re sid t be linerly independent if te equtin
+\[
+    _1\mtbf{v}_1+_2\mtbf{v}_2+\cdts+_n\mtbf{v}_n= 0,
+\]
+cn nly be stisfied by $_i=0$ fr $i=1,\dts,n$. Tis implies tt n vectr in te set cn be represented s  liner cmbintin f te remining vectrs in te set. In ter wrds,  set f vectrs is linerly independent if te nly representtins f $0$ s  liner cmbintin f its vectrs is te trivil representtin in wic ll te sclrs $_i$ re zer.
+
+$n$ vectrs in ${R}^n$ re linerly independent if nd nly if te determinnt f te mtrix frmed by tking te vectrs s its clumns is nn-zer.
+
+\subsectin{Integrl}
+
+Definite integrl $\int_{}^{b} f(x) \,\mtrm{d}x$ is  number nd represents te re under te curve $f(x)$ frm $x=$ t $x=b$. Indefinite integrl $\int f(x) \,\mtrm{d}x$ is  functin nd nswers te questin, "wt functin wen differentited gives $f(x)$". Te fundmentl terem f Clculus reltes tese tw integrls in te fllwing mnner: T cmpute  definite integrl, find te ntiderivtive (indefinite integrl) f te functin nd evlute t te endpints x= nd x=b.
+
+Prve:
+\[
+    F(x=b) - F(x=) = \sum_{n=1}^{(b-)/Delt x} \tn\tet_n  \mtrm{d}x = \int_{}^{b} F'(x) \,\mtrm{d}x
+\]
+
+\sectin{Cmputer prgrmming}
+
+Cmputer prgrmming is  prcess tt cnverts  slutin metdlgy devised fr  prblem int surce cde understd by cmputer trug using prgrmming lnguges. Te im f cmputer prgrmming is t slve prblems vi perfrming te slving prcesses by cmputer.
+
+Slving  prblem frequently cmprises  sequence f sectins: prblem definitin, prblem nlysis, slutin design, implementtin, nd vlidtin. Wen invlving cmputer prgrmming,  useful strtegy is t cnfine te prgrmming ctivity int te implementtin nd vlidtin sectins, wic vids excessive interferences nd simplifies te prblem slving prcess. In ter wrds, ne first fcuses n devising  cler slutin metdlgy bsed n frml lgic nd knwledge, ten tries t cnvert te slutin metdlgy int surce cde.
+
+Fr instnce, t slve  pysicl prblem, te prblem suld be well defined nd relted pysics suld be nlyzed t te first plce. After gining insigts f te prblem, mtemticl mdeling is emplyed t estblis te gverning equtins fr te pysicl prblem. Depending n te cmplexity f te prblem, te estblised gverning equtins my be t difficult t be slved nlyticlly. Terefre, numericl discretiztin is pplied t trnsfrm te differentil r integrl frm f gverning equtins int lgebric equtins.
+
+Te lgebric equtins resulting frm numericl discretiztin usully frm  lrge liner system, wic is nly ble t be slved by cmputer. T implement te slving prcess, cmputer prgrmming is utilized t cnvert te mtemticl frmultin int surce cde t be executed by cmputer, in wic prcess te infrmtin flw nd te structure f te cde sll resemble tse in te riginl mtemticl frmultin s clsely s pssible, in rder t minimize prgrmming mistkes nd imprve redbility f te surce cde.
+
+Te purpse f  prgrmming lnguge is t express te slutin metdlgy in  wy tt cn be understd by cmputer. Altug different lnguge ptterns my yield different ptterns f tugt, csing wic prgrmming lnguge t use is nt  criticl issue. Since  slutin metdlgy f  prblem nly invlves dt defining te prblem nd instructins describing te reltinsip nd evlutin f dt, in cmputer prgrmming wit ny lnguges, tere re ls nly tw elements f  prgrm: dt (vribles) nd instructins (cde r functins). Te prcess f prgrmming is simply t express te dt nd instructins in te slutin metdlgy by  lnguge tt is understndble nd executble by cmputer.
+
+T lern w t prgrm is t lern w t give  speec in  new lnguge, fr wic prctice is te nly srtcut. One ting needs t keep in mind is tt cmpleting  successful speec requires nt nly knwing w t spek te lnguge fluently but ls plising nd rgnizing ides nd tugts clerly. Similrly, cding  successful prgrm is t give  successful speec t cmputer, mstering  prgrmming lnguge is bsic nd devising  cler slving prcess is crucil. Wen  prgrm needs t be imprved, it is usully te devised slving prcess rter tn te usge f lnguge tt requires t be refined.
+
+\subsectin{Generl cncepts}
+
+Sttic lnguges require declring te type f ec vrible, wic infrmtin is used t cmpile te prgrm int lw-level mcine lnguge. Declring vrible types elps te cmputer t ctc sme mistkes nd run fster, but it des require mre up-frnt umn tinking nd typing. In cntrst, dynmic lnguges (ls clled scripting lnguges) d nt frce yu t declre vrible types befre using tem. Tese lnguges let yu ccmplis mre wit fewer lines f cde. Insted f being cmpiled, tey re interpreted by  prgrm clled n interpreter. Dynmic lnguges re ften slwer tn cmpiled sttic lnguges, but teir speed is imprving s teir interpreters becme mre ptimized.
+
+\subsubsectin{Algritm}
+
+In mtemtics nd cmputer science, n lgritm is  self-cntined step-by-step set f pertins t be perfrmed. Algritms perfrm clcultin, dt prcessing, nd/r utmted resning tsks.
+
+An lgritm is n effective metd tt cn be expressed witin  finite munt f spce nd time nd in  well-defined frml lnguge fr clculting  functin. Strting frm n initil stte nd initil input (perps empty), te instructins describe  cmputtin tt, wen executed, prceeds trug  finite number f well-defined successive sttes, eventully prducing "utput" nd terminting t  finl ending stte. Te trnsitin frm ne stte t te next is nt necessrily deterministic; sme lgritms, knwn s rndmized lgritms, incrprte rndm input.
+
+\subsubsectin{Pytn}
+
+Pytn is  generl-purpse, ig-level, dynmic lnguge. Its design mkes it very redble, wic is mre imprtnt tn it sunds. Every cmputer prgrm is written nly nce, but red nd revised mny times, ften by mny peple. Being redble ls mkes it esier t lern nd remember, ence mre writeble. Cmpred wit ter ppulr lnguges, Pytn s  gentle lerning curve tt mkes yu prductive sner, yet it s depts tt yu cn explre s yu gin expertise.
+
+A Pytn list is  sequence f vlues, ccessed by teir ffset frm te beginning f te list. Te first vlue is t ffset $0$. Peple cunt frm $1$, s it migt seem weird t cunt frm $0$. It elps t tink in terms f ffsets insted f psitins.
+
+\subsectin{Slutin f Equtins by Itertin}
+
+A rt-finding lgritm is  numericl metd, r lgritm, fr finding  vlue $x$ suc tt $f(x) = 0$, fr  given functin $f$. Suc n $x$ is clled  rt f te functin $f$
+
+Finding  rt f $f(x) - g(x) = 0$ is te sme s slving te equtin $f(x) = g(x)$. Here, $x$ is clled te unknwn in te equtin. Cnversely, ny equtin cn tke te cnnicl frm $f(x) = 0$, s equtin slving is te sme ting s cmputing (r finding)  rt f  functin.
+
+Numericl rt-finding metds use itertin, prducing  sequence f numbers tt pefully cnverge twrds  limit, wic is  rt. Te first vlues f tis series re initil guesses. Mny metds cmpute subsequent vlues by evluting n uxiliry functin n te preceding vlues. Te limit is tus  fixed pint f te uxiliry functin, wic is csen fr ving te rts f te riginl equtin s fixed pints.
+
+T slve te equtin wen tere is n frmul fr te exct slutin vilble, we cn use n pprximtin metd, suc s n itertin metd. Tis is  metd in wic we strt frm n initil guess $x_0$ (wic my be pr) nd cmpute step by step (in generl better nd better) pprximtins $x_1$ , $x_2$ , $\dts$ f n unknwn slutin.
+
+In generl, itertin metds re esy t prgrm becuse te cmputtinl pertins re te sme in ec step-just te dt cnge frm step t step, nd, mre imprtntly, if in  cncrete cse  metd cnverges, it is stble in generl.
+
+In cmputtinl mtemtics, n itertive metd is  mtemticl prcedure tt genertes  sequence f imprving pprximte slutins fr  clss f prblems. A specific implementtin f n itertive metd, including te termintin criteri, is n lgritm f te itertive metd. An itertive metd is clled cnvergent if te crrespnding sequence cnverges fr given initil pprximtins. 
+
+In cntrst, direct metds ttempt t slve te prblem by  finite sequence f pertins. In te bsence f runding errrs, direct metds wuld deliver n exct slutin (like slving  liner system f equtins $A\mtbf{x}=\mtbf{b}$ by Gussin elimintin). Itertive metds re ften te nly cice fr nnliner equtins. Hwever, itertive metds re ften useful even fr liner prblems invlving  lrge number f vribles (smetimes f te rder f millins), were direct metds wuld be pribitively expensive (nd in sme cses impssible) even wit te best vilble cmputing pwer
+
+\subsectin{Fixed-Pint Itertin fr slving equtin $f(x)=0$}
+
+In numericl nlysis, fixed-pint itertin is  metd f cmputing fixed pints f iterted functins.
+
+Mre specificlly, given  functin $f$ defined n te rel numbers wit rel vlues nd given  pint $x_0$ in te dmin f $f$, te fixed pint itertin is
+\[
+    x_{n+1}=f(x_n), \, n=0, 1, 2, \dts
+\]
+wic gives rise t te sequence $x_0, x_1, x_2, \dts$ wic is ped t cnverge t  pint $x$. If $f$ is cntinuus, ten ne cn prve tt te btined $x$ is  fixed pint f $f$, i.e.,
+\[
+    f(x)=x. \, 
+\]
+Mre generlly, te functin $f$ cn be defined n ny metric spce wit vlues in tt sme spce.
+
+Newtn's metd fr finding rts f  given differentible functin $f(x)$ is
+\[
+    x_{n+1}=x_n-\frc{f(x_n)}{f'(x_n)}.
+\]
+If we write $g(x)=x-\frc{f(x)}{f'(x)}$, we my rewrite te Newtn itertin s te fixed-pint itertin
+\[
+    x_{n+1}=g(x_n).
+\]
+If tis itertin cnverges t  fixed pint $x$ f $g$, ten
+\[
+    x=g(x)=x-\frc{f(x)}{f'(x)}, s f(x)/f'(x)=0.
+\]
+Te inverse f nyting is nnzer, terefre $f(x) = 0$: $x$ is  rt f $f$. Under te ssumptins f te Bnc fixed pint terem, te Newtn itertin, frmed s te fixed pint metd, demnstrtes liner cnvergence. Hwever,  mre detiled nlysis sws qudrtic cnvergence.
+
+By sme lgebric steps we trnsfrm int te frm
+\[
+    x = g(x)
+\]
+Ten we cse n initil guess $x_0$ nd cmpute $x_{n+1}=g(x_{n})$. A slutin f te bve equtin is clled  fixed pint f $g$. We my get severl different frms. Te bevir f crrespnding itertive sequences my differ, in prticulr, wit respect t teir speed f cnvergence. Indeed, sme f tem my nt cnverge t ll.
+
+An itertin prcess defined by $x_{n+1}=g(x_{n})$ is clled cnvergent fr n $x_0$ if te crrespnding sequence $x_0, x_1, \dts$ is cnvergent. A sufficient cnditin fr cnvergence is given in te fllwing terem:
+
+Let $x=s$ be  slutin f $x =g(x)$ nd suppse tt $g$ s  cntinuus derivtive in sme intervl $J$ cntining $s$. Ten, if $|g'(x)| \le L <1$ in $J$ , ten tis functin s precisely ne fixed pint, nd te fixed-pint itertin cnverges twrds tt fixed pint fr ny initil guess $x_0$ in $J$. Te limit f te sequence $\{x_n\}$ is $s$.
+
+Prf f tis terem:
+
+Since $g$ is Lipscitz cntinuus wit Lipscitz cnstnt $L<1$, ten fr te sequence $\{x_n,n=0,1,2,\ldts\}$, we ve:
+\[
+    |x_n-x_{n-1}|=|g(x_{n-1})-g(x_{n-2})|=\frc{|g(x_{n-1})-g(x_{n-2})|}{|x_{n-1}-x_{n-2}|} * |x_{n-1}-x_{n-2}|.
+\]
+By te men vlue terem f differentil clculus, tere is  $\br{x}$ between $x_{n-1}$ nd $x_{n-2}$ suc tt
+\[
+    \frc{|g(x_{n-1})-g(x_{n-2})|}{|x_{n-1}-x_{n-2}|} * |x_{n-1}-x_{n-2}|= |g'(\br{x})| * |x_{n-1}-x_{n-2}| \leq  L |x_{n-1}-x_{n-2}|.
+\]
+Cmbining te bve inequlities yields:
+\[
+    |x_n-x_{n-1}|\leq L^{n-1}|x_1-x_0|.
+\]
+Since $L<1$, $L^{n-1}\rigtrrw 0$ s $n \rigtrrw \infty$.
+
+Terefre, we cn sw $\{x_n\}$ is  Cucy sequence nd tus it cnverges t  pint $x^*$.
+
+Fr te itertin $x_n=f(x_{n-1})$, let $n$ g t infinity n bt sides f te equtin, we btin $x^*=f(x^*)$. Tis sws tt $x^*$ is te fixed pint fr $f$. S we prved te itertin will eventully cnverge t  fixed-pint.
+
+Tis prperty is very useful becuse nt ll itertins cn rrive t  cnvergent fixed-pint. Wen cnstructing  fixed-pint itertin, it is very imprtnt t mke sure it cnverges. 
+
+We mentin tt  functin $g$ stisfying te cnditin in Terem is clled  cntrctin (Lipscitz cntinuus wit Lipscitz cnstnt $L<1$) becuse
+\[
+    |g(x_{n})-g(x_{n-1})| \leq L|x_{n}-x_{n-1}|
+\]
+Furtermre, $L$ gives infrmtin n te speed f cnvergence.
+
+\subsectin{Newtn's Metd fr Slving Equtins $f (x) = 0$}
+
+In numericl nlysis, Newtn's metd (ls knwn s te Newtn-Rpsn metd), nmed fter Isc Newtn nd Jsep Rpsn, is  metd fr finding successively better pprximtins t te rts (r zeres) f  rel-vlued functin.
+\[
+    x : f(x) = 0 \,.
+\]
+
+Te ide f te metd is s fllws: ne strts wit n initil guess wic is resnbly clse t te true rt, ten te functin is pprximted by its tngent line, nd ne cmputes te $x$-intercept f tis tngent line. Tis $x$-intercept will typiclly be  better pprximtin t te functin's rt tn te riginl guess, nd te metd cn be iterted.
+
+Suppse $ƒ : [, b] \t R$ is  differentible functin defined n te intervl $[, b]$ wit vlues in te rel numbers $R$. Te frmul fr cnverging n te rt cn be esily derived. Suppse we ve sme current pprximtin $x_n$. Ten we cn derive te frmul fr  better pprximtin, $x_{n+1}$. Te equtin f te tngent line t te curve $y = ƒ(x)$ t te pint $x=x_n$ is
+\[
+    y = f'(x_n) \, (x-x_n) + f(x_n),
+\]
+were $ƒ'$ dentes te derivtive f te functin $ƒ$.
+
+Te $x$-intercept f tis line (te vlue f $x$ suc tt $y=0$) is ten used s te next pprximtin t te rt, $x_{n+1}$. In ter wrds, setting $y$ t zer nd $x$ t $x_{n+1}$ gives
+\[
+    0 = f'(x_n) \, (x_{n+1}-x_n) + f(x_n).
+\]
+Slving fr $x_{n+1}$ gives
+\[
+    x_{n+1} = x_n - \frc{f(x_n)}{f'(x_n)}. \,\!
+\]
+We strt te prcess ff wit sme rbitrry initil vlue $x_0$. (Te clser t te zer, te better. But, in te bsence f ny intuitin but were te zer migt lie,  "guess nd ceck" metd migt nrrw te pssibilities t  resnbly smll intervl by ppeling t te intermedite vlue terem.) Te metd will usully cnverge, prvided tis initil guess is clse enug t te unknwn zer, nd tt $ƒ'(x_0) \neq 0$.
+
+Prf f qudrtic cnvergence fr Newtn's itertive metd
+
+Accrding t Tylr's terem, ny functin $f(x)$ wic s  cntinuus secnd derivtive cn be represented by n expnsin but  pint tt is clse t  rt f $f(x)$. Suppse tis rt is $\lp \,$. Ten te expnsin f $f(\lp)$ but $x_n$ is:
+\[
+    f(\lp) = f(x_n) + f^\prime(x_n)(\lp - x_n) + R_1 \,
+\]
+were te Lgrnge frm f te Tylr series expnsin reminder is
+\[
+    R_1 = \frc{1}{2!}f^{\prime\prime}(\xi_n)(\lp - x_n)^{2} \,,
+\]
+were $\xi_n$ is in between $x_n$ nd $\lp \,$.
+
+Since $\lp \,$ is te rt, (1) becmes:
+\[
+    0 = f(\lp) = f(x_n) + f^\prime(x_n)(\lp - x_n) + \frc{1}{2}f^{\prime\prime}(\xi_n)(\lp - x_n)^{2} \,
+\]
+Dividing equtin (2) by $f^\prime(x_n)\,$ nd rerrnging gives
+\[
+    \frc {f(x_n)}{f^\prime(x_n)}+\left(\lp-x_n\rigt) = \frc {- f^{\prime\prime} (\xi_n)}{2 f^\prime(x_n)}\left(\lp-x_n\rigt)^2
+\]
+
+Remembering tt $x_{n+1}$ is defined by
+\[
+    x_{n+1} = x_{n} - \frc {f(x_n)}{f^\prime(x_n)} \,,
+\]
+ne finds tt
+\[
+    \underbrce{\lp - x_{n+1}}_{\epsiln_{n+1}} = \frc {- f^{\prime\prime} (\xi_n)}{2 f^\prime(x_n)} (\underbrce{\lp - x_n}_{\epsiln_{n}})^2 \,.
+\]
+Tt is,
+\[
+    \epsiln_{n+1} = \frc {- f^{\prime\prime} (\xi_n)}{2 f^\prime(x_n)} \, {\epsiln_n}^2 \,.
+\]
+Tking bslute vlue f bt sides gives
+\[
+    \left| {\epsiln_{n+1}}\rigt| = \frc {\left| f^{\prime\prime} (\xi_n) \rigt| }{2 \left| f^\prime(x_n) \rigt|} \, {\epsiln_n}^2 \,
+\]
+
+Equtin (6) sws tt te rte f cnvergence is qudrtic if te fllwing cnditins re stisfied:
+\[
+    f'(x)\ne0; \frll x\in I \text{, were }I \text{ is te intervl }[\lp-r,\lp+r] \text{ fr sme } r \ge \left\vert(\lp-x_0)\rigt\vert;\,
+    f''(x) \text{ is cntinuus},\frll x\in I; \,
+    x_0 \, sufficiently clse t te rt \lp \,
+\]
+Te term sufficiently clse in tis cntext mens te fllwing:
+
+() Tylr pprximtin is ccurte enug suc tt we cn ignre iger rder terms,
+\[
+    (b) \frc 1 {2}\left |{\frc {f^{\prime\prime} (x_n)}{f^\prime(x_n)}}\rigt |<C\left |{\frc {f^{\prime\prime} (\lp)}{f^\prime(\lp)}}\rigt |, \text{ fr sme } C<\infty,\,
+\]
+\[
+    (c) C \left |{\frc {f^{\prime\prime} (\lp)}{f^\prime(\lp)}}\rigt |\epsiln_n<1, \text{ fr }n\in \zet^+\cup\{0\} \text{ nd }C \text{ stisfying cnditin (b) }.\,
+\]
+Finlly, (6) cn be expressed in te fllwing wy:
+\[
+    \left | {\epsiln_{n+1}}\rigt | \le M{{\epsiln}_n}^2 \, 
+\]
+were $M$ is te supremum f te vrible cefficient f ${\epsiln_n}^2$ n te intervl $I$ defined in te cnditin $1$, tt is:
+\[
+    M = \sup_{x \in I} \frc 1 {2}\left |{\frc {f^{\prime\prime} (x)}{f^\prime(x)}}\rigt |. \,
+\]
+Te initil pint $x_0$ s t be csen suc tt cnditins $1$ trug $3$ re stisfied, were te tird cnditin requires tt $M\left |\epsiln_0 \rigt |<1.$
+
+Minimiztin nd mximiztin prblems
+
+Newtn's metd cn be used t find  minimum r mximum f  functin. Te derivtive is zer t  minimum r mximum, s minim nd mxim cn be fund by pplying Newtn's metd t te derivtive. Te itertin becmes:
+\[
+    x_{n+1} = x_n - \frc{f'(x_n)}{f''(x_n)} 
+\]
+
+Pseudcde
+
+Te fllwing is n exmple f using te Newtn's Metd t elp find  rt f  functin $f$ wic s derivtive fprime.
+
+mxItertins = 20          Dn't llw te itertins t cntinue indefinitely
+veWeFundSlutin = flse Hve nt cnverged t  slutin yet
+\begin{verbtim}
+    
+fr i = 1 : mxItertins
+
+y = f(x0)
+yprime = fprime(x0)
+
+if(bs(yprime) < epsiln) Dn't wnt t divide by t smll f  number
+denmintr is t smll
+brek;Leve te lp
+end
+
+x1 = x0 - y/yprime D Newtn's cmputtin
+
+if(bs(x1 - x0) <=  tlernce * bs(x1))If te result is witin te desired tlernce
+veWeFundSlutin = true
+brek; Dne, s leve te lp
+end
+
+x0 = x1 Updte x0 t strt te prcess gin
+
+end
+
+if (veWeFundSlutin)
+...  x1 is  slutin witin tlernce nd mximum number f itertins
+else
+...  did nt cnverge
+end
+\end{verbtim}
+
+\subsectin{Secnt metd}
+
+In numericl nlysis, te secnt metd is  rt-finding lgritm tt uses  successin f rts f secnt lines t better pprximte  rt f  functin $f$. Te secnt metd cn be tugt f s  finite difference pprximtin f Newtn's metd. 
+
+Te secnt metd is defined by te recurrence reltin
+\[
+    x_n =x_{n-1}-f(x_{n-1})\frc{x_{n-1}-x_{n-2}}{f(x_{n-1})-f(x_{n-2})}  
+\]
+As cn be seen frm te recurrence reltin, te secnt metd requires tw initil vlues, $x_0$ nd $x_1$, wic suld idelly be csen t lie clse t te rt.
+
+Te secnt metd des nt require tt te rt remin brcketed like te bisectin metd des, nd ence it des nt lwys cnverge. Te secnt metd cn be interpreted s  metd in wic te derivtive is replced by n pprximtin nd is tus  Qusi-Newtn metd.
+
+\subsectin{Bisectin metd}
+
+Brcketing metds trck te end pints f n intervl cntining  rt. Tis llws tem t prvide bslute errr bunds n  rt's lctin wen te functin is knwn t be cntinuus. Brcketing metds require tw initil cnditins, ne n eiter side f te rt.
+
+Te bisectin metd in mtemtics is  rt-finding metd tt repetedly bisects n intervl nd ten selects  subintervl in wic  rt must lie fr furter prcessing. It is  very simple nd rbust metd, but it is ls reltively slw. Becuse f tis, it is ften used t btin  rug pprximtin t  slutin wic is ten used s  strting pint fr mre rpidly cnverging metds.
+
+Te metd is pplicble fr numericlly slving te equtin $f(x) = 0$ fr te rel vrible $x$, were $f$ is  cntinuus functin defined n n intervl $[, b]$ nd were $f()$ nd $f(b)$ ve ppsite signs. In tis cse $$ nd $b$ re sid t brcket  rt since, by te intermedite vlue terem, te cntinuus functin $f$ must ve t lest ne rt in te intervl $(, b)$.
+
+At ec step te metd divides te intervl in tw by cmputing te midpint $c = (+b) / 2$ f te intervl nd te vlue f te functin $f(c)$ t tt pint. Unless $c$ is itself  rt (wic is very unlikely, but pssible) tere re nw nly tw pssibilities: eiter $f()$ nd $f(c)$ ve ppsite signs nd brcket  rt, r $f(c)$ nd $f(b)$ ve ppsite signs nd brcket  rt. Te metd selects te subintervl tt is gurnteed t be  brcket s te new intervl t be used in te next step. In tis wy n intervl tt cntins  zer f $f$ is reduced in widt by $50\%$ t ec step. Te prcess is cntinued until te intervl is sufficiently smll.
+
+Explicitly, if $f()$ nd $f(c)$ ve ppsite signs, ten te metd sets $c$ s te new vlue fr $b$, nd if $f(b)$ nd $f(c)$ ve ppsite signs ten te metd sets $c$ s te new $$. (If $f(c)=0$ ten $c$ my be tken s te slutin nd te prcess stps.) In bt cses, te new $f()$ nd $f(b)$ ve ppsite signs, s te metd is pplicble t tis smller intervl.
+
+Algritm
+
+Te metd my be written in pseudcde s fllws:
+
+INPUT: Functin $f$, endpint vlues $$, $b$, tlernce $TOL$, mximum itertins $NMAX$
+CONDITIONS: $ < b$, eiter $f() < 0$ nd $f(b) > 0$ r $f() > 0$ nd $f(b) < 0$
+OUTPUT: vlue wic differs frm  rt f $f(x)=0$ by less tn $TOL$
+
+$N \gets 1$
+
+Wile $N \leq NMAX$ limit itertins t prevent infinite lp
+
+$c \gets ( + b)/2$ new midpint
+
+If $f(c) = 0$ r $(b - )/2 < TOL$ ten slutin fund
+
+Output($c$)
+
+Stp
+
+EndIf
+
+$N \gets N + 1$ increment step cunter
+
+If $sign(f(c)) = sign(f())$ ten $ \gets c$ else $b \gets c$ new intervl
+
+EndWile
+
+Output("Metd filed.")  mx number f steps exceeded
+
+Te metd is gurnteed t cnverge t  rt f $f$ if $f$ is  cntinuus functin n te intervl $[, b]$ nd $f()$ nd $f(b)$ ve ppsite signs. Te bslute errr is lved t ec step s te metd cnverges linerly, wic is cmprtively slw.
+
+Specificlly, if $c_11 = (+b)/2$ is te midpint f te initil intervl, nd $c_n$ is te midpint f te intervl in te nt step, ten te difference between $c_n$ nd  slutin $c$ is bunded by
+\[
+    |c_n-c|\le\frc{|b-|}{2^n}.
+\]
+Tis frmul cn be used t determine in dvnce te number f itertins tt te bisectin metd wuld need t cnverge t  rt t witin  certin tlernce. Te number f itertins needed, $n$, t cieve  given errr (r tlernce), $\epsiln$, is given by: $n = \lg_2\left(\frc{\epsiln_0}{\epsiln}\rigt)=\frc{\lg\epsiln_0-\lg\epsiln}{\lg2}$ ,
+
+were $\epsiln_0 = \text{initil brcket size} = b- $.
+
+Terefre, te liner cnvergence is expressed by $\epsiln_{n+1} = \text{cnstnt} \times \epsiln_n^m, \ m=1$ .
+
+\subsectin{Liner Systems: Slutin by Itertin}
+
+In numericl liner lgebr, te metd f successive ver-relxtin (SOR) is  vrint f te Guss-Seidel metd fr slving  liner system f equtins, resulting in fster cnvergence. A similr metd cn be used fr ny slwly cnverging itertive prcess.
+
+Frmultin
+
+Given  squre system f $n$ liner equtins wit unknwn $x$:
+\[
+    A\mtbf x = \mtbf b
+\]
+were:
+\[
+    A=
+    \begin{bmtrix} 
+        _{11} & _{12} & \cdts & _{1n} \\
+        _{21} & _{22} & \cdts & _{2n} \\ 
+        \vdts & \vdts & \ddts & \vdts \\
+        _{n1} & _{n2} & \cdts & _{nn} 
+    \end{bmtrix}
+    , \qqud \mtbf{x} = 
+    \begin{bmtrix} 
+        x_{1} \\ 
+        x_2 \\ 
+        \vdts \\
+        x_n 
+    \end{bmtrix} 
+    , \qqud \mtbf{b} = 
+    \begin{bmtrix} 
+        b_{1} \\ 
+        b_2 \\ 
+        \vdts \\ 
+        b_n 
+    \end{bmtrix}.
+\]
+Ten $A$ cn be decmpsed int  dignl cmpnent $D$, nd strictly lwer nd upper tringulr cmpnents $L$ nd $U$:
+\[
+    A=D+L+U, 
+\]
+were
+\[
+    D = \begin{bmtrix} 
+        _{11} & 0 & \cdts & 0 \\ 
+        0 & _{22} & \cdts & 0 \\ 
+        \vdts & \vdts & \ddts & \vdts \\
+        0 & 0 & \cdts & _{nn} 
+    \end{bmtrix}
+    , \qud L = 
+    \begin{bmtrix} 
+        0 & 0 & \cdts & 0 \\
+        _{21} & 0 & \cdts & 0 \\ 
+        \vdts & \vdts & \ddts & \vdts \\
+        _{n1} & _{n2} & \cdts & 0 
+    \end{bmtrix}, 
+    \qud U = \begin{bmtrix}
+        0 & _{12} & \cdts & _{1n} \\ 
+        0 & 0 & \cdts & _{2n} \\
+        \vdts & \vdts & \ddts & \vdts \\
+        0 & 0 & \cdts & 0 
+    \end{bmtrix}. 
+\]
+Te system f liner equtins my be rewritten s:
+\[
+    (D+\meg L) \mtbf{x} = \meg \mtbf{b} - [\meg U + (\meg-1) D ] \mtbf{x} 
+\]
+te cnstnt $\meg$ clled te relxtin fctr.
+
+Te metd f successive ver-relxtin is n itertive tecnique tt slves te left nd side f tis expressin fr $x$, using previus vlue fr $x$ n te rigt nd side. Anlyticlly, tis my be written s:
+\[
+    \mtbf{x}^{(k+1)} = (D+\meg L)^{-1} \big(\meg \mtbf{b} - [\meg U + (\meg-1) D ] \mtbf{x}^{(k)}\big)=L_w \mtbf{x}^{(k)}+\mtbf{c}, 
+\]
+were $\mtbf{x}^{(k)}$ is te $k$t pprximtin r itertin f $\mtbf{x}$ nd $\mtbf{x}^{(k+1)}$ is te next r $k + 1$ itertin f $\mtbf{x}$. Hwever, by tking dvntge f te tringulr frm f $(D+\meg L)$, te elements f $x^(k+1)$ cn be cmputed sequentilly using frwrd substitutin:
+\[
+    x^{(k+1)}_i = (1-\meg)x^{(k)}_i + \frc{\meg}{_{ii}} \left(b_i - \sum_{j<i} _{ij}x^{(k+1)}_j - \sum_{j>i} _{ij}x^{(k)}_j \rigt),\qud i=1,2,\ldts,n. 
+\]
+Te cice f relxtin fctr $\meg$ is nt necessrily esy, nd depends upn te prperties f te cefficient mtrix.
+
+A similr tecnique cn be used fr ny itertive metd. If te riginl itertin d te frm
+\[
+    x_{n+1}=f(x_n)
+\]
+ten te mdified versin wuld use
+\[
+    x^\mtrm{SOR}_{n+1}=(1-\meg)x^{\mtrm{SOR}}_n+\meg f(x^\mtrm{SOR}_n).
+\]
+Nte wever tt te frmultin presented bve, used fr slving systems f liner equtins, is nt  specil cse f tis frmultin if $x$ is cnsidered t be te cmplete vectr. If tis frmultin is used insted, te equtin fr clculting te next vectr will lk like
+\[
+    \mtbf{x}^{(k+1)} = (1-\meg)\mtbf{x}^{(k)} + \meg L_*^{-1} (\mtbf{b} - U\mtbf{x}^{(k)}),
+\]
+were $L_* = L + D$. Vlues f $\meg>1$ re used t speed up cnvergence f  slw-cnverging prcess, wile vlues f $\meg<1$ re ften used t elp estblis cnvergence f  diverging itertive prcess r speed up te cnvergence f n versting prcess.
+
+In numericl liner lgebr, te Guss-Seidel metd, ls knwn s te Liebmnn metd r te metd f successive displcement, is n itertive metd used t slve  liner system f equtins nd is similr t te Jcbi metd. Tug it cn be pplied t ny mtrix wit nn-zer elements n te dignls, cnvergence is nly gurnteed if te mtrix is eiter dignlly dminnt, r symmetric nd psitive definite.
+
+Te Guss-Seidel metd is n itertive tecnique fr slving  squre system f $n$ liner equtins wit unknwn $x$:
+\[
+A\mtbf x = \mtbf b.
+\]
+It is defined by te itertin
+\[
+L_* \mtbf{x}^{(k+1)} = \mtbf{b} - U \mtbf{x}^{(k)}, 
+\]
+were $\mtbf{x}^{(k)}$ is te $k$t pprximtin r itertin f $\mtbf{x},\,\mtbf{x}^{k+1}$ is te next r $k + 1$ itertin f $\mtbf{x}$, nd te mtrix $A$ is decmpsed int  lwer tringulr cmpnent $L_*$, nd  strictly upper tringulr cmpnent $U: A = L_* + U$.
+
+In mre detil, write ut $A$, $x$ nd $b$ in teir cmpnents:
+\[
+    A=\begin{bmtrix} 
+        _{11} & _{12} & \cdts & _{1n} \\
+        _{21} & _{22} & \cdts & _{2n} \\ 
+        \vdts & \vdts & \ddts & \vdts \\
+        _{n1} & _{n2} & \cdts & _{nn}
+    \end{bmtrix}
+    , \qqud \mtbf{x} = 
+    \begin{bmtrix} 
+        x_{1} \\
+        x_2 \\
+        \vdts \\
+        x_n 
+    \end{bmtrix} 
+    , \qqud \mtbf{b} =
+    \begin{bmtrix}
+        b_{1} \\
+        b_2 \\ 
+        \vdts \\ 
+        b_n
+    \end{bmtrix}.
+\]
+Ten te decmpsitin f $A$ int its lwer tringulr cmpnent nd its strictly upper tringulr cmpnent is given by:
+\[
+    A=L_*+U \qqud \text{were} \qqud L_* = 
+    \begin{bmtrix} 
+        _{11} & 0 & \cdts & 0 \\
+        _{21} & _{22} & \cdts & 0 \\
+        \vdts & \vdts & \ddts & \vdts \\
+        _{n1} & _{n2} & \cdts & _{nn} 
+    \end{bmtrix}
+    , \qud U = 
+    \begin{bmtrix} 
+        0 & _{12} & \cdts & _{1n} \\ 
+        0 & 0 & \cdts & _{2n} \\ 
+        \vdts & \vdts & \ddts & \vdts \\
+        0 & 0 & \cdts & 0 
+    \end{bmtrix}. 
+\]
+Te system f liner equtins my be rewritten s:
+\[
+L_* \mtbf{x} = \mtbf{b} - U \mtbf{x} 
+\]
+Te Guss-Seidel metd nw slves te left nd side f tis expressin fr $x$, using previus vlue fr $x$ n te rigt nd side. Anlyticlly, tis my be written s:
+\[
+\mtbf{x}^{(k+1)} = L_*^{-1} (\mtbf{b} - U \mtbf{x}^{(k)}). 
+\]
+Hwever, by tking dvntge f te tringulr frm f $L_*$, te elements f $x^(k+1)$ cn be cmputed sequentilly using frwrd substitutin:
+\[
+x^{(k+1)}_i = \frc{1}{_{ii}} \left(b_i - \sum_{j=1}^{i-1}_{ij}x^{(k+1)}_j - \sum_{j=i+1}^{n}_{ij}x^{(k)}_j \rigt),\qud i,j=1,2,\dts,n. [3]
+\]
+Te prcedure is generlly cntinued until te cnges mde by n itertin re belw sme tlernce, suc s  sufficiently smll residul.
+
+Discussin
+
+Te element-wise frmul fr te Guss-Seidel metd is extremely similr t tt f te Jcbi metd.
+
+Te cmputtin f $x_i^{(k+1)}$ uses nly te elements f $x^{(k+1)}$ tt ve lredy been cmputed, nd nly te elements f $x^{(k)}$ tt ve nt yet t be dvnced t itertin $k+1$. Tis mens tt, unlike te Jcbi metd, nly ne strge vectr is required s elements cn be verwritten s tey re cmputed, wic cn be dvntgeus fr very lrge prblems.
+
+Hwever, unlike te Jcbi metd, te cmputtins fr ec element cnnt be dne in prllel. Furtermre, te vlues t ec itertin re dependent n te rder f te riginl equtins.
+
+Guss-Seidel is te sme s SOR (successive ver-relxtin) wit $\meg=1$.
+
+Jcbi metd
+
+Let
+\[
+    A\mtbf x = \mtbf b
+\]
+be  squre system f $n$ liner equtins, were:
+\[
+    A=\begin{bmtrix} 
+        _{11} & _{12} & \cdts & _{1n} \\ 
+        _{21} & _{22} & \cdts & _{2n} \\ 
+        \vdts & \vdts & \ddts & \vdts \\
+        _{n1} & _{n2} & \cdts & _{nn} 
+    \end{bmtrix}
+    , \qqud \mtbf{x} = 
+    \begin{bmtrix}
+        x_{1} \\ 
+        x_2 \\ 
+        \vdts \\
+        x_n 
+    \end{bmtrix}
+    , \qqud \mtbf{b} = 
+    \begin{bmtrix} 
+        b_{1} \\
+        b_2 \\
+        \vdts \\
+        b_n
+    \end{bmtrix}.
+\]
+Ten $A$ cn be decmpsed int  dignl cmpnent $D$, nd te reminder $R$:
+\[
+    A=D+R \qqud \text{were} \qqud D = 
+    \begin{bmtrix} 
+        _{11} & 0 & \cdts & 0 \\
+        0 & _{22} & \cdts & 0 \\ 
+        \vdts & \vdts & \ddts & \vdts \\
+        0 & 0 & \cdts & _{nn} 
+    \end{bmtrix} 
+    \text{ nd } R = 
+    \begin{bmtrix} 
+        0 & _{12} & \cdts & _{1n} \\
+        _{21} & 0 & \cdts & _{2n} \\
+        \vdts & \vdts & \ddts & \vdts \\ 
+        _{n1} & _{n2} & \cdts & 0 
+    \end{bmtrix}. 
+\]
+Te slutin is ten btined itertively vi
+\[
+    \mtbf{x}^{(k+1)} = D^{-1} (\mtbf{b} - R \mtbf{x}^{(k)}), 
+\]
+were $\mtbf{x}^{(k)}$ is te $k$t pprximtin r itertin f $\mtbf{x}$ nd $\mtbf{x}^{(k+1)}$ is te next r $k + 1$ itertin f $\mtbf{x}$. Te element-bsed frmul is tus:
+\[
+    x^{(k+1)}_i = \frc{1}{_{ii}} \left(b_i -\sum_{j\ne i}_{ij}x^{(k)}_j\rigt),\qud i=1,2,\ldts,n. 
+\]
+Te cmputtin f $x_i^{(k+1)}$ requires ec element in $x^{(k)}$ except itself. Unlike te Guss-Seidel metd, we cn't verwrite $x_i^{(k)}$ wit $x_i^{(k+1)}$, s tt vlue will be needed by te rest f te cmputtin. Te minimum munt f strge is tw vectrs f size $n$.
+
+In 2014,  refinement f te lgritm, clled sceduled relxtin Jcbi (SRJ) metd, ws publised ("Accelertin f te Jcbi itertive metd by fctrs exceeding 100 using sceduled relxtin", "Sceduled Relxtin Jcbi metd: imprvements nd pplictins"). Te new metd emplys  scedule f ver- nd under-relxtins nd prvides perfrmnce imprvements fr slving elliptic equtins discretized n lrge tw- nd tree-dimensinl Crtesin grids. 
+
+\bibligrpy{ref}
+\end{dcument}

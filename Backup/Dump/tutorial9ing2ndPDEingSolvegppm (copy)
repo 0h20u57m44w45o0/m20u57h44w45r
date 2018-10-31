@@ -1,0 +1,149 @@
+%********************************************************************%
+%                       UW ME 303 Tutorial 9                         %
+%                Solve the 2nd order Wave Equation                   %
+% Huangrui Mo, University of Waterloo                                %
+%********************************************************************%
+%
+% Preprocess: problem definition and initialization
+%
+clear; % clean the current workspace by removing all variables
+rho = 7000; % density
+A = 10^-6; % area
+F = 17.5; % string tension
+a = (F/(rho * A))^0.5; % wave speed
+Ls = [0, 0.8]; % space domain
+L = Ls(2) - Ls(1); % space length
+T = 0.03; % solution time
+Nm = 80; % number of meshes
+CFL = 0.9; % stability control
+dx = L / Nm; % spatial step
+%
+% Initialization
+%
+% sm, sn, s denote solution at time level n-1, n, n+1, respectively
+L_init = 1*L; % initialization length
+for i = 1 : Nx % solution space
+    x(i) = Ls(1) + dx * (i - 1);
+    if abs(x(i)-L/2) < L_init
+        s_init(i) = 0.004 * sin(x(i) / L * pi);
+    else
+        s_init(i) = 0;
+    end
+end
+sm = s_init;
+sn = sm;
+%
+% Solve: explicit marching
+%
+t = 0;
+s = [];
+while t < T
+    % temporal step
+    dt = CFL * dx / a;
+    if (t + dt) > T
+        dt = T - t;
+    end
+    for i = 2 : (Nx-1) % interior
+        s(i) = 2 * sn(i) - sm(i) + CFL^2 * (sn(i+1) - 2 * sn(i) + sn(i-1));
+    end
+    % Boundary treatment
+    s(1) = 0;
+    s(Nx) = 0;
+    % Update time levels
+    sm = sn;
+    sn = s;
+    % Accumulate time
+    t = t + dt;
+end
+sExp = s; % Explicit solution
+%
+% Solve: implicit with iteration
+%
+maxIteration = 10000; % maximum number of iterations
+tolerance = 10^-10; % error tolerance of solution
+% reset values
+t = 0;
+sm = s_init;
+sn = sm;
+s = [];
+while t < T
+    % temporal step
+    dt = CFL * dx / a;
+    if (t + dt) > T
+        dt = T - t;
+    end
+    s_guess = sn;
+    s = s_guess; % initial guess
+    for r = 1 : maxIteration
+        for i = 2 : (Nx-1) % interior
+            s(i) = 1 / (1 + 2 * CFL^2) * (2 * sn(i) - sm(i) + CFL^2 * (s(i+1) + s(i-1)));
+        end
+        % Boundary treatment
+        s(1) = 0;
+        s(Nx) = 0;
+        max_err = max(abs(s-s_guess));
+        if  max_err <= tolerance % converged
+            break;
+        end
+        s_guess = s; % update the guessed value
+    end
+    % Update time levels
+    sm = sn;
+    sn = s;
+    % Accumulate time
+    t = t + dt;
+end
+sImp = s; % Implicit solution
+%
+% Solve: Crank-Nicolson with iteration
+%
+% reset values
+t = 0;
+sm = s_init;
+sn = sm;
+s = [];
+while t < T
+    % temporal step
+    dt = CFL * dx / a;
+    if (t + dt) > T
+        dt = T - t;
+    end
+    s_guess = sn;
+    s = s_guess; % initial guess
+    for r = 1 : maxIteration
+        for i = 2 : (Nx-1) % interior
+            s(i) = 1 / (1 + CFL^2) * (2 * sn(i) - sm(i) + 0.5 * CFL^2 * (sn(i+1) - 2 * sn(i) + sn(i-1) + s(i+1) + s(i-1)));
+        end
+        % Boundary treatment
+        s(1) = 0;
+        s(Nx) = 0;
+        max_err = max(abs(s-s_guess));
+        if  max_err <= tolerance % converged
+            break;
+        end
+        s_guess = s; % update the guessed value
+    end
+    % Update time levels
+    sm = sn;
+    sn = s;
+    % Accumulate time
+    t = t + dt;
+    % plot time instants
+    plot(x, s, '-k');
+    axis([0 L -0.005 0.005]);
+    xlabel('x');
+    ylabel('s');
+    pause(1/192);
+end
+sCN = s; % Implicit solution
+%
+% Postprocess: data visualization and analysis
+%
+% Resources: http:%www.mathworks.com/help/matlab/ref/plot.html
+s_ref = max(sCN) * ones(length(s));
+plot(x, sExp, '-k', x, sImp, '--r', x, sCN, ':b', x, s_ref, '-b');
+axis([0 L -0.005 0.005]);
+xlabel('x');
+ylabel('y');
+legend('Explicit', 'Implicit', 'Crank-Nicolson', 'Reference Line');
+%********************************************************************%

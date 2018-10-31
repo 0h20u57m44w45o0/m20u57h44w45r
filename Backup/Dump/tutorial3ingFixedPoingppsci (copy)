@@ -1,0 +1,39 @@
+//********************************************************************//
+//                       UW ME 303 Tutorial #3                        //
+//                Root Finding by Fixed Point Method                  //
+// This is an example code of using the fixed point method to find a  //
+// root of an equation x = g(x).                                      //
+// Huangrui Mo, University of Waterloo                                //
+//********************************************************************//
+//
+// Preprocess: problem definition and initialization
+//
+clear; // clean the current workspace by removing all variables
+xn = 5; // initial guess of solution
+w = 0.25; // relaxation factor (w = 1 for no relaxation)
+maxIteration = 100; // maximum number of iterations
+tolerance = 10^-5; // error tolerance of solution
+foundSolution = 0; // convergence indicator
+//
+// Solve: iteration
+//
+for n = 1 : maxIteration
+    g = 15 - (7.5 * 10^-5) * (80 + 10.5 * xn^(5/3))^2; // compute g
+    xStar = g; // compute updated value
+    xm = w * xStar + (1 - w) * xn; // relaxation step
+    if (abs(xm - xn) <= tolerance * abs(xm)) // reaches desired tolerance
+        foundSolution = 1; // indicator for convergence
+        break; // terminate loop computation
+    end
+    xn = xm; // update the guessed value for next iteration
+end
+//
+// Postprocess: data visualization and analysis
+//
+if (foundSolution == 1)
+    disp('A converged solution within tolerance is:');
+    disp(xm);
+else
+    disp('failed to converge');
+end
+//********************************************************************//

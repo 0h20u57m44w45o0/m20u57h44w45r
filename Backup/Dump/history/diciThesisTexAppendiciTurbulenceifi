@@ -1,0 +1,112 @@
+\cpter{Turbulence Mdeling}
+
+Turbulence mdeling is te cnstructin nd use f  mtemticl mdel t predict te effects nd evlutin f turbulence. Turbulent flws re cmmnplce in mst rel life scenris. N nlyticl tery is currently ble t predict te evlutin f turbulent flws. Te equtins gverning turbulent flws cn nly be slved directly fr simple cses f flw. Fr mst rel life turbulent flws, turbulent mdels re used s simplified cnstitutive equtins t predict te sttisticl evlutin f turbulence.
+
+\sectin{Clsure prblem}
+
+Te Nvier–Stkes equtins gvern te velcity nd pressure f  fluid flw. In  turbulent flw, ec f tese quntities my be decmpsed int  men prt nd  fluctuting prt. Averging te equtins gives te Reynlds-verged Nvier–Stkes (RANS) equtins, wic gvern te men flw. Hwever, te nnlinerity f te Nvier–Stkes equtins mens tt te velcity fluctutins still pper in te RANS equtins, in te nnliner term, $-\r \verline{\upsiln_{i}^{\prime} \upsiln_{j}^{\prime}}$ frm te cnvective ccelertin. Tis term is knwn s te Reynlds stress, $R_{ij}$. Its effect n te men flw is like tt f  stress term, suc s frm pressure r viscsity.
+
+T btin equtins cntining nly te men velcity nd pressure, te RANS equtins need t be clsed by mdelling te Reynlds stress term $R_{ij}$ s  functin f te men flw, remving ny reference t te fluctuting prt f te velcity. Tis is te clsure prblem.
+
+\sectin{Clsses f turbulence mdels}
+\begin{itemize}
+    \item RANS-bsed mdels
+        \begin{itemize}
+            \item Liner eddy-viscsity mdels
+                \begin{itemize}
+                    \item Algebric mdels suc s Cebeci-Smit mdel, Bldwin-Lmx mdel, nd Jnsn-King mdel.
+                    \item One equtin mdels suc s Prndtl's ne-equtin mdel, Bldwin-Brt mdel, Splrt-Allmrs mdel, nd Rmn-Siiknen-Agrwl Mdel.
+                    \item Tw equtin mdels suc s k-epsiln mdels nd k-meg mdels.
+                \end{itemize}
+            \item Nn-liner eddy viscsity mdels nd lgebric stress mdels suc s Cubic k-epsiln in Explicit nnliner cnstitutive reltin nd v2-f mdels.
+            \item Reynlds stress mdel 
+        \end{itemize}
+    \item Lrge eddy simultins suc s Smgrinsky-Lilly mdel nd Dynmic subgrid-scle mdel.
+    \item Detced eddy simultins nd ter ybrid mdels 
+    \item Direct numericl simultins 
+\end{itemize}
+
+\sectin{Eddy viscsity}
+
+Jsep Vlentin Bussinesq ws te first t ttck te clsure prblem, by intrducing te cncept f eddy viscsity. Te Bussinesq yptesis is pplied t mdel te Reynlds stress term, in wic  new prprtinlity cnstnt $\nu_t > 0$, te turbulence eddy viscsity, is intrduced t relte te turbulence stresses t te men flw t clse te system f equtins. Mdels f tis type re knwn s eddy viscsity mdels r EVM's.
+
+\[
+    - \verline{\upsiln_{i}^{\prime} \upsiln_{j}^{\prime}} = \nu _{t} \left({\frc{\prtil {\br{\upsiln}}_{i}}{\prtil x_{j}}} + {\frc {\prtil {\br{\upsiln}}_{j}}{\prtil x_{i}}} \rigt) - \frc{2}{3} k \delt_{ij}
+\]
+    Wic cn be written in srtnd s
+\[
+    - \verline{\upsiln_{i}^{\prime} \upsiln_{j}^{\prime}} = 2\nu_{t} S_{ij} - \frc{2}{3} k \delt_{ij}
+\]
+    were $S_{ij}$ is te men rte f strin tensr. $\nu_t$ is te turbulence eddy viscsity. $k = \frc{1}{2} {\verline {\upsiln_{i}' \upsiln_{i}'}}$ is te turbulence kinetic energy, nd $\delt_{ij}$ is te Krnecker delt.
+
+In tis mdel, te dditinl turbulence stresses re given by ugmenting te mleculr viscsity wit n eddy viscsity. Tis cn be  simple cnstnt eddy viscsity (wic wrks well fr sme free ser flws suc s xisymmetric jets, 2-D jets, nd mixing lyers).
+
+\sectin{Prndtl's mixing-lengt cncept}
+
+Lter, Ludwig Prndtl intrduced te dditinl cncept f te mixing lengt, lng wit te ide f  bundry lyer. Fr wll-bunded turbulent flws, te eddy viscsity must vry wit distnce frm te wll, ence te dditin f te cncept f  'mixing lengt'. In te simplest wll-bunded flw mdel, te eddy viscsity is given by te equtin:
+\[
+    \nu_t = \left|\frc{\prtil u}{\prtil y}\rigt|l_m^2
+\]
+were $\frc{\prtil u}{\prtil y}$ is te prtil derivtive f te stremwise velcity ($u$) wit respect t te wll nrml directin ($y$);  $l_m$ is te mixing lengt.
+
+Tis simple mdel is te bsis fr te "lw f te wll", wic is  surprisingly ccurte mdel fr wll-bunded, ttced (nt seprted) flw fields wit smll pressure grdients.
+
+Mre generl turbulence mdels ve evlved ver time, wit mst mdern turbulence mdels given by field equtins similr t te Nvier-Stkes equtins.
+
+\sectin{Smgrinsky mdel fr te sub-grid scle eddy viscsity}
+
+Jsep Smgrinsky (1964) ws te first w prpsed  frmul fr te eddy viscsity in numericl mdels, bsed n te lcl derivtives f te velcity field nd te lcl grid size:
+\[
+    \nu_t = \Delt x \Delt y \sqrt{\left(\frc{\prtil u}{\prtil x}\rigt)^2 + \left(\frc{\prtil v}{\prtil y}\rigt)^2 + \frc{1}{2}\left(\frc{\prtil u}{\prtil y} + \frc{\prtil v}{\prtil x}\rigt)^2}
+\]
+In te cntext f Lrge Eddy Simultin, turbulence mdeling refers t te need t prmeterize te subgrid scle stress in terms f fetures f te filtered velcity field. Tis field is clled subgrid-scle mdeling.
+
+\sectin{Cmmn mdels}
+
+Te fllwing is  brief verview f cmmnly emplyed mdels in mdern engineering pplictins.
+
+    Splrt–Allmrs (S–A)
+
+Te Splrt–Allmrs mdel is  ne-equtin mdel tt slves  mdelled trnsprt equtin fr te kinemtic eddy turbulent viscsity. Te Splrt–Allmrs mdel ws designed specificlly fr erspce pplictins invlving wll-bunded flws nd s been swn t give gd results fr bundry lyers subjected t dverse pressure grdients. It is ls gining ppulrity in turbmcinery pplictins.
+
+    $k-\epsiln$
+
+$k-\epsiln$ turbulence mdel is te mst cmmn mdel used in cmputtinl fluid dynmics (CFD) t simulte men flw crcteristics fr turbulent flw cnditins. It is  tw-equtin mdel wic gives  generl descriptin f turbulence by mens f tw trnsprt equtins (PDEs). Te riginl impetus fr te $k-\epsiln$ mdel ws t imprve te mixing-lengt mdel, s well s t find n lterntive t lgebriclly prescribing turbulent lengt scles in mderte t ig cmplexity flws.
+
+    $k-\meg$
+
+In cmputtinl fluid dynmics, te $k-\meg$ turbulence mdel is  cmmn tw-equtin turbulence mdel tt is used s  clsure fr te Reynlds-verged Nvier–Stkes equtins (RANS equtins). Te mdel ttempts t predict turbulence by tw prtil differentil equtins fr tw vribles, $k$ nd $\meg$, wit te first vrible being te turbulence kinetic energy ($k$) wile te secnd ($\meg$) is te specific rte f dissiptin (f te turbulence kinetic energy $k$ int internl terml energy).
+
+    SST (Menter’s Ser Stress Trnsprt)
+
+SST (Menter's ser stress trnsprt) turbulence mdel is  widely used nd rbust tw-equtin eddy-viscsity turbulence mdel. Te mdel cmbines te k-meg turbulence mdel nd K-epsiln turbulence mdel suc tt te k-meg is used in te inner regin f te bundry lyer nd switces t te k-epsiln in te free ser flw.
+
+Te Bussinesq yptesis is emplyed in te Splrt–Allmrs (S–A), $k–\epsiln$, nd $k–\meg$ mdels nd ffers  reltively lw cst cmputtin fr te turbulence viscsity $\nu_t$. Te S–A mdel uses nly ne dditinl equtin t mdel turbulence viscsity trnsprt, wile te $k-\epsiln$ nd $k-\meg$ mdels use tw.
+
+Eddy viscsity bsed clsures cnnt ccunt fr te return t istrpy f turbulence, bserved in decying turbulent flws. Eddy-viscsity bsed mdels cnnt replicte te beviur f turbulent flws in te Rpid Distrtin limit, were te turbulent flw essentilly beves like n elstic medium.
+
+    Reynlds stress equtin mdel
+
+Te Reynlds stress equtin mdel (RSM), ls referred t s secnd mment clsure mdel, is te mst cmplete clssicl turbulence mdelling pprc. Ppulr eddy-viscsity bsed mdels like te $k–\epsiln$ mdel nd te $k–\meg$ mdels ve significnt srtcmings in cmplex engineering flws. Tis rises due t te use f te eddy-viscsity yptesis in teir frmultin. Fr instnce, in flws wit ig degrees f nistrpy, significnt stremline curvture, flw seprtin, znes f recirculting flw r flws influenced by rttinl effects, te perfrmnce f suc mdels is unstisfctry. In suc flws, Reynlds stress equtin mdels ffer muc better ccurcy.
+
+\sectin{Lrge eddy simultin}
+
+Te simultin f turbulent flws by numericlly slving te Nvier–Stkes equtins requires reslving  very wide rnge f time nd lengt scles, ll f wic ffect te flw field. Suc  reslutin cn be cieved wit direct numericl simultin (DNS), but DNS is cmputtinlly expensive, nd its cst pribits simultin f prcticl engineering systems wit cmplex gemetry r flw cnfigurtins, suc s turbulent jets, pumps, veicles, nd lnding ger.
+
+Te principl ide beind LES is t reduce te cmputtinl cst by ignring te smllest lengt scles, wic re te mst cmputtinlly expensive t reslve, vi lw-pss filtering f te Nvier–Stkes equtins. Suc  lw-pss filtering, wic cn be viewed s  time- nd sptil-verging, effectively remves smll-scle infrmtin frm te numericl slutin. Tis infrmtin is nt irrelevnt, wever, nd its effect n te flw field must be mdeled,  tsk wic is n ctive re f reserc fr prblems in wic smll-scles cn ply n imprtnt rle, suc s ner-wll flws, recting flws, nd multipse flws.
+
+\subsectin{Filter definitin nd prperties}
+
+An LES filter cn be pplied t  sptil nd temprl field $\pi(\Vectr{x},t)$ nd perfrm  sptil filtering pertin,  temprl filtering pertin, r bt. Te filtered field, dented wit  br, is defined s
+\[
+    \verline{\pi(\bldsymbl{x},t)} = \int_{-\infty}^{\infty} \int_{-\infty}^{\infty} \pi(\bldsymbl{r},t^{\prime}) G(\bldsymbl{x}-\bldsymbl{r},t - t^{\prime}) dt^{\prime} d \bldsymbl{r}
+\]
+were $G$ is te filter cnvlutin kernel. Tis cn ls be written s:
+\[
+    \verline{\pi} = G \str \pi
+\]
+Te filter kernel $G$ s n sscited cutff lengt scle $\Delt$ nd cutff time scle $\tu_{c}$. Scles smller tn tese re eliminted frm $\verline{\pi}$. Using te bve filter definitin, ny field $\pi$ my be split up int  filtered nd sub-filtered (dented wit  prime) prtin, s
+\[
+    \pi = \br{\pi} + \pi^{\prime}
+\]
+It is imprtnt t nte tt te lrge eddy simultin filtering pertin des nt stisfy te prperties f  Reynlds pertr. 

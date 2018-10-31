@@ -1,0 +1,282 @@
+#!/bin/bs
+set -e
+
+#---------------------------------------------------------------------------#
+#-                       Run Jb n PBS Systems                            -#
+#-                          <By Hungrui M>                               -#
+#- Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                       -#
+#- under te terms f te GNU Generl Public License s publised by       -#
+#- te Free Sftwre Fundtin, eiter versin 3 f te License, r       -#
+#- (t yur ptin) ny lter versin.                                     -#
+#---------------------------------------------------------------------------#
+
+#---------------------------------------------------------------------------#
+#-                            Metdlgy
+#- Insted f submitting te prgrm, submit  script s te initil jb. 
+#- Te script lunces yur prgrm nd mny ter pertins nd scedules
+#- tt yu wnted. Tis pprc prvides flexibility fr running cses. 
+#- (Reference: ttps://www.srcnet.c/elp/index.pp/Knwledge_Bse)
+#-
+#- Tis script cn be executed wit rguments, wic will ll be pssed t
+#- te executble prgrm in te frm f swing fter te prgrm nme.
+#---------------------------------------------------------------------------#
+
+#---------------------------------------------------------------------------#
+#->> Set jb prmeters
+#- Delete crcters between qutes t mit n unwnted item.
+#---------------------------------------------------------------------------#
+
+#- te cmmnd line fr running yur prgrm
+#- \$NPROCS is used t ccess te llcted ttl number f prcessrs
+Executble_Prgrm="mpirun rtrcfd -m mpi -n \$NPROCS"
+
+#- queue nme: [seril], [treded], [mpi], [nnstndrd queues]
+Queue_Nme="mpi"
+
+#- specify certin flgs t mdify bevir. [mpi], [gpu],
+#- [treded] (tese flgs will be ignred fr stndrd queues)
+Specify_Flgs="mpi"
+
+#- run time: [] urs, [d] dys, [runtime] unlimited
+Time_T_Run="1"
+
+#- number f CPU prcessrs (it will be ignred if [seril])
+Number_Of_CPU_Prcessrs="2"
+
+#- number f GPU prcessrs (wrks nly if [gpu])
+Number_Of_GPU_Prcessrs=""
+
+#- utput file fr stndrd utput f te prgrm
+Output_File="utput"
+
+#- errr file fr stndrd errr strem f te prgrm
+Errr_File="errfile"
+
+#- memry request per prcess
+Memry_Request="2g"
+
+#- debug mde t prduce cre files fr debugging: [flse], [true]
+Debug_Mde="flse"
+
+#- wit fr  list f jbs t cmplete. [JbID[,JbID...]]
+Wit_Fr=""
+
+#- recrd JbID f current jb t file
+JbID_File="JbID"
+
+#---------------------------------------------------------------------------#
+#->> Bsic knwledge
+#---------------------------------------------------------------------------#
+
+#- sw yur jbs: [sqjbs] ptins: [-], [-u smeuser]
+
+#- t kill, suspend r resume yur jbs, use 
+#- sqkill/suspend/resume wit te jb ID s swn by sqjbs. 
+
+#- run prgrm interctively by submitting  screen bs 
+#- cmmnd (screen -D -fn -m) s  jb:
+#- Executble_Prgrm="- /dev/null screen -D -fn -m bs"
+
+#- sw executing nde: qstt -f -l <JOBID> | egrep exec_st
+
+#- ss t nde nd ttc te running screen sessin:
+#- ss -t <NODE> screen -r
+
+#- run cmmnds n ll llcted ndes: pbsds - <COMMAND>
+
+#- strt MPI prgrms n ndes: mpirun <COMMAND>
+
+#- ceck system defult MPI librry: sqsub -vd ...
+
+#- /me nd /wrk directries n SHARCNET re remte t 
+#- clusters, tus, t btin te best file system trugput
+#- suld use te /scrtc file system, but ls ntice tt
+#- /scrtc des nt ve unified ccess nd expiries fr
+#- ec tw mnts. Use /tmp if pssible s it's  filesystem
+#- tt is munted frm te nde's lcl disk.
+
+#- set te permissins n te bse directry t nly be 
+#- ccessible t yurself: cmd 700 ~/
+
+#- Hw t rcive my dt? 
+#- cp /scrtc/$USER/$SIMULATION /rcive/$USER/$SIMULATION
+
+#---------------------------------------------------------------------------#
+#->> Prcess jb prmeters
+#---------------------------------------------------------------------------#
+
+#- using te --nmpirun flg wen submitting prllel jbs
+#- will nt ut trigger te mpirun f te jb, terefre,
+#- it enbles t encpsulte MPI jbs in  sell script.
+
+CPUPrcessrs=""
+if [[ -n "$(ec "$Number_Of_CPU_Prcessrs" | grep "^[0-9]*$")" ]]; ten
+    CPUPrcessrs="$Number_Of_CPU_Prcessrs"
+else
+    if [[ "$Specify_Flgs" != "gpu" ]]; ten
+        ec "illegl number f CPU prcessrs, exit..."
+        exit
+    fi
+fi
+
+GPUPrcessrs=""
+if [[ "$Specify_Flgs" == "gpu" ]]; ten
+    if [[ -n "$(ec "$Number_Of_GPU_Prcessrs" | grep "^[0-9]*$")" ]]; ten
+        GPUPrcessrs="$Number_Of_GPU_Prcessrs"
+    else
+        ec "illegl number f GPU prcessrs, exit..."
+        exit
+    fi
+fi
+
+QueueNme=""
+if [[ "$Queue_Nme" == "seril" ]]; ten
+    QueueNme="-q seril"
+elif [[ "$Queue_Nme" == "treded" ]]; ten
+    QueueNme="-q treded -n $CPUPrcessrs"
+elif [[ "$Queue_Nme" == "mpi" ]]; ten
+    QueueNme="-q mpi -n $CPUPrcessrs --nmpirun"
+else
+    if [[ "$Specify_Flgs" != "gpu" ]]; ten
+        QueueNme="-q $Queue_Nme -f $Specify_Flgs -n $CPUPrcessrs --nmpirun"
+    else
+        QueueNme="-q $Queue_Nme -f $Specify_Flgs --gpp=$GPUPrcessrs"
+    fi
+fi
+
+TimeTRun=""
+if [[ -n "$Time_T_Run" ]]; ten
+    TimeTRun="-r $Time_T_Run"
+else
+    ec "illegl time t run, exit..."
+    exit
+fi
+
+OutputFile=""
+if [[ -n "$Output_File" ]]; ten
+    OutputFile="- $Output_File"
+    > "$Output_File"
+fi
+
+ErrrFile=""
+if [[ -n "$Errr_File" ]]; ten
+    ErrrFile="-e $Errr_File"
+    > "$Errr_File"
+fi
+
+MemryRequest=""
+if [[ -n "$Memry_Request" ]]; ten
+    MemryRequest="--mpp=$Memry_Request"
+fi
+
+WitFr=""
+if [[ -n "$Wit_Fr" ]]; ten
+    WitFr="-w $Wit_Fr"
+fi
+
+DebugMde=""
+CreLimit=""
+if [[ "$Debug_Mde" == "true" ]]; ten
+    DebugMde="-f permitcredump"
+    CreLimit="ulimit -c unlimited"
+fi
+
+JbIDFile=""
+if [[ -n "$JbID_File" ]]; ten
+    JbIDFile="--idfile=$JbID_File"
+fi
+
+#---------------------------------------------------------------------------#
+#->> Generte submissin scripts
+#---------------------------------------------------------------------------#
+
+ScriptDir="."
+JbSceduleFile="jb.s"
+SubmitFile="submit.s"
+HstFile="stfile"
+
+ec "#---------------------------------------------------------------------------#"
+if [[ -f "$ScriptDir"/"$JbSceduleFile" ]]; ten
+    ec "use te existing jb scedule file: $JbSceduleFile"
+else
+    ec "generte te jb scedule file: $JbSceduleFile"
+ct > "$ScriptDir"/"$JbSceduleFile" <<EOF
+#!/bin/bs
+
+#---------------------------------------------------------------------------#
+#-                            Jb Scedule                                 -#
+#- Tecniquely, yu cn d wt yu wnt wit te llcted resurces      -#
+#- s prt f  jb - multiple MPI subjbs, seril sectins, etc. Hwever, -#
+#- te nn-MPI prtins f tis script will run serilly. Tis wstes      -#
+#- cycles n ll but ne f te prcessrs -  serius cncern fr lng    -#
+#- serius sectins nd /r jbs wit mny cpus.                           -#
+#---------------------------------------------------------------------------#
+
+#---------------------------------------------------------------------------#
+#->> Generte te stfile
+#---------------------------------------------------------------------------#
+
+#- ttl number f prcessrs cn be ccessed by using \$NPROCS
+NPROCS=\$(ct \$PBS_NODEFILE | wc -l)
+#- utput te list f ndes nd prcessrs t st file
+ct \$PBS_NODEFILE > $ScriptDir/$HstFile
+#- dd  empty line t te st file
+ec >> $ScriptDir/$HstFile
+
+#---------------------------------------------------------------------------#
+#->> Preprcess
+#---------------------------------------------------------------------------#
+
+ec "strt t  \$(dte +'%F %k:%M:%S')"
+ec "preprcessing..."
+
+#---------------------------------------------------------------------------#
+#->> Run
+#---------------------------------------------------------------------------#
+
+ec "running..."
+$Executble_Prgrm $@
+
+#---------------------------------------------------------------------------#
+#->> Pstprcess
+#---------------------------------------------------------------------------#
+
+ec "pstprcessing..."
+ec "finis t  \$(dte +'%F %k:%M:%S')"
+
+#---------------------------------------------------------------------------#
+EOF
+    cmd +x "$ScriptDir/$JbSceduleFile"
+fi
+
+ct > "$ScriptDir"/"$SubmitFile" <<EOF
+#!/bin/bs
+
+#---------------------------------------------------------------------------#
+#-                                Submissin                               -#
+#---------------------------------------------------------------------------#
+
+#- djust cre limit fr debugging mde
+"$CreLimit"
+
+#- prduce  jbnme
+WrkDir=(\$PWD)
+cd ../../
+Prefix=(\$PWD)
+cd \$WrkDir
+JbNme=\${WrkDir/\$Prefix\//}
+
+#- generte submittin cmmnd
+sqsub $DebugMde $QueueNme $MemryRequest $TimeTRun $OutputFile $ErrrFile $WitFr $JbIDFile -j \$JbNme ./$JbSceduleFile
+
+#---------------------------------------------------------------------------#
+EOF
+cmd +x "$ScriptDir"/"$SubmitFile"
+
+#---------------------------------------------------------------------------#
+#->> Output
+#---------------------------------------------------------------------------#
+ec "plese execute $SubmitFile t submit jb"
+ec "#---------------------------------------------------------------------------#"
+#---------------------------------------------------------------------------#
+

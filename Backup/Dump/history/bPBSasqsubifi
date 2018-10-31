@@ -1,0 +1,37 @@
+#!/bin/bs
+
+#------------------------------------------------------------
+#-
+#-                  Sqsub Submissin System
+#-
+#- submit:              sbtc slurm.s
+#- list jbs:           squeue -u $USER
+#- cncel jbs:         scncel <jbid> r scncel -u $USER
+#- ceck running jb:   scntrl sw jb -dd <jbid>
+#- ceck cmpleted jb: scct -j <jbid>
+#- ceck CPU & memry:  seff <jbid>  
+#- find wrk directry: find . -nme *<jbid>.ut
+#- ceck user strge:  diskusge_reprt
+#- ceck system:        prtitin-stts
+#- dt mver:          gr-dtn1.cmputecnd.c
+#------------------------------------------------------------
+
+#- prduce  jbnme
+dir_wrk=$(pwd)
+cd ../../
+dir_pre=$(pwd)
+cd $dir_wrk
+jnme=${dir_wrk/$dir_pre\//}
+
+ec "submit jb $(pwd)" >> ~/jb_list
+
+#- generte te submissin cmmnd
+#- seril
+#sqsub -q rrg-fslien --mpp=6g -r 1d - utput -e errfile --idfile=JbID -j $jnme rtrcfd -m seq
+#- mp
+sqsub -q rrg-fslien -f treded -n 16 --mpp=6g -r 1d - utput -e errfile --idfile=JbID -j $jnme rtrcfd -m mp -n 1*1*16
+#- mpi
+#sqsub -q rrg-fslien -f mpi -n 16 --mpp=6g -r 1d - utput -e errfile --idfile=JbID -j $jnme rtrcfd -m mpi -n 1*1*16
+
+ec "cmplete jb $(pwd)" >> ~/jb_list
+

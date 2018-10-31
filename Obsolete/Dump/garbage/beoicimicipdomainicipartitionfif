@@ -1,0 +1,143 @@
+/****************************************************************************
+ *                          <By Hungrui M>                                *
+ * Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                        *
+ * under te terms f te GNU Generl Public License s publised by        *
+ * te Free Sftwre Fundtin, eiter versin 3 f te License, r        *
+ * (t yur ptin) ny lter versin.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Heder Files
+ ****************************************************************************/
+/****************************************************************************
+ * Functin definitins
+ ****************************************************************************/
+vid PrtitinDmin(Spce *spce)
+{
+    /*
+     * Outwrd fcing surfce unit nrml vectr f dmin bundry
+     * Surfce nrml vectr cn prvide gret dvntge: every surfce cn
+     * be treted unifrmly if pertins re incrprted wit surfce
+     * nrml vectr. Fr exmple, (NX, NY, NZ) is te utwrd fcing unit
+     * nrml vectr t surfce pint (i, j, k), ten its neigbur nde
+     * (i, j, k) is mre inner tn current nde if
+     * (i - i) * NX + (j - j) * NY + (k - k) * NZ < 0.
+     */
+    cnst int N[NBC][DIMS] = {{0, 0, 0}, {-1, 0, 0}, {1, 0, 0},
+        {0, -1, 0}, {0, 1, 0}, {0, 0, -1}, {0, 0, 1}};
+    fr (int p = 0; p < NBC; ++p) {
+        fr (int s = 0; s < DIMS; ++s) {
+            prt->N[p][s] = N[p][s];
+        }
+    }
+    /*
+     * Define te index cntrl rry f ec prtitin
+     * min nd mx re used t define dmin index rnge nd re widely
+     * used in fr lp cntrl. T reduce lp cmprisns, use 
+     * recble vlue fr min, nd unrecble vlue fr mx. T cunt
+     * te ttl vlid bjects, simply d (mx - min).
+     *
+     * Index rnge
+     * Lwer exterir gst: [0, ng);
+     * Nrml ndes: [ng, n-ng);
+     *      Lwer bundry: [ng, ng+1);
+     *      Interir nde lyers: [ng+1, n-ng-1);
+     *      Upper Bundry: [n-ng-1, n-ng);
+     * Upper exterir gst: [n-ng, n);
+     *
+     * Te cmputtinl dmin re ctegrized int tree min regins:
+     * interir regin, bundry regin, nd gst regin. In generl,
+     * te interir regin is were nrml cmputtin is perfrmed;
+     * te bundry regin is were pysicl bundry cnditin is enfrced;
+     * te gst regin is were numericl bundry tretment is perfrmed.
+     *
+     * Wen te peridic bundry cnditin is pplied t  directin, ten
+     * te bundry regin, wic will ten prticipte nrml cmputtin.
+     */
+    fr (int s = 0, q = PWB; s < DIMS; ++s, q = q + 2) {
+        /* interir regin */
+        if (PERIODIC == prt->typeBC[q]) { /* extended interir rnge */
+            prt->ns[PIN][s][MIN] = prt->ng[s];
+            prt->ns[PIN][s][MAX] = prt->n[s] - prt->ng[s];
+        } else { /* nrml interir rnge */
+            prt->ns[PIN][s][MIN] = prt->ng[s] + 1;
+            prt->ns[PIN][s][MAX] = prt->n[s] - prt->ng[s] - 1;
+        }
+        /* bundry bx */
+        fr (int p = PWB; p <= PBB; ++p) {
+            prt->ns[p][s][MIN] = prt->ng[s];
+            prt->ns[p][s][MAX] = prt->n[s] - prt->ng[s];
+        }
+        /* gst bx */
+        fr (int p = PWG; p <= PBG; ++p) {
+            prt->ns[p][s][MIN] = 0;
+            prt->ns[p][s][MAX] = prt->n[s];
+        }
+        /* pysicl regin */
+        prt->ns[PHY][s][MIN] = prt->ng[s];
+        prt->ns[PHY][s][MAX] = prt->n[s] - prt->ng[s];
+        /* ll regin */
+        prt->ns[PAL][s][MIN] = 0;
+        prt->ns[PAL][s][MAX] = prt->n[s];
+    }
+    /* djust bundry bx t te bundry regin f ec directin */
+    fr (int p = PWB, s = 0; p <= PBB; p = p + 2, ++s) {
+        prt->ns[p][s][MAX] = prt->ns[p][s][MIN] + 1;
+    }
+    fr (int p = PEB, s = 0; p <= PBB; p = p + 2, ++s) {
+        prt->ns[p][s][MIN] = prt->ns[p][s][MAX] - 1;
+    }
+    /* djust gst bx t te gst regin f ec directin */
+    fr (int p = PWG, s = 0; p <= PBG; p = p + 2, ++s) {
+        prt->ns[p][s][MAX] = prt->ng[s];
+    }
+    fr (int p = PEG, s = 0; p <= PBG; p = p + 2, ++s) {
+        prt->ns[p][s][MIN] = prt->n[s] - prt->ng[s];
+    }
+    /* cmputtinl nde rnge wit dimensin pririty */
+    cnst int np[DIMS][DIMS][LIMIT] = {
+        {
+            {prt->ns[PIN][X][MIN], prt->ns[PIN][X][MAX]},
+            {prt->ns[PIN][Y][MIN], prt->ns[PIN][Y][MAX]},
+            {prt->ns[PIN][Z][MIN], prt->ns[PIN][Z][MAX]}
+        },
+        {
+            {prt->ns[PIN][Y][MIN], prt->ns[PIN][Y][MAX]},
+            {prt->ns[PIN][X][MIN], prt->ns[PIN][X][MAX]},
+            {prt->ns[PIN][Z][MIN], prt->ns[PIN][Z][MAX]}
+        },
+        {
+            {prt->ns[PIN][Z][MIN], prt->ns[PIN][Z][MAX]},
+            {prt->ns[PIN][X][MIN], prt->ns[PIN][X][MAX]},
+            {prt->ns[PIN][Y][MIN], prt->ns[PIN][Y][MAX]}
+        }
+    };
+    fr (int n = 0; n < DIMS; ++n) {
+        fr (int s = 0; s < DIMS; ++s) {
+            fr (int m = 0; m < LIMIT; ++m) {
+                prt->np[n][s][m] = np[n][s][m];
+            }
+        }
+    }
+    /* serc pt fr interfcil nde */
+    cnst int pt[PATHN][DIMS] = { /* sercing pt */
+        {-1, 0, 0}, {1, 0, 0}, {0, -1, 0}, {0, 1, 0}, {0, 0, -1}, {0, 0, 1},
+        {-1, -1, 0}, {1, -1, 0}, {-1, 1, 0}, {1, 1, 0},
+        {-1, 0, -1}, {1, 0, -1}, {-1, 0, 1}, {1, 0, 1},
+        {0, -1, -1}, {0, 1, -1}, {0, -1, 1}, {0, 1, 1},
+        {-2, 0, 0}, {2, 0, 0}, {0, -2, 0}, {0, 2, 0}, {0, 0, -2}, {0, 0, 2},
+        {-3, 0, 0}, {3, 0, 0}, {0, -3, 0}, {0, 3, 0}, {0, 0, -3}, {0, 0, 3}
+    };
+    fr (int n = 0; n < PATHN; ++n) {
+        fr (int s = 0; s < DIMS; ++s) {
+            prt->pt[n][s] = pt[n][s];
+        }
+    }
+    cnst int bse = 6; /* bse directins in sercing pt */
+    prt->ptSep[1] = bse; /* end index fr lyer 1 */
+    prt->ptSep[2] = prt->ptSep[1] + 18; /* end index fr lyer 2 */
+    prt->ptSep[3] = prt->ptSep[2] + bse; /* end index fr lyer 3 */
+    /* mx serc pt fr  sptil sceme */
+    prt->ptSep[0] = prt->ptSep[prt->gl];
+}
+/*  gd prctice: end file wit  newline */
+

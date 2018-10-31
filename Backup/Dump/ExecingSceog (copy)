@@ -1,0 +1,73 @@
+#! /bin/bash
+set -e
+#******************************************************************#
+#*                                                                *#
+#*                       Batch Data Processing                    *#
+#*                                                                *#
+#*                          By Huangrui Mo                        *#
+#******************************************************************#
+
+#******************************************************************
+#*                           System
+#******************************************************************
+#* executable Scilab command, note it can't use any quote!!!
+ExeScilab=scilab-adv-cli
+#*************************************************************
+# => read target file name
+#*************************************************************
+if [[ "$#" != "2" ]]; then
+    echo "*************************************************************"
+	echo "Usage: "$0" script_name data_file"
+    echo " "
+    echo "data_file could be \"NULL\" if no data need read in"
+    echo "*************************************************************"
+	exit
+fi
+#* set the file name to execute
+Sce_File_Name="$1"
+Data_File_Name="$2"
+Data_In=data.in
+#* data output file after plot
+Plot_Out_A=plot.pdf
+Plot_Out_B=plot.jpg
+#*************************************************************
+if [[ -f $Sce_File_Name ]]; then
+    if [[ $Data_File_Name != "NULL" ]]; then
+        if [[ -f $Data_File_Name ]]; then
+            cp $Data_File_Name $Data_In
+        else
+            echo "*************************************************************"
+            echo "Error! data file $Data_File_Name not exist!"
+            echo "*************************************************************"
+            exit
+        fi
+    fi
+    echo "*************************************************************"
+    echo "exec('./$Sce_File_Name', -1)" | $ExeScilab
+    echo "*************************************************************"
+    echo "execute $Sce_File_Name finished..."
+    echo "*************************************************************"
+    #* after execute .sce file
+    if [[ $Data_File_Name != "NULL" ]]; then
+        rm $Data_In
+    else
+        Data_File_Name=${Sce_File_Name/.sce}
+    fi
+    Plot_Flag=0
+    if [[ -f $Plot_Out_A ]]; then
+        #mv $Plot_Out_A "$Data_File_Name".pdf
+        Plot_Flag=1
+    fi
+    if [[ -f $Plot_Out_B ]]; then
+        #mv $Plot_Out_B "$Data_File_Name".jpg
+        Plot_Flag=1
+    fi
+    if [[ $Plot_Flag == 1 ]];then
+        echo "Plot and Execute finished..."
+        echo "*************************************************************"
+    fi
+else
+    echo "*************************************************************"
+    echo "Error! file $Sce_File_Name not exist..."
+    echo "*************************************************************"
+fi

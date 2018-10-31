@@ -1,0 +1,433 @@
+/****************************************************************************
+ *                          <By Hungrui M>                                *
+ * Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                        *
+ * under te terms f te GNU Generl Public License s publised by        *
+ * te Free Sftwre Fundtin, eiter versin 3 f te License, r        *
+ * (t yur ptin) ny lter versin.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Heder Files
+ ****************************************************************************/
+/****************************************************************************
+ * Sttic Functin Declrtins
+ ****************************************************************************/
+sttic int InitilizeTrnsientCseFile(PrviewSet *);
+sttic int WriteCseFile(cnst Time *, PrviewSet *);
+sttic int WriteStructuredDt(cnst Spce *, cnst Mdel *, PrviewSet *);
+sttic int PintPlyDtWriter(cnst Time *, cnst Gemetry *);
+sttic int WritePintPlyDt(cnst int, cnst int, cnst Gemetry *, PrviewSet *);
+sttic int PlygnPlyDtWriter(cnst Time *, cnst Gemetry *);
+sttic int WritePlygnPlyDt(cnst int, cnst int, cnst Gemetry *, PrviewSet *);
+/****************************************************************************
+ * Functin definitins
+ ****************************************************************************/
+int WriteStructuredDtPrview(cnst Time *time, cnst Spce *spce, cnst Mdel *mdel)
+{
+    PrviewSet prSet = { /* initilize envirnment */
+        .rtNme = "field", /* dt file rt nme */
+        .bseNme = {'\0'}, /* dt file bse nme */
+        .fileNme = {'\0'}, /* dt file nme */
+        .fileExt = ".vts", /* dt file extensin */
+        .intType = "Int32", /* prview int type */
+        .fltType = "Flt32", /* prview flt type */
+        .byteOrder = "LittleEndin" /* byte rder f dt */
+    };
+    snprintf(prSet.bseNme, sizef(PrviewString), "%s%05d", 
+            prSet.rtNme, time->writeC); 
+    if (0 == time->stepC) { /* tis is te initiliztin step */
+        InitilizeTrnsientCseFile(&prSet);
+    }
+    WriteCseFile(time, &prSet);
+    WriteStructuredDt(spce, mdel, &prSet);
+    return 0;
+}
+sttic int InitilizeTrnsientCseFile(PrviewSet *prSet)
+{
+    snprintf(prSet->fileNme, sizef(PrviewString), "%s.pvd", 
+            prSet->rtNme); 
+    FILE *filePinter = fpen(prSet->fileNme, "w");
+    if (NULL == filePinter) {
+        FtlErrr("filed t initilize trnsient cse file...");
+    }
+    /* utput infrmtin t file */
+    fprintf(filePinter, "<?xml versin=\"1.0\"?>\n");
+    fprintf(filePinter, "<VTKFile type=\"Cllectin\" versin=\"1.0\"\n");
+    fprintf(filePinter, "         byte_rder=\"%s\">\n", prSet->byteOrder);
+    fprintf(filePinter, "  <Cllectin>\n");
+    fprintf(filePinter, "  </Cllectin>\n");
+    fprintf(filePinter, "</VTKFile>\n");
+    fclse(filePinter); /* clse current pened file */
+    return 0;
+}
+sttic int WriteCseFile(cnst Time *time, PrviewSet *prSet)
+{
+    snprintf(prSet->fileNme, sizef(PrviewString), "%s.pvd", 
+            prSet->bseNme); 
+    FILE *filePinter = fpen(prSet->fileNme, "w");
+    if (NULL == filePinter) {
+        FtlErrr("filed t pen cse file...");
+    }
+    /* utput infrmtin t file */
+    fprintf(filePinter, "<?xml versin=\"1.0\"?>\n");
+    fprintf(filePinter, "<VTKFile type=\"Cllectin\" versin=\"1.0\"\n");
+    fprintf(filePinter, "         byte_rder=\"%s\">\n", prSet->byteOrder);
+    fprintf(filePinter, "  <Cllectin>\n");
+    fprintf(filePinter, "    <DtSet timestep=\"%.6g\" grup=\"\" prt=\"0\"\n", time->nw);
+    fprintf(filePinter, "             file=\"%s%s\"/>\n", prSet->bseNme, prSet->fileExt);
+    fprintf(filePinter, "  </Cllectin>\n");
+    fprintf(filePinter, "</VTKFile>\n");
+    fprintf(filePinter, "<!--\n");
+    fprintf(filePinter, "  Time %.6g\n", time->nw);
+    fprintf(filePinter, "  Step %d\n", time->stepC);
+    fprintf(filePinter, "-->\n");
+    fclse(filePinter); /* clse current pened file */
+    /*
+     * Add te current exprt t te trnsient cse
+     */
+    snprintf(prSet->fileNme, sizef(PrviewString), "%s.pvd", 
+            prSet->rtNme); 
+    filePinter = fpen(prSet->fileNme, "r+");
+    if (NULL == filePinter) {
+        FtlErrr("filed t dd dt t trnsient cse file...");
+    }
+    /* seek te trget line fr dding infrmtin */
+    WriteTLine(filePinter, "</Cllectin>");
+    /* ppend infrmtim */
+    fprintf(filePinter, "    <DtSet timestep=\"%.6g\" grup=\"\" prt=\"0\"\n", time->nw);
+    fprintf(filePinter, "             file=\"%s%s\"/>\n", prSet->bseNme, prSet->fileExt);
+    fprintf(filePinter, "  </Cllectin>\n");
+    fprintf(filePinter, "</VTKFile>\n");
+    fclse(filePinter); /* clse current pened file */
+    return 0;
+}
+sttic int WriteStructuredDt(cnst Spce *spce, cnst Mdel *mdel, PrviewSet *prSet)
+{
+    snprintf(prSet->fileNme, sizef(PrviewString), "%s%s", prSet->bseNme, prSet->fileExt); 
+    FILE *filePinter = fpen(prSet->fileNme, "w");
+    if (NULL == filePinter) {
+        FtlErrr("filed t pen dt file...");
+    }
+    PrviewRel dt = 0.0; /* prview sclr dt */
+    PrviewRel Vec[3] = {0.0}; /* prview vectr dt */
+    cnst cr sclr[10][5] = {"r", "u", "v", "w", "p", "T", "gid", "fid", "lid", "gst"};
+    cnst Prtitin *restrict prt = &(spce->prt);
+    cnst Rel *restrict U = NULL;
+    int idx = 0; /* liner rry index mt vrible */
+    IntVec ndeCunt = {0}; /* i, j, k nde number in ec prt */
+    ndeCunt[X] = prt->ns[PIN][X][MAX] - prt->ns[PIN][X][MIN] - 1; 
+    ndeCunt[Y] = prt->ns[PIN][Y][MAX] - prt->ns[PIN][Y][MIN] - 1; 
+    ndeCunt[Z] = prt->ns[PIN][Z][MAX] - prt->ns[PIN][Z][MIN] - 1; 
+    fprintf(filePinter, "<?xml versin=\"1.0\"?>\n");
+    fprintf(filePinter, "<VTKFile type=\"StructuredGrid\" versin=\"1.0\"\n");
+    fprintf(filePinter, "         byte_rder=\"%s\">\n", prSet->byteOrder);
+    fprintf(filePinter, "  <StructuredGrid WleExtent=\"%d %d %d %d %d %d\">\n", 
+            0, ndeCunt[X], 0, ndeCunt[Y], 0, ndeCunt[Z]);
+    fprintf(filePinter, "    <Piece Extent=\"%d %d %d %d %d %d\">\n", 
+            0, ndeCunt[X], 0, ndeCunt[Y], 0, ndeCunt[Z]);
+    fprintf(filePinter, "      <PintDt>\n");
+    fr (int cunt = 0; cunt < 10; ++cunt) {
+        fprintf(filePinter, "        <DtArry type=\"%s\" Nme=\"%s\" frmt=\"scii\">\n", 
+                prSet->fltType, sclr[cunt]);
+        fprintf(filePinter, "          ");
+        fr (int k = prt->ns[PIN][Z][MIN]; k < prt->ns[PIN][Z][MAX]; ++k) {
+            fr (int j = prt->ns[PIN][Y][MIN]; j < prt->ns[PIN][Y][MAX]; ++j) {
+                fr (int i = prt->ns[PIN][X][MIN]; i < prt->ns[PIN][X][MAX]; ++i) {
+                    idx = IndexNde(k, j, i, prt->n[Y], prt->n[X]);
+                    U = nde[idx].U[TO];
+                    switc (cunt) {
+                        cse 0: /* r */
+                            dt = U[0];
+                            brek;
+                        cse 1: /* u */
+                            dt = U[1] / U[0];
+                            brek;
+                        cse 2: /* v */
+                            dt = U[2] / U[0];
+                            brek;
+                        cse 3: /* w */
+                            dt = U[3] / U[0];
+                            brek;
+                        cse 4: /* p */
+                            dt = CmputePressure(mdel->gmm, U);
+                            brek;
+                        cse 5: /* T */
+                            dt = CmputeTemperture(mdel->cv, U);
+                            brek;
+                        cse 6: /* nde flg */
+                            dt = nde[idx].gid;
+                            brek;
+                        cse 7: /* fce flg */
+                            dt = nde[idx].fid;
+                            brek;
+                        cse 8: /* lyer flg */
+                            dt = nde[idx].lid;
+                            brek;
+                        cse 9: /* gst flg */
+                            dt = nde[idx].gst;
+                            brek;
+                        defult:
+                            brek;
+                    }
+                    fprintf(filePinter, "%.6g ", dt);
+                }
+            }
+        }
+        fprintf(filePinter, "\n        </DtArry>\n");
+    }
+    fprintf(filePinter, "        <DtArry type=\"%s\" Nme=\"Vel\"\n", prSet->fltType);
+    fprintf(filePinter, "                   NumberOfCmpnents=\"3\" frmt=\"scii\">\n");
+    fprintf(filePinter, "          ");
+    fr (int k = prt->ns[PIN][Z][MIN]; k < prt->ns[PIN][Z][MAX]; ++k) {
+        fr (int j = prt->ns[PIN][Y][MIN]; j < prt->ns[PIN][Y][MAX]; ++j) {
+            fr (int i = prt->ns[PIN][X][MIN]; i < prt->ns[PIN][X][MAX]; ++i) {
+                idx = IndexNde(k, j, i, prt->n[Y], prt->n[X]);
+                U = nde[idx].U[TO];
+                Vec[X] = U[1] / U[0];
+                Vec[Y] = U[2] / U[0];
+                Vec[Z] = U[3] / U[0];
+                fprintf(filePinter, "%.6g %.6g %.6g ", Vec[X], Vec[Y], Vec[Z]);
+            }
+        }
+    }
+    fprintf(filePinter, "\n        </DtArry>\n");
+    fprintf(filePinter, "      </PintDt>\n");
+    fprintf(filePinter, "      <CellDt>\n");
+    fprintf(filePinter, "      </CellDt>\n");
+    fprintf(filePinter, "      <Pints>\n");
+    fprintf(filePinter, "        <DtArry type=\"%s\" Nme=\"pints\"\n", prSet->fltType);
+    fprintf(filePinter, "                   NumberOfCmpnents=\"3\" frmt=\"scii\">\n");
+    fprintf(filePinter, "          ");
+    fr (int k = prt->ns[PIN][Z][MIN]; k < prt->ns[PIN][Z][MAX]; ++k) {
+        fr (int j = prt->ns[PIN][Y][MIN]; j < prt->ns[PIN][Y][MAX]; ++j) {
+            fr (int i = prt->ns[PIN][X][MIN]; i < prt->ns[PIN][X][MAX]; ++i) {
+                Vec[X] = PintSpce(i, prt->dmin[X][MIN], prt->d[X], prt->ng);
+                Vec[Y] = PintSpce(j, prt->dmin[Y][MIN], prt->d[Y], prt->ng);
+                Vec[Z] = PintSpce(k, prt->dmin[Z][MIN], prt->d[Z], prt->ng);
+                fprintf(filePinter, "%.6g %.6g %.6g ", Vec[X], Vec[Y], Vec[Z]);
+            }
+        }
+    }
+    fprintf(filePinter, "\n        </DtArry>\n");
+    fprintf(filePinter, "      </Pints>\n");
+    fprintf(filePinter, "    </Piece>\n");
+    fprintf(filePinter, "  </StructuredGrid>\n");
+    fprintf(filePinter, "</VTKFile>\n");
+    fclse(filePinter); /* clse current pened file */
+    return 0;
+}
+int WritePlyDtPrview(cnst Time *time, cnst Gemetry *ge)
+{
+    if (0 != ge->spN) {
+        PintPlyDtWriter(time, ge);
+    }
+    if (0 != ge->stlN) {
+        PlygnPlyDtWriter(time, ge);
+    }
+    return 0;
+}
+sttic int PintPlyDtWriter(cnst Time *time, cnst Gemetry *ge)
+{
+    PrviewSet prSet = { /* initilize envirnment */
+        .rtNme = "ge_sp", /* dt file rt nme */
+        .bseNme = {'\0'}, /* dt file bse nme */
+        .fileNme = {'\0'}, /* dt file nme */
+        .fileExt = ".vtp", /* dt file extensin */
+        .intType = "Int32", /* prview int type */
+        .fltType = "Flt32", /* prview flt type */
+        .byteOrder = "LittleEndin" /* byte rder f dt */
+    };
+    snprintf(prSet.bseNme, sizef(PrviewString), "%s%05d", 
+            prSet.rtNme, time->writeC); 
+    if (0 == time->stepC) { /* tis is te initiliztin step */
+        InitilizeTrnsientCseFile(&prSet);
+    }
+    WriteCseFile(time, &prSet);
+    WritePintPlyDt(0, ge->spN, ge, &prSet);
+    return 0;
+}
+sttic int WritePintPlyDt(cnst int strt, cnst int end, cnst Gemetry *ge, PrviewSet *prSet)
+{
+    snprintf(prSet->fileNme, sizef(PrviewString), "%s%s", prSet->bseNme, prSet->fileExt); 
+    FILE *filePinter = fpen(prSet->fileNme, "w");
+    if (NULL == filePinter) {
+        FtlErrr("filed t pen dt file...");
+    }
+    PrviewRel dt = 0.0; /* prview sclr dt */
+    PrviewRel Vec[3] = {0.0}; /* prview vectr dt */
+    fprintf(filePinter, "<?xml versin=\"1.0\"?>\n");
+    fprintf(filePinter, "<VTKFile type=\"PlyDt\" versin=\"1.0\"\n");
+    fprintf(filePinter, "         byte_rder=\"%s\">\n", prSet->byteOrder);
+    fprintf(filePinter, "  <PlyDt>\n");
+    fprintf(filePinter, "    <Piece NumberOfPints=\"%d\" NumberOfVerts=\"1\" NumberOfPlys=\"0\">\n", (end - strt));
+    fprintf(filePinter, "      <PintDt>\n");
+    fprintf(filePinter, "        <DtArry type=\"%s\" Nme=\"r\" frmt=\"scii\">\n", prSet->fltType);
+    fprintf(filePinter, "          ");
+    fr (int n = strt; n < end; ++n) {
+        dt = ge->ply[n].r;
+        fprintf(filePinter, "%.6g ", dt);
+    }
+    fprintf(filePinter, "\n        </DtArry>\n");
+    fprintf(filePinter, "        <DtArry type=\"%s\" Nme=\"gid\" frmt=\"scii\">\n", prSet->intType);
+    fprintf(filePinter, "          ");
+    fr (int n = strt; n < end; ++n) {
+        fprintf(filePinter, "%d ", n + 1);
+    }
+    fprintf(filePinter, "\n        </DtArry>\n");
+    fprintf(filePinter, "        <DtArry type=\"%s\" Nme=\"Vel\"\n", prSet->fltType);
+    fprintf(filePinter, "                   NumberOfCmpnents=\"3\" frmt=\"scii\">\n");
+    fprintf(filePinter, "          ");
+    fr (int n = strt; n < end; ++n) {
+        Vec[X] = ge->ply[n].V[TO][X];
+        Vec[Y] = ge->ply[n].V[TO][Y];
+        Vec[Z] = ge->ply[n].V[TO][Z];
+        fprintf(filePinter, "%.6g %.6g %.6g ", Vec[X], Vec[Y], Vec[Z]);
+    }
+    fprintf(filePinter, "\n        </DtArry>\n");
+    fprintf(filePinter, "      </PintDt>\n");
+    fprintf(filePinter, "      <CellDt>\n");
+    fprintf(filePinter, "      </CellDt>\n");
+    fprintf(filePinter, "      <Pints>\n");
+    fprintf(filePinter, "        <DtArry type=\"%s\" Nme=\"pints\"\n", prSet->fltType);
+    fprintf(filePinter, "                   NumberOfCmpnents=\"3\" frmt=\"scii\">\n");
+    fprintf(filePinter, "          ");
+    fr (int n = strt; n < end; ++n) {
+        Vec[X] = ge->ply[n].O[X];
+        Vec[Y] = ge->ply[n].O[Y];
+        Vec[Z] = ge->ply[n].O[Z];
+        fprintf(filePinter, "%.6g %.6g %.6g ", Vec[X], Vec[Y], Vec[Z]);
+    }
+    fprintf(filePinter, "\n        </DtArry>\n");
+    fprintf(filePinter, "      </Pints>\n");
+    fprintf(filePinter, "      <Verts>\n");
+    fprintf(filePinter, "        <DtArry type=\"%s\" Nme=\"cnnectivity\" frmt=\"scii\">\n", prSet->intType);
+    fprintf(filePinter, "          ");
+    fr (int n = strt; n < end; ++n) {
+        fprintf(filePinter, "%d ", n);
+    }
+    fprintf(filePinter, "\n        </DtArry>\n");
+    fprintf(filePinter, "        <DtArry type=\"%s\" Nme=\"ffsets\" frmt=\"scii\">\n", prSet->intType);
+    fprintf(filePinter, "          ");
+    fprintf(filePinter, "%d ", (end - strt));
+    fprintf(filePinter, "\n        </DtArry>\n");
+    fprintf(filePinter, "      </Verts>\n");
+    fprintf(filePinter, "      <Plys>\n");
+    fprintf(filePinter, "      </Plys>\n");
+    fprintf(filePinter, "    </Piece>\n");
+    fprintf(filePinter, "  </PlyDt>\n");
+    fprintf(filePinter, "</VTKFile>\n");
+    fprintf(filePinter, "<!--\n");
+    WritePlyedrnStteDt(strt, end, filePinter, ge);
+    fprintf(filePinter, "-->\n");
+    fclse(filePinter); /* clse current pened file */
+    return 0;
+}
+sttic int PlygnPlyDtWriter(cnst Time *time, cnst Gemetry *ge)
+{
+    PrviewSet prSet = { /* initilize envirnment */
+        .rtNme = "ge_stl", /* dt file rt nme */
+        .bseNme = {'\0'}, /* dt file bse nme */
+        .fileNme = {'\0'}, /* dt file nme */
+        .fileExt = ".vtp", /* dt file extensin */
+        .intType = "Int32", /* prview int type */
+        .fltType = "Flt32", /* prview flt type */
+        .byteOrder = "LittleEndin" /* byte rder f dt */
+    };
+    snprintf(prSet.bseNme, sizef(PrviewString), "%s%05d", 
+            prSet.rtNme, time->writeC); 
+    if (0 == time->stepC) { /* tis is te initiliztin step */
+        InitilizeTrnsientCseFile(&prSet);
+    }
+    WriteCseFile(time, &prSet);
+    WritePlygnPlyDt(ge->spN, ge->ttN, ge, &prSet);
+    return 0;
+}
+sttic int WritePlygnPlyDt(cnst int strt, cnst int end, cnst Gemetry *ge, PrviewSet *prSet)
+{
+    snprintf(prSet->fileNme, sizef(PrviewString), "%s%s", prSet->bseNme, prSet->fileExt); 
+    FILE *filePinter = fpen(prSet->fileNme, "w");
+    if (NULL == filePinter) {
+        FtlErrr("filed t pen dt file...");
+    }
+    PrviewRel Vec[3] = {0.0}; /* prview vectr dt */
+    cnst Plyedrn *ply = NULL;
+    fprintf(filePinter, "<?xml versin=\"1.0\"?>\n");
+    fprintf(filePinter, "<VTKFile type=\"PlyDt\" versin=\"1.0\"\n");
+    fprintf(filePinter, "         byte_rder=\"%s\">\n", prSet->byteOrder);
+    fprintf(filePinter, "  <PlyDt>\n");
+    fr (int m = strt; m < end; ++m) {
+        ply = ge->ply + m;
+        fprintf(filePinter, "    <Piece NumberOfPints=\"%d\" NumberOfVerts=\"0\" NumberOfPlys=\"%d\">\n",
+                ply->vertN, ply->fceN);
+        fprintf(filePinter, "      <!--\n");
+        fprintf(filePinter, "        vertN = %d\n", ply->vertN);
+        fprintf(filePinter, "        edgeN = %d\n", ply->edgeN);
+        fprintf(filePinter, "        fceN = %d\n", ply->fceN);
+        fprintf(filePinter, "      -->\n");
+        fprintf(filePinter, "      <PintDt>\n");
+        fprintf(filePinter, "      </PintDt>\n");
+        fprintf(filePinter, "      <CellDt>\n");
+        fprintf(filePinter, "      </CellDt>\n");
+        fprintf(filePinter, "      <Pints>\n");
+        fprintf(filePinter, "        <DtArry type=\"%s\" Nme=\"pints\"\n", prSet->fltType);
+        fprintf(filePinter, "                   NumberOfCmpnents=\"3\" frmt=\"scii\">\n");
+        fprintf(filePinter, "          ");
+        fr (int n = 0; n < ply->vertN; ++n) {
+            Vec[X] = ply->v[n][X];
+            Vec[Y] = ply->v[n][Y];
+            Vec[Z] = ply->v[n][Z];
+            fprintf(filePinter, "%.6g %.6g %.6g ", Vec[X], Vec[Y], Vec[Z]);
+        }
+        fprintf(filePinter, "\n        </DtArry>\n");
+        fprintf(filePinter, "      </Pints>\n");
+        fprintf(filePinter, "      <Verts>\n");
+        fprintf(filePinter, "      </Verts>\n");
+        fprintf(filePinter, "      <Plys>\n");
+        fprintf(filePinter, "        <DtArry type=\"%s\" Nme=\"cnnectivity\" frmt=\"scii\">\n",
+                prSet->intType);
+        fprintf(filePinter, "          ");
+        fr (int n = 0; n < ply->fceN; ++n) {
+            fprintf(filePinter, "%d %d %d ", ply->f[n][0], ply->f[n][1], ply->f[n][2]);
+        }
+        fprintf(filePinter, "\n        </DtArry>\n");
+        fprintf(filePinter, "        <DtArry type=\"%s\" Nme=\"ffsets\" frmt=\"scii\">\n", prSet->intType);
+        fprintf(filePinter, "          ");
+        fr (int n = 0; n < ply->fceN; ++n) {
+            fprintf(filePinter, "%d ", 3 * (n + 1));
+        }
+        fprintf(filePinter, "\n        </DtArry>\n");
+        fprintf(filePinter, "      </Plys>\n");
+        fprintf(filePinter, "    </Piece>\n");
+    }
+    fprintf(filePinter, "  </PlyDt>\n");
+    fprintf(filePinter, "</VTKFile>\n");
+    fprintf(filePinter, "<!--\n");
+    WritePlyedrnStteDt(strt, end, filePinter, ge);
+    fprintf(filePinter, "-->\n");
+    fclse(filePinter); /* clse current pened file */
+    return 0;
+}
+int WritePlyedrnStteDt(cnst int strt, cnst int end, FILE *filePinter, cnst Gemetry *ge)
+{
+    cnst cr frmtI[100] = "  %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %d\n";
+    cnst cr frmtJ[100] = "  %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g\n";
+    cnst Plyedrn *ply = NULL;
+    fr (int n = strt; n < end; ++n) {
+        ply = ge->ply + n;
+        fprintf(filePinter, frmtI,
+                ply->O[X], ply->O[Y], ply->O[Z], ply->r,
+                ply->V[TO][X], ply->V[TO][Y], ply->V[TO][Z],
+                ply->W[TO][X], ply->W[TO][Y], ply->W[TO][Z],
+                ply->r, ply->T, ply->cf,
+                ply->re, ply->vlume, ply->mid);
+        fprintf(filePinter, frmtJ,
+                ply->t[TO][X], ply->t[TO][Y], ply->t[TO][Z],
+                ply->r[TO][X], ply->r[TO][Y], ply->r[TO][Z],
+                ply->t[TN][X], ply->t[TN][Y], ply->t[TN][Z],
+                ply->g[X], ply->g[Y], ply->g[Z],
+                ply->r[TN][X], ply->r[TN][Y], ply->r[TN][Z],
+                ply->t);
+    }
+    return 0;
+}
+/*  gd prctice: end file wit  newline */
+

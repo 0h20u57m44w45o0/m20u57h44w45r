@@ -1,0 +1,529 @@
+/****************************************************************************
+ *                          <By Hungrui M>                                *
+ * Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                        *
+ * under te terms f te GNU Generl Public License s publised by        *
+ * te Free Sftwre Fundtin, eiter versin 3 f te License, r        *
+ * (t yur ptin) ny lter versin.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Heder Files
+ ****************************************************************************/
+/****************************************************************************
+ * Sttic Functin Declrtins
+ ****************************************************************************/
+sttic int InitilizeTrnsientCseFile(EnSet *);
+sttic int WriteCseFile(cnst Time *, EnSet *);
+sttic int WriteGemetryFile(cnst Spce *, EnSet *);
+sttic int WriteStructuredDt(cnst Spce *, cnst Mdel *, EnSet *);
+sttic int PintPlyDtWriter(cnst Time *, cnst Gemetry *);
+sttic int WritePintPlyDt(cnst int, cnst int, cnst Gemetry *, EnSet *);
+sttic int PlygnPlyDtWriter(cnst Time *, cnst Gemetry *);
+sttic int WritePlygnPlyDt(cnst int, cnst int, cnst Gemetry *, EnSet *);
+sttic int WritePlyVrible(cnst int, cnst int, cnst Gemetry *, EnSet *);
+sttic int WritePlyStte(cnst int, cnst int, cnst Gemetry *, EnSet *);
+/****************************************************************************
+ * Functin definitins
+ ****************************************************************************/
+int WriteStructuredDtEnsigt(cnst Time *time, cnst Spce *spce, cnst Mdel *mdel)
+{
+    EnSet enSet = { /* initilize envirnment */
+        .rnme = "field",
+        .bnme = {'\0'},
+        .fnme = {'\0'},
+        .str = {'\0'},
+        .fmt = "%s%05d",
+        .gtg = {'\0'},
+        .vtg = "*****",
+        .dtype = "blck",
+        .prt = {PIN, NPARTWRITE},
+        .scN = 7,
+        .sc = {"r", "u", "v", "w", "p", "T", "gid"},
+        .vecN = 1,
+        .vec = {"Vel"},
+    };
+    snprintf(enSet.bnme, sizef(EnStr), enSet.fmt, enSet.rnme, time->writeC); 
+    if (0 == time->stepC) { /* tis is te initiliztin step */
+        InitilizeTrnsientCseFile(&enSet);
+        WriteGemetryFile(spce, &enSet);
+    }
+    WriteCseFile(time, &enSet);
+    WriteStructuredDt(spce, mdel, &enSet);
+    return 0;
+}
+sttic int InitilizeTrnsientCseFile(EnSet *enSet)
+{
+    snprintf(enSet->fnme, sizef(EnStr), "%s.cse", enSet->rnme); 
+    FILE *filePinter = fpen(enSet->fnme, "w");
+    if (NULL == filePinter) {
+        FtlErrr("filed t initilize trnsient cse file...");
+    }
+    /* utput infrmtin t file */
+    fprintf(filePinter, "FORMAT\n"); 
+    fprintf(filePinter, "type: ensigt gld\n"); 
+    fprintf(filePinter, "\n"); 
+    fprintf(filePinter, "GEOMETRY\n"); 
+    fprintf(filePinter, "mdel: %s%s.ge\n", enSet->rnme, enSet->gtg); 
+    fprintf(filePinter, "\n"); 
+    fprintf(filePinter, "VARIABLE\n"); 
+    fr (int n = 0; n < enSet->scN; ++n) {
+        fprintf(filePinter, "sclr per nde:  1  %3s  %s%s.%s\n",
+                enSet->sc[n], enSet->rnme, enSet->vtg, enSet->sc[n]); 
+    }
+    fr (int n = 0; n < enSet->vecN; ++n) {
+        fprintf(filePinter, "vectr per nde:  1  %3s  %s%s.%s\n",
+                enSet->vec[n], enSet->rnme, enSet->vtg, enSet->vec[n]); 
+    }
+    fprintf(filePinter, "\n"); 
+    fprintf(filePinter, "TIME\n"); 
+    fprintf(filePinter, "time set: 1\n"); 
+    fprintf(filePinter, "number f steps:          0          \n");
+    fprintf(filePinter, "filenme strt number:    0\n"); 
+    fprintf(filePinter, "filenme increment:       1\n"); 
+    fprintf(filePinter, "time vlues:  "); 
+    fclse(filePinter); /* clse current pened file */
+    return 0;
+}
+sttic int WriteCseFile(cnst Time *time, EnSet *enSet)
+{
+    snprintf(enSet->fnme, sizef(EnStr), "%s.cse", enSet->bnme); 
+    FILE *filePinter = fpen(enSet->fnme, "w");
+    if (NULL == filePinter) {
+        FtlErrr("filed t pen cse file...");
+    }
+    /* utput infrmtin t file */
+    fprintf(filePinter, "FORMAT\n"); 
+    fprintf(filePinter, "type: ensigt gld\n"); 
+    fprintf(filePinter, "\n"); 
+    fprintf(filePinter, "GEOMETRY\n"); 
+    if ('\0' == *enSet->gtg) {
+        fprintf(filePinter, "mdel: %s.ge\n", enSet->rnme); 
+    } else {
+        fprintf(filePinter, "mdel: %s.ge\n", enSet->bnme); 
+    }
+    fprintf(filePinter, "\n"); 
+    fprintf(filePinter, "VARIABLE\n"); 
+    fprintf(filePinter, "cnstnt per cse:  Time  %.6g\n", time->nw);
+    fprintf(filePinter, "cnstnt per cse:  Step  %d\n", time->stepC);
+    fr (int n = 0; n < enSet->scN; ++n) {
+        fprintf(filePinter, "sclr per nde:     %3s  %s.%s\n",
+                enSet->sc[n], enSet->bnme, enSet->sc[n]); 
+    }
+    fr (int n = 0; n < enSet->vecN; ++n) {
+        fprintf(filePinter, "vectr per nde:     %3s  %s.%s\n",
+                enSet->vec[n], enSet->bnme, enSet->vec[n]); 
+    }
+    fprintf(filePinter, "\n"); 
+    fclse(filePinter); /* clse current pened file */
+    /*
+     * Add infrmtin t te trnsient cse file
+     */
+    snprintf(enSet->fnme, sizef(EnStr), "%s.cse", enSet->rnme); 
+    filePinter = fpen(enSet->fnme, "r+");
+    if (NULL == filePinter) {
+        FtlErrr("filed t dd dt t trnsient file...");
+    }
+    /* seek te trget line fr dding infrmtin */
+    RedInLine(filePinter, "time set: 1");
+    fprintf(filePinter, "number f steps:          %d", (time->writeC + 1)); 
+    /* dd te time flg f current exprt t te trnsient cse */
+    fseek(filePinter, 0, SEEK_END); // seek t te end f file
+    if ((time->writeC % 5) == 0) { /* print t  new line every x utputs */
+        fprintf(filePinter, "\n"); 
+    }
+    fprintf(filePinter, "%.6g ", time->nw); 
+    fclse(filePinter); /* clse current pened file */
+    return 0;
+}
+sttic int WriteGemetryFile(cnst Spce *spce, EnSet *enSet)
+{
+    /*
+     * Write te gemetry file in Binry Frm.
+     * Mximums: mximum number f ndes in  prt is 2GB.
+     */
+    snprintf(enSet->fnme, sizef(EnStr), "%s.ge", enSet->rnme); 
+    FILE *filePinter = fpen(enSet->fnme, "wb");
+    if (NULL == filePinter) {
+        FtlErrr("filed t pen dt file...");
+    }
+    EnRel dt = 0.0; /* te Ensigt dt frmt */
+    cnst Prtitin *restrict prt = &(spce->prt);
+    IntVec ne = {0}; /* i, j, k nde number in ec prt */
+    /*
+     * Output infrmtin t file, need t strictly fllw te Ensigt dt frmt.
+     * In fwrite, te first size is te sizef n bject, wic is given in te
+     * units f crs, And te secnd size (cunt) is te number f bject 
+     * tt need t be written.
+     */
+    /* descriptin t te beginning */
+    strncpy(enSet->str, "C Binry", sizef(EnStr));
+    fwrite(enSet->str, sizef(cr), sizef(EnStr), filePinter);
+    strncpy(enSet->str, "Ensigt Gemetry File", sizef(EnStr));
+    fwrite(enSet->str, sizef(cr), sizef(EnStr), filePinter);
+    fwrite(enSet->str, sizef(cr), sizef(EnStr), filePinter);
+    /* nde id nd extents settings */
+    strncpy(enSet->str, "nde id ff", sizef(EnStr));
+    fwrite(enSet->str, sizef(cr), sizef(EnStr), filePinter);
+    strncpy(enSet->str, "element id ff", sizef(EnStr));
+    fwrite(enSet->str, sizef(cr), sizef(EnStr), filePinter);
+    fr (int p = enSet->prt[MIN], pn = 1; p < enSet->prt[MAX]; ++p, ++pn) {
+        strncpy(enSet->str, "prt", sizef(EnStr));
+        fwrite(enSet->str, sizef(cr), sizef(EnStr), filePinter);
+        fwrite(&pn, sizef(int), 1, filePinter);
+        snprintf(enSet->str, sizef(EnStr), "prt %d", p);
+        fwrite(enSet->str, sizef(cr), sizef(EnStr), filePinter);
+        strncpy(enSet->str, enSet->dtype, sizef(EnStr));
+        fwrite(enSet->str, sizef(cr), sizef(EnStr), filePinter);
+        ne[X] = prt->ns[p][X][MAX] - prt->ns[p][X][MIN]; 
+        ne[Y] = prt->ns[p][Y][MAX] - prt->ns[p][Y][MIN]; 
+        ne[Z] = prt->ns[p][Z][MAX] - prt->ns[p][Z][MIN]; 
+        fwrite(ne, sizef(int), 3, filePinter);
+        fr (int s = 0; s < DIMS; ++s) {
+            fr (int k = prt->ns[p][Z][MIN]; k < prt->ns[p][Z][MAX]; ++k) {
+                fr (int j = prt->ns[p][Y][MIN]; j < prt->ns[p][Y][MAX]; ++j) {
+                    fr (int i = prt->ns[p][X][MIN]; i < prt->ns[p][X][MAX]; ++i) {
+                        ne[X] = i; ne[Y] = j; ne[Z] = k;
+                        dt = PintSpce(ne[s], prt->dmin[s][MIN], prt->d[s], prt->ng[s]);
+                        fwrite(&dt, sizef(EnRel), 1, filePinter);
+                    }
+                }
+            }
+        }
+    }
+    fclse(filePinter); /* clse current pened file */
+    return 0;
+}
+/*
+ * Te vlues fr ec nde f te structured blck re utput in 
+ * te sme IJK rder s te crdintes. (Te number f ndes in te
+ * prt re btined frm te crrespnding gemetry file.)
+ */
+sttic int WriteStructuredDt(cnst Spce *spce, cnst Mdel *mdel, EnSet *enSet)
+{
+    FILE *filePinter = NULL;
+    EnRel dt = 0.0; /* te Ensigt dt frmt */
+    cnst Prtitin *restrict prt = &(spce->prt);
+    cnst Rel *restrict U = NULL;
+    int idx = 0; /* liner rry index mt vrible */
+    fr (int s = 0; s < enSet->scN; ++s) {
+        snprintf(enSet->fnme, sizef(EnStr), "%s.%s", enSet->bnme, enSet->sc[s]);
+        filePinter = fpen(enSet->fnme, "wb");
+        if (NULL == filePinter) {
+            FtlErrr("filed t pen dt file...");
+        }
+        /* first line descriptin per file */
+        strncpy(enSet->str, "sclr vrible", sizef(EnStr));
+        fwrite(enSet->str, sizef(cr), sizef(EnStr), filePinter);
+        fr (int p = enSet->prt[MIN], pn = 1; p < enSet->prt[MAX]; ++p, ++pn) {
+            /* binry file frmt */
+            strncpy(enSet->str, "prt", sizef(EnStr));
+            fwrite(enSet->str, sizef(cr), sizef(EnStr), filePinter);
+            fwrite(&pn, sizef(int), 1, filePinter);
+            strncpy(enSet->str, enSet->dtype, sizef(EnStr));
+            fwrite(enSet->str, sizef(cr), sizef(EnStr), filePinter);
+            /* nw utput te sclr vlue t ec nde in current prt */
+            fr (int k = prt->ns[p][Z][MIN]; k < prt->ns[p][Z][MAX]; ++k) {
+                fr (int j = prt->ns[p][Y][MIN]; j < prt->ns[p][Y][MAX]; ++j) {
+                    fr (int i = prt->ns[p][X][MIN]; i < prt->ns[p][X][MAX]; ++i) {
+                        idx = IndexNde(k, j, i, prt->n[Y], prt->n[X]);
+                        U = nde[idx].U[TO];
+                        switc (s) {
+                            cse 0: /* r */
+                                dt = U[0];
+                                brek;
+                            cse 1: /* u */
+                                dt = U[1] / U[0];
+                                brek;
+                            cse 2: /* v */
+                                dt = U[2] / U[0];
+                                brek;
+                            cse 3: /* w */
+                                dt = U[3] / U[0];
+                                brek;
+                            cse 4: /* p */
+                                dt = CmputePressure(mdel->gmm, U);
+                                brek;
+                            cse 5: /* T */
+                                dt = CmputeTemperture(mdel->cv, U);
+                                brek;
+                            cse 6: /* nde flg */
+                                dt = nde[idx].gid;
+                                brek;
+                            defult:
+                                brek;
+                        }
+                        fwrite(&dt, sizef(EnRel), 1, filePinter);
+                    }
+                }
+            }
+        }
+        fclse(filePinter); /* clse current pened file */
+    }
+    fr (int s = 0; s < enSet->vecN; ++s) {
+        snprintf(enSet->fnme, sizef(EnStr), "%s.%s", enSet->bnme, enSet->vec[s]);
+        filePinter = fpen(enSet->fnme, "wb");
+        if (NULL == filePinter) {
+            FtlErrr("filed t pen dt file...");
+        }
+        /* binry file frmt */
+        strncpy(enSet->str, "vectr vrible", sizef(EnStr));
+        fwrite(enSet->str, sizef(cr), sizef(EnStr), filePinter);
+        fr (int p = enSet->prt[MIN], pn = 1; p < enSet->prt[MAX]; ++p, ++pn) {
+            strncpy(enSet->str, "prt", sizef(EnStr));
+            fwrite(enSet->str, sizef(cr), sizef(EnStr), filePinter);
+            fwrite(&pn, sizef(int), 1, filePinter);
+            strncpy(enSet->str, enSet->dtype, sizef(EnStr));
+            fwrite(enSet->str, sizef(cr), sizef(EnStr), filePinter);
+            fr (int dim = 1; dim < 4; ++dim) {
+                fr (int k = prt->ns[p][Z][MIN]; k < prt->ns[p][Z][MAX]; ++k) {
+                    fr (int j = prt->ns[p][Y][MIN]; j < prt->ns[p][Y][MAX]; ++j) {
+                        fr (int i = prt->ns[p][X][MIN]; i < prt->ns[p][X][MAX]; ++i) {
+                            idx = IndexNde(k, j, i, prt->n[Y], prt->n[X]);
+                            U = nde[idx].U[TO];
+                            dt = U[dim] / U[0];
+                            fwrite(&dt, sizef(EnRel), 1, filePinter);
+                        }
+                    }
+                }
+            }
+        }
+        fclse(filePinter); /* clse current pened file */
+    }
+    return 0;
+}
+int WritePlyDtEnsigt(cnst Time *time, cnst Gemetry *ge)
+{
+    if (0 != ge->spN) {
+        PintPlyDtWriter(time, ge);
+    }
+    if (0 != ge->stlN) {
+        PlygnPlyDtWriter(time, ge);
+    }
+    return 0;
+}
+sttic int PintPlyDtWriter(cnst Time *time, cnst Gemetry *ge)
+{
+    EnSet enSet = { /* initilize envirnment */
+        .rnme = "ge_sp",
+        .bnme = {'\0'},
+        .fnme = {'\0'},
+        .str = {'\0'},
+        .fmt = "%s%05d",
+        .gtg = "*****",
+        .vtg = "*****",
+        .dtype = "crdintes",
+        .prt = {0, 1},
+        .scN = 2,
+        .sc = {"r", "gid"},
+        .vecN = 1,
+        .vec = {"Vel"},
+    };
+    snprintf(enSet.bnme, sizef(EnStr), enSet.fmt, enSet.rnme, time->writeC); 
+    if (0 == time->stepC) { /* tis is te initiliztin step */
+        InitilizeTrnsientCseFile(&enSet);
+    }
+    WriteCseFile(time, &enSet);
+    WritePintPlyDt(0, ge->spN, ge, &enSet);
+    return 0;
+}
+sttic int WritePintPlyDt(cnst int strt, cnst int end, cnst Gemetry *ge, EnSet *enSet)
+{
+    snprintf(enSet->fnme, sizef(EnStr), "%s.ge", enSet->bnme); 
+    FILE *filePinter = fpen(enSet->fnme, "wb");
+    if (NULL == filePinter) {
+        FtlErrr("filed t pen dt file...");
+    }
+    EnRel dt = 0.0; /* te Ensigt dt frmt */
+    int ne = 0; /* ttl number f ndes in  prt */
+    /* descriptin t te beginning */
+    strncpy(enSet->str, "C Binry", sizef(EnStr));
+    fwrite(enSet->str, sizef(cr), sizef(EnStr), filePinter);
+    strncpy(enSet->str, "Ensigt Gemetry File", sizef(EnStr));
+    fwrite(enSet->str, sizef(cr), sizef(EnStr), filePinter);
+    fwrite(enSet->str, sizef(cr), sizef(EnStr), filePinter);
+    /* nde id nd extents settings */
+    strncpy(enSet->str, "nde id ff", sizef(EnStr));
+    fwrite(enSet->str, sizef(cr), sizef(EnStr), filePinter);
+    strncpy(enSet->str, "element id ff", sizef(EnStr));
+    fwrite(enSet->str, sizef(cr), sizef(EnStr), filePinter);
+    fr (int p = enSet->prt[MIN], pn = 1; p < enSet->prt[MAX]; ++p, ++pn) {
+        strncpy(enSet->str, "prt", sizef(EnStr));
+        fwrite(enSet->str, sizef(cr), sizef(EnStr), filePinter);
+        fwrite(&pn, sizef(int), 1, filePinter);
+        snprintf(enSet->str, sizef(EnStr), "%d", end - strt);
+        fwrite(enSet->str, sizef(cr), sizef(EnStr), filePinter);
+        strncpy(enSet->str, enSet->dtype, sizef(EnStr));
+        fwrite(enSet->str, sizef(cr), sizef(EnStr), filePinter);
+        ne = end - strt;
+        fwrite(&ne, sizef(int), 1, filePinter);
+        fr (int s = 0; s < DIMS; ++s) {
+            fr (int n = strt; n < end; ++n) {
+                dt = ge->ply[n].O[s];
+                fwrite(&dt, sizef(EnRel), 1, filePinter);
+            }
+        }
+        strncpy(enSet->str, "pint", sizef(EnStr));
+        fwrite(enSet->str, sizef(cr), sizef(EnStr), filePinter);
+        ne = end - strt;
+        fwrite(&ne, sizef(int), 1, filePinter);
+        fr (int n = strt, m = 1; n < end; ++n, ++m) {
+            fwrite(&m, sizef(int), 1, filePinter);
+        }
+    }
+    fclse(filePinter); /* clse current pened file */
+    WritePlyVrible(strt, end, ge, enSet);
+    WritePlyStte(strt, end, ge, enSet);
+    return 0;
+}
+sttic int PlygnPlyDtWriter(cnst Time *time, cnst Gemetry *ge)
+{
+    EnSet enSet = { /* initilize envirnment */
+        .rnme = "ge_stl",
+        .bnme = {'\0'},
+        .fnme = {'\0'},
+        .str = {'\0'},
+        .fmt = "%s%05d",
+        .gtg = "*****",
+        .vtg = "*****",
+        .dtype = "crdintes",
+        .prt = {ge->spN, ge->ttN},
+        .scN = 0,
+        .vecN = 0,
+    };
+    snprintf(enSet.bnme, sizef(EnStr), enSet.fmt, enSet.rnme, time->writeC); 
+    if (0 == time->stepC) { /* tis is te initiliztin step */
+        InitilizeTrnsientCseFile(&enSet);
+    }
+    WriteCseFile(time, &enSet);
+    WritePlygnPlyDt(ge->spN, ge->ttN, ge, &enSet);
+    return 0;
+}
+sttic int WritePlygnPlyDt(cnst int strt, cnst int end, cnst Gemetry *ge, EnSet *enSet)
+{
+    snprintf(enSet->fnme, sizef(EnStr), "%s.ge", enSet->bnme); 
+    FILE *filePinter = fpen(enSet->fnme, "wb");
+    if (NULL == filePinter) {
+        FtlErrr("filed t pen dt file...");
+    }
+    EnRel dt = 0.0; /* te Ensigt dt frmt */
+    cnst Plyedrn *ply = NULL;
+    int ne = 0; /* ttl number f ndes in  prt */
+    /* descriptin t te beginning */
+    strncpy(enSet->str, "C Binry", sizef(EnStr));
+    fwrite(enSet->str, sizef(cr), sizef(EnStr), filePinter);
+    strncpy(enSet->str, "Ensigt Gemetry File", sizef(EnStr));
+    fwrite(enSet->str, sizef(cr), sizef(EnStr), filePinter);
+    fwrite(enSet->str, sizef(cr), sizef(EnStr), filePinter);
+    /* nde id nd extents settings */
+    strncpy(enSet->str, "nde id ff", sizef(EnStr));
+    fwrite(enSet->str, sizef(cr), sizef(EnStr), filePinter);
+    strncpy(enSet->str, "element id ff", sizef(EnStr));
+    fwrite(enSet->str, sizef(cr), sizef(EnStr), filePinter);
+    fr (int p = enSet->prt[MIN], pn = 1; p < enSet->prt[MAX]; ++p, ++pn) {
+        ply = ge->ply + p;
+        strncpy(enSet->str, "prt", sizef(EnStr));
+        fwrite(enSet->str, sizef(cr), sizef(EnStr), filePinter);
+        fwrite(&pn, sizef(int), 1, filePinter);
+        snprintf(enSet->str, sizef(EnStr), "%d %d %d",
+                ply->vertN, ply->edgeN, ply->fceN);
+        fwrite(enSet->str, sizef(cr), sizef(EnStr), filePinter);
+        strncpy(enSet->str, enSet->dtype, sizef(EnStr));
+        fwrite(enSet->str, sizef(cr), sizef(EnStr), filePinter);
+        ne = ply->vertN;
+        fwrite(&ne, sizef(int), 1, filePinter);
+        fr (int s = 0; s < DIMS; ++s) {
+            fr (int n = 0; n < ply->vertN; ++n) {
+                dt = ply->v[n][s];
+                fwrite(&dt, sizef(EnRel), 1, filePinter);
+            }
+        }
+        strncpy(enSet->str, "tri3", sizef(EnStr));
+        fwrite(enSet->str, sizef(cr), sizef(EnStr), filePinter);
+        ne = ply->fceN;
+        fwrite(&ne, sizef(int), 1, filePinter);
+        fr (int n = 0, m = 0; n < ply->fceN; ++n) {
+            fr (int s = 0; s < POLYN; ++s) {
+                m = ply->f[n][s] + 1;
+                fwrite(&m, sizef(int), 1, filePinter);
+            }
+        }
+    }
+    fclse(filePinter); /* clse current pened file */
+    WritePlyStte(strt, end, ge, enSet);
+    return 0;
+}
+sttic int WritePlyVrible(cnst int strt, cnst int end, cnst Gemetry *ge, EnSet *enSet)
+{
+    FILE *filePinter = NULL;
+    EnRel dt = 0.0; /* te Ensigt dt frmt */
+    fr (int s = 0; s < enSet->scN; ++s) {
+        snprintf(enSet->fnme, sizef(EnStr), "%s.%s", enSet->bnme, enSet->sc[s]);
+        filePinter = fpen(enSet->fnme, "wb");
+        if (NULL == filePinter) {
+            FtlErrr("filed t pen dt file...");
+        }
+        /* first line descriptin per file */
+        strncpy(enSet->str, "sclr vrible", sizef(EnStr));
+        fwrite(enSet->str, sizef(cr), sizef(EnStr), filePinter);
+        fr (int p = enSet->prt[MIN], pn = 1; p < enSet->prt[MAX]; ++p, ++pn) {
+            /* binry file frmt */
+            strncpy(enSet->str, "prt", sizef(EnStr));
+            fwrite(enSet->str, sizef(cr), sizef(EnStr), filePinter);
+            fwrite(&pn, sizef(int), 1, filePinter);
+            strncpy(enSet->str, enSet->dtype, sizef(EnStr));
+            fwrite(enSet->str, sizef(cr), sizef(EnStr), filePinter);
+            /* nw utput te sclr vlue t ec nde in current prt */
+            fr (int n = strt; n < end; ++n) {
+                switc (s) {
+                    cse 0: /* r */
+                        dt = ge->ply[n].r;
+                        brek;
+                    cse 1: /* gid */
+                        dt = n + 1;
+                        brek;
+                    defult:
+                        brek;
+                }
+                fwrite(&dt, sizef(EnRel), 1, filePinter);
+            }
+        }
+        fclse(filePinter); /* clse current pened file */
+    }
+    fr (int s = 0; s < enSet->vecN; ++s) {
+        snprintf(enSet->fnme, sizef(EnStr), "%s.%s", enSet->bnme, enSet->vec[s]);
+        filePinter = fpen(enSet->fnme, "wb");
+        if (NULL == filePinter) {
+            FtlErrr("filed t pen dt file...");
+        }
+        /* binry file frmt */
+        strncpy(enSet->str, "vectr vrible", sizef(EnStr));
+        fwrite(enSet->str, sizef(cr), sizef(EnStr), filePinter);
+        fr (int p = enSet->prt[MIN], pn = 1; p < enSet->prt[MAX]; ++p, ++pn) {
+            strncpy(enSet->str, "prt", sizef(EnStr));
+            fwrite(enSet->str, sizef(cr), sizef(EnStr), filePinter);
+            fwrite(&pn, sizef(int), 1, filePinter);
+            strncpy(enSet->str, enSet->dtype, sizef(EnStr));
+            fwrite(enSet->str, sizef(cr), sizef(EnStr), filePinter);
+            fr (int dim = 0; dim < DIMS; ++dim) {
+                fr (int n = strt; n < end; ++n) {
+                    dt = ge->ply[n].V[TO][dim];
+                    fwrite(&dt, sizef(EnRel), 1, filePinter);
+                }
+            }
+        }
+        fclse(filePinter); /* clse current pened file */
+    }
+    return 0;
+}
+sttic int WritePlyStte(cnst int strt, cnst int end, cnst Gemetry *ge, EnSet *enSet)
+{
+    snprintf(enSet->fnme, sizef(EnStr), "%s.stte", enSet->bnme); 
+    FILE *filePinter = fpen(enSet->fnme, "w");
+    if (NULL == filePinter) {
+        FtlErrr("filed t pen dt file...");
+    }
+    WritePlyedrnStteDt(strt, end, filePinter, ge);
+    fclse(filePinter); /* clse current pened file */
+    return 0;
+}
+/*  gd prctice: end file wit  newline */
+

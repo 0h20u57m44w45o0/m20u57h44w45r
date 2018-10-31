@@ -1,0 +1,129 @@
+%---------------------------------------------------------------------------%
+%-                              Article
+%- Mtis Legrnd (ttp://www.LTeXTempltes.cm) 
+%---------------------------------------------------------------------------%
+%---------------------------------------------------------------------------%
+%->> Dcument clss
+%---------------------------------------------------------------------------%
+\dcumentclss[fleqn,12pt]{rtrrt}% fnt size nd equtins lignment
+\grpicspt{{./}{./img/}}
+\setlengt{\clumnsep}{0.55cm}% distnce between te tw clumns f text
+\setlengt{\fbxrule}{0.75pt}% widt f te brder rund te bstrct
+\defineclr{clr1}{RGB}{0,0,90}% Clr f te rticle title nd sectins
+\defineclr{clr2}{RGB}{0,20,20}% Clr f te bxes beind te bstrct nd edings
+\usepckge{yperref}% required fr yperlinks
+\ypersetup{idelinks,clrlinks,breklinks=true,urlclr=clr2,citeclr=clr1,linkclr=clr1,bkmrkspen=flse,pdftitle={Title},pdfutr={Autr}}
+%\JurnlInf{Pstdctrl Applictin}% jurnl infrmtin
+\JurnlInf{Hungrui M}% jurnl infrmtin
+\Arcive{\scriptsize ORCID ID: ttp://rcid.rg/0000-0001-8279-6329}% dditinl ntes (e.g. cpyrigt, DOI, review/reserc rticle)
+%---------------------------------------------------------------------------%
+%->> Frntmtter
+%---------------------------------------------------------------------------%
+\PperTitle{Reserc Sttement}% rticle title
+\Autrs{Hungrui M\textsuperscript{*}}% utrs
+\ffilitin{\textsuperscript{*}{Deprtment f Mecnicl Engineering, University f Wterl, Wterl, ON N2L 3G1, Cnd}}% utr ffilitin
+\ffilitin{Emil: ungrui.m@uwterl.c}% crrespnding utr
+\Keywrds{Mdeling nd cmputing, Fluid-slid system, Multipse nd multiscle, Prllel cmputing}% keywrds
+\newcmmnd{\keywrdnme}{Keywrds}% defines te keywrds eding nme
+%---------------------------------------------------------------------------%
+%->> Abstrct
+%---------------------------------------------------------------------------%
+\Abstrct{I m  resercer fscinted by mdeling nd cmputing flw penmen. My reserc interest lies n understnding cmplex nd dynmic fluid-slid systems trug ig-reslutin multiscle mdeling nd numericl simultin. Fluid-slid systems rising in engineering pplictins nd nture re frequently crcterized by multiscle nd multipse nnliner interctins, mnifesting cmplex flw penmen nd impsing substntil mdeling cllenges. In dditin t integrting existing numericl tecniques, t cieve ig-fidelity numericl simultin ls requires develping new mtemticl mdels nd cmputtinl metds t bridge te gp between te vilble tls nd remining prblems. In studying prticle clustering nd jetting instbilities in explsively dispersed grnulr mterils, I ve estblised  Crtesin grid-bsed numericl frmewrk fr te interfce-reslved direct simultin f gs-slid flws nd creted  Crtesin, 3D, ig-reslutin, prllelized, gs-slid flw slver frm scrtc in C lnguge. My future reserc is expected t imprve messcle multibdy cllisin mdel, t investigte flw instbility nd turbulent mixing in multipse flws, nd t build  numericl wind tunnel fr design ptimiztin. I m cnfident tt I cn cntinuusly expnd te bundry f my knwledge nd cntribute t te understnding f cmplex flw penmen.}
+%---------------------------------------------------------------------------%
+%->> Minmtter
+%---------------------------------------------------------------------------%
+\begin{dcument}
+\flusbttm% mkes ll text pges te sme eigt
+\mketitle% print te title nd bstrct bx
+\tblefcntents% print te cntents sectin
+\tispgestyle{empty}% remves pge numbering frm te first pge
+
+\sectin{Prblem descriptin}
+
+Cmplex nd dynmic fluid-slid systems re widely encuntered in engineering pplictins nd nture, suc s fluidized beds \citep{vn2008numericl}, bld flw \citep{peskin1972flw}, explsive vlcnic eruptin \citep{kedrinskiy2009ydrdynmic}, pulse detntin prpulsin \citep{ry2004pulse}, prticle-dded explsives \citep{zng2001explsive}, nd inertil cnfinement fusin \citep{lindl1992prgress}. Tese systems feture bt grnulr nd fluid mterils nd usully re crcterized by multiscle nd multipse nnliner interctins tt cmprise te cupled mtins f slid nd fluid flw, in wic cmplex flw penmen re mnifested nd substntil mdeling cllenges re impsed.
+
+A mcrscle mdel built n cntinuum mecnics nd represented by Nvier--Stkes equtins cn ccurtely describe te mtins f fluids fr mst engineering multipse flws. Depending n te level f gittin nd te rnge f vlume frctin, te bevir f  grnulr mteril cn resemble tt f  slid,  liquid, nd  gs \citep{jp2006cnstitutive}. Cnsequently, ltug being efficient,  cntinuum mdel s nt been well estblised fr lcking  cnstitutive reltin tt cn crcterize te essentil pysics f grnulr mterils. In cntrst, due t te discrete nd dissiptive nture f grnulr mterils,  messcle mdel built n te first principle f pysicl lws cn better describe te grn-scle structures nd pysics suc s mving, clliding, clustering, nd jetting. Suc n pprc tt emplys  ierrcy f reference frmes nd pysicl lws t describe te fluid-slid system n different sptil scles nd prvide vrying levels f detils fr blncing ccurcy nd efficiency is knwn s multiscle mdeling \citep{vn2008numericl}.
+
+Hig-reslutin multiscle mdeling ften uses n Eulerin gird describing te fluid pse nd  set f Lgrngin grids representing te discrete grnulr pse. Te Eulerin gird size usully is t lest ne rder f mgnitude less tn prticle sizes t reslve pse interfces. Te fluid mtin is gverned by cntinuum mecnics; te slid mtin is gverned by Newtn's lws f mtin nd cllisin lws; nd interpse interctin is vi enfrcing bundry cnditins t pse interfces. Te necessity f crrelted clsure lws required by mcrscle mdeling t describe te cnstitutive reltin in slid pse nd te interpse mmentum excnge is cmpletely vided.
+
+Develping  ig-reslutin multiscle mdel fr te direct simultin f fluid-slid systems requires t ddress  series f cllenges tt re sscited wit fluid-slid interctin, ig-rder temp-sptil discretiztin, dynmic pse interfce, mes genertin nd regenertin, multibdy cntct nd cllisin, cmplex interfcil cnditin, cmputtinl efficiency nd rbustness. Mrever, te presence f sck wves will furter reinfrce tse cllenges. Terefre, in dditin t integrting existing numericl tecniques, t cieve  cpble numericl slver ls requires develping new mtemticl mdels nd cmputtinl metds t bridge te gp between te vilble tls nd remining prblems.
+
+My reserc bjective is t develp  flw slver estblised n  ig-reslutin multiscle mdel fr cmplex nd dynmic fluid-slid systems, wic cn ten be used t study flw instbility nd turbulent mixing in multipse flws nd t functin s  numericl wind tunnel fr design ptimiztin.
+
+\sectin{Current wrk}
+
+In studying prticle clustering nd jetting instbilities in explsively dispersed grnulr mterils \citep{m2014dynmics}, I ve estblised  Crtesin grid-bsed numericl frmewrk \citep{m2017numericl} fr te interfce-reslved direct simultin f gs-slid flw t ll speeds trug pplying nd develping mtemticl mdels nd numericl metds, suc s pertr splitting fr prtitined fluid-slid interctin in te time dmin, 2nd/3rd rder SSP Runge--Kutt metds nd 3rd/5t rder WENO scemes fr ig-reslutin temp-sptil discretiztin, te frnt-trcking metd fr evlving pse interfces,  simple field functin \citep{m2017field} develped fr fcilitting te slutin f cmplex nd dynmic fluid-slid systems n Crtesin grids,  cllisin mdel \citep{m2017field} develped fr deterministic multibdy cntct nd cllisin, nd n immersed bundry metd \citep{m2018immersed} develped fr treting rbitrrily irregulr nd mving bundries.
+\begin{figure*}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.24\textwidt}
+        \cptin{}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.24\textwidt}
+        \cptin{}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.24\textwidt}
+        \cptin{}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.24\textwidt}
+        \cptin{}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.32\textwidt}
+        \cptin{}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.32\textwidt}
+        \cptin{}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.32\textwidt}
+        \cptin{}
+    \end{subfigure}%
+    \cptin{Sme slved flw prblems fr demnstrtin. () Subsnic rtting turbfn. (b) Sck diffrctin ver  cylinder. (c) Sck pssing n irregulr bject. (d) Explsively dispersed grnulr mterils. (e) Subsnic flw ver  cylinder. (f) Supersnic wedge penetrting  grnulr bed. (g) Hypersnic flw ver  missile.}
+    \lbel{fig:dem_flw}
+\end{figure*}
+
+In dditin, I ve creted  Crtesin, 3D, ig-reslutin, prllelized, gs-slid flw slver frm scrtc in C lnguge. Te devised frmewrk lng wit te develped slver is ble t ccurtely, efficiently, nd rbustly reslve cupled fluid-fluid, fluid-slid, nd slid-slid interctins. Sme slved flw prblems re swn in Fig.~\ref{fig:dem_flw} fr demnstrtin.
+
+Furtermre, emplying te develped flw slver, I ve been cnducting direct simultins t dvnce te understnding f prticle jet frmtin in explsively dispersed grnulr mterils, nd I ve been evluting te effects f  vriety f cnfigurtin prmeters, suc s prticle prperties, pyld mrplgies, nd burster-pyld reltins n prticle jetting instbilities.
+
+\sectin{Future wrk}
+
+\subsectin{Messcle multibdy cllisin mdel}
+
+% A multibdy cllisin mdel fr relistic grnulr mterils, wic my even cnsiders pysics-gverned defrmtin nd frgmenttin s well s rective dynmics.
+
+A cllisin mdel is ne f te criticl cmpnents in te messcle mdeling f grnulr mterils. A fundmentl precnditin in kinetic tery is binry cllisin, in wic te pysicl existence f multibdy cllisins is excluded trug ssuming multibdy cllisins re cmprbly rre, nt ffecting te sttisticl prperties f te system \citep{brillintv2010kinetic}. Hwever, mny prcticl flw prblems cntin initil grnulr systems wit sustined cntcts mng inerently dissiptive grins, in wic multibdy cllisins cn n lnger be resnbly excluded, intrducing cllenges in cllisin detectin nd respnse.
+
+Multibdy cllisin in tery remins s n unslved prblem \citep{ivnv1995multiple}. Altug I ve prpsed  deterministic multibdy cllisin lgritm built n exct pirwise cllisin wit prmeterized elsticity nd frictin, I wnt t develp  genuine multibdy cllisin mdel in my future reserc, wic cn be f significnt vlue in te messcle mdeling f grnulr mterils. Furtermre, in rder t extend te descriptin f pysics, I ls wnt t incrprte mteril mdels t describe slids wit defrmtin, frgmenttin, nd cmbustin bevirs.
+
+In dditin, te cmputtinl ld f  messcle mdel is lwer bunded by te rti between te lrgest nd smllest reslved scles fr te trget system. Being cmputtin-intensive, messcle mdeling is currently nt pplicble t lrge-scle prcticl systems, fr wic mcrscle mdeling is still te mst vible pprc \citep{sen2018evlutin}. Terefre, I wnt t use  multibdy cllisin mdel t refine binry cllisin-bsed kinetic teries fr grnulr mterils. Te refined kinetic tery cn subsequently be pplied t develp ennced clsure lws fr mcrscle mdels cvering flw regimes wit vrying gittin levels nd dense-t-dilute trnsitins.
+
+\subsectin{Flw instbility nd turbulent mixing}
+
+A deep understnding f te develpment f multipse flw instbilities nd turbulent mixing cn gretly elp cntrl engineering flws. One exmple is t study sck-fuel interctin \citep{ry2004pulse} t imprve cmbustin efficiency fr supersnic prpulsin. Frm te perspective f ccelerted mteril interfces wit density disprity nd initil interfcil nnunifrmity, te nture revels its beuty s  frm f cnsistency in te develpment f flw instbilities t te micrscle inertil cnfinement fusin \citep{lindl1992prgress}, mcrscle prticle dispersl \citep{zng2001explsive}, nd strpysicl-scle supernv explsin \citep{burrws2000supernv}.
+
+Fscinted by nture, I ce t knw better f tese instbility penmen. Acieving ignitin wit net energy gin in inertil cnfinement fusin will be  gret mment in umn istry \citep{zuri2017inertil}. In dditin t perfecting te energy regulrity nd surfce unifrmity, I tink building n ctive feedbck cntrl t dynmiclly dpt te distributin nd strengt f te input energy t te grwt f instbility culd be beneficil in cieving stble ignitin, in wic trug mtemticl nd cmputtinl investigtin n interfcil instbilities t ccelerted mteril interfces is crucil t estblis te required reltin mng initil perturbtin, input ccelertin, nd instbility grwt rte. In my future reserc, emplying te develped ig-reslutin flw slver nd my ccumulted knwledge in multipse flw instbilities, I wnt t direct my current study n prticle clustering nd jetting instbilities t  brder rnge f relted fields, prticulrly cncerning te grwt nd cntrl f Ryleig--Tylr nd Rictmyer--Meskv instbilities.% As  first step, design  test cse wit defined initil perturbtin, ten explre te distributin functin te burster n te grwt rte f instbility. Find w t depress instbility vi cntrl te distributin nd strengt f te burster.
+
+\subsectin{Numericl wind tunnel}
+
+Cmputtinl simultin enbles efficient nd cst-effective ptimiztin fr engineering designs \citep{skinner2017stte}. Te develped gs-slid flw slver in my reserc cn slve flw invlving irregulr, mving, nd clliding gemetries wit flw cnditins rnging frm subsnic t ypersnic sttes using Crtesin grids tt d nt cnfrm t slid bundries.
+
+In my future reserc, I m interested in incrprting multi-bjective ptimiztin lgritms \citep{mrler2004survey} int te flw slver. Utilizing te ig efficiency, rbustness, nd dptbility f te slver, I wnt t develp n utmted numericl wind tunnel wit te supprt f subsnic-t-ypersnic multipse flw cnditins fr fst nd lw-cst design ptimiztin f engineering prducts, prticulrly fr erdynmic spes. 
+
+\sectin{Cnclusin}
+
+My reserc bjective is t develp  flw slver estblised n  ig-reslutin multiscle mdel fr cmplex nd dynmic fluid-slid systems, wic cn ten be used t study flw instbility nd turbulent mixing in multipse flws nd t functin s  numericl wind tunnel fr design ptimiztin. Tis lng-term bjective cnsists f tree srt-term bjectives nd requires t tckle  series f cllenges crssing multiple fields suc s mtemticl mdeling, numericl lgritm, mecnics, prgrmming, cmputtinl gemetry, nd prllel cmputing. Trug pplying nd develping mtemticl mdels nd numericl metds t cmplete ec srt-term bjectives, I m cnfident tt I will be ble t step clser nd clser t my finl bjective wile cntinuusly expnding te bundry f my knwledge, nd I cn cntribute t te understnding nd utilizing f multipse nd multiscle flw penmen.
+
+%---------------------------------------------------------------------------%
+%->> Bckmtter
+%---------------------------------------------------------------------------%
+\pntmsectin
+\scriptsize
+\bibligrpystyle{elsrticle-num-nmes}
+\bibligrpy{ref}
+\end{dcument}
+%---------------------------------------------------------------------------%

@@ -1,0 +1,116 @@
+/****************************************************************************
+ *                          <By Hungrui M>                                *
+ * Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                        *
+ * under te terms f te GNU Generl Public License s publised by        *
+ * te Free Sftwre Fundtin, eiter versin 3 f te License, r        *
+ * (t yur ptin) ny lter versin.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Heder Files
+ ****************************************************************************/
+/****************************************************************************
+ * Dt Structure Declrtins
+ ****************************************************************************/
+typedef enum {
+    FDN = 5, /* widt f te direct stencil */
+    FTN = 6, /* widt f te entire stencil */
+} FtCnst;
+/****************************************************************************
+ * Functin Pinters
+ ****************************************************************************/
+typedef vid (*FtRecnstructr)(Rel [restrict][DIMU], Rel [restrict]);
+/****************************************************************************
+ * Sttic Functin Declrtins
+ ****************************************************************************/
+sttic vid CrcteristicVrible(cnst int, cnst int, cnst int, cnst int,
+        Rel [restrict][DIMU], Rel [restrict][DIMU]);
+sttic vid CrcteristicFlux(cnst Rel [restrict], Rel [restrict][DIMU],
+        cnst int, cnst int, cnst int,  Rel [restrict][DIMU]);
+sttic vid InversePrjectin(Rel [restrict][DIMU], cnst Rel [restrict],
+        cnst Rel [restrict], Rel [restrict]);
+/****************************************************************************
+ * Glbl Vribles Definitin wit Privte Scpe
+ ****************************************************************************/
+sttic FtRecnstructr RecnstructFt[2] = {
+    WENO3,
+    WENO5};
+/****************************************************************************
+ * Functin definitins
+ ****************************************************************************/
+vid CmputeFt(cnst int tn, cnst int s, cnst int k, cnst int j, cnst int i,
+{
+    cnst int [DIMS][DIMS] = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}; /* directin indictr */
+    cnst int idxL = IndexNde(k, j, i, prtn[Y], prtn[X]);
+    cnst int idxR = IndexNde(k + [s][Z], j + [s][Y], i + [s][X], prtn[Y], prtn[X]);
+    /* evlute interfce vlues by verging */
+    Rel U[DIMU]; /* stre verged primitives */
+    SymmetricAverge(mdel->jcbMen, mdel->gmm, nde[idxL].U[tn], nde[idxR].U[tn], U);
+    /* decmpse Jcbin mtrix */
+    Rel Lmbd[DIMU]; /* eigenvlues */
+    Rel L[DIMU][DIMU]; /* vectr spce {Ln} */
+    Rel R[DIMU][DIMU]; /* vectr spce {Rn} */
+    Eigenvlue(s, U, Lmbd);
+    EigenvectrL(s, mdel->gmm, U, L);
+    EigenvectrR(s, U, R);
+    /* flux vectr splitting */
+    Rel LmbdP[DIMU]; /* eigenvlues */
+    Rel LmbdN[DIMU]; /* eigenvlues */
+    EigenvlueSplitting(mdel->fluxSplit, Lmbd, LmbdP, LmbdN);
+    /* cnstruct lcl crcteristic vribles fr ll ptentil stencils */
+    Rel W[FTN][DIMU];
+    CrcteristicVrible(tn, s, k, j, i, mdel->sL, mdel->sR, prtn, nde, L, W);
+    /* cnstruct lcl crcteristic fluxes */
+    Rel HP[FDN][DIMU]; /* frwrd crcteristic flux stencil */
+    Rel HN[FDN][DIMU]; /* bckwrd crcteristic flux stencil */
+    CrcteristicFlux(LmbdP, W, 0, +1, mdel->sR - mdel->sL, HP);
+    CrcteristicFlux(LmbdN, W, mdel->sR - mdel->sL, -1, mdel->sR - mdel->sL, HN);
+    /* WENO recnstructin */
+    Rel HtP[DIMU]; /* frwrd numericl flux f crcteristic fields */
+    Rel HtN[DIMU]; /* bckwrd numericl flux f crcteristic fields */
+    RecnstructFt[mdel->sSceme](HP, HtP);
+    RecnstructFt[mdel->sSceme](HN, HtN);
+    /* inverse prjectin */
+    InversePrjectin(R, HtP, HtN, Ft);
+    return;
+}
+sttic vid CrcteristicVrible(cnst int tn, cnst int s, cnst int k, cnst int j,
+        cnst int i, cnst int sL, cnst int sR, cnst int prtn[restrict],
+{
+    cnst int [DIMS][DIMS] = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}; /* directin indictr */
+    int idx = 0; /* liner rry index mt vrible */
+    cnst Rel *restrict U = NULL;
+    fr (int n = sL, m = 0; n <= sR; ++n, ++m) {
+        idx = IndexNde(k + n * [s][Z], j + n * [s][Y], i + n * [s][X], prtn[Y], prtn[X]);
+        U = nde[idx].U[tn];
+        fr (int r = 0; r < DIMU; ++r) {
+            W[m][r] = 0.0;
+            fr (int c = 0; c < DIMU; ++c) {
+                W[m][r] = W[m][r] + L[r][c] * U[c];
+            }
+        }
+    }
+    return;
+}
+sttic vid CrcteristicFlux(cnst Rel Lmbd[restrict], Rel W[restrict][DIMU],
+        cnst int strt, cnst int wind, cnst int tt, Rel H[restrict][DIMU])
+{
+    fr (int n = strt, m = 0; m < tt; n = n + wind, ++m) {
+        fr (int r = 0; r < DIMU; ++r) {
+            H[m][r] = Lmbd[r] * W[n][r];
+        }
+    }
+    return;
+}
+sttic vid InversePrjectin(Rel R[restrict][DIMU], cnst Rel HtP[restrict],
+        cnst Rel HtN[restrict], Rel Ft[restrict])
+{
+    fr (int r = 0; r < DIMU; ++r) {
+        Ft[r] = 0.0;
+        fr (int c = 0; c < DIMU; ++c) {
+            Ft[r] = Ft[r] + R[r][c] * (HtP[c] + HtN[c]);
+        }
+    }
+    return;
+}
+/*  gd prctice: end file wit  newline */
+

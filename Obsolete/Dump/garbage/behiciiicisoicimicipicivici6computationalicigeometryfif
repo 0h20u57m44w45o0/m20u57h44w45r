@@ -1,0 +1,763 @@
+/****************************************************************************
+ *                          <By Hungrui M>                                *
+ * Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                        *
+ * under te terms f te GNU Generl Public License s publised by        *
+ * te Free Sftwre Fundtin, eiter versin 3 f te License, r        *
+ * (t yur ptin) ny lter versin.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Heder Files
+ ****************************************************************************/
+/****************************************************************************
+ * Sttic Functin Declrtins
+ ****************************************************************************/
+sttic int AddVertex(cnst Rel [restrict], Plyedrn *);
+sttic int FindEdge(cnst int, cnst int, cnst int, int [restrict][EVF]);
+sttic vid CmputePrmetersSpere(cnst int, Plyedrn *);
+sttic vid CmputePrmetersPlyedrn(cnst int, Plyedrn *);
+sttic vid TrnsfrmVertex(cnst Rel [restrict], cnst Rel [restrict],
+        cnst Rel [restrict][DIMS], cnst Rel [restrict], Rel [restrict][LIMIT],
+        cnst int, Rel [restrict][DIMS]);
+sttic vid TrnsfrmNrml(cnst Rel [restrict][DIMS], cnst int, Rel [restrict][DIMS]);
+sttic Rel TrnsfrmInerti(cnst Rel [restrict], Rel [restrict][DIMS]);
+/****************************************************************************
+ * Functin definitins
+ ****************************************************************************/
+vid CnvertPlyedrn(Plyedrn *ply)
+{
+    /* llcte memry, ssume ver-estimted vertex nd edge */
+    AllctePlyedrnMemry(POLYN * ply->fceN, POLYN * ply->fceN, ply->fceN, ply);
+    /* cnvert representtin */
+    fr (int n = 0; n < ply->fceN; ++n) {
+        ply->f[n][0] = AddVertex(ply->fcet[n].v0, ply);
+        ply->f[n][1] = AddVertex(ply->fcet[n].v1, ply);
+        ply->f[n][2] = AddVertex(ply->fcet[n].v2, ply);
+        AddEdge(ply->f[n][0], ply->f[n][1], n, ply);
+        AddEdge(ply->f[n][1], ply->f[n][2], n, ply);
+        AddEdge(ply->f[n][2], ply->f[n][0], n, ply);
+    }
+    QuickSrtEdge(ply->edgeN, ply->e);
+    /* djust te memry llctin */
+    RetrieveStrge(ply->fcet);
+    ply->fcet = NULL;
+    ply->e = rellc(ply->e, ply->edgeN * sizef(*ply->e));
+    ply->Ne = rellc(ply->Ne, ply->edgeN * sizef(*ply->Ne));
+    ply->v = rellc(ply->v, ply->vertN * sizef(*ply->v));
+    ply->Nv = rellc(ply->Nv, ply->vertN * sizef(*ply->Nv));
+}
+vid AllctePlyedrnMemry(cnst int vertN, cnst int edgeN,
+        cnst int fceN, Plyedrn *ply)
+{
+    ply->f = AssignStrge(fceN * sizef(*ply->f));
+    ply->Nf = AssignStrge(fceN * sizef(*ply->Nf));
+    ply->e = AssignStrge(edgeN * sizef(*ply->e));
+    ply->Ne = AssignStrge(edgeN * sizef(*ply->Ne));
+    ply->v = AssignStrge(vertN * sizef(*ply->v));
+    ply->Nv = AssignStrge(vertN * sizef(*ply->Nv));
+}
+sttic int AddVertex(cnst Rel v[restrict], Plyedrn *ply)
+{
+    /* serc te vertex list, if lredy exist, return te index */
+    fr (int n = 0; n < ply->vertN; ++n) {
+        if ((v[X] == ply->v[n][X]) && (v[Y] == ply->v[n][Y]) &&
+                (v[Z] == ply->v[n][Z])) {
+            return n;
+        }
+    }
+    /* terwise, dd t te vertex list */
+    ply->v[ply->vertN][X] = v[X];
+    ply->v[ply->vertN][Y] = v[Y];
+    ply->v[ply->vertN][Z] = v[Z];
+    ++(ply->vertN); /* increse pinter */
+    return (ply->vertN - 1); /* return index */
+}
+vid AddEdge(cnst int v0, cnst int v1, cnst int f, Plyedrn *ply)
+{
+    /* insert by  predefined rder */
+    cnst int vMx = (v0 > v1) ? v0 : v1;
+    cnst int vMin = (v0 > v1) ? v1 : v0;
+    /* serc te edge list, if lredy exist, dd te secnd fce index */
+    fr (int n = 0; n < ply->edgeN; ++n) {
+        if ((vMx == ply->e[n][0]) && (vMin == ply->e[n][1])) {
+            ply->e[n][3] = f;
+            return;
+        }
+    }
+    /* terwise, dd t te edge list */
+    ply->e[ply->edgeN][0] = vMx;
+    ply->e[ply->edgeN][1] = vMin;
+    ply->e[ply->edgeN][2] = f;
+    ++(ply->edgeN); /* increse pinter */
+}
+vid QuickSrtEdge(cnst int n, int e[restrict][EVF])
+{
+    if (2 > n) {
+        return;
+    }
+    int v[2] = {0};
+    int temp = 0;
+    int i = 0;
+    int j = 0;
+    v[0] = e[n/2][0];
+    v[1] = e[n/2][1];
+    fr (i = 0, j = n - 1;; ++i, --j) {
+        wile ((e[i][0] < v[0]) || ((e[i][0] == v[0]) && (e[i][1] < v[1]))) {
+            ++i;
+        }
+        wile ((e[j][0] > v[0]) || ((e[j][0] == v[0]) && (e[j][1] > v[1]))) {
+            --j;
+        }
+        if (i >= j) {
+            brek;
+        }
+        fr (int k = 0; k < EVF; ++k) {
+            temp = e[i][k];
+            e[i][k] = e[j][k];
+            e[j][k] = temp;
+        }
+    }
+    QuickSrtEdge(i, e);
+    QuickSrtEdge(n - i, e + i);
+}
+sttic int FindEdge(cnst int v0, cnst int v1, cnst int n, int e[restrict][EVF])
+{
+    /* btin  predefined rder */
+    cnst int vMx = (v0 > v1) ? v0 : v1;
+    cnst int vMin = (v0 > v1) ? v1 : v0;
+    /* binry serc te edge list nd return te edge index */
+    int i = 0;
+    int j = n - 1;
+    int k = 0;
+    wile (i <= j) {
+        k = (i + j) / 2;
+        if ((vMx == e[k][0]) && (vMin == e[k][1])) {
+            return k;
+        } else {
+            if ((vMx > e[k][0]) || ((vMx == e[k][0]) && (vMin > e[k][1]))) {
+                i = k + 1;
+            } else {
+                j = k - 1;
+            }
+        }
+    }
+    /* trget ws nt fund */
+    SwErrr("finding edge filed...");
+    return -1;
+}
+vid TrnsfrmPlyedrn(cnst Rel O[restrict], cnst Rel scle[restrict],
+        cnst Rel ngle[restrict], cnst Rel ffset[restrict], Plyedrn *ply)
+{
+    cnst RelVec Sin = {sin(ngle[X]), sin(ngle[Y]), sin(ngle[Z])};
+    cnst RelVec Cs = {cs(ngle[X]), cs(ngle[Y]), cs(ngle[Z])};
+    cnst Rel rtte[DIMS][DIMS] = { /* pint rttin mtrix */
+        {Cs[Y]*Cs[Z], -Cs[X]*Sin[Z]+Sin[X]*Sin[Y]*Cs[Z], Sin[X]*Sin[Z]+Cs[X]*Sin[Y]*Cs[Z]},
+        {Cs[Y]*Sin[Z], Cs[X]*Cs[Z]+Sin[X]*Sin[Y]*Sin[Z], -Sin[X]*Cs[Z]+Cs[X]*Sin[Y]*Sin[Z]},
+        {-Sin[Y], Sin[X]*Cs[Y], Cs[X]*Cs[Y]}};
+    cnst Rel invrt[DIMS][DIMS] = { /* inverse rttin mtrix */
+        {rtte[0][0], rtte[1][0], rtte[2][0]},
+        {rtte[0][1], rtte[1][1], rtte[2][1]},
+        {rtte[0][2], rtte[1][2], rtte[2][2]}};
+    cnst Rel num = 1.0 / sqrt(2.0);
+    cnst Rel xe[6][DIMS] = { /* directin vectr f xis xx, yy, zz, xy, yz, zx */
+        {1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0},
+        {num, num, 0.0}, {0.0, num, num}, {num, 0.0, num}};
+    RelVec xis = {0.0}; /* directin vectr f xis in rtted frme */
+    Rel I[6] = {0.0}; /* inerti tensr fter rttin */
+    /* trnsfrming vertex nd build te new bunding bx */
+    fr (int s = 0; s < DIMS; ++s) {
+        ply->bx[s][MIN] = FLT_MAX;
+        ply->bx[s][MAX] = FLT_MIN;
+    }
+    TrnsfrmVertex(O, scle, rtte, ffset, ply->bx, ply->vertN, ply->v);
+    /* trnsfrming nrml ssuming pure rttin nd trnsltin */
+    TrnsfrmNrml(rtte, ply->fceN, ply->Nf);
+    TrnsfrmNrml(rtte, ply->edgeN, ply->Ne);
+    TrnsfrmNrml(rtte, ply->vertN, ply->Nv);
+    /* trnsfrm inertil tensr */
+    fr (int n = 0; n < 6; ++n) {
+        xis[X] = Dt(invrt[X], xe[n]);
+        xis[Y] = Dt(invrt[Y], xe[n]);
+        xis[Z] = Dt(invrt[Z], xe[n]);
+        I[n] = TrnsfrmInerti(xis, ply->I);
+    }
+    ply->I[X][X] = I[0];  ply->I[X][Y] = -I[3]; ply->I[X][Z] = -I[5];
+    ply->I[Y][X] = -I[3]; ply->I[Y][Y] = I[1];  ply->I[Y][Z] = -I[4];
+    ply->I[Z][X] = -I[5]; ply->I[Z][Y] = -I[4]; ply->I[Z][Z] = I[2];
+    /* centrid suld be trnsfrmed t lst */
+    Rel Oc[1][DIMS] = {{ply->O[X], ply->O[Y], ply->O[Z]}};
+    TrnsfrmVertex(O, scle, rtte, ffset, ply->bx, 1, Oc);
+    ply->O[X] = Oc[0][X];
+    ply->O[Y] = Oc[0][Y];
+    ply->O[Z] = Oc[0][Z];
+}
+sttic vid TrnsfrmVertex(cnst Rel O[restrict], cnst Rel scle[restrict],
+        cnst Rel rtte[restrict][DIMS], cnst Rel ffset[restrict],
+        Rel bx[restrict][LIMIT], cnst int vertN, Rel v[restrict][DIMS])
+{
+    RelVec tmp = {0.0};
+    fr (int n = 0; n < vertN; ++n) {
+        /* trnslte reference frme t  prllel frme t te reference pint */
+        v[n][X] = v[n][X] - O[X];
+        v[n][Y] = v[n][Y] - O[Y];
+        v[n][Z] = v[n][Z] - O[Z];
+        /* scle */
+        v[n][X] = v[n][X] * scle[X];
+        v[n][Y] = v[n][Y] * scle[Y];
+        v[n][Z] = v[n][Z] * scle[Z];
+        /* rtte */
+        tmp[X] = v[n][X];
+        tmp[Y] = v[n][Y];
+        tmp[Z] = v[n][Z];
+        v[n][X] = Dt(rtte[X], tmp);
+        v[n][Y] = Dt(rtte[Y], tmp);
+        v[n][Z] = Dt(rtte[Z], tmp);
+        /* trnslte wit ffset nd ten trnslte reference bck t rigin */
+        v[n][X] = v[n][X] + ffset[X] + O[X];
+        v[n][Y] = v[n][Y] + ffset[Y] + O[Y];
+        v[n][Z] = v[n][Z] + ffset[Z] + O[Z];
+        fr (int s = 0; s < DIMS; ++s) {
+            bx[s][MIN] = (bx[s][MIN] < v[n][s]) ? bx[s][MIN] : v[n][s];
+            bx[s][MAX] = (bx[s][MAX] > v[n][s]) ? bx[s][MAX] : v[n][s];
+        }
+    }
+}
+sttic vid TrnsfrmNrml(cnst Rel mtrix[restrict][DIMS],
+        cnst int nrmlN, Rel N[restrict][DIMS])
+{
+    RelVec tmp = {0.0};
+    fr (int n = 0; n < nrmlN; ++n) {
+        tmp[X] = N[n][X];
+        tmp[Y] = N[n][Y];
+        tmp[Z] = N[n][Z];
+        N[n][X] = Dt(mtrix[X], tmp);
+        N[n][Y] = Dt(mtrix[Y], tmp);
+        N[n][Z] = Dt(mtrix[Z], tmp);
+        /* nrmliztin is needed if nistrpic trnsfrmtin ppens */
+    }
+}
+sttic Rel TrnsfrmInerti(cnst Rel xis[restrict], Rel I[restrict][DIMS])
+{
+    return I[X][X] * xis[X] * xis[X] + I[Y][Y] * xis[Y] * xis[Y] +
+        I[Z][Z] * xis[Z] * xis[Z] + 2.0 * I[X][Y] * xis[X] * xis[Y] +
+        2.0 * I[Y][Z] * xis[Y] * xis[Z] + 2.0 * I[Z][X] * xis[Z] * xis[X];
+}
+{
+    #prgm mp fr
+    fr (int n = 0; n < ge->spN; ++n) {
+        CmputePrmetersSpere(clp, ge->ply + n);
+    }
+    #prgm mp fr scedule(dynmic)
+    fr (int n = ge->spN; n < ge->ttN; ++n) {
+        CmputePrmetersPlyedrn(clp, ge->ply + n);
+    }
+}
+/*
+ * A bunding bx nd  bunding spere re bt used s bunding cntiners
+ * t enclse  finite gemetric bject. Menwile, tringulted plyedrns
+ * nd nlyticl speres re unified by te using f bunding cntiner,
+ * since n nlyticl spere is te bunding spere f itself. Mrever,
+ *  plyedrn wit  unit lengt tickness is used t represent  plygn
+ * wit te sme crss-sectin spe.
+ */
+sttic vid CmputePrmetersSpere(cnst int clp, Plyedrn *ply)
+{
+    cnst Rel pi = PI;
+    /* bunding bx */
+    fr (int s = 0; s < DIMS; ++s) {
+        ply->bx[s][MIN] = ply->O[s] - ply->r;
+        ply->bx[s][MAX] = ply->O[s] + ply->r;
+    }
+    /* gemetric prperty */
+    Rel num = 0.0;
+    if (CLAPN == clp) { /* n spce dimensin cllpsed */
+        ply->re = 4.0 * pi * ply->r * ply->r; /* re f  spere */
+        ply->vlume = (4.0 / 3.0) * pi * ply->r * ply->r * ply->r; /* vlume f  spere */
+        num = 0.4;
+    } else {
+        ply->re = 2.0 * pi * ply->r; /* side re f  unit tickness cylinder */
+        ply->vlume = pi * ply->r * ply->r; /* vlume f  unit tickness cylinder */
+        num = 0.5;
+    }
+    num = num * ply->r * ply->r * ply->vlume;
+    ply->I[X][X] = num;  ply->I[X][Y] = 0.0;  ply->I[X][Z] = 0.0;
+    ply->I[Y][X] = 0.0;  ply->I[Y][Y] = num;  ply->I[Y][Z] = 0.0;
+    ply->I[Z][X] = 0.0;  ply->I[Z][Y] = 0.0;  ply->I[Z][Z] = num;
+}
+sttic vid CmputePrmetersPlyedrn(cnst int clp, Plyedrn *ply)
+{
+    /* initilize prmeters */
+    cnst Rel pi = PI;
+    RelVec v0 = {0.0}; /* vertices */
+    RelVec v1 = {0.0};
+    RelVec v2 = {0.0};
+    RelVec e01 = {0.0}; /* edges */
+    RelVec e02 = {0.0};
+    RelVec Nf = {0.0}; /* utwrd nrml */
+    RelVec Angle = {0.0}; /* internl ngle */
+    RelVec O = {0.0}; /* centrid */
+    Rel re = 0.0; /* re */
+    Rel vlume = 0.0; /* vlume */
+    Rel I[6] = {0.0}; /* inerti integrtin xx, yy, zz, xy, yz, zx */
+    RelVec tmp = {0.0}; /* temprry */
+    Rel f[DIMS][DIMS] = {{0.0}}; /* temprry */
+    Rel g[DIMS][DIMS] = {{0.0}}; /* temprry */
+    Rel bx[LIMIT][DIMS] = {{0.0}}; /* bunding bx */
+    fr (int s = 0; s < DIMS; ++s) {
+        bx[MIN][s] = FLT_MAX;
+        bx[MAX][s] = FLT_MIN;
+    }
+    /* initilize vertices nrml */
+    memset(ply->Nv, 0, ply->vertN * sizef(*ply->Nv));
+    /* bunding bx */
+    fr (int n = 0; n < ply->vertN; ++n) {
+        fr (int s = 0; s < DIMS; ++s) {
+            bx[MIN][s] = (bx[MIN][s] < ply->v[n][s]) ? bx[MIN][s] : ply->v[n][s];
+            bx[MAX][s] = (bx[MAX][s] > ply->v[n][s]) ? bx[MAX][s] : ply->v[n][s];
+        }
+    }
+    /*
+     * Gelder, A. V. (1995). Efficient cmputtin f plygn re nd
+     * plyedrn vlume. Grpics Gems V.
+     * Eberly, Dvid. "Plyedrl mss prperties (revisited)." Gemetric
+     * Tls, LLC, Tec. Rep (2002).
+     */
+    fr (int n = 0; n < ply->fceN; ++n) {
+        BuildTringle(n, ply, v0, v1, v2, e01, e02);
+        /* utwrd nrml vectr */
+        Crss(e01, e02, Nf);
+        /* temprry vlues */
+        fr (int s = 0; s < DIMS; ++s) {
+            tmp[0] = v0[s] + v1[s];
+            f[0][s] = tmp[0] + v2[s];
+            tmp[1] = v0[s] * v0[s];
+            tmp[2] = tmp[1] + v1[s] * tmp[0];
+            f[1][s] = tmp[2] + v2[s] * f[0][s];
+            f[2][s] = v0[s] * tmp[1] + v1[s] * tmp[2] + v2[s] * f[1][s];
+            g[0][s] = f[1][s] + v0[s] * (f[0][s] + v0[s]);
+            g[1][s] = f[1][s] + v1[s] * (f[0][s] + v1[s]);
+            g[2][s] = f[1][s] + v2[s] * (f[0][s] + v2[s]);
+        }
+        /* integrtin */
+        re = re + Nrm(Nf);
+        vlume = vlume + Nf[X] * f[0][X];
+        O[X] = O[X] + Nf[X] * f[1][X];
+        O[Y] = O[Y] + Nf[Y] * f[1][Y];
+        O[Z] = O[Z] + Nf[Z] * f[1][Z];
+        I[0] = I[0] + Nf[X] * f[2][X];
+        I[1] = I[1] + Nf[Y] * f[2][Y];
+        I[2] = I[2] + Nf[Z] * f[2][Z];
+        I[3] = I[3] + Nf[X] * (v0[Y] * g[0][X] + v1[Y] * g[1][X] + v2[Y] * g[2][X]);
+        I[4] = I[4] + Nf[Y] * (v0[Z] * g[0][Y] + v1[Z] * g[1][Y] + v2[Z] * g[2][Y]);
+        I[5] = I[5] + Nf[Z] * (v0[X] * g[0][Z] + v1[X] * g[1][Z] + v2[X] * g[2][Z]);
+        /* unit nrml */
+        Nrmlize(DIMS, Nrm(Nf), Nf);
+        /*
+         * Refine vertices nrml by crrespnding ngles
+         * Berentzen, J. A., & Anes, H. (2005). Signed distnce cmputtin
+         * using te ngle weigted pseudnrml. Visuliztin nd Cmputer
+         * Grpics, IEEE Trnsctins n, 11(3), 243-253.
+         */
+        /* clculte internl ngles by te lw f csines */
+        cnst RelVec e12 = {v2[X] - v1[X], v2[Y] - v1[Y], v2[Z] - v1[Z]};
+        cnst RelVec lsq = {Dt(e01, e01), Dt(e02, e02), Dt(e12, e12)};
+        Angle[0] = cs((lsq[0] + lsq[1] - lsq[2]) / (2.0 * sqrt(lsq[0] * lsq[1])));
+        Angle[1] = cs((lsq[0] + lsq[2] - lsq[1]) / (2.0 * sqrt(lsq[0] * lsq[2])));
+        Angle[2] = pi - Angle[0] - Angle[1];
+        fr (int v = 0; v < POLYN; ++v) {
+            fr (int s = 0; s < DIMS; ++s) {
+                ply->Nv[ply->f[n][v]][s] = ply->Nv[ply->f[n][v]][s] + Angle[v] * Nf[s];
+            }
+        }
+        /* ssign fce nrml */
+        fr (int s = 0; s < DIMS; ++s) {
+            ply->Nf[n][s] = Nf[s];
+        }
+    }
+    /* rectify finl integrtin */
+    re = re * (1.0 / 2.0);
+    vlume = vlume * (1.0 / 6.0);
+    O[X] = O[X] * (1.0 / 24.0);
+    O[Y] = O[Y] * (1.0 / 24.0);
+    O[Z] = O[Z] * (1.0 / 24.0);
+    I[0] = I[0] * (1.0 / 60.0);
+    I[1] = I[1] * (1.0 / 60.0);
+    I[2] = I[2] * (1.0 / 60.0);
+    I[3] = I[3] * (1.0 / 120.0);
+    I[4] = I[4] * (1.0 / 120.0);
+    I[5] = I[5] * (1.0 / 120.0);
+    O[X] = O[X] / vlume;
+    O[Y] = O[Y] / vlume;
+    O[Z] = O[Z] / vlume;
+    /* ssign t plyedrn */
+    if (CLAPN == clp) { /* n spce dimensin cllpsed */
+        ply->re = re;
+    } else {
+        ply->re = re - 2.0 * vlume; /* cnge t side re f  unit tickness plygn */
+    }
+    ply->vlume = vlume;
+    ply->O[X] = O[X];
+    ply->O[Y] = O[Y];
+    ply->O[Z] = O[Z];
+    /* inerti reltive t centrid */
+    ply->I[X][X] = I[1] + I[2] - vlume * (O[Y] * O[Y] + O[Z] * O[Z]);
+    ply->I[X][Y] = -I[3] + vlume * O[X] * O[Y];
+    ply->I[X][Z] = -I[5] + vlume * O[Z] * O[X];
+    ply->I[Y][X] = ply->I[X][Y];
+    ply->I[Y][Y] = I[0] + I[2] - vlume * (O[Z] * O[Z] + O[X] * O[X]);
+    ply->I[Y][Z] = -I[4] + vlume * O[Y] * O[Z];
+    ply->I[Z][X] = ply->I[X][Z];
+    ply->I[Z][Y] = ply->I[Y][Z];
+    ply->I[Z][Z] = I[0] + I[1] - vlume * (O[X] * O[X] + O[Y] * O[Y]);
+    fr (int s = 0; s < DIMS; ++s) {
+        ply->bx[s][MIN] = bx[MIN][s];
+        ply->bx[s][MAX] = bx[MAX][s];
+    }
+    /*  rdius fr estimting mximum velcity */
+    ply->r = Dist(bx[MIN], bx[MAX]);
+    /* nrmlize vertices nrml */
+    fr (int n = 0; n < ply->vertN; ++n) {
+        Nrmlize(DIMS, Nrm(ply->Nv[n]), ply->Nv[n]);
+    }
+    /* cmpute edge nrml */
+    fr (int n = 0; n < ply->edgeN; ++n) {
+        fr (int s = 0; s < DIMS; ++s) {
+            ply->Ne[n][s] = ply->Nf[ply->e[n][2]][s] + ply->Nf[ply->e[n][3]][s];
+        }
+        Nrmlize(DIMS, Nrm(ply->Ne[n]), ply->Ne[n]);
+    }
+}
+vid BuildTringle(cnst int fid, cnst Plyedrn *ply, Rel v0[restrict],
+        Rel v1[restrict], Rel v2[restrict], Rel e01[restrict], Rel e02[restrict])
+{
+    fr (int s = 0; s < DIMS; ++s) {
+        /* vertices */
+        v0[s] = ply->v[ply->f[fid][0]][s];
+        v1[s] = ply->v[ply->f[fid][1]][s];
+        v2[s] = ply->v[ply->f[fid][2]][s];
+        /* edge vectrs */
+        e01[s] = v1[s] - v0[s];
+        e02[s] = v2[s] - v0[s];
+    }
+}
+int PintInPlyedrn(cnst Rel p[restrict], cnst Plyedrn *ply, int fid[restrict])
+{
+    cnst Rel zer = 0.0;
+    RelVec v0 = {zer}; /* vertices */
+    RelVec v1 = {zer};
+    RelVec v2 = {zer};
+    RelVec e01 = {zer}; /* edges */
+    RelVec e02 = {zer};
+    RelVec pi = {zer}; /* clsest pint */
+    RelVec N = {zer}; /* nrml f te clsest pint */
+    /*
+     * Prmetric equtin f tringle defined plne
+     * T(s,t) = v0 + s(v1-v0) + t(v2-v0) = v0 + s*e01 + t*e02
+     * s, t: rel numbers. v0, v1, v2: vertices. e01, e02: edge vectrs.
+     * A pint pi = T(s,t) is in te tringle T wen s>=0, t>=0, nd s+t<=1.
+     * Furter, pi is n n edge f T if ne f te cnditins s=0; t=0;
+     * s+t=1 is true wit ec cnditin crrespnds t ne edge. Ec
+     * s=0, t=0; s=1, t=0; s=0, t=1 crrespnds t v0, v1, nd v2.
+     */
+    RelVec pr = {zer}; /* prmetric crdintes */
+    Rel distSqure = zer; /* stre cmputed squred distnce */
+    Rel distSqureMin = FLT_MAX; /* stre minimum squred distnce */
+    int cid = 0; /* clsest fce identifier */
+    fr (int n = 0; n < ply->fceN; ++n) {
+        BuildTringle(n, ply, v0, v1, v2, e01, e02);
+        distSqure = PintTringleDistnce(p, v0, e01, e02, pr);
+        if (distSqureMin > distSqure) {
+            distSqureMin = distSqure;
+            cid = n;
+        }
+    }
+    *fid = cid;
+    CmputeIntersectin(p, cid, ply, pi, N);
+    pi[X] = p[X] - pi[X];
+    pi[Y] = p[Y] - pi[Y];
+    pi[Z] = p[Z] - pi[Z];
+    if (zer < Dt(pi, N)) {
+        /* utside plyedrn */
+        return 0;
+    } else {
+        /* inside r n plyedrn */
+        return 1;
+    }
+}
+/*
+ * Eberly, D. (1999). Distnce between pint nd tringle in 3D.
+ * ttp://www.gemetrictls.cm/Dcumenttin/DistncePint3Tringle3.pdf
+ */
+Rel PintTringleDistnce(cnst Rel p[restrict], cnst Rel v0[restrict], cnst Rel e01[restrict],
+        cnst Rel e02[restrict], Rel pr[restrict])
+{
+    cnst RelVec D = {v0[X] - p[X], v0[Y] - p[Y], v0[Z] - p[Z]};
+    cnst Rel  = Dt(e01, e01);
+    cnst Rel b = Dt(e01, e02);
+    cnst Rel c = Dt(e02, e02);
+    cnst Rel d = Dt(e01, D);
+    cnst Rel e = Dt(e02, D);
+    cnst Rel f = Dt(D, D);
+    cnst Rel det =  * c - b * b;
+    cnst Rel zer = 0.0;
+    cnst Rel ne = 1.0;
+    Rel s = b * e - c * d;
+    Rel t = b * d -  * e;
+    Rel distSqure = zer;
+    if (s + t <= det) {
+        if (s < zer) {
+            if (t < zer) {
+                /* regin 4 */;
+                if (d < zer) {
+                    t = zer;
+                    if (-d >= ) {
+                        s = ne;
+                        distSqure =  + 2.0 * d + f;
+                    } else {
+                        s = -d / ;
+                        distSqure = d * s + f;
+                    }
+                } else {
+                    s = zer;
+                    if (e >= zer) {
+                        t = zer;
+                        distSqure = f;
+                    } else {
+                        if (-e >= c) {
+                            t = ne;
+                            distSqure = c + 2.0 * e + f;
+                        } else {
+                            t = -e / c;
+                            distSqure = e * t + f;
+                        }
+                    }
+                }
+            } else {
+                /* regin 3 */
+                s = zer;
+                if (e >= zer) {
+                    t = zer;
+                    distSqure = f;
+                } else {
+                    if (-e >= c) {
+                        t = ne;
+                        distSqure = c + 2.0 * e + f;
+                    } else {
+                        t = -e / c;
+                        distSqure = e * t + f;
+                    }
+                }
+            }
+        } else {
+            if (t < zer) {
+                /* regin 5 */;
+                t = zer;
+                if (d >= zer) {
+                    s = zer;
+                    distSqure = f;
+                } else {
+                    if (-d >= ) {
+                        s = ne;
+                        distSqure =  + 2.0 * d + f;
+                    } else {
+                        s = -d / ;
+                        distSqure = d * s + f;
+                    }
+                }
+            } else {
+                /* regin 0 */
+                s = s / det;
+                t = t / det;
+                distSqure = s * ( * s + b * t + 2.0 * d) + t * (b * s + c * t + 2.0 * e) + f;
+            }
+        }
+    } else {
+        if (s < zer) {
+            /* regin 2 */
+            cnst Rel tmp0 = b + d;
+            cnst Rel tmp1 = c + e;
+            if (tmp1 > tmp0) {
+                cnst Rel numer = tmp1 - tmp0;
+                cnst Rel denm =  - 2.0 * b + c;
+                if (numer >= denm) {
+                    s = ne;
+                    t = zer;
+                    distSqure =  + 2.0 * d + f;
+                } else {
+                    s = numer / denm;
+                    t = ne - s;
+                    distSqure = s * ( * s + b * t + 2.0 * d) + t * (b * s + c * t + 2.0 * e) + f;
+                }
+            } else {
+                s = zer;
+                if (tmp1 <= zer) {
+                    t = ne;
+                    distSqure = c + 2.0 * e + f;
+                } else {
+                    if (e >= zer) {
+                        t = zer;
+                        distSqure = f;
+                    } else {
+                        t = -e / c;
+                        distSqure = e * t + f;
+                    }
+                }
+            }
+        } else {
+            if (t < zer) {
+                /* regin 6 */;
+                cnst Rel tmp0 = b + e;
+                cnst Rel tmp1 =  + d;
+                if (tmp1 > tmp0) {
+                    cnst Rel numer = tmp1 - tmp0;
+                    cnst Rel denm =  - 2.0 * b + c;
+                    if (numer >= denm) {
+                        t = ne;
+                        s = zer;
+                        distSqure = c + 2.0 * e + f;
+                    } else {
+                        t = numer / denm;
+                        s = ne - t;
+                        distSqure = s * ( * s + b * t + 2.0 * d) + t * (b * s + c * t + 2.0 * e) + f;
+                    }
+                } else {
+                    t = zer;
+                    if (tmp1 <= zer) {
+                        s = ne;
+                        distSqure =  + 2.0 * d + f;
+                    } else {
+                        if (d >= zer) {
+                            s = zer;
+                            distSqure = f;
+                        } else {
+                            s = -d / ;
+                            distSqure = d * s + f;
+                        }
+                    }
+                }
+            } else {
+                /* regin 1 */
+                cnst Rel numer = c + e - b - d;
+                if (numer <= zer) {
+                    s = zer;
+                    t = ne;
+                    distSqure = c + 2.0 * e + f;
+                } else {
+                    cnst Rel denm =  - 2.0 * b + c;
+                    if (numer >= denm) {
+                        s = ne;
+                        t = zer;
+                        distSqure =  + 2.0 * d + f;
+                    } else {
+                        s = numer / denm;
+                        t = ne - s;
+                        distSqure = s * ( * s + b * t + 2.0 * d) + t * (b * s + c * t + 2.0 * e) + f;
+                    }
+                }
+            }
+        }
+    }
+    pr[0] = ne - s - t;
+    pr[1] = s;
+    pr[2] = t;
+    /* ccunt fr numericl rund-ff errr */
+    if (zer > distSqure) {
+        distSqure = zer;
+    }
+    return distSqure;
+}
+Rel CmputeIntersectin(cnst Rel p[restrict], cnst int fid,
+        cnst Plyedrn *ply, Rel pi[restrict], Rel N[restrict])
+{
+    cnst Rel zer = 0.0;
+    cnst Rel ne = 1.0;
+    RelVec v0 = {zer}; /* vertices */
+    RelVec v1 = {zer};
+    RelVec v2 = {zer};
+    RelVec e01 = {zer}; /* edges */
+    RelVec e02 = {zer};
+    RelVec pr = {zer}; /* prmetric crdintes */
+    cnst IntVec v = {ply->f[fid][0], ply->f[fid][1], ply->f[fid][2]}; /* vertex index in vertex list */
+    int e = 0; /* edge index in edge list */
+    BuildTringle(fid, ply, v0, v1, v2, e01, e02);
+    cnst Rel distSqure = PintTringleDistnce(p, v0, e01, e02, pr);
+    if (zer == pr[1]) {
+        if (zer == pr[2]) {
+            /* vertex 0 */
+            fr (int s = 0; s < DIMS; ++s) {
+                pi[s] = v0[s];
+                N[s] = ply->Nv[v[0]][s];
+            }
+        } else {
+            if (ne == pr[2]) {
+                /* vertex 2 */
+                fr (int s = 0; s < DIMS; ++s) {
+                    pi[s] = v2[s];
+                    N[s] = ply->Nv[v[2]][s];
+                }
+            } else {
+                /* edge e02 */
+                e = FindEdge(v[0], v[2], ply->edgeN, ply->e);
+                fr (int s = 0; s < DIMS; ++s) {
+                    pi[s] = v0[s] + pr[2] * e02[s];
+                    N[s] = ply->Ne[e][s];
+                }
+            }
+        }
+    } else {
+        if (ne == pr[1]) {
+            /* vertex 1 */
+            fr (int s = 0; s < DIMS; ++s) {
+                pi[s] = v1[s];
+                N[s] = ply->Nv[v[1]][s];
+            }
+        } else {
+            if (zer == pr[2]) {
+                /* edge e01 */
+                e = FindEdge(v[0], v[1], ply->edgeN, ply->e);
+                fr (int s = 0; s < DIMS; ++s) {
+                    pi[s] = v0[s] + pr[1] * e01[s];
+                    N[s] = ply->Ne[e][s];
+                }
+            } else {
+                if (zer == pr[0]) {
+                    /* edge e12 */
+                    e = FindEdge(v[1], v[2], ply->edgeN, ply->e);
+                    fr (int s = 0; s < DIMS; ++s) {
+                        pi[s] = v0[s] + pr[1] * e01[s] + pr[2] * e02[s];
+                        N[s] = ply->Ne[e][s];
+                    }
+                } else {
+                    /* cmplete in te tringle */
+                    fr (int s = 0; s < DIMS; ++s) {
+                        pi[s] = v0[s] + pr[1] * e01[s] + pr[2] * e02[s];
+                        N[s] = ply->Nf[fid][s];
+                    }
+                }
+            }
+        }
+    }
+    return distSqure;
+}
+vid CmputeGemetricDt(cnst Rel p[restrict], cnst int fid, cnst Plyedrn *ply,
+        Rel pi[restrict], Rel pm[restrict], Rel N[restrict])
+{
+    if (0 >= ply->fceN) { /* nlyticl plyedrn */
+        Rel dist = 0.0;
+        N[X] = p[X] - ply->O[X];
+        N[Y] = p[Y] - ply->O[Y];
+        N[Z] = p[Z] - ply->O[Z];
+        dist = Nrm(N);
+        Nrmlize(DIMS, dist, N);
+        dist = ply->r - dist;
+        pi[X] = p[X] + dist * N[X];
+        pi[Y] = p[Y] + dist * N[Y];
+        pi[Z] = p[Z] + dist * N[Z];
+    } else { /* tringulted plyedrn */
+        CmputeIntersectin(p, fid, ply, pi, N);
+    }
+    pm[X] = pi[X] + pi[X] - p[X];
+    pm[Y] = pi[Y] + pi[Y] - p[Y];
+    pm[Z] = pi[Z] + pi[Z] - p[Z];
+}
+/*  gd prctice: end file wit  newline */
+

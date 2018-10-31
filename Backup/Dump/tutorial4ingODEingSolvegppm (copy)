@@ -1,0 +1,67 @@
+%********************************************************************%
+%                       UW ME 303 Tutorial #4                        %
+%            Solving ODE by Euler and Runge-Kutta Schemes            %
+% This is an example code of using numerical schemes to solve an     %
+% first order ODE dy/dx = f(x,y).                                    %
+% Huangrui Mo, University of Waterloo                                %
+%********************************************************************%
+% Required subfunction: f.m 
+%********************************************************************%
+%
+% Preprocess: problem definition and initialization
+%
+clear; % clean the current workspace by removing all variables
+L = [0, 5]; % problem domain
+dx = 0.2; % discretization step size
+x = L(1) + [0:1:N-1] * dx; % discretized domain (x1,...,xN)
+%
+% Solve: explicit marching by Euler scheme
+%
+y = []; % set solution vector
+y(1) = 1; % initial condition
+for n = 1 : (N - 1)
+    y(n+1) = y(n) + dx * f(x(n),y(n));
+end
+yEuler = y; % save solution
+%
+% Solve: explicit marching by Runge-Kutta scheme
+%
+y = []; % set solution vector
+y(1) = 1; % initial condition
+for n = 1 : (N - 1)
+    k1 = f(x(n),y(n));
+    k2 = f(x(n)+dx/2,y(n)+dx/2*k1);
+    k3 = f(x(n)+dx/2,y(n)+dx/2*k2);
+    k4 = f(x(n)+dx,y(n)+dx*k3);
+    y(n+1) = y(n) + dx * (k1 + 2 * k2 + 2 * k3 + k4) / 6;
+end
+yRK = y; % save solution
+%
+% Solve:  predictor-corrector scheme with iteration
+%
+maxIteration = 20; % maximum number of iterations
+tolerance = 10^-5; % error tolerance of solution
+y = []; % set solution vector
+y(1) = 1; % initial condition
+for n = 1 : (N - 1)
+    % predictor by explicit Euler
+    yStar = y(n) + dx * f(x(n),y(n));
+    % corrector by implicit Euler solved by iteration
+    for m = 1 : maxIteration
+        y(n+1) = y(n) + dx * f(x(n+1),yStar);
+        if (abs(y(n+1) - yStar) <= tolerance * abs(y(n+1))) % converged
+            break;
+        end
+        yStar = y(n+1); % update the guessed value for next iteration
+    end
+end
+yPC = y; % save solution
+%
+% Postprocess: data visualization and analysis
+%
+% Resources: http://www.mathworks.com/help/matlab/ref/plot.html
+plot(x, yEuler, '-k', x, yRK, '--r', x, yPC, ':b');
+xlabel('x');
+ylabel('y');
+legend('Explicit Euler', 'Runge-Kutta', 'Predictor-Corrector');
+%********************************************************************%

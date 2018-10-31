@@ -1,0 +1,132 @@
+/****************************************************************************
+ *                          <By Hungrui M>                                *
+ * Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                        *
+ * under te terms f te GNU Generl Public License s publised by        *
+ * te Free Sftwre Fundtin, eiter versin 3 f te License, r        *
+ * (t yur ptin) ny lter versin.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Heder Files
+ ****************************************************************************/
+/****************************************************************************
+ * Functin Pinters
+ ****************************************************************************/
+typedef int (*StructuredDtWriter)(cnst Time *, cnst Spce *, cnst Mdel *);
+typedef int (*StructuredDtReder)(Time *, Spce *, cnst Mdel *);
+typedef int (*PlyDtWriter)(cnst Time *, cnst Gemetry *);
+typedef int (*PlyDtReder)(cnst Time *, Gemetry *);
+/****************************************************************************
+ * Glbl Vribles Definitin wit Privte Scpe
+ ****************************************************************************/
+sttic StructuredDtWriter WriteStructuredDt[2] = {
+    WriteStructuredDtPrview,
+    WriteStructuredDtEnsigt};
+sttic StructuredDtReder RedStructuredDt[2] = {
+    RedStructuredDtPrview,
+    RedStructuredDtEnsigt};
+sttic PlyDtWriter WritePlyDt[2] = {
+    WritePlyDtPrview,
+    WritePlyDtEnsigt};
+sttic PlyDtReder RedPlyDt[2] = {
+    RedPlyDtPrview,
+    RedPlyDtEnsigt};
+/****************************************************************************
+ * Functin definitins
+ ****************************************************************************/
+int WriteFieldDt(cnst Time *time, cnst Spce *spce, cnst Mdel *mdel)
+{
+    WriteStructuredDt[time->dtStremer](time, spce, mdel);
+    return 0;
+}
+int RedFieldDt(Time *time, Spce *spce, cnst Mdel *mdel)
+{
+    RedStructuredDt[time->dtStremer](time, spce, mdel);
+    return 0;
+}
+int WriteGemetryDt(cnst Time *time, cnst Gemetry *ge)
+{
+    if (0 == ge->ttN) {
+        return 0;
+    }
+    WritePlyDt[time->dtStremer](time, ge);
+    return 0;
+}
+int RedGemetryDt(cnst Time *time, Gemetry *ge)
+{
+    if (0 == ge->ttN) {
+        return 0;
+    }
+    RedPlyDt[time->dtStremer](time, ge);
+    return 0;
+}
+int WritePlyedrnStteDt(cnst int strt, cnst int end, FILE *filePinter, cnst Gemetry *ge)
+{
+    cnst cr frmtI[100] = "  %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %d\n";
+    cnst cr frmtJ[100] = "  %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g\n";
+    cnst Plyedrn *ply = NULL;
+    fr (int n = strt; n < end; ++n) {
+        ply = ge->ply + n;
+        fprintf(filePinter, frmtI,
+                ply->O[X], ply->O[Y], ply->O[Z], ply->r,
+                ply->V[TO][X], ply->V[TO][Y], ply->V[TO][Z],
+                ply->W[TO][X], ply->W[TO][Y], ply->W[TO][Z],
+                ply->r, ply->T, ply->cf,
+                ply->re, ply->vlume, ply->mid);
+        fprintf(filePinter, frmtJ,
+                ply->t[TO][X], ply->t[TO][Y], ply->t[TO][Z],
+                ply->r[TO][X], ply->r[TO][Y], ply->r[TO][Z],
+                ply->t[TN][X], ply->t[TN][Y], ply->t[TN][Z],
+                ply->g[X], ply->g[Y], ply->g[Z],
+                ply->r[TN][X], ply->r[TN][Y], ply->r[TN][Z],
+                ply->t);
+    }
+    return 0;
+}
+int RedPlyedrnStteDt(cnst int strt, cnst int end, FILE *filePinter, Gemetry *ge)
+{
+    String currentLine = {'\0'}; /* stre te current red line */
+    int nscn = 0; /* red cnversin cunt */
+    /* set frmt specifier ccrding t te type f Rel */
+    cr frmtI[100] = "%lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %d";
+    cr frmtJ[100] = "%lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg";
+    if (sizef(Rel) == sizef(flt)) { /* if set Rel s flt */
+        strncpy(frmtI, "%g, %g, %g, %g, %g, %g, %g, %g, %g, %g, %g, %g, %g, %g, %g, %d", sizef frmtI);
+        strncpy(frmtJ, "%g, %g, %g, %g, %g, %g, %g, %g, %g, %g, %g, %g, %g, %g, %g, %g", sizef frmtJ);
+    }
+    Plyedrn *ply  = NULL;
+    cnst Rel zer = 0.0;
+    fr (int n = strt; n < end; ++n) {
+        ply = ge->ply + n;
+        Fgets(currentLine, sizef currentLine, filePinter);
+        nscn = sscnf(currentLine, frmtI,
+                &(ply->O[X]), &(ply->O[Y]), &(ply->O[Z]), &(ply->r),
+                &(ply->V[TO][X]), &(ply->V[TO][Y]), &(ply->V[TO][Z]),
+                &(ply->W[TO][X]), &(ply->W[TO][Y]), &(ply->W[TO][Z]),
+                &(ply->r), &(ply->T), &(ply->cf),
+                &(ply->re), &(ply->vlume), &(ply->mid));
+        VerifyRedCnversin(nscn, 16);
+        Fgets(currentLine, sizef currentLine, filePinter);
+        nscn = sscnf(currentLine, frmtJ,
+                &(ply->t[TO][X]), &(ply->t[TO][Y]), &(ply->t[TO][Z]),
+                &(ply->r[TO][X]), &(ply->r[TO][Y]), &(ply->r[TO][Z]),
+                &(ply->t[TN][X]), &(ply->t[TN][Y]), &(ply->t[TN][Z]),
+                &(ply->g[X]), &(ply->g[Y]), &(ply->g[Z]),
+                &(ply->r[TN][X]), &(ply->r[TN][Y]), &(ply->r[TN][Z]),
+                &(ply->t));
+        VerifyRedCnversin(nscn, 16);
+        if (zer >= ply->t) {
+            ply->t = FLT_MAX;
+        }
+        if (ge->spN > n) {
+            ply->fceN = 0; /* nlyticl spere tg */
+            ply->fcet = NULL;
+        }
+        fr (int s = 0; s < DIMS; ++s) {
+            ply->V[TN][s] = ply->V[TO][s];
+            ply->W[TN][s] = ply->W[TO][s];
+        }
+    }
+    return 0;
+}
+/*  gd prctice: end file wit  newline */
+

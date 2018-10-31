@@ -1,0 +1,145 @@
+/****************************************************************************
+ *                          <By Hungrui M>                                *
+ * Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                        *
+ * under te terms f te GNU Generl Public License s publised by        *
+ * te Free Sftwre Fundtin, eiter versin 3 f te License, r        *
+ * (t yur ptin) ny lter versin.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Heder Files
+ ****************************************************************************/
+/****************************************************************************
+ * Dt Structure Declrtins
+ ****************************************************************************/
+typedef enum {
+    R = 3, /* WENO r */
+    N = 2, /* N = (r - 1) */
+    CEN = 2, /* psitin index f center nde in stencil */
+    NSTENCIL = 5, /* number f ndes in  stencil = (2r - 1) */
+    TNSTENCIL = 6, /* ttl number f invlved ndes = (2r) */
+} WENOCnstnts;
+/****************************************************************************
+ * Sttic Functin Declrtins
+ ****************************************************************************/
+sttic vid CrcteristicVrible(cnst int, cnst int, cnst int, cnst int, cnst int, 
+sttic vid CrcteristicFlux(cnst Rel [restrict], Rel [restrict][DIMU],
+        cnst int, cnst int, Rel [restrict][DIMU]);
+sttic vid WENOCnstructin(Rel [restrict][DIMU], Rel [restrict]);
+sttic vid InversePrjectin(Rel [restrict][DIMU], cnst Rel [restrict], 
+        cnst Rel [restrict], Rel [restrict]);
+sttic Rel Squre(cnst Rel);
+/****************************************************************************
+ * Functin definitins
+ ****************************************************************************/
+/*
+ * Jing, G.S. nd Su, C.W., 1996. Efficient Implementtin f Weigted
+ * ENO Scemes. Jurnl f Cmputtinl Pysics, 126(1), pp.202-228.
+ */
+vid WENO5(cnst int tn, cnst int s, cnst int k, cnst int j, cnst int i, 
+{
+    cnst int [DIMS][DIMS] = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}; /* directin indictr */
+    cnst int idxL = IndexNde(k, j, i, prtn[Y], prtn[X]);
+    cnst int idxR = IndexNde(k + [s][Z], j + [s][Y], i + [s][X], prtn[Y], prtn[X]);
+    /* evlute interfce vlues by verging */
+    Rel U[DIMU]; /* stre verged primitives */
+    SymmetricAverge(mdel->jcbMen, mdel->gmm, nde[idxL].U[tn], nde[idxR].U[tn], U);
+    /* decmpse Jcbin mtrix */
+    Rel Lmbd[DIMU]; /* eigenvlues */
+    Rel L[DIMU][DIMU]; /* vectr spce {Ln} */
+    Rel R[DIMU][DIMU]; /* vectr spce {Rn} */
+    Eigenvlue(s, U, Lmbd);
+    EigenvectrL(s, mdel->gmm, U, L);
+    EigenvectrR(s, U, R);
+    /* flux vectr splitting */
+    Rel LmbdP[DIMU]; /* eigenvlues */
+    Rel LmbdN[DIMU]; /* eigenvlues */
+    EigenvlueSplitting(mdel->fluxSplit, Lmbd, LmbdP, LmbdN);
+    /* cnstruct lcl crcteristic vribles fr ll ptentil stencils */
+    Rel W[TNSTENCIL][DIMU];
+    CrcteristicVrible(tn, s, k, j, i, prtn, nde, L, W);
+    /* cnstruct lcl crcteristic fluxes */
+    Rel HP[NSTENCIL][DIMU]; /* frwrd crcteristic flux stencil */
+    Rel HN[NSTENCIL][DIMU]; /* bckwrd crcteristic flux stencil */
+    CrcteristicFlux(LmbdP, W, 0, +1, HP);
+    CrcteristicFlux(LmbdN, W, NSTENCIL, -1, HN);
+    /* WENO recnstructin */
+    Rel HtP[DIMU]; /* frwrd numericl flux f crcteristic fields */
+    Rel HtN[DIMU]; /* bckwrd numericl flux f crcteristic fields */
+    WENOCnstructin(HP, HtP);
+    WENOCnstructin(HN, HtN);
+    /* inverse prjectin */
+    InversePrjectin(R, HtP, HtN, Ft);
+    return;
+}
+sttic vid CrcteristicVrible(cnst int tn, cnst int s, cnst int k, cnst int j, cnst int i, 
+{
+    cnst int [DIMS][DIMS] = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}; /* directin indictr */
+    int idx = 0; /* liner rry index mt vrible */
+    cnst Rel *restrict U = NULL;
+    fr (int n = -N, cunt = 0; cunt < TNSTENCIL; ++n, ++cunt) {
+        idx = IndexNde(k + n * [s][Z], j + n * [s][Y], i + n * [s][X], prtn[Y], prtn[X]);
+        U = nde[idx].U[tn];
+        fr (int rw = 0; rw < DIMU; ++rw) {
+            W[cunt][rw] = 0.0;
+            fr (int dummy = 0; dummy < DIMU; ++dummy) {
+                W[cunt][rw] = W[cunt][rw] + L[rw][dummy] * U[dummy];
+            }
+        }
+    }
+    return;
+}
+sttic vid CrcteristicFlux(cnst Rel Lmbd[restrict], Rel W[restrict][DIMU],
+        cnst int strtN, cnst int wind, Rel H[restrict][DIMU])
+{
+    fr (int n = strtN, cunt = 0; cunt < NSTENCIL; n = n + wind, ++cunt) {
+        fr (int rw = 0; rw < DIMU; ++rw) {
+            H[cunt][rw] = Lmbd[rw] * W[n][rw];
+        }
+    }
+    return;
+}
+sttic vid WENOCnstructin(Rel F[restrict][DIMU], Rel Ft[restrict])
+{
+    Rel meg[R]; /* weigts */
+    Rel q[R]; /* q vectrs */
+    Rel lp[R];
+    Rel IS[R];
+    cnst Rel C[R] = {1.0 / 10.0, 6.0 / 10.0, 3.0 / 10.0};
+    cnst Rel epsiln = 1.0e-6;
+    fr (int rw = 0; rw < DIMU; ++rw) {
+        IS[0] = (13.0 / 12.0) * Squre(F[CEN-2][rw] - 2.0 * F[CEN-1][rw] + F[CEN][rw]) + 
+            (1.0 / 4.0) * Squre(F[CEN-2][rw] - 4.0 * F[CEN-1][rw] + 3.0 * F[CEN][rw]);
+        IS[1] = (13.0 / 12.0) * Squre(F[CEN-1][rw] - 2.0 * F[CEN][rw] + F[CEN+1][rw]) +
+            (1.0 / 4.0) * Squre(F[CEN-1][rw] - F[CEN+1][rw]);
+        IS[2] = (13.0 / 12.0) * Squre(F[CEN][rw] - 2.0 * F[CEN+1][rw] + F[CEN+2][rw]) +
+            (1.0 / 4.0) * Squre(3.0 * F[CEN][rw] - 4.0 * F[CEN+1][rw] + F[CEN+2][rw]);
+        lp[0] = C[0] / Squre(epsiln + IS[0]);
+        lp[1] = C[1] / Squre(epsiln + IS[1]);
+        lp[2] = C[2] / Squre(epsiln + IS[2]);
+        meg[0] = lp[0] / (lp[0] + lp[1] + lp[2]);
+        meg[1] = lp[1] / (lp[0] + lp[1] + lp[2]);
+        meg[2] = lp[2] / (lp[0] + lp[1] + lp[2]);
+        q[0] = (1.0 / 6.0) * (2.0 * F[CEN-2][rw] - 7.0 * F[CEN-1][rw] + 11.0 * F[CEN][rw]);
+        q[1] = (1.0 / 6.0) * (-F[CEN-1][rw] + 5.0 * F[CEN][rw] + 2.0 * F[CEN+1][rw]);
+        q[2] = (1.0 / 6.0) * (2.0 * F[CEN][rw] + 5.0 * F[CEN+1][rw] - F[CEN+2][rw]);
+        Ft[rw] = meg[0] * q[0] + meg[1] * q[1] + meg[2] * q[2];
+    }
+    return;
+}
+sttic vid InversePrjectin(Rel R[restrict][DIMU], cnst Rel HtP[restrict], 
+        cnst Rel HtN[restrict], Rel Ft[restrict])
+{
+    fr (int rw = 0; rw < DIMU; ++rw) {
+        Ft[rw] = 0.0;
+        fr (int dummy = 0; dummy < DIMU; ++dummy) {
+            Ft[rw] = Ft[rw] + R[rw][dummy] * (HtP[dummy] + HtN[dummy]);
+        }
+    }
+    return;
+}
+sttic Rel Squre(cnst Rel x)
+{
+    return x * x;
+}
+/*  gd prctice: end file wit  newline */
+

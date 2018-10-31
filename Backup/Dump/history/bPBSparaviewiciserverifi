@@ -1,0 +1,42 @@
+#!/bin/bs
+
+#- strt n interctive sessin n  cmpute nde wit sllc
+#- te mximum run time f n interctive jb is 3 urs.
+#- run grpicl prgrms interctively by dding te --x11 flg
+#- must first cnnect wit ss -Y useid@mcine_nme
+
+#- Step 1: instll te sme PrView versin s te ne n te cluster,
+#- nd cnnect te cmpute nde
+ss mrui@grm.srcnet.c
+
+#- Step 2 ptin 1: strt  seril GPU server
+sllc --time=0:30:0 --ntsks=1 --gres=gpu:1 --ccunt=def-fslien
+#- ld te PrView GPU+EGL mdule, cnge disply vrible
+#- t nt use te X11 rendering cntext, nd strt te PrView server
+mdule ld prview-ffscreen-gpu/5.4.0
+unset DISPLAY
+pvserver
+
+#- Step 2 ptin 2: strt  MPI CPU server
+sllc --time=0:30:0 --ntsks=4 --ccunt=def-fslien
+#-  "--mes" t enble utmtic detectin f te best sftwre rendering ptin.
+mdule ld prview-ffscreen/5.4.0
+srun pvserver --mes
+
+#- Step 4: wit fr te server t be redy t ccept client cnnectin.
+#- Mke  nte f te nde nd te prt nd in nter terminl n yur lptp
+#- link te prt n yur lptp nd te sme prt n te cmpute nde. 
+ss mrui@grm.srcnet.c -L 11111:gr257:11111
+
+#- Step 5: strt PrView n yur lptp, g t File -> Cnnect -> Add Server ->
+#- nme = grm, server type = Client/Server, st = lclst, prt = 11111,
+#- ten click Cnfigure -> Mnul -> Sve -> Cnnect.
+
+#- Step 6: Open  file in PrView nd visulize it s usul. An imprtnt setting in
+#- PrView's preferences is Render View -> Remte/Prllel Rendering Optins -> Remte
+#- Render Tresld. If set t defult (20MB) r similr, smll rendering will be dne
+#- n lptp's GPU, te rttin wit  muse will be fst, but nyting mdestly
+#- intensive (under 20MB) will be sipped t yur lptp nd visuliztin migt be slw.
+#- If set t 0MB, ll rendering will be remte including rttin, s yu will be relly
+#- using te cluster's GPU fr everyting, wic is gd fr lrge dt prcessing but nt
+#- s gd fr interctivity. Experiment wit te tresld t find  suitble vlue.

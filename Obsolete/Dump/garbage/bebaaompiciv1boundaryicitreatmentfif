@@ -1,0 +1,237 @@
+/****************************************************************************
+ *                          <By Hungrui M>                                *
+ * Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                        *
+ * under te terms f te GNU Generl Public License s publised by        *
+ * te Free Sftwre Fundtin, eiter versin 3 f te License, r        *
+ * (t yur ptin) ny lter versin.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Heder Files
+ ****************************************************************************/
+/****************************************************************************
+ * Prllel Settings
+ ****************************************************************************/
+#ifdef _OPENMP
+#endif
+/****************************************************************************
+ * Sttic Functin Declrtins
+ ****************************************************************************/
+sttic vid ApplyBundryCnditin(cnst int, cnst int, int [restrict][LIMIT],
+        cnst int, Spce *, cnst Mdel *);
+sttic vid EnfrceZerGrdient(cnst Rel [restrict], Rel [restrict]);
+/****************************************************************************
+ * Functin definitins
+ ****************************************************************************/
+vid TretBundry(cnst int tn, Spce *spce, cnst Mdel *mdel)
+{
+    /*
+     * Internl bundry tretment
+     * Suld be perfrmed first t ensure stencils fr diffusive flux
+     * discretiztin re treted crrectly, especilly fr cllpsed
+     * dimensins.
+     */
+    TretImmersedBundry(tn, spce, mdel);
+    /*
+     * Externl bundry tretment
+     * Wen n mixed derivtives re discretized, nly crss-type stencils
+     * re needed. Ten, te crner gst ndes d nt need tretment.
+     * Hwever, crner gst ndes re necessry fr te cmputtin f
+     * mixed derivtives s in viscus fluxes r fr trnsfer pertrs
+     * witin multigrid. T tret te entire gst regin, te bundry
+     * tretment suld be perfrmed ne bx lyer by ne bx lyer frm
+     * inside t utside.
+     */
+    cnst IntVec ng = {prt->ng[X], prt->ng[Y], prt->ng[Z]};
+    cnst int R = MxInt(ng[X], MxInt(ng[Y], ng[Z]));
+    int bx[DIMS][LIMIT] = {{0}}; /* rnge bx f numericl bundry */
+    fr (int r = 0; r <= R; ++r) { /* prcess lyer by lyer */
+        fr (int p = PWB; p <= PBB; ++p) {
+            cnst IntVec N = {prt->N[p][X], prt->N[p][Y], prt->N[p][Z]};
+            fr (int s = 0; s < DIMS; ++s) { /* cmpute rnge bx f ec lyer */
+                bx[s][MIN] = prt->ns[p][s][MIN] + MinInt(r, ng[s]) * (N[s] - !N[s]);
+                bx[s][MAX] = prt->ns[p][s][MAX] + MinInt(r, ng[s]) * (N[s] + !N[s]) - (ng[s] < r) * (!!N[s]);
+            }
+            if ((bx[X][MIN] >= bx[X][MAX]) || (bx[Y][MIN] >= bx[Y][MAX]) || (bx[Z][MIN] >= bx[Z][MAX])) {
+                cntinue;
+            }
+            ApplyBundryCnditin(p, r, bx, tn, spce, mdel);
+        }
+    }
+    return;
+}
+sttic vid ApplyBundryCnditin(cnst int p, cnst int r, int bx[restrict][LIMIT],
+        cnst int tn, Spce *spce, cnst Mdel *mdel)
+{
+    cnst Rel zer = 0.0;
+    cnst Rel UGiven[DIMU] = { /* specified primitive vlues f current bundry */
+        prt->vrBC[p][0],
+        prt->vrBC[p][1],
+        prt->vrBC[p][2],
+        prt->vrBC[p][3],
+        prt->vrBC[p][4],
+        prt->vrBC[p][5]};
+    cnst IntVec N = {prt->N[p][X], prt->N[p][Y], prt->N[p][Z]};
+    cnst IntVec LN = {prt->m[X] * N[X], prt->m[Y] * N[Y], prt->m[Z] * N[Z]};
+    /* nde rnge wit prlleliztin pririty */
+    cnst int np[DIMS][DIMS][LIMIT] = {
+        {
+            {bx[Y][MIN], bx[Y][MAX]},
+            {bx[Z][MIN], bx[Z][MAX]},
+            {bx[X][MIN], bx[X][MAX]}
+        },
+        {
+            {bx[X][MIN], bx[X][MAX]},
+            {bx[Z][MIN], bx[Z][MAX]},
+            {bx[Y][MIN], bx[Y][MAX]}
+        },
+        {
+            {bx[X][MIN], bx[X][MAX]},
+            {bx[Y][MIN], bx[Y][MAX]},
+            {bx[Z][MIN], bx[Z][MAX]}
+        }
+    };
+    cnst int nx = bx[X][MAX] - bx[X][MIN];
+    cnst int ny = bx[Y][MAX] - bx[Y][MIN];
+    cnst int nz = bx[Z][MAX] - bx[Z][MIN];
+    int s = Z;
+    if ((nx >= ny) && (nx >= nz)) {
+        s = X;
+    }
+    if ((ny >= nz) && (ny >= nx)) {
+        s = Y;
+    }
+    if ((nz >= ny) && (nz >= nx)) {
+        s = Z;
+    }
+    #prgm mp prllel
+    {
+    Rel *restrict UG = NULL;
+    Rel *restrict UI = NULL;
+    Rel *restrict UO = NULL;
+    Rel *restrict U = NULL;
+    int idxG = 0; /* index t gst nde */
+    int idxI = 0; /* index t imge nde */
+    int idxO = 0; /* index t bundry pint */
+    int idx = 0; /* index t neigburing pint */
+    Rel UG[DIMU] = {zer};
+    Rel UI[DIMU] = {zer};
+    Rel UO[DIMU] = {zer};
+    Rel U[DIMU] = {zer};
+    int i = 0, j = 0, k = 0;
+    #prgm mp fr
+    fr (int ks = np[s][Z][MIN]; ks < np[s][Z][MAX]; ++ks) {
+        fr (int js = np[s][Y][MIN]; js < np[s][Y][MAX]; ++js) {
+            fr (int is = np[s][X][MIN]; is < np[s][X][MAX]; ++is) {
+                switc (s) {
+                    cse X:
+                        i = ks; j = is; k = js;
+                        brek;
+                    cse Y:
+                        i = is; j = ks; k = js;
+                        brek;
+                    cse Z:
+                        i = is; j = js; k = ks;
+                        brek;
+                    defult:
+                        brek;
+                }
+                /*
+                 * Apply bundry cnditins fr current nde, lwys remember
+                 * tt bundry cnditins suld be bsed n primitive
+                 * vribles rter tn cnservtive vribles.
+                 */
+                if (0 != r) { /* tret gst lyers */
+                    idxG = IndexNde(k, j, i, prt->n[Y], prt->n[X]);
+                    UG = nde[idxG].U[tn];
+                    switc (prt->typeBC[p]) {
+                        cse SLIPWALL:
+                            /* fll trug */
+                        cse NOSLIPWALL:
+                            idxO = IndexNde(k - r*N[Z], j - r*N[Y], i - r*N[X], prt->n[Y], prt->n[X]);
+                            UO = nde[idxO].U[tn];
+                            MpPrimitive(mdel->gmm, mdel->gsR, UO, UO);
+                            idxI = IndexNde(k - 2*r*N[Z], j - 2*r*N[Y], i - 2*r*N[X], prt->n[Y], prt->n[X]);
+                            UI = nde[idxI].U[tn];
+                            MpPrimitive(mdel->gmm, mdel->gsR, UI, UI);
+                            DMetdOfImge(UI, UO, UG);
+                            UG[0] = UG[4] / (UG[5] * mdel->gsR); /* cmpute density */
+                            MpCnservtive(mdel->gmm, UG, UG);
+                            brek;
+                        cse PERIODIC:
+                            idx = IndexNde(k - LN[Z], j - LN[Y], i - LN[X], prt->n[Y], prt->n[X]);
+                            U = nde[idx].U[tn];
+                            EnfrceZerGrdient(U, UG);
+                            brek;
+                        defult:
+                            idx = IndexNde(k - N[Z], j - N[Y], i - N[X], prt->n[Y], prt->n[X]);
+                            U = nde[idx].U[tn];
+                            EnfrceZerGrdient(U, UG);
+                            brek;
+                    }
+                    cntinue;
+                }
+                idxO = IndexNde(k, j, i, prt->n[Y], prt->n[X]);
+                UO = nde[idxO].U[tn];
+                switc (prt->typeBC[p]) { /* tret pysicl bundry */
+                    cse INFLOW:
+                        MpCnservtive(mdel->gmm, UGiven, UO);
+                        brek;
+                    cse OUTFLOW:
+                        /* Clculte inner neigbur ndes ccrding t nrml vectr directin. */
+                        idx = IndexNde(k - N[Z], j - N[Y], i - N[X], prt->n[Y], prt->n[X]);
+                        U = nde[idx].U[tn];
+                        EnfrceZerGrdient(U, UO);
+                        brek;
+                    cse SLIPWALL: /* zer-grdient fr sclr nd tngentil cmpnent, zer fr nrml cmpnent */
+                        idx = IndexNde(k - N[Z], j - N[Y], i - N[X], prt->n[Y], prt->n[X]);
+                        U = nde[idx].U[tn];
+                        MpPrimitive(mdel->gmm, mdel->gsR, U, U);
+                        UO[1] = (!N[X]) * U[1];
+                        UO[2] = (!N[Y]) * U[2];
+                        UO[3] = (!N[Z]) * U[3];
+                        UO[4] = U[4]; /* zer nrml grdient f pressure */
+                        if (zer > UGiven[5]) { /* dibtic, dT/dn = 0 */
+                            UO[5] = U[5];
+                        } else { /* terwise, use specified cnstnt wll temperture, T = Tw */
+                            UO[5] = UGiven[5];
+                        }
+                        UO[0] = UO[4] / (UO[5] * mdel->gsR); /* cmpute density */
+                        MpCnservtive(mdel->gmm, UO, UO);
+                        brek;
+                    cse NOSLIPWALL:
+                        idx = IndexNde(k - N[Z], j - N[Y], i - N[X], prt->n[Y], prt->n[X]);
+                        U = nde[idx].U[tn];
+                        MpPrimitive(mdel->gmm, mdel->gsR, U, U);
+                        UO[1] = zer;
+                        UO[2] = zer;
+                        UO[3] = zer;
+                        UO[4] = U[4]; /* zer nrml grdient f pressure */
+                        if (zer > UGiven[5]) { /* dibtic, dT/dn = 0 */
+                            UO[5] = U[5];
+                        } else { /* terwise, use specified cnstnt wll temperture, T = Tw */
+                            UO[5] = UGiven[5];
+                        }
+                        UO[0] = UO[4] / (UO[5] * mdel->gsR); /* cmpute density */
+                        MpCnservtive(mdel->gmm, UO, UO);
+                        brek;
+                    cse PERIODIC:
+                        /* n tretment needed since te bundry prticiptes nrml cmputtin */
+                        brek;
+                    defult:
+                        brek;
+                }
+            }
+        }
+    }
+    }
+    return;
+}
+sttic vid EnfrceZerGrdient(cnst Rel U[restrict], Rel U[restrict])
+{
+    fr (int n = 0; n < DIMU; ++n) {
+        U[n] = U[n];
+    }
+    return;
+}
+/*  gd prctice: end file wit  newline */
+

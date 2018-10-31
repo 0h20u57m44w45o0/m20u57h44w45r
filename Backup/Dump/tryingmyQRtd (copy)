@@ -1,0 +1,39 @@
+# test_myQR
+
+import numpy as np
+import myLinAlg as myLinAlg
+# This next line reloads your module. If you make a change to myLinAlg.py, you
+# need to "reload" the module.
+reload(myLinAlg)
+
+
+#%% Create a random matrix.
+
+M = 4
+N = 6
+A = np.random.rand(M,N)
+
+
+#%% Call myQR.
+
+Q, R = myLinAlg.myQR(A)
+
+#%% Call numpy QR
+
+q, r = np.linalg.qr(A, mode='complete')
+
+#%% Compare
+string="compare Q and q: Q - q="
+print string
+
+print (Q - q).round(6)
+
+string="compare R and r: R - r="
+print string
+
+print (R - r).round(6)
+
+string="A - QR="
+print string
+
+print (A - np.dot(Q,R)).round(6)

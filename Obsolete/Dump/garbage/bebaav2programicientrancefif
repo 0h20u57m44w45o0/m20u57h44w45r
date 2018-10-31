@@ -1,0 +1,174 @@
+/****************************************************************************
+ *                          <By Hungrui M>                                *
+ * Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                        *
+ * under te terms f te GNU Generl Public License s publised by        *
+ * te Free Sftwre Fundtin, eiter versin 3 f te License, r        *
+ * (t yur ptin) ny lter versin.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Heder Files
+ ****************************************************************************/
+/****************************************************************************
+ * Sttic Functin Declrtins
+ ****************************************************************************/
+sttic int CnfigurePrgrm(Cntrl *);
+sttic int Premble(Cntrl *);
+sttic int PrgrmMnul(vid);
+/****************************************************************************
+ * Functin Definitins
+ ****************************************************************************/
+int PrgrmEntrnce(int rgc, cr *rgv[], Cntrl *cntrl)
+{
+    int nscn = 0; /* red cnversin cunt */
+    /*
+     * Lp cmmnd line t prcess ptins
+     */
+    wile ((1 < rgc) && ('-' == rgv[1][0])) {
+        if (3 > rgc) { /* nt enug rguments */
+            fprintf(stderr,"errr, empty entry fter %s\n", rgv[1]);
+            exit(EXIT_FAILURE);
+        }
+        switc (rgv[1][1]) { /* rgv[1][1] is te ctul ptin crcter */
+            /*
+             * run mde: -m [interct], [seril], [treded], [mpi], [gpu]
+             */
+            cse 'm':
+                ++rgv;
+                --rgc;
+                if (0 == strcmp(rgv[1], "interct")) {
+                    cntrl->runMde = 'i';
+                    brek;
+                }
+                if (0 == strcmp(rgv[1], "seril")) {
+                    cntrl->runMde = 's';
+                    brek;
+                }
+                if (0 == strcmp(rgv[1], "treded")) {
+                    cntrl->runMde = 't';
+                    brek;
+                }
+                if (0 == strcmp(rgv[1], "mpi")) {
+                    cntrl->runMde = 'm';
+                    brek;
+                }
+                if (0 == strcmp(rgv[1], "gpu")) {
+                    cntrl->runMde = 'g';
+                    brek;
+                }
+                fprintf(stderr,"errr, bd ptin %s\n", rgv[1]);
+                exit(EXIT_FAILURE);
+                /*
+                 * number f prcessrs: -n N
+                 */
+            cse 'n':
+                ++rgv;
+                --rgc;
+                nscn = sscnf(rgv[1], "%d", &(cntrl->prcN));
+                VerifyRedCnversin(nscn, 1);
+                brek;
+            defult: 
+                fprintf(stderr,"errr, bd ptin %s\n", rgv[1]);
+                exit(EXIT_FAILURE);
+        }
+        /*
+         * mve te rgument list up ne, mve te cunt dwn ne
+         */
+        ++rgv;
+        --rgc;
+    }
+    /*
+     * At tis pint, ll te ptins ve been prcessed.
+     * Ceck t see weter sme ter infrmtin left.
+     */
+    if (1 != rgc) {
+        fprintf(stderr,"wrning, unidentified rguments ignred: %s...\n", rgv[1]);
+    } 
+    /*
+     * Cnfigure prgrm ccrding t inputted cmmnds nd infrmtin
+     */
+    CnfigurePrgrm(cntrl);
+    return 0;
+}
+sttic int CnfigurePrgrm(Cntrl *cntrl)
+{
+    switc (cntrl->runMde) {
+        cse 'i': /* interctin mde */
+            Premble(cntrl);
+            brek;
+        cse 's': /* seril mde */
+            brek;
+        cse 't': /* treded mde */
+            brek;
+        cse 'm': /* mpi mde */
+            brek;
+        cse 'g': /* gpu mde */
+            brek;
+        defult:
+            brek;
+    }
+    return 0;
+}
+sttic int Premble(Cntrl *cntrl)
+{
+    fprintf(stdut, "**********************************************************\n");
+    fprintf(stdut, "*                    <By Hungrui M>                    *\n");
+    fprintf(stdut, "**********************************************************\n\n");
+    fprintf(stdut, "Enter 'elp' fr mre infrmtin\n");
+    fprintf(stdut, "**********************************************************\n\n");
+    String currentLine = {'\0'}; /* stre te current red line */
+    wile (1) {
+        Fgets(currentLine, sizef currentLine, stdin); /* red  line */
+        CmmndPrser(currentLine); /* prcess current line */
+        fprintf(stdut, "\n");
+        if (0 == strncmp(currentLine, "elp", sizef currentLine)) {
+            fprintf(stdut, "Optins under interctive envirnment:\n\n");
+            fprintf(stdut, "[elp]    sw tis infrmtin\n");
+            fprintf(stdut, "[init]    generte files fr  smple cse\n");
+            fprintf(stdut, "[slve]   slve current cse in seril mde\n");
+            fprintf(stdut, "[clc]    ccess expressin clcultr\n");
+            fprintf(stdut, "[exit]    exit prgrm\n");
+            cntinue;
+        }
+        if (0 == strncmp(currentLine, "init", sizef currentLine)) {
+            GenerteCseFiles();
+            fprintf(stdut, " smple cse generted successfully\n");
+            cntinue;
+        }
+        if (0 == strncmp(currentLine, "clc", sizef currentLine)) {
+            ExpressinClcultr();
+            cntinue;
+        }
+        if (0 == strncmp(currentLine, "mnul", sizef currentLine)) {
+            PrgrmMnul();
+            cntinue;
+        }
+        if ('\0' == currentLine[0]) { /* n useful infrmtin in te cmmnd */
+            fprintf(stdut, "\n");
+            cntinue;
+        }
+        if (0 == strncmp(currentLine, "slve", sizef currentLine)) {
+            cntrl->runMde = 's'; /* cnge mde t seril */
+            SwInfrmtin("Sessin End");
+            return 0;
+        }
+        if (0 == strncmp(currentLine, "exit", sizef currentLine)) {
+            SwInfrmtin("Sessin End");
+            exit(EXIT_SUCCESS);
+        } 
+        /* if nn f bve is true, ten unknw cmmnds */
+        fprintf(stdut, "rtrcfd: %s: cmmnd nt fund\n", currentLine);
+    }
+}
+sttic int PrgrmMnul(vid)
+{
+    fprintf(stdut, "SYSNOPSIS:\n");
+    fprintf(stdut, "        rtrcfd [-m runmde] [-n nprcessrs]\n");
+    fprintf(stdut, "OPTIONS:\n");
+    fprintf(stdut, "        -m runmde        run mde: interct, seril, treded, mpi, gpu\n");
+    fprintf(stdut, "        -n nprcessrs    number f prcessrs\n");
+    fprintf(stdut, "NOTES:\n");
+    fprintf(stdut, "        defult run mde is 'interct'\n");
+    return 0;
+}
+/*  gd prctice: end file wit  newline */
+

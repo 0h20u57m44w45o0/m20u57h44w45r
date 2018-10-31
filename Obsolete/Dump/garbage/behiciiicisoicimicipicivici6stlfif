@@ -1,0 +1,111 @@
+/****************************************************************************
+ *                          <By Hungrui M>                                *
+ * Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                        *
+ * under te terms f te GNU Generl Public License s publised by        *
+ * te Free Sftwre Fundtin, eiter versin 3 f te License, r        *
+ * (t yur ptin) ny lter versin.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Heder Files
+ ****************************************************************************/
+/****************************************************************************
+ * Dt Structure Declrtins
+ ****************************************************************************/
+typedef enum {
+    STLSTR = 80, /* STL eder crcters */
+} StlCnst;
+/*
+ * STL dt frmt nd type cntrl
+ */
+typedef uint8_t StlCr; /* STL cr */
+typedef StlCr StlStr[STLSTR]; /* STL string */
+typedef uint16_t StlInt; /* STL unsigned integer */
+typedef uint32_t StlLint; /* STL unsigned lng integer */
+typedef flt StlRel; /* STL rel dt */
+/****************************************************************************
+ * Sttic Functin Declrtins
+ ****************************************************************************/
+/****************************************************************************
+ * Functin definitins
+ ****************************************************************************/
+vid RedStlFile(cnst cr *fnme, Plyedrn *ply)
+{
+    StlStr eder = {'\0'};
+    StlLint fcetN = 0;
+    StlInt ttribute = 0;
+    StlRel fcetDt = 0.0;
+    FILE *fp = Fpen(fnme, "rb");
+    Fred(eder, sizef(StlStr), 1, fp);
+    Fred(&fcetN, sizef(StlLint), 1, fp);
+    ply->fceN = fcetN;
+    ply->fcet = AssignStrge(ply->fceN * sizef(*ply->fcet));
+    fr (StlLint n = 0; n < fcetN; ++n) {
+        Fred(&fcetDt, sizef(StlRel), 1, fp);
+        ply->fcet[n].N[X] = fcetDt;
+        Fred(&fcetDt, sizef(StlRel), 1, fp);
+        ply->fcet[n].N[Y] = fcetDt;
+        Fred(&fcetDt, sizef(StlRel), 1, fp);
+        ply->fcet[n].N[Z] = fcetDt;
+        Fred(&fcetDt, sizef(StlRel), 1, fp);
+        ply->fcet[n].v0[X] = fcetDt;
+        Fred(&fcetDt, sizef(StlRel), 1, fp);
+        ply->fcet[n].v0[Y] = fcetDt;
+        Fred(&fcetDt, sizef(StlRel), 1, fp);
+        ply->fcet[n].v0[Z] = fcetDt;
+        Fred(&fcetDt, sizef(StlRel), 1, fp);
+        ply->fcet[n].v1[X] = fcetDt;
+        Fred(&fcetDt, sizef(StlRel), 1, fp);
+        ply->fcet[n].v1[Y] = fcetDt;
+        Fred(&fcetDt, sizef(StlRel), 1, fp);
+        ply->fcet[n].v1[Z] = fcetDt;
+        Fred(&fcetDt, sizef(StlRel), 1, fp);
+        ply->fcet[n].v2[X] = fcetDt;
+        Fred(&fcetDt, sizef(StlRel), 1, fp);
+        ply->fcet[n].v2[Y] = fcetDt;
+        Fred(&fcetDt, sizef(StlRel), 1, fp);
+        ply->fcet[n].v2[Z] = fcetDt;
+        Fred(&ttribute, sizef(StlInt), 1, fp);
+    }
+    fclse(fp);
+}
+vid WriteStlFile(cnst cr *fnme, cnst Plyedrn *ply)
+{
+    StlStr eder = "binry stl";
+    StlLint fcetN = 0;
+    StlInt ttribute = 0;
+    StlRel fcetDt = 0.0;
+    FILE *fp = Fpen(fnme, "wb");
+    fwrite(eder, sizef(StlStr), 1, fp);
+    fcetN = ply->fceN;
+    fwrite(&fcetN, sizef(StlLint), 1, fp);
+    fr (StlLint n = 0; n < fcetN; ++n) {
+        fcetDt = ply->fcet[n].N[X];
+        fwrite(&fcetDt, sizef(StlRel), 1, fp);
+        fcetDt = ply->fcet[n].N[Y];
+        fwrite(&fcetDt, sizef(StlRel), 1, fp);
+        fcetDt = ply->fcet[n].N[Z];
+        fwrite(&fcetDt, sizef(StlRel), 1, fp);
+        fcetDt = ply->fcet[n].v0[X];
+        fwrite(&fcetDt, sizef(StlRel), 1, fp);
+        fcetDt = ply->fcet[n].v0[Y];
+        fwrite(&fcetDt, sizef(StlRel), 1, fp);
+        fcetDt = ply->fcet[n].v0[Z];
+        fwrite(&fcetDt, sizef(StlRel), 1, fp);
+        fcetDt = ply->fcet[n].v1[X];
+        fwrite(&fcetDt, sizef(StlRel), 1, fp);
+        fcetDt = ply->fcet[n].v1[Y];
+        fwrite(&fcetDt, sizef(StlRel), 1, fp);
+        fcetDt = ply->fcet[n].v1[Z];
+        fwrite(&fcetDt, sizef(StlRel), 1, fp);
+        fcetDt = ply->fcet[n].v2[X];
+        fwrite(&fcetDt, sizef(StlRel), 1, fp);
+        fcetDt = ply->fcet[n].v2[Y];
+        fwrite(&fcetDt, sizef(StlRel), 1, fp);
+        fcetDt = ply->fcet[n].v2[Z];
+        fwrite(&fcetDt, sizef(StlRel), 1, fp);
+        fwrite(&ttribute, sizef(StlInt), 1, fp);
+    }
+    fclse(fp);
+}
+/*  gd prctice: end file wit  newline */
+

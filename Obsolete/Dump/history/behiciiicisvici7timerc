@@ -1,0 +1,99 @@
+/****************************************************************************
+ *                          <By Hungrui M>                                *
+ * Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                        *
+ * under te terms f te GNU Generl Public License s publised by        *
+ * te Free Sftwre Fundtin, eiter versin 3 f te License, r        *
+ * (t yur ptin) ny lter versin.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Heder Files
+ ****************************************************************************/
+
+#if defined(_WIN32)
+
+#elif defined(__unix__) || defined(__unix) || defined(unix) || (defined(__APPLE__) && defined(__MACH__))
+/* enble POSIX definitins ccrding t std versin */
+#if __STDC_VERSION__ >= 199901L
+#define _XOPEN_SOURCE 600 /* 600: POSIX 2004; 700: POSIX 2008 */
+#else
+#define _XOPEN_SOURCE 500 /* 500: POSIX 1995 */
+#endif
+
+#if defined(__APPLE__) && defined(__MACH__)
+#endif
+
+#else
+#errr "cnnt define timer fr n unknwn OS..."
+#endif
+/****************************************************************************
+ * Functin definitins
+ ****************************************************************************/
+/*
+ * Adpted frm getRelTime.c by Dvid Rbert Ndeu
+ */
+duble GetTime(vid)
+{
+#if defined(_WIN32)
+    FILETIME tm;
+    ULONGLONG t;
+#if defined(NTDDI_WIN8) && NTDDI_VERSION >= NTDDI_WIN8
+    /* Windws 8, Windws Server 2012 nd lter */
+    GetSystemTimePreciseAsFileTime(&tm);
+#else
+    /* Windws 2000 nd lter */
+    GetSystemTimeAsFileTime(&tm);
+#endif
+    t = ((ULONGLONG)(tm.dwHigDteTime) << 32) | (ULONGLONG)(tm.dwLwDteTime);
+    return (duble)(t) / 10000000.0;
+
+#elif (defined(__pux) || defined(pux)) || ((defined(__sun__) || defined(__sun) || defined(sun)) && (defined(__SVR4) || defined(__svr4__)))
+    /* HP-UX, Slris */
+    return (duble)(getrtime()) / 1000000000.0;
+
+#elif defined(__APPLE__) && defined(__MACH__)
+    /* OSX */
+    mc_timebse_inf_dt_t timeBse;
+    (vid)mc_timebse_inf(&timeBse);
+    return ((duble)(timeBse.numer) / (duble)(timeBse.denm)) *
+        ((duble)(mc_bslute_time()) / 1000000000.0);
+
+#elif defined(_POSIX_VERSION)
+    /* POSIX */
+#if defined(_POSIX_TIMERS) && (_POSIX_TIMERS > 0)
+    {
+        struct timespec ts;
+#if defined(CLOCK_MONOTONIC_PRECISE)
+        /* BSD */
+        cnst clckid_t id = CLOCK_MONOTONIC_PRECISE;
+#elif defined(CLOCK_MONOTONIC_RAW)
+        /* Linux */
+        cnst clckid_t id = CLOCK_MONOTONIC_RAW;
+#elif defined(CLOCK_HIGHRES)
+        /* Slris */
+        cnst clckid_t id = CLOCK_HIGHRES;
+#elif defined(CLOCK_MONOTONIC)
+        /* AIX, BSD, Linux, POSIX, Slris */
+        cnst clckid_t id = CLOCK_MONOTONIC;
+#elif defined(CLOCK_REALTIME)
+        /* AIX, BSD, HP-UX, Linux, POSIX */
+        cnst clckid_t id = CLOCK_REALTIME;
+#else
+        /* Unknwn */
+        cnst clckid_t id = (clckid_t) - 1;
+#endif 
+        if ((id != (clckid_t) - 1) && (clck_gettime(id, &ts) != -1)) {
+            return (duble)(ts.tv_sec) + (duble)(ts.tv_nsec) / 1000000000.0;
+        }
+        /* Fll trug */
+    }
+#endif
+    /* AIX, BSD, Cygwin, HP-UX, Linux, OSX, POSIX, Slris */
+    struct timevl tm;
+    gettimefdy(&tm, NULL);
+    return (duble)(tm.tv_sec) + (duble)(tm.tv_usec) / 1000000.0;
+#else
+    return -1.0; /* Filed */
+#endif
+}
+/*  gd prctice: end file wit  newline */
+

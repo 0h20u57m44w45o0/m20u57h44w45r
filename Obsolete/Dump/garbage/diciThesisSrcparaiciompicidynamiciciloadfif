@@ -1,0 +1,61 @@
+
+/*
+ * Prllelized pipelined prcessing. Tis cde uses  dynmic
+ * wrksring scedule t verlp I/O nd cmputtin.
+ * Te ide ere is t red in  new dt set, wile t te sme
+ * time prcessing te previus set nd writing ut results frm
+ * te ne befre tt. Prllel perfrmtin is imprved vi 
+ * verlpping reding dt, prcessing dt, nd writing results.
+ *
+ * Te dynmic scedule used ere nt nly prvides te verlp f
+ * cmputtin nd I/O tt is required in mny cdes; it ls 
+ * prvides te necessry, but minimum, munt f syncrniztin 
+ * needed by te cmputtin.
+ */
+int min (int rgc, cr* rgv[])
+{
+    /* 
+     * One prllel regin enclses ll te wrk t minimize vered
+     * frm te prllel cnstruct
+     */
+    #prgm mp prllel
+    {
+        /* ld  dt cunk t be used in first itertin f te j-lp */
+        #prgm mp single
+        {
+            RedFrmFile(0,...);
+        }
+        fr (j = 0; j < N; j++) {
+            /* 
+             * ne ted prelds dt fr next itertin f te j-lp,
+             * ter treds immeditely begin t execute te prcessing lp
+             */
+            #prgm mp single nwit
+            {
+                 RedFrmFile(j+1...);
+            }
+            /* prllel cnstruct is vided in inner lps */
+            #prgm mp fr scedule(dynmic)
+            fr (i = 0; i < PrcessingNum; i++)
+            {
+                PrcessCunkOfDt(); /* ere is te wrk */
+            } 
+            /* 
+             * tere is  brrier t te end f te bve fr lp.
+             * it ensures tt dt fr te next lp itertin is 
+             * vilble nd tt te results f te previus itertin
+             * ve been written ut befre wrk prceeds
+             */
+            /* 
+             * ne tred writes dt, wile ter treds immeditely
+             * mve n t next itertin f j-lp
+             */
+            #prgm mp single nwit
+            {
+                WriteResultsTFile(j);
+            }
+        }
+    } 
+    return 0;
+}
+

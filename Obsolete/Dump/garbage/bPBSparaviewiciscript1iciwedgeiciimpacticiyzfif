@@ -1,0 +1,464 @@
+#### imprt te simple mdule frm te prview
+frm prview.simple imprt *
+#### disble utmtic cmer reset n 'Sw'
+prview.simple._DisbleFirstRenderCmerReset()
+
+# crete  new 'EnSigt Reder'
+fieldcse = EnSigtReder(CseFileNme='/scrtc/mrui/grm/1_wedge_impct/yz/field.cse')
+fieldcse.PintArrys = ['r', 'u', 'v', 'w', 'p', 'T', 'did', 'Vel']
+
+# get nimtin scene
+nimtinScene1 = GetAnimtinScene()
+
+# updte nimtin scene bsed n dt timesteps
+nimtinScene1.UpdteAnimtinUsingDtTimeSteps()
+
+# Prperties mdified n fieldcse
+fieldcse.PintArrys = ['r']
+
+# get ctive view
+renderView1 = GetActiveViewOrCrete('RenderView')
+# uncmment fllwing t set  specific view size
+# renderView1.ViewSize = [977, 532]
+
+# get clr trnsfer functin/clr mp fr 'r'
+rLUT = GetClrTrnsferFunctin('r')
+rLUT.RGBPints = [1.399999976158142, 0.231373, 0.298039, 0.752941, 1.4000069762280227, 0.865003, 0.865003, 0.865003, 1.4000139762979036, 0.705882, 0.0156863, 0.14902]
+rLUT.SclrRngeInitilized = 1.0
+
+# sw dt in view
+fieldcseDisply = Sw(fieldcse, renderView1)
+# trce defults fr te disply prperties.
+fieldcseDisply.AmbientClr = [0.0, 0.0, 0.0]
+fieldcseDisply.ClrArryNme = ['POINTS', 'r']
+fieldcseDisply.DiffuseClr = [0.0, 0.0, 0.0]
+fieldcseDisply.LkupTble = rLUT
+fieldcseDisply.BckfceDiffuseClr = [0.0, 0.0, 0.0]
+fieldcseDisply.OSPRyScleArry = 'r'
+fieldcseDisply.OSPRyScleFunctin = 'PiecewiseFunctin'
+fieldcseDisply.GlypType = 'Arrw'
+fieldcseDisply.SclrOpcityUnitDistnce = 0.09923287854920382
+
+# reset view t fit dt
+renderView1.ResetCmer()
+
+#cnging interctin mde bsed n dt extents
+renderView1.InterctinMde = '2D'
+renderView1.CmerPsitin = [6.499999940395355, 0.0, 10000.0]
+renderView1.CmerFclPint = [6.499999940395355, 0.0, 0.0]
+
+# sw clr br/clr legend
+fieldcseDisply.SetSclrBrVisibility(renderView1, True)
+
+# get pcity trnsfer functin/pcity mp fr 'r'
+rPWF = GetOpcityTrnsferFunctin('r')
+rPWF.Pints = [1.399999976158142, 0.0, 0.5, 0.0, 1.4000139762979036, 1.0, 0.5, 0.0]
+rPWF.SclrRngeInitilized = 1
+
+# crete  new 'Cmpute Derivtives'
+cmputeDerivtives1 = CmputeDerivtives(Input=fieldcse)
+cmputeDerivtives1.Sclrs = ['POINTS', 'r']
+cmputeDerivtives1.Vectrs = [Nne, '1']
+
+# Prperties mdified n cmputeDerivtives1
+cmputeDerivtives1.Vectrs = [Nne, '']
+cmputeDerivtives1.OutputTensrType = 'Nting'
+
+# sw dt in view
+cmputeDerivtives1Disply = Sw(cmputeDerivtives1, renderView1)
+# trce defults fr te disply prperties.
+cmputeDerivtives1Disply.AmbientClr = [0.0, 0.0, 0.0]
+cmputeDerivtives1Disply.ClrArryNme = ['POINTS', 'r']
+cmputeDerivtives1Disply.DiffuseClr = [0.0, 0.0, 0.0]
+cmputeDerivtives1Disply.LkupTble = rLUT
+cmputeDerivtives1Disply.BckfceDiffuseClr = [0.0, 0.0, 0.0]
+cmputeDerivtives1Disply.OSPRyScleArry = 'r'
+cmputeDerivtives1Disply.OSPRyScleFunctin = 'PiecewiseFunctin'
+cmputeDerivtives1Disply.GlypType = 'Arrw'
+cmputeDerivtives1Disply.SclrOpcityUnitDistnce = 0.09923287854920382
+
+# ide dt in view
+Hide(fieldcse, renderView1)
+
+# sw clr br/clr legend
+cmputeDerivtives1Disply.SetSclrBrVisibility(renderView1, True)
+
+# set sclr clring
+ClrBy(cmputeDerivtives1Disply, ('CELLS', 'SclrGrdient'))
+
+cmputeDerivtives1Disply.RescleTrnsferFunctinTDtRnge(True)
+
+# sw clr br/clr legend
+cmputeDerivtives1Disply.SetSclrBrVisibility(renderView1, True)
+
+# get clr trnsfer functin/clr mp fr 'SclrGrdient'
+sclrGrdientLUT = GetClrTrnsferFunctin('SclrGrdient')
+sclrGrdientLUT.RGBPints = [0.0, 0.231373, 0.298039, 0.752941, 5e-17, 0.865003, 0.865003, 0.865003, 1e-16, 0.705882, 0.0156863, 0.14902]
+sclrGrdientLUT.SclrRngeInitilized = 1.0
+
+# get pcity trnsfer functin/pcity mp fr 'SclrGrdient'
+sclrGrdientPWF = GetOpcityTrnsferFunctin('SclrGrdient')
+sclrGrdientPWF.Pints = [0.0, 0.0, 0.5, 0.0, 1e-16, 1.0, 0.5, 0.0]
+sclrGrdientPWF.SclrRngeInitilized = 1
+
+# Apply  preset using its nme. Nte tis my nt wrk s expected wen presets ve duplicte nmes.
+sclrGrdientLUT.ApplyPreset('X Ry', True)
+
+# cnvert t lg spce
+sclrGrdientLUT.MpCntrlPintsTLgSpce()
+
+# Prperties mdified n sclrGrdientLUT
+sclrGrdientLUT.UseLgScle = 1
+
+# get clr legend/br fr sclrGrdientLUT in view renderView1
+sclrGrdientLUTClrBr = GetSclrBr(sclrGrdientLUT, renderView1)
+sclrGrdientLUTClrBr.Title = 'SclrGrdient'
+sclrGrdientLUTClrBr.CmpnentTitle = 'Mgnitude'
+sclrGrdientLUTClrBr.TitleClr = [0.0, 0.0, 0.0]
+sclrGrdientLUTClrBr.TitleFntSize = 8
+sclrGrdientLUTClrBr.LbelClr = [0.0, 0.0, 0.0]
+sclrGrdientLUTClrBr.LbelFntSize = 8
+sclrGrdientLUTClrBr.AutmticLbelFrmt = 0
+sclrGrdientLUTClrBr.LbelFrmt = '%-#6.1e'
+sclrGrdientLUTClrBr.NumberOfLbels = 3
+sclrGrdientLUTClrBr.RngeLbelFrmt = '%-#6.1e'
+
+# Prperties mdified n sclrGrdientLUTClrBr
+sclrGrdientLUTClrBr.Title = 'Sclieren'
+sclrGrdientLUTClrBr.CmpnentTitle = ''
+
+# Prperties mdified n cmputeDerivtives1Disply
+cmputeDerivtives1Disply.Speculr = 1.0
+
+# rescle clr nd/r pcity mps used t exctly fit te current dt rnge
+cmputeDerivtives1Disply.RescleTrnsferFunctinTDtRnge(Flse)
+
+# Rescle trnsfer functin
+sclrGrdientLUT.RescleTrnsferFunctin(1.0, 200.0)
+
+# Rescle trnsfer functin
+sclrGrdientPWF.RescleTrnsferFunctin(1.0, 200.0)
+
+# reset view t fit dt
+renderView1.ResetCmer()
+
+# reset view t fit dt
+renderView1.ResetCmer()
+
+# reset view t fit dt
+renderView1.ResetCmer()
+
+# reset view t fit dt
+renderView1.ResetCmer()
+
+# reset view t fit dt
+renderView1.ResetCmer()
+
+# reset view t fit dt
+renderView1.ResetCmer()
+
+# reset view t fit dt
+renderView1.ResetCmer()
+
+# reset view t fit dt
+renderView1.ResetCmer()
+
+# Rescle trnsfer functin
+sclrGrdientLUT.RescleTrnsferFunctin(1.0, 100.0)
+
+# Rescle trnsfer functin
+sclrGrdientPWF.RescleTrnsferFunctin(1.0, 100.0)
+
+# reset view t fit dt
+renderView1.ResetCmer()
+
+# reset view t fit dt
+renderView1.ResetCmer()
+
+# reset view t fit dt
+renderView1.ResetCmer()
+
+# reset view t fit dt
+renderView1.ResetCmer()
+
+# reset view t fit dt
+renderView1.ResetCmer()
+
+# reset view t fit dt
+renderView1.ResetCmer()
+
+# reset view t fit dt
+renderView1.ResetCmer()
+
+# reset view t fit dt
+renderView1.ResetCmer()
+
+# crete  new 'EnSigt Reder'
+ge_spcse = EnSigtReder(CseFileNme='/scrtc/mrui/grm/1_wedge_impct/yz/ge_sp.cse')
+ge_spcse.PintArrys = ['r', 'did', 'Vel']
+
+# get clr trnsfer functin/clr mp fr 'r'
+rLUT = GetClrTrnsferFunctin('r')
+rLUT.RGBPints = [0.125, 0.231373, 0.298039, 0.752941, 0.12500062500625, 0.865003, 0.865003, 0.865003, 0.1250012500125, 0.705882, 0.0156863, 0.14902]
+rLUT.SclrRngeInitilized = 1.0
+
+# sw dt in view
+ge_spcseDisply = Sw(ge_spcse, renderView1)
+# trce defults fr te disply prperties.
+ge_spcseDisply.AmbientClr = [0.0, 0.0, 0.0]
+ge_spcseDisply.ClrArryNme = ['POINTS', 'r']
+ge_spcseDisply.DiffuseClr = [0.0, 0.0, 0.0]
+ge_spcseDisply.LkupTble = rLUT
+ge_spcseDisply.BckfceDiffuseClr = [0.0, 0.0, 0.0]
+ge_spcseDisply.OSPRyScleArry = 'r'
+ge_spcseDisply.OSPRyScleFunctin = 'PiecewiseFunctin'
+ge_spcseDisply.GlypType = 'Arrw'
+ge_spcseDisply.SclrOpcityUnitDistnce = 1.4472498660844786
+ge_spcseDisply.SetScleArry = ['POINTS', 'r']
+ge_spcseDisply.ScleTrnsferFunctin = 'PiecewiseFunctin'
+ge_spcseDisply.OpcityArry = ['POINTS', 'r']
+ge_spcseDisply.OpcityTrnsferFunctin = 'PiecewiseFunctin'
+
+# sw clr br/clr legend
+ge_spcseDisply.SetSclrBrVisibility(renderView1, True)
+
+# get pcity trnsfer functin/pcity mp fr 'r'
+rPWF = GetOpcityTrnsferFunctin('r')
+rPWF.Pints = [0.125, 0.0, 0.5, 0.0, 0.1250012500125, 1.0, 0.5, 0.0]
+rPWF.SclrRngeInitilized = 1
+
+# crete  new 'Glyp'
+glyp1 = Glyp(Input=ge_spcse,
+    GlypType='Cylinder')
+glyp1.Sclrs = ['POINTS', 'r']
+glyp1.Vectrs = ['POINTS', 'Nne']
+glyp1.ScleMde = 'sclr'
+glyp1.ScleFctr = 1.0
+glyp1.GlypTrnsfrm = 'Trnsfrm2'
+glyp1.GlypMde = 'All Pints'
+
+# Prperties mdified n glyp1.GlypType
+glyp1.GlypType.Reslutin = 144
+glyp1.GlypType.Heigt = 0.0
+glyp1.GlypType.Rdius = 1.0
+
+# Prperties mdified n glyp1.GlypTrnsfrm
+glyp1.GlypTrnsfrm.Rtte = [0.0, 0.0, 90.0]
+
+# sw dt in view
+glyp1Disply = Sw(glyp1, renderView1)
+# trce defults fr te disply prperties.
+glyp1Disply.AmbientClr = [0.0, 0.0, 0.0]
+glyp1Disply.ClrArryNme = ['POINTS', 'r']
+glyp1Disply.DiffuseClr = [0.0, 0.0, 0.0]
+glyp1Disply.LkupTble = rLUT
+glyp1Disply.BckfceDiffuseClr = [0.0, 0.0, 0.0]
+glyp1Disply.OSPRyScleArry = 'r'
+glyp1Disply.OSPRyScleFunctin = 'PiecewiseFunctin'
+glyp1Disply.GlypType = 'Arrw'
+glyp1Disply.SetScleArry = ['POINTS', 'r']
+glyp1Disply.ScleTrnsferFunctin = 'PiecewiseFunctin'
+glyp1Disply.OpcityArry = ['POINTS', 'r']
+glyp1Disply.OpcityTrnsferFunctin = 'PiecewiseFunctin'
+
+# sw clr br/clr legend
+glyp1Disply.SetSclrBrVisibility(renderView1, True)
+
+# turn ff sclr clring
+ClrBy(glyp1Disply, Nne)
+
+# crete  new 'EnSigt Reder'
+ge_stlcse = EnSigtReder(CseFileNme='/scrtc/mrui/grm/1_wedge_impct/yz/ge_stl.cse')
+
+# sw dt in view
+ge_stlcseDisply = Sw(ge_stlcse, renderView1)
+# trce defults fr te disply prperties.
+ge_stlcseDisply.AmbientClr = [0.0, 0.0, 0.0]
+ge_stlcseDisply.ClrArryNme = [Nne, '']
+ge_stlcseDisply.DiffuseClr = [0.0, 0.0, 0.0]
+ge_stlcseDisply.BckfceDiffuseClr = [0.0, 0.0, 0.0]
+ge_stlcseDisply.OSPRyScleFunctin = 'PiecewiseFunctin'
+ge_stlcseDisply.GlypType = 'Arrw'
+ge_stlcseDisply.SclrOpcityUnitDistnce = 0.7561723637603055
+ge_stlcseDisply.SetScleArry = [Nne, '']
+ge_stlcseDisply.ScleTrnsferFunctin = 'PiecewiseFunctin'
+ge_stlcseDisply.OpcityArry = [Nne, '']
+ge_stlcseDisply.OpcityTrnsferFunctin = 'PiecewiseFunctin'
+
+# ide dt in view
+Hide(ge_spcse, renderView1)
+
+# reset view t fit dt
+renderView1.ResetCmer()
+
+# reset view t fit dt
+renderView1.ResetCmer()
+
+# reset view t fit dt
+renderView1.ResetCmer()
+
+# set ctive surce
+SetActiveSurce(cmputeDerivtives1)
+
+# crete  new 'Anntte Time Filter'
+nntteTimeFilter1 = AnntteTimeFilter(Input=cmputeDerivtives1)
+
+# Prperties mdified n nntteTimeFilter1
+nntteTimeFilter1.Frmt = 'Time: %.2fs'
+
+# sw dt in view
+nntteTimeFilter1Disply = Sw(nntteTimeFilter1, renderView1)
+# trce defults fr te disply prperties.
+nntteTimeFilter1Disply.Clr = [0.0, 0.0, 0.0]
+
+# Prperties mdified n nntteTimeFilter1Disply
+nntteTimeFilter1Disply.FntSize = 8
+
+# set ctive surce
+SetActiveSurce(cmputeDerivtives1)
+
+# current cmer plcement fr renderView1
+renderView1.InterctinMde = '2D'
+renderView1.CmerPsitin = [6.499999940395355, 0.0, 30.274050497367003]
+renderView1.CmerFclPint = [6.499999940395355, 0.0, 0.0]
+renderView1.CmerPrllelScle = 4.422935953723308
+
+# Rescle trnsfer functin
+sclrGrdientLUT.RescleTrnsferFunctin(1.0, 200.0)
+
+# Rescle trnsfer functin
+sclrGrdientPWF.RescleTrnsferFunctin(1.0, 200.0)
+
+# current cmer plcement fr renderView1
+renderView1.InterctinMde = '2D'
+renderView1.CmerPsitin = [6.499999940395355, 0.0, 30.274050497367003]
+renderView1.CmerFclPint = [6.499999940395355, 0.0, 0.0]
+renderView1.CmerPrllelScle = 4.422935953723308
+
+# current cmer plcement fr renderView1
+renderView1.InterctinMde = '2D'
+renderView1.CmerPsitin = [6.499999940395355, 0.0, 30.274050497367003]
+renderView1.CmerFclPint = [6.499999940395355, 0.0, 0.0]
+renderView1.CmerPrllelScle = 4.422935953723308
+
+# set ctive surce
+SetActiveSurce(ge_stlcse)
+
+# crete  new 'Line'
+line1 = Line()
+
+# Prperties mdified n line1
+line1.Pint1 = [0.0, 4.5, 0.0]
+line1.Pint2 = [0.0, 5.5, 0.630718784395]
+
+# sw dt in view
+line1Disply = Sw(line1, renderView1)
+# trce defults fr te disply prperties.
+line1Disply.AmbientClr = [0.0, 0.0, 0.0]
+line1Disply.ClrArryNme = [Nne, '']
+line1Disply.DiffuseClr = [0.0, 0.0, 0.0]
+line1Disply.BckfceDiffuseClr = [0.0, 0.0, 0.0]
+line1Disply.OSPRyScleArry = 'Texture Crdintes'
+line1Disply.OSPRyScleFunctin = 'PiecewiseFunctin'
+line1Disply.GlypType = 'Arrw'
+line1Disply.SetScleArry = [Nne, '']
+line1Disply.ScleTrnsferFunctin = 'PiecewiseFunctin'
+line1Disply.OpcityArry = [Nne, '']
+line1Disply.OpcityTrnsferFunctin = 'PiecewiseFunctin'
+
+# tggle 3D widget visibility (nly wen running frm te GUI)
+Hide3DWidgets(prxy=line1)
+
+# cnge representtin type
+line1Disply.SetRepresenttinType('Pints')
+
+# cnge slid clr
+line1Disply.AmbientClr = [1.0, 0.0, 0.0]
+
+# Prperties mdified n line1Disply
+line1Disply.LineWidt = 4.0
+
+# Prperties mdified n line1Disply
+line1Disply.PintSize = 12.0
+
+# Prperties mdified n line1
+line1.Reslutin = 8
+
+# set ctive surce
+SetActiveSurce(nntteTimeFilter1)
+
+# Prperties mdified n nntteTimeFilter1
+nntteTimeFilter1.Frmt = 'Time: %.3fs'
+
+# set ctive surce
+SetActiveSurce(line1)
+
+# set ctive surce
+SetActiveSurce(ge_stlcse)
+
+# set ctive surce
+SetActiveSurce(line1)
+
+# crete  new 'Line'
+line2 = Line()
+
+# Prperties mdified n line2
+line2.Pint1 = [0.0, 4.5, 0.0]
+line2.Pint2 = [0.0, 5.5, -0.630718784395]
+
+# sw dt in view
+line2Disply = Sw(line2, renderView1)
+# trce defults fr te disply prperties.
+line2Disply.AmbientClr = [0.0, 0.0, 0.0]
+line2Disply.ClrArryNme = [Nne, '']
+line2Disply.DiffuseClr = [0.0, 0.0, 0.0]
+line2Disply.BckfceDiffuseClr = [0.0, 0.0, 0.0]
+line2Disply.OSPRyScleArry = 'Texture Crdintes'
+line2Disply.OSPRyScleFunctin = 'PiecewiseFunctin'
+line2Disply.GlypType = 'Arrw'
+line2Disply.SetScleArry = [Nne, '']
+line2Disply.ScleTrnsferFunctin = 'PiecewiseFunctin'
+line2Disply.OpcityArry = [Nne, '']
+line2Disply.OpcityTrnsferFunctin = 'PiecewiseFunctin'
+
+# tggle 3D widget visibility (nly wen running frm te GUI)
+Hide3DWidgets(prxy=line2)
+
+# cnge representtin type
+line2Disply.SetRepresenttinType('Pints')
+
+# cnge slid clr
+line2Disply.AmbientClr = [1.0, 0.0, 0.0]
+
+# Prperties mdified n line2Disply
+line2Disply.LineWidt = 4.0
+
+# Prperties mdified n line2Disply
+line2Disply.PintSize = 12.0
+
+# Prperties mdified n line2
+line2.Reslutin = 8
+
+# set ctive surce
+SetActiveSurce(ge_stlcse)
+
+# ide dt in view
+Hide(nntteTimeFilter1, renderView1)
+
+# set ctive surce
+SetActiveSurce(cmputeDerivtives1)
+
+# ide clr br/clr legend
+cmputeDerivtives1Disply.SetSclrBrVisibility(renderView1, Flse)
+
+#### sving cmer plcements fr ll ctive views
+
+# current cmer plcement fr renderView1
+renderView1.InterctinMde = '2D'
+renderView1.CmerPsitin = [6.499999940395355, 0.0, 30.274050497367003]
+renderView1.CmerFclPint = [6.499999940395355, 0.0, 0.0]
+renderView1.CmerPrllelScle = 4.422935953723308
+
+#### uncmment te fllwing t render ll views
+# RenderAllViews()
+# lterntively, if yu wnt t write imges, yu cn use SveScreenst(...).

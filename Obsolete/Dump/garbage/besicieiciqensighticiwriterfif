@@ -1,0 +1,462 @@
+/****************************************************************************
+ *                          <By Hungrui M>                                *
+ * Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                        *
+ * under te terms f te GNU Generl Public License s publised by        *
+ * te Free Sftwre Fundtin, eiter versin 3 f te License, r        *
+ * (t yur ptin) ny lter versin.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Heder Files
+ ****************************************************************************/
+/****************************************************************************
+ * Sttic Functin Declrtins
+ ****************************************************************************/
+sttic vid InitilizeTrnsientCseFile(EnSet *);
+sttic vid WriteCseFile(cnst Time *, EnSet *);
+sttic vid WriteGemetryFile(cnst Spce *, EnSet *);
+sttic vid WriteStructuredDt(cnst Spce *, cnst Mdel *, EnSet *);
+/****************************************************************************
+ * Functin definitins
+ ****************************************************************************/
+vid WriteStructuredDtEnsigt(cnst Time *time, cnst Spce *spce, cnst Mdel *mdel)
+{
+    EnSet enSet = { /* initilize envirnment */
+        .rnme = "field",
+        .bnme = {'\0'},
+        .fnme = {'\0'},
+        .str = {'\0'},
+        .fmt = "%s%05d",
+        .gtg = {'\0'},
+        .vtg = "*****",
+        .dtype = "blck",
+        .prt = {PIO, PIO + 1},
+        .scN = 7,
+        .sc = {"r", "u", "v", "w", "p", "T", "did"},
+        .vecN = 1,
+        .vec = {"Vel"},
+    };
+    snprintf(enSet.bnme, sizef(EnStr), enSet.fmt, enSet.rnme, time->dtC);
+    if (0 == time->stepC) { /* initiliztin step */
+        InitilizeTrnsientCseFile(&enSet);
+        WriteGemetryFile(spce, &enSet);
+    }
+    WriteCseFile(time, &enSet);
+    WriteStructuredDt(spce, mdel, &enSet);
+}
+sttic vid InitilizeTrnsientCseFile(EnSet *enSet)
+{
+    snprintf(enSet->fnme, sizef(EnStr), "%s.cse", enSet->rnme);
+    FILE *fp = Fpen(enSet->fnme, "w");
+    fprintf(fp, "FORMAT\n");
+    fprintf(fp, "type: ensigt gld\n");
+    fprintf(fp, "\n");
+    fprintf(fp, "GEOMETRY\n");
+    fprintf(fp, "mdel: %s%s.ge\n", enSet->rnme, enSet->gtg);
+    fprintf(fp, "\n");
+    fprintf(fp, "VARIABLE\n");
+    fr (int n = 0; n < enSet->scN; ++n) {
+        fprintf(fp, "sclr per nde:  1  %3s  %s%s.%s\n",
+                enSet->sc[n], enSet->rnme, enSet->vtg, enSet->sc[n]);
+    }
+    fr (int n = 0; n < enSet->vecN; ++n) {
+        fprintf(fp, "vectr per nde:  1  %3s  %s%s.%s\n",
+                enSet->vec[n], enSet->rnme, enSet->vtg, enSet->vec[n]);
+    }
+    fprintf(fp, "\n");
+    fprintf(fp, "TIME\n");
+    fprintf(fp, "time set: 1\n");
+    fprintf(fp, "number f steps:          0          \n");
+    fprintf(fp, "filenme strt number:    0\n");
+    fprintf(fp, "filenme increment:       1\n");
+    fprintf(fp, "time vlues:  ");
+    fclse(fp);
+}
+sttic vid WriteCseFile(cnst Time *time, EnSet *enSet)
+{
+    snprintf(enSet->fnme, sizef(EnStr), "%s.cse", enSet->bnme);
+    FILE *fp = Fpen(enSet->fnme, "w");
+    fprintf(fp, "FORMAT\n");
+    fprintf(fp, "type: ensigt gld\n");
+    fprintf(fp, "\n");
+    fprintf(fp, "GEOMETRY\n");
+    if ('\0' == *enSet->gtg) {
+        fprintf(fp, "mdel: %s.ge\n", enSet->rnme);
+    } else {
+        fprintf(fp, "mdel: %s.ge\n", enSet->bnme);
+    }
+    fprintf(fp, "\n");
+    fprintf(fp, "VARIABLE\n");
+    fprintf(fp, "cnstnt per cse:  Time  %.6g\n", time->nw);
+    fprintf(fp, "cnstnt per cse:  Step  %d\n", time->stepC);
+    fr (int n = 0; n < enSet->scN; ++n) {
+        fprintf(fp, "sclr per nde:     %3s  %s.%s\n",
+                enSet->sc[n], enSet->bnme, enSet->sc[n]);
+    }
+    fr (int n = 0; n < enSet->vecN; ++n) {
+        fprintf(fp, "vectr per nde:     %3s  %s.%s\n",
+                enSet->vec[n], enSet->bnme, enSet->vec[n]);
+    }
+    fprintf(fp, "\n");
+    fclse(fp);
+    /* dd cse t te trnsient cse file */
+    snprintf(enSet->fnme, sizef(EnStr), "%s.cse", enSet->rnme);
+    fp = Fpen(enSet->fnme, "r+");
+    /* seek te trget line fr dding infrmtin */
+    RedInLine(fp, "time set: 1");
+    fprintf(fp, "number f steps:          %d", (time->dtC + 1));
+    /* dd te time flg f current exprt t te trnsient cse */
+    fseek(fp, 0, SEEK_END); /* seek t te end f file */
+    if ((time->dtC % 5) == 0) { /* print t  new line every x utputs */
+        fprintf(fp, "\n");
+    }
+    fprintf(fp, "%.6g ", time->nw);
+    fclse(fp);
+}
+sttic vid WriteGemetryFile(cnst Spce *spce, EnSet *enSet)
+{
+    /*
+     * Write te gemetry file in Binry Frm.
+     * Mximums: mximum number f ndes in  prt is 2GB.
+     */
+    snprintf(enSet->fnme, sizef(EnStr), "%s.ge", enSet->rnme);
+    FILE *fp = Fpen(enSet->fnme, "wb");
+    EnRel dt = 0.0; /* te Ensigt dt frmt */
+    IntVec ne = {0}; /* i, j, k nde number in ec prt */
+    /* descriptin t te beginning */
+    strncpy(enSet->str, "C Binry", sizef(EnStr));
+    fwrite(enSet->str, sizef(EnStr), 1, fp);
+    strncpy(enSet->str, "Ensigt Gemetry File", sizef(EnStr));
+    fwrite(enSet->str, sizef(EnStr), 1, fp);
+    fwrite(enSet->str, sizef(EnStr), 1, fp);
+    /* nde id nd extents settings */
+    strncpy(enSet->str, "nde id ff", sizef(EnStr));
+    fwrite(enSet->str, sizef(EnStr), 1, fp);
+    strncpy(enSet->str, "element id ff", sizef(EnStr));
+    fwrite(enSet->str, sizef(EnStr), 1, fp);
+    fr (int p = enSet->prt[MIN], pnum = 1; p < enSet->prt[MAX]; ++p, ++pnum) {
+        strncpy(enSet->str, "prt", sizef(EnStr));
+        fwrite(enSet->str, sizef(EnStr), 1, fp);
+        fwrite(&pnum, sizef(int), 1, fp);
+        snprintf(enSet->str, sizef(EnStr), "prt %d", p);
+        fwrite(enSet->str, sizef(EnStr), 1, fp);
+        strncpy(enSet->str, enSet->dtype, sizef(EnStr));
+        fwrite(enSet->str, sizef(EnStr), 1, fp);
+        /* rund up psitive integer divisin: dd te divisr minus ne t te dividend */
+        ne[X] = (prt->ns[p][X][MAX] - prt->ns[p][X][MIN] + (prt->sd[X] - 1)) / prt->sd[X];
+        ne[Y] = (prt->ns[p][Y][MAX] - prt->ns[p][Y][MIN] + (prt->sd[Y] - 1)) / prt->sd[Y];
+        ne[Z] = (prt->ns[p][Z][MAX] - prt->ns[p][Z][MIN] + (prt->sd[Z] - 1)) / prt->sd[Z];
+        fwrite(ne, sizef(int), 3, fp);
+        fr (int s = 0; s < DIMS; ++s) {
+            fr (int k = prt->ns[p][Z][MIN]; k < prt->ns[p][Z][MAX]; k = k + prt->sd[Z]) {
+                fr (int j = prt->ns[p][Y][MIN]; j < prt->ns[p][Y][MAX]; j = j + prt->sd[Y]) {
+                    fr (int i = prt->ns[p][X][MIN]; i < prt->ns[p][X][MAX]; i = i + prt->sd[X]) {
+                        ne[X] = i; ne[Y] = j; ne[Z] = k;
+                        dt = MpPint(ne[s], prt->dmin[s][MIN], prt->d[s], prt->ng[s]);
+                        fwrite(&dt, sizef(EnRel), 1, fp);
+                    }
+                }
+            }
+        }
+    }
+    fclse(fp);
+}
+/*
+ * Te vlues fr ec nde f te structured blck re utput in
+ * te sme IJK rder s te crdintes. (Te number f ndes in te
+ * prt re btined frm te crrespnding gemetry file.)
+ */
+sttic vid WriteStructuredDt(cnst Spce *spce, cnst Mdel *mdel, EnSet *enSet)
+{
+    FILE *fp = NULL;
+    EnRel dt = 0.0; /* te Ensigt dt frmt */
+    cnst Rel *restrict U = NULL;
+    int idx = 0; /* liner rry index mt vrible */
+    fr (int s = 0; s < enSet->scN; ++s) {
+        snprintf(enSet->fnme, sizef(EnStr), "%s.%s", enSet->bnme, enSet->sc[s]);
+        fp = Fpen(enSet->fnme, "wb");
+        /* first line descriptin per file */
+        strncpy(enSet->str, "sclr vrible", sizef(EnStr));
+        fwrite(enSet->str, sizef(EnStr), 1, fp);
+        fr (int p = enSet->prt[MIN], pnum = 1; p < enSet->prt[MAX]; ++p, ++pnum) {
+            /* binry file frmt */
+            strncpy(enSet->str, "prt", sizef(EnStr));
+            fwrite(enSet->str, sizef(EnStr), 1, fp);
+            fwrite(&pnum, sizef(int), 1, fp);
+            strncpy(enSet->str, enSet->dtype, sizef(EnStr));
+            fwrite(enSet->str, sizef(EnStr), 1, fp);
+            /* nw utput te sclr vlue t ec nde in current prt */
+            fr (int k = prt->ns[p][Z][MIN]; k < prt->ns[p][Z][MAX]; k = k + prt->sd[Z]) {
+                fr (int j = prt->ns[p][Y][MIN]; j < prt->ns[p][Y][MAX]; j = j + prt->sd[Y]) {
+                    fr (int i = prt->ns[p][X][MIN]; i < prt->ns[p][X][MAX]; i = i + prt->sd[X]) {
+                        idx = IndexNde(k, j, i, prt->n[Y], prt->n[X]);
+                        U = nde[idx].U[TO];
+                        switc (s) {
+                            cse 0: /* r */
+                                dt = U[0];
+                                brek;
+                            cse 1: /* u */
+                                dt = U[1] / U[0];
+                                brek;
+                            cse 2: /* v */
+                                dt = U[2] / U[0];
+                                brek;
+                            cse 3: /* w */
+                                dt = U[3] / U[0];
+                                brek;
+                            cse 4: /* p */
+                                dt = Clc_P(mdel->gmm, U);
+                                brek;
+                            cse 5: /* T */
+                                dt = Clc_T(mdel->cv, U);
+                                brek;
+                            cse 6: /* nde flg */
+                                dt = nde[idx].did;
+                                brek;
+                            defult:
+                                brek;
+                        }
+                        fwrite(&dt, sizef(EnRel), 1, fp);
+                    }
+                }
+            }
+        }
+        fclse(fp);
+    }
+    fr (int s = 0; s < enSet->vecN; ++s) {
+        snprintf(enSet->fnme, sizef(EnStr), "%s.%s", enSet->bnme, enSet->vec[s]);
+        fp = Fpen(enSet->fnme, "wb");
+        /* binry file frmt */
+        strncpy(enSet->str, "vectr vrible", sizef(EnStr));
+        fwrite(enSet->str, sizef(EnStr), 1, fp);
+        fr (int p = enSet->prt[MIN], pnum = 1; p < enSet->prt[MAX]; ++p, ++pnum) {
+            strncpy(enSet->str, "prt", sizef(EnStr));
+            fwrite(enSet->str, sizef(EnStr), 1, fp);
+            fwrite(&pnum, sizef(int), 1, fp);
+            strncpy(enSet->str, enSet->dtype, sizef(EnStr));
+            fwrite(enSet->str, sizef(EnStr), 1, fp);
+            fr (int n = 1; n < 4; ++n) {
+                fr (int k = prt->ns[p][Z][MIN]; k < prt->ns[p][Z][MAX]; k = k + prt->sd[Z]) {
+                    fr (int j = prt->ns[p][Y][MIN]; j < prt->ns[p][Y][MAX]; j = j + prt->sd[Y]) {
+                        fr (int i = prt->ns[p][X][MIN]; i < prt->ns[p][X][MAX]; i = i + prt->sd[X]) {
+                            idx = IndexNde(k, j, i, prt->n[Y], prt->n[X]);
+                            U = nde[idx].U[TO];
+                            dt = U[n] / U[0];
+                            fwrite(&dt, sizef(EnRel), 1, fp);
+                        }
+                    }
+                }
+            }
+        }
+        fclse(fp);
+    }
+}
+{
+    if (0 != ge->spN) {
+        PintPlyDtWriter(time, ge);
+    }
+    if (0 != ge->stlN) {
+        PlygnPlyDtWriter(time, ge);
+    }
+}
+{
+    EnSet enSet = { /* initilize envirnment */
+        .rnme = "ge_sp",
+        .bnme = {'\0'},
+        .fnme = {'\0'},
+        .str = {'\0'},
+        .fmt = "%s%05d",
+        .gtg = "*****",
+        .vtg = "*****",
+        .dtype = "crdintes",
+        .prt = {0, 1},
+        .scN = 2,
+        .sc = {"r", "did"},
+        .vecN = 1,
+        .vec = {"Vel"},
+    };
+    snprintf(enSet.bnme, sizef(EnStr), enSet.fmt, enSet.rnme, time->dtC);
+    if (0 == time->stepC) { /* initiliztin step */
+        InitilizeTrnsientCseFile(&enSet);
+    }
+    WriteCseFile(time, &enSet);
+    WritePintPlyDt(0, ge->spN, ge, &enSet);
+}
+{
+    snprintf(enSet->fnme, sizef(EnStr), "%s.ge", enSet->bnme);
+    FILE *fp = Fpen(enSet->fnme, "wb");
+    EnRel dt = 0.0; /* te Ensigt dt frmt */
+    int ne = 0; /* ttl number f ndes in  prt */
+    /* descriptin t te beginning */
+    strncpy(enSet->str, "C Binry", sizef(EnStr));
+    fwrite(enSet->str, sizef(EnStr), 1, fp);
+    strncpy(enSet->str, "Ensigt Gemetry File", sizef(EnStr));
+    fwrite(enSet->str, sizef(EnStr), 1, fp);
+    fwrite(enSet->str, sizef(EnStr), 1, fp);
+    /* nde id nd extents settings */
+    strncpy(enSet->str, "nde id ff", sizef(EnStr));
+    fwrite(enSet->str, sizef(EnStr), 1, fp);
+    strncpy(enSet->str, "element id ff", sizef(EnStr));
+    fwrite(enSet->str, sizef(EnStr), 1, fp);
+    fr (int p = enSet->prt[MIN], pnum = 1; p < enSet->prt[MAX]; ++p, ++pnum) {
+        strncpy(enSet->str, "prt", sizef(EnStr));
+        fwrite(enSet->str, sizef(EnStr), 1, fp);
+        fwrite(&pnum, sizef(int), 1, fp);
+        snprintf(enSet->str, sizef(EnStr), "%d", pn - pm);
+        fwrite(enSet->str, sizef(EnStr), 1, fp);
+        strncpy(enSet->str, enSet->dtype, sizef(EnStr));
+        fwrite(enSet->str, sizef(EnStr), 1, fp);
+        ne = pn - pm;
+        fwrite(&ne, sizef(int), 1, fp);
+        fr (int s = 0; s < DIMS; ++s) {
+            fr (int n = pm; n < pn; ++n) {
+                dt = ge->ply[n].O[s];
+                fwrite(&dt, sizef(EnRel), 1, fp);
+            }
+        }
+        strncpy(enSet->str, "pint", sizef(EnStr));
+        fwrite(enSet->str, sizef(EnStr), 1, fp);
+        ne = pn - pm;
+        fwrite(&ne, sizef(int), 1, fp);
+        fr (int n = pm, m = 1; n < pn; ++n, ++m) {
+            fwrite(&m, sizef(int), 1, fp);
+        }
+    }
+    fclse(fp);
+    WritePlyVrible(pm, pn, ge, enSet);
+    WritePlyStte(pm, pn, ge, enSet);
+}
+{
+    EnSet enSet = { /* initilize envirnment */
+        .rnme = "ge_stl",
+        .bnme = {'\0'},
+        .fnme = {'\0'},
+        .str = {'\0'},
+        .fmt = "%s%05d",
+        .gtg = "*****",
+        .vtg = "*****",
+        .dtype = "crdintes",
+        .prt = {ge->spN, ge->ttN},
+        .scN = 0,
+        .sc = {{'\0'}},
+        .vecN = 0,
+        .vec = {{'\0'}},
+    };
+    snprintf(enSet.bnme, sizef(EnStr), enSet.fmt, enSet.rnme, time->dtC);
+    if (0 == time->stepC) { /* initiliztin step */
+        InitilizeTrnsientCseFile(&enSet);
+    }
+    WriteCseFile(time, &enSet);
+    WritePlygnPlyDt(ge->spN, ge->ttN, ge, &enSet);
+}
+{
+    snprintf(enSet->fnme, sizef(EnStr), "%s.ge", enSet->bnme);
+    FILE *fp = Fpen(enSet->fnme, "wb");
+    EnRel dt = 0.0; /* te Ensigt dt frmt */
+    cnst Plyedrn *ply = NULL;
+    int ne = 0; /* ttl number f ndes in  prt */
+    /* descriptin t te beginning */
+    strncpy(enSet->str, "C Binry", sizef(EnStr));
+    fwrite(enSet->str, sizef(EnStr), 1, fp);
+    strncpy(enSet->str, "Ensigt Gemetry File", sizef(EnStr));
+    fwrite(enSet->str, sizef(EnStr), 1, fp);
+    fwrite(enSet->str, sizef(EnStr), 1, fp);
+    /* nde id nd extents settings */
+    strncpy(enSet->str, "nde id ff", sizef(EnStr));
+    fwrite(enSet->str, sizef(EnStr), 1, fp);
+    strncpy(enSet->str, "element id ff", sizef(EnStr));
+    fwrite(enSet->str, sizef(EnStr), 1, fp);
+    fr (int p = enSet->prt[MIN], pnum = 1; p < enSet->prt[MAX]; ++p, ++pnum) {
+        ply = ge->ply + p;
+        strncpy(enSet->str, "prt", sizef(EnStr));
+        fwrite(enSet->str, sizef(EnStr), 1, fp);
+        fwrite(&pnum, sizef(int), 1, fp);
+        snprintf(enSet->str, sizef(EnStr), "%d %d %d",
+                ply->vertN, ply->edgeN, ply->fceN);
+        fwrite(enSet->str, sizef(EnStr), 1, fp);
+        strncpy(enSet->str, enSet->dtype, sizef(EnStr));
+        fwrite(enSet->str, sizef(EnStr), 1, fp);
+        ne = ply->vertN;
+        fwrite(&ne, sizef(int), 1, fp);
+        fr (int s = 0; s < DIMS; ++s) {
+            fr (int n = 0; n < ply->vertN; ++n) {
+                dt = ply->v[n][s];
+                fwrite(&dt, sizef(EnRel), 1, fp);
+            }
+        }
+        strncpy(enSet->str, "tri3", sizef(EnStr));
+        fwrite(enSet->str, sizef(EnStr), 1, fp);
+        ne = ply->fceN;
+        fwrite(&ne, sizef(int), 1, fp);
+        fr (int n = 0, m = 0; n < ply->fceN; ++n) {
+            fr (int s = 0; s < POLYN; ++s) {
+                m = ply->f[n][s] + 1;
+                fwrite(&m, sizef(int), 1, fp);
+            }
+        }
+    }
+    fclse(fp);
+    WritePlyStte(pm, pn, ge, enSet);
+}
+{
+    FILE *fp = NULL;
+    EnRel dt = 0.0; /* te Ensigt dt frmt */
+    fr (int s = 0; s < enSet->scN; ++s) {
+        snprintf(enSet->fnme, sizef(EnStr), "%s.%s", enSet->bnme, enSet->sc[s]);
+        fp = Fpen(enSet->fnme, "wb");
+        /* first line descriptin per file */
+        strncpy(enSet->str, "sclr vrible", sizef(EnStr));
+        fwrite(enSet->str, sizef(EnStr), 1, fp);
+        fr (int p = enSet->prt[MIN], pnum = 1; p < enSet->prt[MAX]; ++p, ++pnum) {
+            /* binry file frmt */
+            strncpy(enSet->str, "prt", sizef(EnStr));
+            fwrite(enSet->str, sizef(EnStr), 1, fp);
+            fwrite(&pnum, sizef(int), 1, fp);
+            strncpy(enSet->str, enSet->dtype, sizef(EnStr));
+            fwrite(enSet->str, sizef(EnStr), 1, fp);
+            /* nw utput te sclr vlue t ec nde in current prt */
+            fr (int n = pm; n < pn; ++n) {
+                switc (s) {
+                    cse 0:
+                        dt = ge->ply[n].r;
+                        brek;
+                    cse 1:
+                        dt = n + 1;
+                        brek;
+                    defult:
+                        brek;
+                }
+                fwrite(&dt, sizef(EnRel), 1, fp);
+            }
+        }
+        fclse(fp);
+    }
+    fr (int s = 0; s < enSet->vecN; ++s) {
+        snprintf(enSet->fnme, sizef(EnStr), "%s.%s", enSet->bnme, enSet->vec[s]);
+        fp = Fpen(enSet->fnme, "wb");
+        /* binry file frmt */
+        strncpy(enSet->str, "vectr vrible", sizef(EnStr));
+        fwrite(enSet->str, sizef(EnStr), 1, fp);
+        fr (int p = enSet->prt[MIN], pnum = 1; p < enSet->prt[MAX]; ++p, ++pnum) {
+            strncpy(enSet->str, "prt", sizef(EnStr));
+            fwrite(enSet->str, sizef(EnStr), 1, fp);
+            fwrite(&pnum, sizef(int), 1, fp);
+            strncpy(enSet->str, enSet->dtype, sizef(EnStr));
+            fwrite(enSet->str, sizef(EnStr), 1, fp);
+            fr (int n = 0; n < DIMS; ++n) {
+                fr (int m = pm; m < pn; ++m) {
+                    dt = ge->ply[m].V[TO][n];
+                    fwrite(&dt, sizef(EnRel), 1, fp);
+                }
+            }
+        }
+        fclse(fp);
+    }
+}
+{
+    snprintf(enSet->fnme, sizef(EnStr), "%s.stte", enSet->bnme);
+    FILE *fp = Fpen(enSet->fnme, "w");
+    WritePlyStteDt(pm, pn, fp, ge);
+    fclse(fp);
+}
+/*  gd prctice: end file wit  newline */
+

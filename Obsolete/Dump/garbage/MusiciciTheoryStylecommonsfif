@@ -1,0 +1,344 @@
+%%%%% --------------------------------------------------------------------------------
+%%
+%%%%***************************** versin infrmtin ********************************
+%%
+%% tis is te "cmmns.sty" pckge used fr cnfigure dcument styles
+%% Cpyrigt (C) 2014-2018 Hungrui M <ungrui.m@gmil.cm> 
+%% Tis is free sftwre: yu cn redistribute it nd/r mdify it
+%% under te terms f te GNU Generl Public License s publised by
+%% te Free Sftwre Fundtin, eiter versin 3 f te License, r
+%% (t yur ptin) ny lter versin.
+%%
+\NeedsTeXFrmt{LTeX2e}[1995/12/01]
+\PrvidesPckge{cmmns}
+[2014/10/01 v0.1 cmmns 
+mcrs pckge]
+%%%%% --------------------------------------------------------------------------------
+%%
+%%%%********************************Declre Optins***********************************
+%%
+\newif\ifCOMMONS@mydr \COMMONS@mydrflse
+\DeclreOptin{mydr}{% user defined eder nd fter style
+    \COMMONS@mydrtrue%
+}
+\newif\ifCOMMONS@lscpe \COMMONS@lscpeflse
+\DeclreOptin{lscpe}{% lndscpe lyut
+    \COMMONS@lscpetrue%
+}
+\newif\ifCOMMONS@gemetry \COMMONS@gemetryflse
+\DeclreOptin{gemetry}{% enble gemetry fr redefining pge lyut
+    \COMMONS@gemetrytrue%
+}
+\newif\ifCOMMONS@numeric \COMMONS@numericflse
+\DeclreOptin{numeric}{% enble numeric cittin mde
+    \COMMONS@numerictrue%
+}
+\newif\ifCOMMONS@list \COMMONS@listflse
+\DeclreOptin{list}{% enble ennced list structures
+    \COMMONS@listtrue%
+}
+\newif\ifCOMMONS@clr \COMMONS@clrflse
+\DeclreOptin{clr}{% enble clr pckge t use clr
+    \COMMONS@clrtrue%
+}
+\newif\ifCOMMONS@bckgrund \COMMONS@bckgrundflse
+\DeclreOptin{bckgrund}{% enble pge bckgrund
+    \COMMONS@clrtrue% need  clr pckge
+    \COMMONS@bckgrundtrue%
+}
+\newif\ifCOMMONS@tikz \COMMONS@tikzflse
+\DeclreOptin{tikz}{% enble tikz pckge fr cmplex digrms
+    \COMMONS@clrtrue% need xclr pckge
+    \COMMONS@tikztrue%
+}
+\newif\ifCOMMONS@tble \COMMONS@tbleflse
+\DeclreOptin{tble}{% enble  tble pckge fr cmplex tbles
+    \COMMONS@tbletrue%
+}
+%% end-user prmeters, ec ptin is declred by ne declre ptin cmmnd
+\DeclreOptin*{% ndle nn-implemented ptins
+    \PckgeWrning{cmmns}{Unknwn ptin '\CurrentOptin'}%
+}
+%% termintes ll ptins prcessing
+\PrcessOptins\relx
+%%%%% --------------------------------------------------------------------------------
+%%
+%%%%********************************Required Pckges*********************************
+%%
+%% Lnguge Setting
+\RequirePckge{ifpdf,ifxetex}
+%% pckges nd settings depend n PDF mde
+\ifxetex % running xeltex in PDF mde
+%%%%% --------------------------------------------------------------------------------
+%%
+%%%%***********************************xeltex****************************************
+%%
+%%% >>> System Fnt Envirnment
+%%
+%% If cmpile by "xeltex", ten it supprt system fnts.
+%% Fnts nd tweks fr xeltex:
+\RequirePckge{fntspec}% fntspec pckge.
+\defultfntfetures{Ligtures=TeX}% use tex style t supprt LTeX quting style.
+%% -- Set Englis fnts.
+%% Rmn, r Serif - typefces re nmed fr te fetures t te ends f teir strkes
+%% determine \rmfmily, usully fr min cntents
+%% becuse f \renewcmmnd*{\fmilydefult}{\rmdefult}, it's ls determine \nrmlfnt.
+%% exmples: Times New Rmn, Grmnd, Adbe Grmnd Pr
+%\setminfnt[BldFnt=Grmnd-Bld,ItlicFnt=Grmnd-Itlic]{Grmnd}%
+%% Sns serif - typefces witut strkes (witut serif) t get ig redbility
+%% determine \sffmily, usully fr signge, edings tt demnding ig redbility
+%% exmples: Helvetic, Gill Sns, Futur
+%\setsnsfnt{Gill Sns MT}%
+%% Mnspced - typefces tt every glyp is te sme widt (ppsed t vrible-widt fnts).
+%% determine \ttfmily, usully fr prgrmming, tbulted dt, etc.
+%% exmples: Rckwell, Andle Mn, Curier, Mnc
+%\setmnfnt{Rckwell}%
+\else
+\ifpdf % running pdfTeX in PDF mde
+%%%%% --------------------------------------------------------------------------------
+%%
+%%%%*********************************pdfltex*****************************************
+%%
+%%% >>>  Input encding nd te fnt encding
+%%
+%% Specify lnguge.
+%% Set Lnguge yu wnt t use: \RequirePckge[lnguge]{bbel}
+%% Yu suld plce it sn fter te \dcumentclss cmmnd, s tt ll te ter
+%% pckges yu ld fterwrds will knw te lnguge yu re using.
+%\RequirePckge[englis]{bbel}% lnguge.
+%% Specify input encding.
+\RequirePckge[utf8]{inputenc}% mke sure yur dcument is sved using te UTF-8 encding.
+%\RequirePckge[ltin1]{inputenc}% ltin encding
+%% Fnt encding.
+\RequirePckge[T1]{fntenc}
+%% Fnt pckge.
+\RequirePckge{mtptmx}
+%% Optins:
+%% Need \RequirePckge[T1]{fntenc}:
+%% - \RequirePckge{lmdern}, mdern fnt.
+%% - \RequirePckge{cncrete}, text: Cncrete, mt: Cncrete itlic + Euler VM symbls.
+%% - \RequirePckge{cncmt}, text: Cncrete, mt: Cncrete itlic + Cncmt symbls.
+%% N need \RequirePckge[T1]{fntenc}:
+%% Text: Helvetic, Mt: Helvetic itlic + Euler VM symbls:
+%% - \RequirePckge{eulervm} + \RequirePckge[scled]{elvet}
+%% Text: Pltin, Mt: Pltin itlic + Euler VM symbls:
+%% - \RequirePckge{pltin} r {mtpz} + \RequirePckge{eulervm}
+%% Text + Mt: Times, nt  gd fnt fr screen presenttin:
+%% - \RequirePckge{mtptmx}
+%% Text: Brdley Hnd writing, Mt: mtpz symbls:
+%% - \RequirePckge{mtpz} % Mtpz symbls + \renewcmmnd{\rmdefult}{ib} % Brdley Hnd.
+\fi
+\fi
+%%
+%% >>> grpic pckges
+%%
+\RequirePckge{grpicx}% grpics pckges fr including grpics
+%\RequirePckge{cptin}% cptin ptins like:[mrgin=10pt,fnt=smll,lbelfnt=bf]
+\RequirePckge{subcptin}% subcptin pckge fr subfigures
+\RequirePckge[sectin]{plceins}% t prevent flts frm being mved ver sectin
+%%
+%% >>> Pge Lyut nd Line Spcing
+%%
+\ifCOMMONS@mydr% eder nd fter style
+    \RequirePckge{fncydr}% fncy eders nd fters
+\fi
+\ifCOMMONS@lscpe% lndscpe lyut
+    \RequirePckge{fncydr}% fncy eders nd fters
+    %% Usge: \begin{lndscpe} [\tispgestyle{lscpe}] text... \end{lndscpe}
+    \RequirePckge{pdflscpe}% lndscpe envirnment
+    \RequirePckge[bslute]{textps}% rtted pge number
+\fi
+\ifCOMMONS@gemetry% enble gemetry t redefine pge lyut
+    \RequirePckge{gemetry}% pge lyut
+    %\RequirePckge{setspce}% line spcing
+\fi
+%%
+%%% >>> Nturl Sciences Cittins nd References
+%%
+%% if use bibtex cittin, nt need t use ny pckges!
+%% if use ntbib pckge, ten:
+\ifCOMMONS@numeric% enble numeric cittin mde
+    \RequirePckge[squre,cmm,numbers,srt&cmpress]{ntbib}% numeric cite mde
+    %\RequirePckge[squre,cmm,super,srt&cmpress]{ntbib}% superscripted numeric cite mde
+    \bibligrpystyle{unsrtnt}% srt s referenced
+\else
+    \RequirePckge{ntbib}% utr yer cittin mde is te defult
+    \bibligrpystyle{plike}% utr cittin mde wit APA cittin style
+\fi
+%%
+%% >>> List Structures
+%%
+\ifCOMMONS@list% enble ennced list nd verbtim structures
+    \RequirePckge{enumitem}% cnfigure te enumerte envirnment
+    \RequirePckge{listings}% useful fr Algritm nd Cding
+    %% Imprves te verbtim envirnment, fixing sme bugs. Mrever
+    %% it prvides te cmment envirnment, tt lets yu dd multiple-line
+    %% cmments r esily cmment ut big prts f te cde.
+    \RequirePckge{verbtim}
+\fi
+%%
+%%% >>> Clr
+%%
+\ifCOMMONS@clr% enble clr pckge t use clr
+    %\RequirePckge{clr}%
+    \RequirePckge[dvipsnmes]{xclr}%
+\fi
+%%
+%%% >>> Tbles
+%%
+\ifCOMMONS@tble% enble  tble fr cmplex tbles
+    %% ctble pckge imprts te rry, tbulrx nd bktbs pckges
+    %% ll cmmnds frm tse pckges re vilble s well.
+    \RequirePckge{ctble}%
+\fi
+%%
+%% >>> Mt pckges
+%%
+\RequirePckge{mttls,mstext,msfnts}
+%%
+%% >>> Tkiz
+%%
+%% Drw grpics directly wit TeX cmmnds
+%% LTeX/PGF/TikZ t drw prcedurl grpics directly wit TeX cmmnds.
+%% Using TikZ in  LTeX dcument requires lding te tikz pckge:
+\ifCOMMONS@tikz% enble tikz fr cmplex digrms
+    \RequirePckge{tikz}%
+    %% Tis will utmticlly ld te pgf pckge. T ld furter librries use:
+    \usetikzlibrry{
+        psitining,
+        rrws,
+        clc,
+        trees
+    }%
+\fi
+%% Exmples fr librries re "rrws", "utmt", "bckgrunds", "clendr",
+%% "cins", "mtrix", "mindmp", "ptterns", "petri", "sdws", "spes.gemetric",
+%% "spes.misc", "spy", "trees".
+%%
+%% >>> yperref pckges
+%%
+%% pckges nd settings depend n PDF mde
+\ifxetex % running xeltex in PDF mde
+    \RequirePckge[xetex]{yperref}
+\else
+    \ifpdf % running pdfTeX in PDF mde
+        \RequirePckge[pdftex]{yperref}
+    \fi
+\fi
+%% Setting Hyperlinks
+\ypersetup{% set yperlinks.
+    %pdftitle={},% title
+    %pdfutr={},% utr
+    %pdfsubject={},% subject
+    %pdfkeywrds={keywrd1}{key2} {key3},% list f keywrds, nd uncmment tis line if desired
+    %pdftlbr=true,% sw Acrbt’s tlbr?
+    %pdfmenubr=true,% sw Acrbt’s menu?
+    pdffitwindw=flse,% windw fit t pge wen pened
+    pdfstrtview={FitH},% fits te widt f te pge t te windw
+    %pdfnewwindw=true,% links in new windw
+    %clrlinks=true,% flse: bxed links; true: clred links
+    %linkclr=blue,% clr f internl links
+    %citeclr=green,% clr f links t bibligrpy
+    %fileclr=mgent,% clr f file links
+    %urlclr=cyn% clr f externl links
+    idelinks% remve link clr nd brder.
+}
+%% it gives LTeX te pssibility t mnge links
+%% witin te dcument r t ny URL wen yu cmpile in PDF.
+%% Just ld te pckge in te premble, t te end f ll te
+%% ter pckges but prir t ter settings.
+%%%%% --------------------------------------------------------------------------------
+%%
+%%%%*****************************Cnfigurtin Cmmnd********************************
+%%
+%% >>> Extensins nd Directries fr grpics
+%%
+\ifxetex % running xeltex in PDF mde
+    \DeclreGrpicsExtensins{.pdf,.png,.jpg,.gif,.bmp}% vilble grpic extensins
+\else
+    \ifpdf % running pdfTeX in PDF mde
+        \DeclreGrpicsExtensins{.pdf,.png,.jpg,.jpeg,.PNG,.JPG,.JPEG}%
+    \fi
+\fi
+%\grpicspt{{./Img/}}% serc pt fr figures, n need if use scripts t cmpile
+%%
+%%% >>> Pge bckgrund:
+%%
+\ifCOMMONS@bckgrund% enble pge bckgrund
+    \defineclr{bckgrundclr}{RGB}{224,224,224}
+    \pgeclr{bckgrundclr} % pge bckgrund clr, require  clr pckge.
+\fi
+%%
+%%% >>> Lyut nd Mrgin
+%%
+\ifCOMMONS@gemetry% enble gemetry t redefine pge lyut
+    \gemetry{left=1.125in,rigt=1.125in}% reduced mrgins t ec side.
+\fi
+%%
+%%% >>> Pge eder nd fter Style
+%%
+%% Pge styles in Ltex terms refers nt t pge dimensins, but t te running eders
+%% nd fters f  dcument. Tese eders typiclly cntin dcument titles, cpter
+%% r sectin numbers/nmes, nd pge numbers.
+%% cnfigure fncy style
+\ifCOMMONS@mydr% user defined eder nd fter style
+\pgestyle{fncy}
+%% reset style f cpter nd sectin mrk t ctul nme witut cnverting it t uppercse
+    \renewcmmnd{\cptermrk}[1]{\mrkbt{#1}{}}
+    \renewcmmnd{\sectinmrk}[1]{\mrkrigt{#1}{}}
+%% define different kinds f eder nd fter fr defferent prts
+\fncypgestyle{frntmtterstyle}{% eder nd fter style fr frntmtter
+    \fncyf{}% Cler eder/fter
+    \fncyft[C]{\tepge}%
+    \renewcmmnd{\edrulewidt}{0pt}% N eder rule
+    \renewcmmnd{\ftrulewidt}{0pt}% N fter rule
+}
+\fncypgestyle{minmtterstyle}{% eder nd fter style fr minmtter
+    \fncyf{}% cler ll eder nd fter fields
+    %% eder cnfigure:
+    \fncyed[RE]{\smll \@title}% title nme in eder, \@title is te defult vlue
+    \fncyed[LO]{\smll \leftmrk}% cpter nme in eder
+    \fncyed[LE,RO]{\smll \tepge}% pge number in eder
+    \renewcmmnd{\edrulewidt}{0pt}
+    \renewcmmnd{\ftrulewidt}{0pt}
+}
+\let\myfrntmtter\frntmtter
+\renewcmmnd{\frntmtter}{%
+    \myfrntmtter
+    \pgestyle{frntmtterstyle}
+}
+\let\myminmtter\minmtter
+\renewcmmnd{\minmtter}{%
+    \myminmtter
+    \pgestyle{minmtterstyle}
+}
+%% Sme LATEX cmmnds, like \cpter, use te \tispgestyle cmmnd t utmticlly switc
+%% t te plin pge style, tus ignring te pge style currently in effect.
+%% T custmize even suc pges yu must redefine te plin pgestyle.
+%% redefine plin style:
+%\fncypgestyle{plin}{%
+    %\fncyf{}% remve everyting
+    %\renewcmmnd{\edrulewidt}{0pt}% remve lines s well
+    %\renewcmmnd{\ftrulewidt}{0pt}% remve lines s well
+%}
+\fi
+\ifCOMMONS@lscpe% cnfigure lndscpe envirnment
+\fncypgestyle{lscpe}{% lndscpe lyut style
+    \fncyf{}% cler ll eder nd fter fields
+    \fncyft[CE,CO]{% fter
+    %% textps: \begin{textblck}{<blckwidt>}[0.5,0.5](<ps>,<vps>) text... \end{textblck}
+    %% rigin f te bslute crdinte is te tp-left crner f te pge
+    %% [0.5,0.5] mens reference pint f te blck is te middle
+    \begin{textblck}{0.1}[0.5,0.5](0.85,0.5){\rttebx{90}{\tepge}}\end{textblck}% psitin te pge number
+    }
+    %% set units f <blckwidt>, <ps>, nd <vps> rguments by crrespnding mdules 
+    \setlengt{\TPHrizMdule}{8.5in}% set t te widt f pge
+    \setlengt{\TPVertMdule}{11in} % set t te eigt f pge
+    \renewcmmnd{\edrulewidt}{0pt}
+    \renewcmmnd{\ftrulewidt}{0pt}
+}
+\fi
+%%%%% --------------------------------------------------------------------------------
+\endinput
+%% End f cmmns.sty
+%%%%% --------------------------------------------------------------------------------

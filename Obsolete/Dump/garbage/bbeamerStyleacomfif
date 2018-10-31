@@ -1,0 +1,90 @@
+%---------------------------------------------------------------------------%
+%-                                                                         -%
+%-                        User-defined Cmmnds                            -%
+%-                                                                         -%
+%---------------------------------------------------------------------------%
+%- Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm> 
+%- Tis is free sftwre: yu cn redistribute it nd/r mdify it
+%- under te terms f te GNU Generl Public License s publised by
+%- te Free Sftwre Fundtin, eiter versin 3 f te License, r
+%- (t yur ptin) ny lter versin.
+%---------------------------------------------------------------------------%
+%->> Identifictin
+%---------------------------------------------------------------------------%
+\NeedsTeXFrmt{LTeX2e}%
+\PrvidesPckge{rtrcm}[2014/10/01 v0.1 LTeX mcrs pckge]%
+%---------------------------------------------------------------------------%
+%->> Declre ptins
+%---------------------------------------------------------------------------%
+%-
+%-> Hndle nn-implemented ptins
+%-
+\DeclreOptin*{%
+    \PckgeWrning{rtrcm}{Unknwn ptin '\CurrentOptin'}%
+}
+%-
+%-> Termintes ll ptins prcessing
+%-
+\PrcessOptins\relx%
+%---------------------------------------------------------------------------%
+%->> User defined cmmnds
+%---------------------------------------------------------------------------%
+%-
+%-> Generl infrmtin
+%- 
+%- \newcmmnd: defines  new cmmnd, mkes n errr if lredy defined
+%- \renewcmmnd: redefines  predefined cmmnd, mkes n errr if nt yet defined
+%- \prvidecmmnd: defines  new cmmnd, if lredy defined, keep ld definitin
+%- *-frms: enble errr ceck fr missing rguments r rguments cntin \pr
+%- \def: define  cmmnd weter new r predefined, equivlent t
+%-       \prvidecmmnd{nme}{}%
+%-       \renewcmmnd*{nme}[number f rguments][defult vlue]{definitin}
+%- \lng\def: define  cmmnd weter new r predefined, equivlent t
+%-       \prvidecmmnd{nme}{}%
+%-       \renewcmmnd{nme}[number f rguments][defult vlue]{definitin}
+%- *-frms tt re usully te better frm t use wen defining cmmnds wit
+%- rguments, unless ny f tese rguments is intended t cntin wle prgrps
+%- f text. If yu need t use te nn-str frm ten yu suld sk weter tt 
+%- rgument better be treted s te cntents f  suitbly defined envirnment.
+%-
+%-> Mt functins
+%-
+%- Interntinl stndrd lyut rules (frm ismt pckge)
+%- Te verll rule is tt symbls representing mt quntities r vribles suld
+%- be itlicised, symbls representing units r lbels re unitlicised (rmn).
+%- Symbls fr vectrs nd mtrices re bld itlic, symbls fr tensrs re 
+%- sns-serif bld itlic.
+%- Te bve rules pply eqully t letter symbls frm te Greek nd 
+%- te Ltin lpbet.
+%- Mre infrmtin my be fund in <<Te LTeX Mtemtics Cmpnin>>
+%- Hwever, mt typefces vry frm field t field. T keep cnsistent typgrpy
+%- nd esy dptin, it it lwys best t crete  crrespnding cmmnd fr 
+%- vribles in ec mt ctegry.  
+%\prvidecmmnd{\Sclr}[1]{#1}% sclr is te nrml mt typeset, itlic
+\prvidecmmnd{\Vectr}[1]{\bldsymbl{#1}}% generl vectrs in bld itlic
+%\renewcmmnd{\vec}[1]{\Vectr{#1}}% redefine predefined vectr if needed
+\prvidecmmnd{\unitVectr}[1]{\bldsymbl{\mtbf{#1}}}% unit vectrs in bld rmn
+\prvidecmmnd{\Tensr}[1]{\bldsymbl{\mtsf{#1}}}% tensr in sns-serif bld itlic
+\prvidecmmnd{\unitTensr}[1]{\bldsymbl{{\mtsf{#1}}}}% identity tensr in sns-serif bld
+\prvidecmmnd{\Mtrix}[1]{\bldsymbl{\mtbf{#1}}}% mtrix in bld rmn
+\prvidecmmnd{\unitMtrix}[1]{\bldsymbl{\mtbf{#1}}}% identity mtrix in bld rmn
+\prvidecmmnd{\Unit}[1]{\,\mtrm{#1}}% units in rmn
+\prvidecmmnd{\Cnst}[1]{\mtrm{#1}}% mt cnstnts, functins
+\prvidecmmnd{\Set}[1]{\mtbb{#1}}% specil sets in blckbrd bld
+\prvidecmmnd{\Div}{\pertrnme{div}}% divergence pertr
+\prvidecmmnd{\Order}{\pertrnme{O}}% rder pertr
+\prvidecmmnd{\Trce}{\pertrnme{tr}}% trce pertr
+\prvidecmmnd{\Dig}{\pertrnme{dig}}% dignl
+\prvidecmmnd{\Def}{\pertrnme{def}}% define
+\prvidecmmnd{\Lptr}{\pertrnme{\mtcl{L}}}% sptil pertr
+\prvidecmmnd{\Tptr}{\pertrnme{\mtcl{LL}}}% temprl pertr
+\prvidecmmnd{\Sptr}{\pertrnme{\mtcl{S}}}% slutin pertr
+\prvidecmmnd{\Des}[1]{\mtrm{#1}}% descriptive superscripts nd subscripts in rmn type 
+%-
+%-> Grpicl lengt fctr
+%-
+\prvidecmmnd*{\MyFctr}{0.6}% fr single figure
+\prvidecmmnd*{\MySubFctr}{0.45}% fr subfigure
+%---------------------------------------------------------------------------%
+\endinput
+

@@ -1,0 +1,1265 @@
+\cpter{Numericl Discretiztin}
+\lbel{c:numeric}
+
+As mtemticl sttements f pysicl cnservtin lws, te gverning equtins f mteril mtin re te crnerstne fr describing nd quntifying te trnsprttin f mss, mmentum, nd energy. Due t prperties suc s nnlinerity, multidimensins, time-spce cupling, nd cmplex bundry cnditins, t slve te equtin system nlyticlly is extremely difficult. Terefre, numericl slutin is currently te mst prmising pprc, ltug te relibility f numericl results is limited by te precisin f input dt, te dequcy f mtemticl mdels, nd te vilbility f cmputing resurces. 
+
+In discussing numericl slutins, it is cnvenient t represent  system f prtil differentil equtins by n bstrct vectr frm
+\begin{equtin}\lbel{eq:gverneq}
+    \frc{\prtil \Vectr{U}}{\prtil t} = \Lptr\Vectr{U}
+\end{equtin}
+were $\Vectr{U}$ is te slutin vectr, $\Lptr$ is te sptil pertr. Fr te system f cnservtin lws f mteril mtins,
+\begin{equtin} \lbel{eq:cnserlw}
+    \begin{gtered}
+        \Lptr = \Lptr_x + \Lptr_y + \Lptr_z + \Vectr{\Pi}\\
+        \Lptr_s\Vectr{U} = - \frc{\prtil \Vectr{F}_s(\Vectr{U})}{\prtil x_s} + \frc{\prtil \Vectr{F}^{\Des{v}}_s(\Vectr{U})}{\prtil x_s}, \,\, s = x, y, z 
+    \end{gtered}
+\end{equtin}
+
+\sectin{Cncepts nd fundmentls}
+
+A cncept mp f numericl slutins is swn in Fig.~\ref{fig:cfd_cncept_mp}. Te utiliztin f numericl metds emplys discretiztin tt replces te cntinuus prblem represented by integrl r differentil equtins t  discrete prblem represented by lgebric equtins. By first discretizing te cntinuus pysicl dmins int discrete cmputtinl dmins in bt time nd spce, te crrespnding discretiztin f gverning equtins results in  system f lgebric equtins wit  finite set f discrete vlues. As  result, te infinite degrees f freedm in te integrl r differentil equtins re reduced t finite degrees f freedm in te lgebric equtins, wic re ble t be slved n cmputers.
+\begin{figure}[!tbp]
+    \centering
+    \cptin{A cncept mp f numericl slutins.}
+    \lbel{fig:cfd_cncept_mp}
+\end{figure}
+
+\subsectin{An illustrtive exmple}
+
+T illustrte te cncept f discretiztin, cnsider  prtil differentil equtin defined n te spce-time dmin represented by te $x-t$ plne
+\begin{equtin}
+    \frc{\prtil u}{\prtil t} + \frc{\prtil f(u)}{\prtil x} = 0, \ \text{n}\ \Omeg \times T
+\end{equtin}
+
+\prgrp{Discretiztin f prblem dmin}
+
+As illustrted in Fig.~\ref{fig:discretize_dmin}, t mp te cntinuus pysicl dmin $\Omeg \times T$ t  discrete cmputtinl dmin $\bigcup \Omeg_i \times \bigcup T_n$,  mes wit sptil widt $\Delt x$ nd time step $\Delt t$ cn be used, nd ec mes cell center represented by  discrete grid pint $(x_i,t_n)$ is defined by
+\begin{equtin}
+    \begin{ligned}
+        x_i &= i \Delt x, \,\, i = 0, \dtsc, I-1\\
+        t_n &= n \Delt t, \,\, n = 0, \dtsc, N-1
+    \end{ligned}
+\end{equtin}
+nd te mes cell $\Omeg_i \times T_n$ is creted by
+\begin{equtin}
+    \begin{ligned}
+        \Omeg_i &= [x_{i-\frc{1}{2}}, x_{i+\frc{1}{2}}]\\
+        T_n &= [t_n, t_{n+1}]
+    \end{ligned}
+\end{equtin}
+were
+\begin{equtin}
+    x_{i+\frc{1}{2}} = x_i + \frc{\Delt x}{2} = (i + \frc{1}{2}) \Delt x
+\end{equtin}
+re sptil cell interfces.
+\begin{figure}[!tbp]
+    \centering
+    \cptin{A scemtic digrm f dmin discretiztin.}
+    \lbel{fig:discretize_dmin}
+\end{figure}
+
+\prgrp{Discretiztin f gverning equtin}
+
+Te pplictin f numericl metds is t prduce pprximtins t te slutin t te discrete grid pints. Terefre, it is cnvenient t intrduce  nttin fr te pint-wise pprximtin vlue t te true slutin $u(x,t)$ t te discrete grid pint $(x_i,t_n)$ s
+\begin{equtin}
+    u_i^n \pprx u(x_i, t_n) \equiv u(i \Delt x, n \Delt t)
+\end{equtin}
+
+After dmin discretiztin, different numericl metds dpt designted pprces t trnsfrm te integrl r differentil pertrs int lgebric expressins, wic cn ten be slved t find te pprximte slutin $u_i^n$. Accrding t te time level n wic te sptil pertrs re discretized, sptil discretiztin scemes re brdly ctegrized int tw grups: explicit scemes nd implicit scemes. Te ptiml cice f te sceme type depends n te purpse f te slutin.
+
+Explicit scemes pply sptil discretiztin n te time level wit knwn slutin vlues, wic enbles  time-mrcing slving prcess nd is frequently cnsidered fr btining time-ccurte slutins f trnsient prblems due t its lw cst per time step. Mrever, tese scemes re esy t implement nd prllelize. Te min drwbck f explicit scemes is tt te time step size is tigtly restricted by stbility cnditins.
+
+In cntrst, implicit scemes pply sptil discretiztin n te time level wit unknwn slutin vlues. In generl, implicit scemes re uncnditinlly stble since teir dmin f dependence cntins te entire cmputtinl dmin. Terefre, tey llw rbitrrily lrge time steps, bunded nly by te desired time ccurcy. Hwever, n implicit discretiztin prduces  cupled system f equtins ver te entire cmputtinl dmin, tus lrge sprse mtrices re invlved in te slutin system, wic is generlly required t be slved by ig-cst itertive slvers suc s Jcbin itertin r Guss-Seidel itertin metds.
+
+Finite difference pprximtins f $u_i^n$ re btined by replcing derivtives f $u$ t $(x_i,t_n)$ wit lgebric expressins invlving $u$ t pints neigbring $(x_i,t_n)$. Fr instnce, using frwrd discretiztin in time nd explicit centrl difference discretiztin in spce gives
+\begin{equtin}
+    \frc{u_i^{n+1} - u_i^n}{\Delt t} + \frc{f(u_{i+1}^n) - f(u_{i-1}^n)}{2 \Delt x} = 0, \,\, 1 \le i \le I-2, \ n \ge 0
+\end{equtin}
+Using frwrd discretiztin in time nd implicit centrl difference discretiztin in spce gives
+\begin{equtin}
+    \frc{u_i^{n+1} - u_i^n}{\Delt t} + \frc{f(u_{i+1}^{n+1}) - f(u_{i-1}^{n+1})}{2 \Delt x} = 0, \,\, 1 \le i \le I-2, \ n \ge 0
+\end{equtin}
+
+In generl, te set f grid pints invlved in te cmputtin f $u_i^{n+1}$ under  given metd is clled te stencil r te direct numericl dmin f dependence f te metd. Te discretiztin f te gverning equtin is pplied fr ll ndes, except fr tse t te temprl nd sptil bundries.
+
+T cnstruct  well-defined prblem nd cmpletely define te slutin, initil cnditins nd bundry cnditins re required t be prvided s  supplement t te gverning equtin, wic leds te crrespnding enfrcement f initil nd bundry cnditins n te discrete slutin.
+
+\prgrp{Initil cnditin}
+
+T strt te evlutin f te slutin, n initil cnditin tt cmpletely defines te slutin t $t=0$ is needed.
+
+\prgrp{Bundry cnditin nd tretment}
+
+In dditin t te enfrcement f prcticl cnditins t te pysicl bundries, te discretiztin f gverning equtins leds t extr issues relted t numericl bundry tretment, wic is due t tt numericl metds usully require stencils frm utside te cmputtinl dmin.
+
+Te numericl bundry issue cn be ddressed by tw wys: eiter cnge te metd r cnge te cmputtinl dmin. In te frmer pprc, ner dmin bundries, te interir metd my be switced t  directin bised metd fr viding stencils frm utside te cmputtinl dmin. In te ltter pprc, te cmputtinl dmin my be extended by intrducing imginry cells clled "gst cells" utside f te cmputtinl dmin \citep{lney1998cmputtinl}. Wen pysicl prperties t te gst cells re prperly recnstructed frm pysicl bundry cnditins nd vlues t interir cmputtinl dmin, te interir metd cn be cnsistently implemented witut invlving dptin ner bundries.
+\begin{figure}[!tbp]
+    \centering
+    \cptin{A scemtic digrm illustrting dmin prtitin nd index rnge in  gst-cell pprc. [Nmenclture: $I=m+1+2I_g$, ttl number f ndes; $m$, number f nrml cells; $I_g$, number f gst nde lyers.]}
+    \lbel{fig:dmin_index}
+\end{figure}
+
+T illustrte te gst-cell pprc, cnsider  ne-dimensinl dmin discretized by $m$ cells s swn in Fig.~\ref{fig:dmin_index}. T prvide numericl bundries fr fcilitting numericl discretiztin, $I_g$ gst nde lyers re intrduced t ec side f te cmputtinl dmin. As  result, te rle f ec cmputtinl regin nd its index rnge re subject t te reltin
+\begin{equtin}
+    [0, I)
+    \begin{cses}
+        [0, I_g), \ \text{lwer gst}\\
+        [I_g, I-I_g), \ \text{nrml nde}
+        \begin{cses}
+            [I_g, I_g+1), \ \text{lwer bundry}\\
+            [I_g+1, I-I_g-1), \ \text{interir nde}\\
+            [I-I_g-1, I-I_g), \ \text{upper bundry}\\
+        \end{cses}\\
+        [I-I_g, I), \ \text{upper gst}\\
+    \end{cses}
+\end{equtin}
+
+Assume te slutin stisfies te peridic bundry cnditin
+\begin{equtin}
+    u(x,t) = u(x-l \unitVectr{n},t)
+\end{equtin}
+were $l = m \Delt x$ is te dmin lengt, nd $\unitVectr{n} = \pm 1$ is te unit utwrd nrml f te bundries t ec directin.
+
+By trnslting te cmputtinl dmin between te nde $i=I_g$ nd te nde $i=I-I_g-1$, te discrete versin fr enfrcing peridic bundry cnditin s
+\begin{equtin}
+    u_{i}^n = u_{i-m \unitVectr{n}}^n
+\end{equtin}
+
+\prgrp{A cmplete lgebric system}
+
+Terefre, te cmplete lgebric system fr slving te discrete slutin under peridic bundry cnditin is btined s
+\begin{equtin}
+    \begin{ligned}
+        u_i^{n+1} = \Lptr_{\Delt} u^{n}, \,\,& i \in [I_g, I-I_g), \ n \ge 0\\
+        \ \text{I.C.}\ u_i^0 = u(x_i, 0), \,\, i \in [I_g, I-I_g); \,\,&
+        \ \text{B.C.}\
+        \begin{cses}
+            u_i^{n} = u_{i+m}^{n}, \,\, i \in [0, I_g), \ n \ge 0\\
+            u_i^{n} = u_{i-m}^{n}, \,\, i \in [I-I_g, I), \ n \ge 0\\
+        \end{cses}
+    \end{ligned}
+\end{equtin}
+were $u_i^{n+1} = \Lptr_{\Delt} u^{n}$ represents te discretized gverning equtin.
+
+\subsectin{Cell verge interprettin}
+
+In dditin t te stndrd interprettin f te pprximte slutin $u_i^n$ s pint-wise vlues defined t grid pints $(x_i, t_n)$, in develping numericl metds fr cnservtin lws it is generlly preferble t view $u_i^n$ s n pprximtin t  cell verge f $u(x,t_n)$ n $\Omeg_i$, defined by
+\begin{equtin}
+    u_i^n \pprx \br{u}_i^n \equiv \frc{1}{\Delt x} \int_{x_{i - \frc{1}{2}}}^{x_{i + \frc{1}{2}}} u(x,t_n) \,\mtrm{d}x \equiv u(\br{x}_i,t_n)
+\end{equtin}
+were $\br{x}_i$ is te midpint f integrtin n $\Omeg_i$.
+
+Tis cell verge interprettin is nturl since te integrl frm f te cnservtin lw describes precisely te time evlutin f te cell verged integrl, s swn by te integrtin f te differentil equtin ver $\Omeg_i \times T_n$
+\begin{equtin}
+    \begin{ligned}
+        \int_{t_n}^{t_{n+1}} \int_{x_{i - \frc{1}{2}}}^{x_{i + \frc{1}{2}}} \frc{\prtil u}{\prtil t} \,\mtrm{d}x \,\mtrm{d}t 
+        &= \int_{x_{i - \frc{1}{2}}}^{x_{i + \frc{1}{2}}} u(x,t_{n+1}) - u(x,t_n) \,\mtrm{d}x \\
+        &= (\br{u}_i^{n+1} - \br{u}_i^n) \Delt x\\
+        \int_{t_n}^{t_{n+1}} \int_{x_{i - \frc{1}{2}}}^{x_{i + \frc{1}{2}}} \frc{\prtil f}{\prtil x} \,\mtrm{d}x \,\mtrm{d}t
+        &= \int_{t_n}^{t_{n+1}} f(u(x_{i+\frc{1}{2}},t)) - f(u(x_{i-\frc{1}{2}},t)) \,\mtrm{d}t\\ 
+        &= (\t{f}_{i+\frc{1}{2}}^{n+\frc{1}{2}} - \t{f}_{i-\frc{1}{2}}^{n+\frc{1}{2}}) \Delt t \\
+    \end{ligned}
+\end{equtin}
+were
+\begin{equtin}
+    \t{f}_{i+\frc{1}{2}}^{n+\frc{1}{2}} = \frc{1}{\Delt t} \int_{t_n}^{t_{n+1}} f(u(x_{i+\frc{1}{2}},t)) \,\mtrm{d}t
+\end{equtin}
+is te time verge f te interfcil flux $f(u(x_{i+1/2},t))$ ver $T_n$ t te interfce between te cell $\Omeg_i$ nd $\Omeg_{i+1}$ nd is cmmnly referred t s numericl flux.
+
+\subsectin{Fully-discrete frm}
+
+After intrducing te cell verge interprettin f te slutin nd te numericl flux,  fully-discrete equtin in bt time nd spce is btined nd describes te reltin mng te verged vlues precisely
+\begin{equtin} \lbel{eq:stndrd_frm}
+    u_i^{n+1} = u_i^n - \frc{\Delt t}{\Delt x} (\t{f}_{i+\frc{1}{2}}^{n+\frc{1}{2}} - \t{f}_{i-\frc{1}{2}}^{n+\frc{1}{2}})
+\end{equtin}
+
+As te discrete equtin nly prpgtes te slutin verge $u_i^n$ in time, t slve tis equtin,  specific sptil distributin f te slutin, $\t{u}_i^n(x)$, requires t be ssumed fr recnstructing te slutin $u(x,t^n)$ frm te slutin verge $u_i^n$ s well s fr finding te unknwn interfcil fluxes $f(u(x_{i+1/2},t^{n+1/2}))$. Assuming  single plynmil f rbitrry degree trug ll te cells fr slutin recnstructin is imprcticl nd ls impses unnecessry smtness n te slutin, since discntinuities suld be llwed fr n integrl frm f cnservtin lw. Terefre,  mre resnble wy is t use  piecewise plynmil t recnstruct te slutin n ec cell seprtely. As ec recnstructin plynmil is restricted witin ec cell, nd n smtness cnditin is impsed n slutin crss neigbring cells, discntinuities cn be nturlly dmitted int te slutin.
+\begin{figure}[!tbp]
+    \centering
+    \cptin{Gdunv's metd fr slving yperblic system.}
+    \lbel{fig:gdunv_metd}
+\end{figure}
+
+Fr instnce, s illustrted in Fig.~\ref{fig:gdunv_metd}, if ssuming  piecewise cnstnt plynmil suc tt $u(x,t_n)$ s  cnstnt distributin ver ec cell $\Omeg_i$
+\begin{equtin}
+    \t{u}_i^n(x) = u_i^n, \,\, x \in \Omeg_i
+\end{equtin}
+ten  jump discntinuity exists t te interfce f neigbring cells, wic s t be reslved in rder t determine te interfcil stte nd te numericl flux. Gdunv's ide is t cnstruct  Riemnn prblem ver ec interfce $x_{i+1/2}$ wit te initil cnditin
+\begin{equtin}
+    \t{u}(x,t^n) =
+    \begin{cses}
+        \t{u}_i^n(x), &\ \text{if}\ x < x_{i+\frc{1}{2}}\\
+        \t{u}_{i+1}^n(x), &\ \text{if}\ x > x_{i+\frc{1}{2}}\\
+    \end{cses}
+\end{equtin}
+wic cn be slved fr $t \in [t^n, t^{n+1}]$ t find te interfcil stte by using te metd f crcteristics. Wen te crcteristic speed $(u) = {\mtrm{d} f} / {\mtrm{d} u}$ des nt dependent explicitly n $x$ nd $t$, ten te crcteristics re strigt lines
+\begin{equtin}
+    \frc{\mtrm{d} x}{\mtrm{d} t} = (u)
+\end{equtin}
+Under te piecewise cnstnt distributin ssumptin, if te time intervl is sufficiently smll, te crcteristic line crss te interfce t every time instnt is lwys riginted frm  cnstnt upwind stte. Ten, te interfcil stte is ls cnstnt trug te time intervl nd is equl t te upwind stte. 
+\begin{itemize}
+    \item If $(u_i^n) > (u_{i+1}^n)$,  sck wve, sck speed $s = (f(u_{i+1}^n) - f(u_i^n)) / (u_{i+1}^n - u_i^n)$.
+        \begin{equtin}
+            \t{f}_{i+1/2}^{n+\frc{1}{2}} = 
+            \begin{cses}
+                f(u_i^n), &\ \text{if}\ s > 0, \ \text{rigt prpgting sck} \\
+                f(u_{i+1}^n), &\ \text{if}\ s < 0, \ \text{left prpgting sck} \\
+            \end{cses}
+        \end{equtin}
+    \item If $(u_i^n) \le (u_{i+1}^n)$,  rrefctin wve.
+        \begin{equtin}
+            \t{f}_{i+1/2}^{n+\frc{1}{2}} = 
+            \begin{cses}
+                f(u_i^n), &\ \text{if}\ (u_i^n) \ge 0, \ \text{rigt prpgting rrefctin} \\
+                0, &\ \text{if}\ (u_i^n) < 0 < (u_{i+1}^n), \ \text{snic pint} \\
+                f(u_{i+1}^n), &\ \text{if}\ (u_{i+1}^n) \le 0, \ \text{left prpgting rrefctin} \\
+            \end{cses}
+        \end{equtin}
+\end{itemize}
+
+A symmetric stencil is referred t s centrl difference discretiztin, wile n upwind-bissed stencil is clled upwind discretiztin. Te ccurcy tt is nrmlly sscited wit symmetry wuld suggest tking  symmetric stencil. Hwever, wve prpgtin is inerently n symmetric prcess. Csing te stencil t reflect te directin f wve prpgtin is clled upwinding.
+
+In te fully-discrete equtin, nce dmitting $u_i^n$ s te cell verge f te slutin, ten te ccurcy f $\t{f}_{i+1/2}^{n+1/2}$ t pprximte te temprl verge f te interfcil flux ver $T_n$ determines te sptil nd temprl ccurcy f te numericl pprximtin. Hence, te reliztin f $\t{f}_{i+1/2}^{n+1/2}$ cmpletely determines te underlying numericl sceme bt in time nd spce.
+
+\subsectin{Semi-discrete frm}
+
+In generl, fr enncing te flexibility in develping s well s implementing numericl scemes, it is preferble t tret time nd spce discretiztin seprtely rter tn simultneusly s in te fully-discrete equtin. In fct, te independent tretment f time nd spce discretiztin cn be cieved in  semi-discrete equtin, wic is btined by te integrtin f te differentil equtin ver $\Omeg_i$
+\begin{equtin}
+    \begin{ligned}
+        \int_{x_{i - \frc{1}{2}}}^{x_{i + \frc{1}{2}}} \frc{\prtil u}{\prtil t} \,\mtrm{d}x 
+        &= \frc{\mtrm{d} \br{u}_i}{\mtrm{d} t} \Delt x\\
+        \int_{x_{i - \frc{1}{2}}}^{x_{i + \frc{1}{2}}} \frc{\prtil f}{\prtil x} \,\mtrm{d}x
+        &= f(u(x_{i+\frc{1}{2}},t)) - f(u(x_{i-\frc{1}{2}},t))\\ 
+    \end{ligned}
+\end{equtin}
+After intrducing te cell verge interprettin f te slutin,  semi-discrete equtin tt is cntinuus in time nd discrete in spce is btined s
+\begin{equtin}
+    \frc{\mtrm{d} u_i}{\mtrm{d} t} = - \frc{1}{\Delt x} (\t{f}_{i+\frc{1}{2}} - \t{f}_{i-\frc{1}{2}})
+\end{equtin}
+were te numericl flux $\t{f}_{i+1/2}$ is te interfcil flux $f(u(x_{i+1/2},t))$ t te interfce between te cell $\Omeg_i$ nd $\Omeg_{i+1}$ t ne instnt in time.
+
+In te semi-discrete equtin, te ccurcy f $\t{f}_{i+1/2}$ t pprximte te interfcil flux determines te sptil ccurcy f te numericl pprximtin, nd te ccurcy f integrting te rdinry differentil equtins in time determines te temprl ccurcy. Tis pprc f reducing  prtil differentil equtin t  system f rdinry differentil equtins by decupling te sptil nd temprl discretiztin prcesses is clled te metd f lines \citep{sciesser1991numericl}. Since discretizing in spce is cnducted independently befre discretizing in time, te temprl discretiztin f te prtil differentil equtin is ten equivlent t slving rdinry differentil equtins in te time dmin. 
+
+\subsectin{Cnservtive discretiztin}
+
+Te sptil discretiztin in bt te fully-discrete equtin nd te semi-discrete equtin s te frm
+\begin{equtin}
+    \left. \frc{\prtil f}{\prtil x} \rigt|_i = \frc{1}{\Delt x}(\t{f}_{i+\frc{1}{2}}-\t{f}_{i-\frc{1}{2}})
+\end{equtin}
+In generl, te recnstructin f te numericl flux cn be expressed vi n interpltin functin
+\begin{equtin}
+    \t{f}_{i+{1}/{2}}=\t{f}(u_{i-j},\dtsc,u_{i+k})  
+\end{equtin}
+were te interpltin functin suld stisfy te cnsistency cnditin
+\begin{equtin}
+    \t{f}(u,\dtsc,u) = f(u)
+\end{equtin}
+
+Te bve frm f sptil discretiztin is cmmnly referred t s  cnservtive discretiztin, s te develped numericl scemes gurntee discrete cnservtin vi telescping prperty
+\begin{equtin}
+    \Delt x \sum_{i=p}^{q} u_i^{n+1} - \Delt x \sum_{i=p}^{q} u_i^n = \Delt t\t{f}_{p-\frc{1}{2}}^{n} - \Delt t\t{f}_{q+\frc{1}{2}}^{n}
+\end{equtin}
+wic sttes te cnservtin principle tt te cnge f te ttl quntity f  cnserved vrible in  regin is equl t te flux trug te bundries. Terefre, te numericl slutin beys te sme cnservtin principle s te exct slutin des.
+
+In numericl pprximtins, ensuring te cnservtin principle is elpful in btining pysiclly crrect slutins, prticulrly fr nnliner systems wit discntinuus slutins. T sw tis, ssume te slutin $u(x,t)$ is cnstnt utside sme finite sptil intervl $[x_{p-1/2}, x_{q+1/2}]$ fr te time intervl $[t^, t^b]$
+\begin{equtin}
+    \begin{cses}
+        u(x,t) \equiv u_{-\infty}, & x \le x_{p-\frc{1}{2}}\\
+        u(x,t) \equiv u_{+\infty}, & x \ge x_{q+\frc{1}{2}}\\
+    \end{cses},
+    \,\, t \in [t^, t^b]
+\end{equtin}
+By te finite prpgtin speed in  yperblic system, tis ssumptin is generlly true if te initil dt is cnstnt utside sme finite intervl. Ten, by te integrl frm f te cnservtin lw, it gives
+\begin{equtin}
+    \int_{x_{p-\frc{1}{2}}}^{x_{q+\frc{1}{2}}} u(x,t^b) \,\mtrm{d}x - \int_{x_{p-\frc{1}{2}}}^{x_{q+\frc{1}{2}}} u(x,t^) \,\mtrm{d}x = (t^b - t^) (f(u_{-\infty}) - f(u_{+\infty}))
+\end{equtin}
+Equivlently, te numericl slutin suld ls be cnstnt utside te finite intervl $[x_{p-1/2}, x_{q+1/2}]$. Since te numericl flux generlly s  finite dmin f dependence, s fr $p$ nd $q$ sufficiently fr wy, te cnsistency f te numericl flux cn be used t btin 
+\begin{equtin}
+    \Delt x \sum_{i=p}^{q} u_i^{n+1} - \Delt x \sum_{i=p}^{q} u_i^n = \Delt t (f(u_{-\infty}) - f(u_{+\infty}))
+\end{equtin}
+Sum ver te time intervl $[t^, t^b]$, gives
+\begin{equtin}
+    \Delt x \sum_{i=p}^{q} u_i^b - \Delt x \sum_{i=p}^{q} u_i^{} = (t^b - t^) (f(u_{-\infty}) - f(u_{+\infty}))
+\end{equtin}
+As bt te cntinuus nd te discrete cnservtin reltin cntinuusly ld ver te time intervl $[t^, t^b]$, te equtin
+\begin{equtin}
+    \Delt x \sum_{i=p}^{q} u_i^{n} = \int_{x_{p-\frc{1}{2}}}^{x_{q+\frc{1}{2}}} u(x,t^n) \,\mtrm{d}x
+\end{equtin}
+suld be true fr ny $t^n \in [t^, t^b]$. Hence, te numericl discretiztin is cnservtive.
+
+Te discrete cnservtin implies tt, wen  discntinuity is presented in te slutin, te slutin cmputed wit  cnservtive metd migt ve te discntinuity smered ut, but it must t lest be smered but te crrect lctin. Oterwise, te integrl cnnt be true fr ny intervl $[x_{p-1/2}, x_{q+1/2}]$ cntining te discntinuity, s illustrted in Fig.~\ref{fig:cnservtin_principle}.
+\begin{figure}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidt}
+        \cptin{}
+        \lbel{fig:cnservtin_principle_}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.45\textwidt}
+        \cptin{}
+        \lbel{fig:cnservtin_principle_b}
+    \end{subfigure}%
+    \cptin{True nd cmputed slutins. () A smered discntinuity wit te crrect lctin. (b) A srp discntinuity wit n incrrect lctin.}
+    \lbel{fig:cnservtin_principle}
+\end{figure}
+
+In dditin t te discrete cnservtin prperty, te cnservtive discretiztin ls prvides ig level f bstrctin: different numericl scemes minly led t different reliztins f te numericl flux. As  result, te cnservtive discretiztin frm is cmmnly dpted s te stndrd frm fr develping s well s implementing numericl scemes. 
+
+A cnservtive sceme predicts ttl energy directly nd cmputes te kinetic energy indirectly frm te mss nd mmentum. Fr extremely ig-speed flws, te internl energy is ten te smll difference f tw lrge numbers, nd my nt even be psitive. Wen tis ppens te cde will crs. A sceme is defined t be psitively cnservtive if it culd be gurnteed t predict nly psitive densities nd internl energies. Te riginl Gdunv sceme is psitively cnservtive, nd mny ppulr scemes re nt \citep{rten1987unifrmly}.
+
+\subsectin{Numericl nlysis}
+
+Under te cnservtive discretiztin, te explicit centrl difference discretiztin s te numericl flux
+\begin{equtin}
+    \t{f}_{i+\frc{1}{2}}^{n} = \frc{1}{2}(f(u_i^n) + f(u_{i+1}^n))
+\end{equtin}
+
+Nw ssume  liner flux functin $f(u)=u$, were $$ is  cnstnt. Te gverning equtin cnges t te liner dvectin equtin
+\begin{equtin}
+    \frc{\prtil u}{\prtil t} +  \frc{\prtil u}{\prtil x} = 0
+\end{equtin}
+
+Using frwrd discretiztin in time nd explicit centrl difference discretiztin in spce gives  discrete equtin s
+\begin{equtin}
+    \frc{u_i^{n+1} - u_i^n}{\Delt t} +  \frc{u_{i+1}^n - u_{i-1}^n}{2 \Delt x} = 0
+\end{equtin}
+Apply te Tylr series expnsins
+\begin{equtin}
+    \begin{ligned}
+        u_i^{n+1} &= u_i^n + (\frc{\prtil u}{\prtil t})_i^n \frc{\Delt t}{1!} + (\frc{\prtil^2 u}{\prtil t^2})_i^n \frc{\Delt t^2}{2!} + \dtsb\\
+        u_{i+1}^n &= u_i^n + (\frc{\prtil u}{\prtil x})_i^n \frc{\Delt x}{1!} + (\frc{\prtil^2 u}{\prtil x^2})_i^n \frc{\Delt x^2}{2!} + (\frc{\prtil^3 u}{\prtil x^3})_i^n \frc{\Delt x^3}{3!} + \dtsb\\
+        u_{i-1}^n &= u_i^n - (\frc{\prtil u}{\prtil x})_i^n \frc{\Delt x}{1!} + (\frc{\prtil^2 u}{\prtil x^2})_i^n \frc{\Delt x^2}{2!} - (\frc{\prtil^3 u}{\prtil x^3})_i^n \frc{\Delt x^3}{3!} + \dtsb\\
+    \end{ligned}
+\end{equtin}
+te discrete equtin nd te differentil equtin ve te reltin
+\begin{equtin}
+    \frc{u_i^{n+1} - u_i^n}{\Delt t} +  \frc{u_{i+1}^n - u_{i-1}^n}{2 \Delt x} = (\frc{\prtil u}{\prtil t} +  \frc{\prtil u}{\prtil x})_i^n +  \frc{\Delt t}{2} (\frc{\prtil^2 u}{\prtil t^2})_i^n + \frc{\Delt x^2}{6} (\frc{\prtil^3 u}{\prtil x^3})_i^n + \dtsb 
+\end{equtin}
+If we dente te reminder between te discrete equtin nd te differentil equtin s
+\begin{equtin}
+    \tu_i^n = \frc{\Delt t}{2} (\frc{\prtil^2 u}{\prtil t^2})_i^n + \frc{\Delt x^2}{6} (\frc{\prtil^3 u}{\prtil x^3})_i^n + \dtsb = \Order(\Delt t, \Delt x^2) 
+\end{equtin}
+Ten $\tu_i^n$ mesures te lcl rder f ccurcy f te discrete equtin fr pprximting te differentil equtin nd is referred t s te lcl trunctin errr. Wen discussing lcl trunctin errrs, we lwys ssume tt slutins re sufficiently smt. Terefre, te derivtives re ll ssumed t exist nd be bunded.
+
+Befre slving te discrete equtin, it is f interest t knw w te slutin f te discrete equtin will beve. In studying te bevir f slutins t  discrete equtin, it is useful t mdel te discrete equtin by  differentil equtin, since te qulittive bevir f  differentil equtin is esier t predict tn tt f  system f lgebric equtins. In dditin t using te riginl differentil equtin s  mdel fr te discrete equtin, tere is nter differentil equtin clled te mdified equtin \citep{wrming1974mdified} tt cn mre ccurtely represent te discrete equtin.
+
+\begin{equtin}
+    \frc{\prtil u}{\prtil t} +  \frc{\prtil u}{\prtil x} + \frc{\Delt t}{2} \frc{\prtil^2 u}{\prtil t^2} + \frc{\Delt x^2}{6} \frc{\prtil^3 u}{\prtil x^3} + \dtsb = 0
+\end{equtin}
+ten te trunctin errr between tis mdified equtin nd te discrete equtin is zer, wic mens tt te discrete equtin prduces n exct slutin t tis mdified equtin.
+
+If we furter replce te ig-rder time derivtives in te mdified equtin wit sptil derivtives, we btin n equtin tt is esier t nlyze. Nte tt we nw suld nt use te riginl differentil equtin since te slutin $u$ n lnger stisfies te riginl equtin, but suld use te mdified equtin t d te mnipultin
+\begin{equtin}
+    \begin{ligned}
+        \frc{\prtil^2 u}{\prtil t^2} &= -  \frc{\prtil^2 u}{\prtil t \prtil x} - \frc{\Delt t}{2} \frc{\prtil^3 u}{\prtil t^3} - \frc{\Delt x^2}{6} \frc{\prtil^4 u}{\prtil t \prtil x^3} + \dtsb\\
+        &= ^2 \frc{\prtil^2 u}{\prtil x^2} + \Order(\Delt t, \Delt x^2)\\
+    \end{ligned}
+\end{equtin}
+Substitute int te mdified equtin, gives
+\begin{equtin}
+    \frc{\prtil u}{\prtil t} +  \frc{\prtil u}{\prtil x} = - \frc{^2 \Delt t}{2} \frc{\prtil^2 u}{\prtil x^2} - \frc{\Delt x^2}{6} \frc{\prtil^3 u}{\prtil x^3} + \Order(\Delt t^2, \Delt t \Delt x^2, \Delt x^3)
+\end{equtin}
+Fr simplicity, ignre te ig-rder terms nd generlize te mdified equtin int n dvectin-diffusin-dispersin frm
+\begin{equtin}
+    \frc{\prtil u}{\prtil t} +  \frc{\prtil u}{\prtil x} = \mu \frc{\prtil^2 u}{\prtil x^2} + \nu \frc{\prtil^3 u}{\prtil x^3}
+\end{equtin}
+wic is  liner mgeneus prtil differentil equtin. Let $A(k,t)$ be te Furier trnsfrm f te slutin, ten
+\begin{equtin}
+    u(x,t) = \int_{0}^{\infty} A(k,t) e^{ikx}\,\mtrm{d}k
+\end{equtin}
+Substitute te slutin int te differentil equtin nd use te rtgnlity f te functin spce $\{e^{ikx}\}$, gives te slutin s
+\begin{equtin}
+    u(x,t) = \int_{0}^{\infty} e^{-\mu k^2 t} e^{i(kx - \meg t)}\,\mtrm{d}k, \,\, \meg(k) =  k + \nu k^3
+\end{equtin}
+Terefre, using  cnstnt pse plne $\pi = kx - \meg t$ nd $\prtil \pi / \prtil t = 0$ t btin te wve velcity $c_p$ s
+\begin{equtin}
+    c_p = \frc{\mtrm{d} x}{\mtrm{d} t} = \meg / k =  + \nu k^2
+\end{equtin}
+nd te grup velcity $c_g$ s
+\begin{equtin}
+    c_g = \frc{\prtil \meg}{\prtil k} =  + 3\nu k^2
+\end{equtin}
+were bt te wve velcity nd te grup velcity re functins f te wvenumber $k$. 
+
+By bserving te rle f ec item in ffecting te slutin bevir, in  mdified equtin, even-rder sptil derivtives cuse dissiptin nd intrduce mplitude errr, wile dd-rder sptil derivtives cuse dispersin nd intrduce pse errr. Dissiptive terms wit psitive cefficients cuse te slutin t becme smered ut s time evlves, nd dissiptive terms wit negtive cefficients cuse te slutin t grw unbundedly. As dispersin cuses wves wit different frequencies prpgting t different speeds, te psitive nd negtive cefficients f dispersive terms cuse wves prpgting t speeds leding befre nd lgging beind te true wve speeds, respectively. Cnsequently, different frequency cmpnents in  slutin my becme cmpletely seprted, leding t lrge sptil scilltins. Altug dispersin never leds t unbunded grwt f slutin, lrge scilltins cused by dispersin is still cnsidered s  frm instbility.
+
+Insted f finding te dminnt sptil derivtive term in te mdified equtin t nlyze te stbility f  discrete equtin, fr liner prblems, te vn Neumnn stbility nlysis using Furier series \citep{crney1950numericl} cn be directly pplied t te discrete equtin fr btining te stbility results. Nte tt linerity is strngly required t fcilitte te pplictin f Furier series, since nnliner prblems d nt ve te superpsitin prperty nd different frequency cmpnents interct nnlinerly, mking te nlysis intrctble.
+
+As stbility is lrgely but te grwt f errr s time evlves, nd te errr beys te sme equtin s te slutin des fr liner equtins, ne cn study te bevir f te slutin equivlently. Let te slutin be represented by  liner superpsitin f bse functins in te Furier series functin spce
+\begin{equtin}
+    u(x,t) = \sum_{k=-\infty}^{\infty} c_k(t) e^{ikx}
+\end{equtin}
+Mp $x \in [-\pi, \pi]$ t $j \in [0, J]$ by  liner mp
+\begin{equtin}
+    x_j = \frc{2\pi}{J}j - \pi, \,\, \Delt x = \frc{2 \pi}{J}
+\end{equtin}
+By ssuming te slutin being cntinuus nd peridic wit perid $J$, ten, 
+\begin{equtin}
+    u(x_j,t) = \sum_{k=-\infty}^{\infty} c_k(t) (-1)^k e^{i k \frc{2 \pi}{J} j} = \sum_{k=0}^{J-1} A_k(t) e^{i k \frc{2 \pi}{J} j} = \sum_{k=0}^{J-1} A_k(t) e^{i k \Delt x j}
+\end{equtin}
+were te infinite series is cnverted int  finite sum f discrete Furier mdes. S, we lk t te expnsin f $u_i^n$ in te frm
+\begin{equtin}
+    u_i^n = \sum_{k=0}^{J-1} A_k^n w_j^k, \,\, w_j^k = e^{i k \Delt x j}
+\end{equtin}
+Use te rtgnlity reltin
+\begin{equtin}
+    \sum_{j=0}^{J-1} w_j^k \br{w}_j^l =
+    \begin{cses}
+        J, &\ \text{if}\ k \equiv l \ \mtrm{md}\ J\\
+        0, &\ \text{terwise}\ 
+    \end{cses}
+\end{equtin}
+it gives te Prsevl reltin stting tt te trnsfrm des nt mdify te $L_2$ nrm
+\begin{equtin}
+    ||u^n||_2^2 \equiv u^n \cdt \br{u}^n = \sum_{j=0}^{J-1} u_j^n \br{u}_j^n = J \sum_{k=0}^{J-1} A_k^n \br{A}_k^n = J A^n \cdt \br{A}^n  \equiv J ||A^n||_2^2 
+\end{equtin}
+Substitute te expnsin frm int te discrete equtin nd pply te rtgnlity reltin, gives
+\begin{equtin}
+    A_k^{n+1} = M_k A_k^n, \,\, M_k = 1 - i \lp \sin(2\tet), \ \lp = \frc{ \Delt t}{\Delt x}, \ \tet  = \frc{1}{2} k \Delt x
+\end{equtin}
+Ten,
+\begin{equtin}
+    A_k^{n} = M_k A_k^{n-1} = \dtsb = (M_k)^n A_k^0 
+\end{equtin}
+Apply te Prsevl reltin, gives
+\begin{equtin}
+    ||u^n||_2^2 = J \sum_{k=0}^{J-1} A_k^n \br{A}_k^n = |M_k|^{2n} ||u^0||_2^2
+\end{equtin}
+Use te plr frm f $M_k = |M_k|e^{-i \pi_k}$, gives
+\begin{equtin}
+    u_i^n = \sum_{k=0}^{J-1} |M_k|^n A_k^0 e^{i k \Delt x j - n \pi_k} = \sum_{k=0}^{J-1} |M_k|^n A_k^0 e^{i(kx - \meg t)}, \,\, \meg = \frc{\pi_k}{\Delt t}
+\end{equtin}
+Assume  smll $\tet$, wic crrespnds t well-reslved frequencies, te wve velcity
+\begin{equtin}
+    c_p = \frc{\meg}{k} = \frc{\tn^{-1}(\lp \sin(2\tet))}{k \Delt t} \pprx \frc{\lp \sin(2\tet) - \frc{1}{3}(\lp \sin(2\tet))^3 + \dtsb}{k \Delt t} =  - \frc{1}{3} ^3 k^2 \Delt t^2
+\end{equtin}
+
+$M_k$ gives te grwt r decy f te $k$-t Furier mde in ne time step nd is referred t s mplifictin fctr. Nte tt $M_k$ des nt dependent n time level $n$. Terefre, ec Furier cefficient cnges by exctly te sme fctr t every time step, wic is  direct cnsequence f linerity. Obviusly, te numericl dissiptin cn be determined by te mgnitude f te mplifictin fctr $M_k$, nd te numericl dispersin cn be exmined by te pse f $M_k$.
+
+In pplying Furier series nlysis, te peridic bundry cnditin is ssumed t mke te slutin peridic. Oterwise, te liner cmbintin f finite bse functins my nt cnverge t te slutin, nd te vn Neumnn nlysis re n lnger vlid. A mre prcticl lterntive is te mtrix stbility nlysis \citep{lney1998cmputtinl}. As ny liner numericl sceme cn be written int te frmul
+\begin{equtin}
+    u_i^{n+1} = \sum_{j=-k}^{k}_{ij} u_{i+j}^n
+\end{equtin}
+were linerity requires tt te cefficients $_{ij}$ d nt dependent n te slutin. Ten, n equivlent vectr-mtrix frmultin is
+\begin{equtin}
+    u^{n+1} = A u^n, \,\, u^n \equiv [u_0^n, u_1^n, \dtsc, u_{I-1}^n]^{\Des{T}}
+\end{equtin}
+were $u^n$ is te vectr f smples nd te mtrix $A$ is cmpsed f te cefficients $_{ij}$. Suppse tt $A = Q^{-1} \Lmbd Q$ were $\Lmbd$ is  dignl mtrix f te crcteristic vlues f $A$. Ten,
+\begin{equtin}
+    u^n = A u^{n-1} = \dtsb = A^n u^0 = Q^{-1} \Lmbd^n Q u^0
+\end{equtin}
+tt is,
+\begin{equtin}
+    Q u^n = \Lmbd^n Q u^0
+\end{equtin}
+
+Let te spectrl rdius $\r(A)$ be te lrgest crcteristic vlue f $A$ in mgnitude. Ten, $\r(A)$ represents te slutin mplifictin fctr. Unlike vn Neumnn nlysis, tis mtrix nlysis cn register te effects f bundry cnditins, te number f grid pints, nd te vrible spcing between grid pints, ll f wic rdiclly ffect stbility. Hwever, te mtrix stbility nlysis des nt sy nyting but dispersin, nd finding te spectrl rdius f $A$ my be difficult.
+
+Fr  mtemticl mdel f  pysicl prblem, if te slutin exists nd is unique s well s cntinuusly depends n initil cnditins suc tt smll cnges in initil cnditins led t bunded cnges in slutins, ten te mdel is sid t be well-psed. Wen pplying numericl metds t well-psed prblems, te fllwing cncepts re prticulrly pertinent t te success r terwise f te numericl discretiztin: cnvergence, cnsistency, nd stbility.
+
+\prgrp{Cnvergence} Slutin f te discrete equtin pprces te exct slutin f te riginl equtin s te discretiztin step sizes re reduced t zer. If tis prperty is nt gurnteed, te btined numericl slutin is useless. 
+
+\textit{Definitin.} A numericl pprximtin is cnvergent n $0 < t \le T$, if $||e^n|| = ||u^n - u(x,t_n)|| \t 0$, s $n \t \infty$, $\Delt x \t 0$, $\Delt t \t 0$, $n \Delt t \le T$. Te pprximtin is cnvergent f rder $p$ in time nd f rder $q$ in spce, if $||e^n|| = \Order(\Delt t^p, \Delt x^q)$.
+
+\prgrp{Cnsistency} Te discrete equtin pprces te riginl equtin s te discretiztin step sizes re reduced t zer. Since  numericl metd nly slves te mdified equtin exctly but slves te riginl equtin pprximtely, cnsistency estblises te essentil cnnectin between te riginl equtin nd te discrete equtin, nd it ls gurntees tt te errr cmmitted by te numericl discretiztin ver ec cmputtinl step is smll.
+
+\textit{Definitin.} A numericl pprximtin is cnsistent, if te trunctin errr $\tu_i^n \t 0$, s $\Delt x \t 0$, $\Delt t \t 0$. Te pprximtin is f rder $p$ in time nd f rder $q$ in spce, if $\tu_i^n = \Order(\Delt t^p, \Delt x^q)$.
+
+Altug te trunctin errr nly mesures te lcl rder f ccurcy f te pprximtin, but fr smt slutins te glbl errr will be f te sme rder f te lcl errr prvided te pprximtin is stble.
+
+\prgrp{Stbility} In numericl cmputtin, flting-pint rund-ff errrs, trunctin errrs, nd smll fluctutins in initil dt re inevitble. As te errr prpgtin depends n te numericl lgritm, te discretiztin metd must be stble t prduce vlid slutins under pprximtin errrs intrduced t te dt. Tis mens tt te grwt f errr under te pplied numericl metd suld be bunded. Oterwise, te slutin wuld be destryed by te errr.
+
+\textit{Definitin.} A numericl metd is stble, if tere is  cnstnt $C$ nd  vlue $\Delt t_0 > 0$ suc tt $||e^n|| \le C||e^0||$, s $\Delt t < \Delt t_0$, $n \Delt t \le T$. 
+
+In prticulr, te metd is stble if te mplifictin fctr $|M| \le 1$, since $||e^n|| \le |M|^n ||e^0|| \le ||e^0||$. Mre generlly, sme grwt is llwed. Fr exmple, if $|M| \le 1 + \lp \Delt t$, s $\Delt t < \Delt t_0$, ten $|M|^n \le (1 + \lp \Delt t)^n \le \mtrm{e}^{\lp n \Delt t} \le \mtrm{e}^{\lp T}$.
+
+Cnvergence, te ultimtely desired prperty f  numericl metd, is  glbl prperty nd is difficult t estblis tereticlly. In cntrst, cnsistency nd stbility re less cmplicted t demnstrte fr  given numericl metd. Fr liner prblems, mtemticl tecniques suc s Tylr series expnsin, mdified equtin pprc, vn Neumnn stbility nlysis, nd mtrix stbility nlysis ve estblised  successful fundtin fr nlyzing numericl cnsistency nd stbility.
+
+Intuitively, te intrduced errr in ec cmputtinl step by  cnsistent metd will be very smll. If te metd is ls stble, ten te grwt f errr is bunded. As  result, te errr in te numericl slutin will remin smll, nd te slutin will cnverge t te exct slutin. In fct, fr well-psed liner prblems, Lx's equivlence terem \citep{lx1956survey} sttes tt te cmbintin f cnsistency nd stbility is  necessry nd sufficient cnditin fr cnvergence. Hwever, nly necessity rter tn sufficiency is vlid wen prblems re nnliner.
+
+In nnliner prblems, scks nd cntct discntinuities re ften presented, in wic scenri liner scemes wit liner stbility teries re n lnger dequte due t te lck f smtness. Terefre, nnliner scemes wit nnliner stbility nlysis re required t be estblised. As spurius scilltins tend t be induced ner discntinuities nd re  mjr symptm f nnliner instbility, nnliner stbility nlysis primrily studies te ttl size f scilltins in te slutin, wic is cmmnly mesured by te ttl vritin functin
+\begin{equtin}
+    TV(u(\cdt,t)) = \sum_{i} |u(x_{i+1},t) - u(x_i,t)|
+\end{equtin}
+
+Te ttl vritin is  sum f extrem in te slutin, in wic extrem re cunted twice wit mxim cunted psitively nd minim cunted negtively. Obviusly, nly mxim nd minim ffect te ttl vritin. Furtermre, te cretin f new lcl extrem, te increse f existing lcl mxim, nd te decrese f existing lcl minim ll will increse te ttl vritin, wic inevitbly ppens wen scilltins re prduced r mplified. Terefre, ne cnditin n nnliner stbility is t enfrce te ttl vritin diminising (TVD) cnditin
+\begin{equtin}
+    TV(u(\cdt,t^{n+1})) \le TV(u(\cdt,t^{n}))
+\end{equtin}
+
+\begin{equtin}
+    TV(u(\cdt,t^{n+1})) \le TV(u(\cdt,t^{n})) + \Order(\Delt x^r)
+\end{equtin}
+wic llws  wek grwt f te TV nd becmes TVD in te limit $\Delt x \t 0$. ENO llws $r$-t rder increses in te ttl vritin t every time step, in prticulr $r$-t rder increses in mxim nd decreses in minim, wic elimintes te need fr clipping t lcl extrem nd tus permits  $r$-t rder f ccurcy t lcl extrem. Hwever, ENO tereticlly llws lrge scilltins in te slutin. T btin rbitrrily ig-rder ccurcy, n even weker stbility cnditin is required, suc s te ttl vritin bunded (TVB) cnditin
+\begin{equtin}
+    TV(u(\cdt,t)) \le C \le \infty
+\end{equtin}
+fr ll $t$ nd sme cnstnt $C$. Tis cnditin nly cncerns  bunded TV. Terefre, te ierrcy f nnliner stbility cnditins s
+\begin{equtin}
+    \Set{S}_{\Des{TVD}} \subset \Set{S}_{\Des{ENO}} \subset \Set{S}_{\Des{TVB}}
+\end{equtin}
+
+A strng nnliner stbility cnditin my effectively reduce r eliminte spurius scilltins in te slutin, but it my restrict te frml rder f ccurcy, prticulrly t lcl extrem. By cntrst,  wek nnliner stbility cnditin my plce little r n restrictins n te frml rder f ccurcy t lcl extrem, but it my llw lrge spurius scilltins. T sme extent, tere is  trde-ff between te scilltry errrs nd te clipping errrs t extrem.
+
+\sectin{Sclr cnservtin lw}
+
+Tere re bsiclly tw clsses f mdern sck-cpturing scemes fr te clcultin f wek slutins f nnliner sclr cnservtin lws, nmely te TVD nd ENO scemes. Mdern sck-cpturing scemes re nnliner scemes, nd mst f tem re secnd- r iger-rder in smt regins nd prduce ig-reslutin nnscilltry slutins ner sck nd cntct discntinuities. Te essentil ide beind ny metd wit ig reslutin nd nnscilltry is t use  ig-rder metd t smt regins, but t mdify te metd nd increse te munt f numericl dissiptin in te neigbrd f  discntinuity. By dmping ut te ig-frequency mdes f te slutin, te intrduced numericl dissiptin remves mny numericl difficulties, suc s spurius scilltins, relted t nnsmt slutins.
+
+Te dmping effect f numericl dissiptin n ig-frequency mdes is similr t tt f pysicl viscsity, s described by te Klmgrff yptesis: energy generlly enters  system t lw wve numbers nd cscdes upwrd vi te ig wve numbers t wic te energy is eventully dissipted by mleculr viscsity nd trnsfrms int et f te system. In numericl clcultins, te reslved energy spectrum is limited by te number f grid pints, nd ny frequencies iger tn te Nyquist frequency f te smpling grid re lised nd presented s nise. Hence, by dmping ut te unreslved ig-frequency mdes, te numericl dissiptin is useful t mintin te energy cscde nd vid te ccurcy f lw frequency mdes being destryed by te lising f te ig-frequency nise. Menwile,  reduced frequency spectrum is ls less prne t numericl dissiptin. In dditin, numericl dissiptin is elpful t btin prper entrpy prductin fr selecting te pysiclly relevnt wek slutins. Hwever,  lrge munt f numericl dissiptin my severlly degrde slutin ccurcy. Terefre, n pprprite munt f numericl dissiptin is crucil t cieving nnscilltry wile viding verly-smered slutins. Different frm te numericl dissiptin in  clssicl sck-cpturing sceme, wic is liner nd s te sme munt everywere, te numericl dissiptin in  mdern sck-cpturing sceme is designed t be nnliner nd slutin sensitive.
+
+\subsectin{Ttl vritin diminising sceme}
+
+Fr  ne-dimensinl sclr cnservtin lw
+\begin{equtin}
+    \frc{\prtil u}{\prtil t} + \frc{\prtil f(u)}{\prtil x} = 0
+\end{equtin}
+Te ttl vritin functin is cnstnt fr smt slutins. Menwile, it suld nt increse fr scks since crcteristics re cntinuusly destryed t scks, cusing energy decying. As  result, ttl vritin is  nn-incresing functin f time fr ny pysiclly dmissible wek slutin.
+
+It is prved tt  liner mntne sceme is t mst first rder ccurte, nd liner metds wit rder iger tn ne lwys prduce scilltins ner discntinuities \citep{rten1983ig}. Tis is  direct cnsequence frm liner stbility nlysis using Furier series: dispersin lwys exists fr  numericl sceme, nd  discntinuity cnsists f infinite mdes f frequencies. As time evlves, tese wve cmpnents disperse, leding t n scilltry slutin. Altug numericl dissiptin in  liner mntne sceme is strng enug t dmp spurius scilltins, nd it ls mkes te cnvergence prcess simulte te vnising viscsity limit wic will select te unique pysiclly relevnt wek slutin. Hwever,  efty munt f numericl dissiptin severely smers te discntinuities nd cuses lw rder f ccurcy. 
+
+Terefre, t cieve nnscilltry wek slutins wit rder f ccurcy iger tn ne, we need nnliner scemes wit nnliner stbility nlysis. As ttl vritin mesures te level f scilltins in  slutin, it turns ut tt te ttl vritin nn-incresing prperty nturlly estblises  generl nnliner stbility criterin. Fr  cnsistent nd cnservtive numericl metd, ensuring ttl vritin nn-incresing s time evlves
+\begin{equtin}
+    TV(u^{n+1}) \le TV(u^n)
+\end{equtin}
+is enug t gurntee cnvergence wile preventing spurius scilltins. Tis requirement gives rise t  clss f scemes clled Ttl Vritin Diminising (TVD) metds \citep{rten1983ig}.
+
+Te design f TVD metds typiclly s tw ingredients: first, emplying flux r slutin recnstructin t cmbine  lw-rder but nnlinerly stble metd nd  ig-rder but ptentilly unstble metd; secnd, expliting slutin sensitivity in recnstructin t cieve ig-rder ccurcy wile enfrcing nnliner stbility cnditins, suc s switcing between te stble nd te unstble metds ccrding t te lcl slutin structure.
+
+Altug te TVD prperty leds t nnliner stbility, in mst cses, it is t difficult t enfrce te TVD cnditin directly. Hence, insted f ddressing te verll grwt f te spurius scilltins s mesured by te TV, mst nnliner stbility nlyses ctully emply muc strnger cnditins suc s te upwind rnge cnditin, psitivity cnditin, nd te mntnicity prperty \citep{rten1983ig} t imply TVD but be esier t enfrce in designing numericl scemes.
+
+Depending n te type f recnstructin, te slutin sensitivity cn be cieved eiter by  flux-limiter r  slpe-limiter, wic crrespnds t te flux-bsed nd slutin-bsed recnstructin, respectively.
+
+\prgrp{Slutin recnstructin metd}
+
+Mst slutin recnstructin metds re develped n Gdunv's metd, wic is nly first-rder ccurte. In vn Leer's slutin recnstructin sceme \citep{vn1979twrds}, te bsic ide f imprving te rder f sptil ccurcy is t replce te piecewise cnstnt representtin f te slutin wit  iger rder f plynmil representtin, suc s piecewise liner recnstructin
+\begin{equtin}
+    \t{u}_i^n(x) = u_i^n + c_i^n(x - x_i), \,\, x \in \Omeg_i
+\end{equtin}
+ere $c_i^n$ is  slpe n te $i$-t cell. Tking $c_i^n = 0$ fr ll $i$ recvers te Gdunv's metd. Tis piecewise liner recnstructin preserves cell verge fr ny cice f $c_i^n$, ence te metd is cnservtive fr ny $c_i^n$.
+
+A TVD recnstructin cn be cieved by ensuring te mntnicity prperty, wic ddresses te individul mxim nd minim in te slutin: n new lcl extrem will be creted, existing lcl mxim is nnincresing, nd existing lcl minim is nndecresing. Te mntnicity prperty is  strnger cnditin tn TVD. Nneteless, we still need t prve te resulting sceme is TVD under te derived recnstructin, wic is dne by te psitivity cnditin.
+
+Furtermre, we need t prve tt te resulting sceme is cnsistent wit n entrpy cnditin fr ssuring cnvergence t pysiclly relevnt slutins. Assume te sclr cnservtin lw pssesses n entrpy functin $s(u)$, nd dmissible wek slutins stisfy, in wek sense, te inequlity
+\begin{equtin}
+    \frc{\prtil s(u)}{\prtil t} + \frc{\prtil (u)}{\prtil x} \le 0
+\end{equtin}
+were $(u)$ is n entrpy flux functin, te inequlity is clled n entrpy cnditin. A cnservtive numericl sceme is sid t be cnsistent wit te entrpy cnditin if n inequlity f te fllwing discrete frm is stisfied:
+\begin{equtin}
+    s(u_i^{n+1}) \le s(u_i^n) - \frc{\Delt t}{\Delt x} (\t{}_{i+\frc{1}{2}}^n - \t{}_{i-\frc{1}{2}}^n)
+\end{equtin}
+were $\t{}$ is  numericl entrpy flux cnsistent wit te entrpy flux $(u)$, i.e.,
+\begin{equtin}
+    \t{}(u,\dtsc,u) = (u)
+\end{equtin}
+
+Since te numericl sceme gurntees unifrmly bunded ttl vritin, using cmpctness rguments ne cn deduce tt tere exist cnvergent subsequences fr ll initil dt f bunded ttl vritin. Since te sceme is cnservtive, ec limit slutin is  wek slutin f te cnservtin lw. Furtermre, s ec limit slutin stisfies te entrpy cnditin, wen te entrpy cnditin implies uniqueness f n initil vlue prblem, ll subsequences cnverge t te sme limit slutin. As  result, te numericl sceme is cnvergent \citep{rten1983ig}. 
+
+Under  liner recnstructin, in rder t vid vilting te mntnicity prperty, te slpe vlue $c_i^n$ suld be cnfined by sme slpe limiter
+\begin{equtin}
+    \begin{cses}
+        \begin{cses}
+            \t{u}_i^n(x_{i+\frc{1}{2}}) = u_i^n + c_i^n \frc{\Delt x_i}{2} \le u_{i+1}^n\\
+            \t{u}_i^n(x_{i-\frc{1}{2}}) = u_i^n - c_i^n \frc{\Delt x_i}{2} \ge u_{i-1}^n\\
+        \end{cses}
+        &\ \text{if}\ u_{i-1}^n \le u_i^n \le u_{i+1}^n\\
+        \begin{cses}
+            \t{u}_i^n(x_{i+\frc{1}{2}}) = u_i^n + c_i^n \frc{\Delt x_i}{2} \ge u_{i+1}^n\\
+            \t{u}_i^n(x_{i-\frc{1}{2}}) = u_i^n - c_i^n \frc{\Delt x_i}{2} \le u_{i-1}^n\\
+        \end{cses}
+        &\ \text{if}\ u_{i-1}^n \ge u_i^n \ge u_{i+1}^n\\
+        c_i^n = 0 &\ \text{terwise}\ \\
+    \end{cses}
+\end{equtin}
+wic gives tt te slpe $c_i^n$ suld stisfy
+\begin{equtin}
+    c_i^n \frc{\Delt x_i}{2} = \mtrm{minmd}(\Delt_{i+\frc{1}{2}}^n, \Delt_{i-\frc{1}{2}}^n)
+\end{equtin}
+were
+\begin{equtin}
+    \begin{gtered}
+        \Delt_{i+\frc{1}{2}}^n = u_{i+1}^n - u_i^n\\
+        \mtrm{minmd}(x,y) = 
+        \begin{cses}
+            \mtrm{sign}(x) \min(|x|,|y|), &\ \text{if}\ \mtrm{sign}(x) = \mtrm{sign}(y)\\
+            0, &\ \text{terwise}\ 
+        \end{cses}\\
+        \ \text{r equivlently,}\\
+        \mtrm{minmd}(x,y) = \mtrm{sign}(x) \mx(0,\min(|x|, \mtrm{sign}(x) y))\\
+        \mtrm{sign}(x) = 
+        \begin{cses}
+            1, & x > 0\\
+            0, & x = 0\\
+            -1, & x < 0\\
+        \end{cses}
+    \end{gtered}
+\end{equtin}
+Tis slpe limiter is nmed s minmd limiter, wic returns te rgument clsest t zer if ll rguments ve te sme sign, nd it returns zer if ny tw rguments ve different signs.
+
+Te resulting TVD sceme is nnliner even wen pplied t liner equtins, since $c_i^n$ depends n slutin. Wen $u_i^n$ itself is  lcl extrem, te slpe $c_i^n$ must be zer in rder t mintining TVD prperty. As  cnsequence, liner recnstructin reduces t cnstnt verge, nd te rder f ccurcy f te sceme reduces t first rder t lcl extrem.
+
+After csing  slpe vlue $c_i^n$ fr ec cell $\Omeg_i$,  specific distributin f te slutin is determined, nd  jump cnditin exists t ec cell interfce $x_{i+1/2}$. Te numericl flux ten needs t be recnstructed n tis jump cnditin
+\begin{equtin}
+    \t{f}_{i+\frc{1}{2}}^n = \t{f}(u_{i+\frc{1}{2}}^+,u_{i+\frc{1}{2}}^-), \,\, u_{i+\frc{1}{2}}^+ = \t{u}_{i}^n(x_{i+\frc{1}{2}}), \ u_{i+\frc{1}{2}}^- = \t{u}_{i+1}^n(x_{i+\frc{1}{2}})
+\end{equtin}
+
+In dditin t using n nlyticl Riemnn slver s in Gdunv's sceme,  very ppulr frm f te interpltin functins is n pprximte Riemnn slver represented by n upwind numericl flux functin, wic cmmnly represents  centrl difference pprximtin wit dditinl rtificil viscsity t stbilize te slutin. Suc s
+
+Lx--Friedrics numericl flux
+\begin{equtin}
+    \t{f}_{\Des{LF}}(u^+,u^-) = \frc{1}{2}[f(u^+) + f(u^-) - \lmbd^* (u^- - u^+)]
+\end{equtin}
+were te cnstnt $\lmbd^* = \mx\{|\lmbd|\}$ tking ver te relevnt rnge f $u$.
+
+Re's numericl flux
+\begin{equtin}
+    \t{f}_{\Des{Re}}(u^+,u^-) = \frc{1}{2}[f(u^+) + f(u^-) - |\br{\lmbd}| (u^- - u^+)]
+\end{equtin}
+were $\br{\lmbd}$ is te eigenvlue f te Jcbin mtrix evluted using  symmetric verge between $u^+$ nd $u^-$, suc s $\lmbd = 1/2(\lmbd^+ + \lmbd^-)$. Te effect f te mdulus brs in te extr term is t select te flux frm te upwind side f te interfce, ccrding t te lcl directin f infrmtin flw, tt is, te sign f te crcteristic speed t te interfce.
+
+Altug bt te Lx--Friedrics nd Re's numericl fluxes re nly first-rder ccurte, mst ig-rder numericl scemes re very insensitive t tis lw rder f ccurcy. Hwever, te Re's numericl flux s  drwbck tt it my vilte te entrpy cnditin t snic pints \citep{rten1987unifrmly}. Fr instnce, wen n entrpy-vilting crcteristics-diverging sck wit $\lmbd^+=-1$ nd $\lmbd^-=+1$ exists in te field, te interfce becmes  snic pint wit $\br{\lmbd}=0$, nd te Re's numericl flux cnges t te symmetric centrl difference, wic dmits te existence f tis pysiclly unstble sck s  stble slutin rter tn breks up tis unstble sck int rrefctin wves s ppens in pysicl relity. Terefre, mecnisms tt cn, wen necessry, brek symmetry is needed. Suc n dditinl mecnism is ften clled n entrpy fix, wic results in te Re's numericl flux wit entrpy fix
+\begin{equtin}
+    \t{f}_{\Des{Re}}(u^+,u^-) = \frc{1}{2}[f(u^+) + f(u^-) - \psi(\br{\lmbd}) (u^- - u^+)]
+\end{equtin}
+were $\psi(x)$ mdifies te cefficient f te rtificil viscsity term t remedy te entrpy-vilting prblem nd s
+\begin{equtin}
+    \psi(x) = 
+    \begin{cses}
+        |x|, & |x| \ge \vrepsiln\\
+        \frc{1}{2}(\frc{x^2}{\vrepsiln} + \vrepsiln), & |x| < \vrepsiln\\
+    \end{cses}
+\end{equtin}
+Te smll psitive prmeter $\vrepsiln \in [0.05, 0.25]$ suc s $\vrepsiln = 0.2$. Fr subsnic t lw supersnic perfect gs flws, te reslutin f scks is insensitive t $\vrepsiln$, nd  cnstnt $\vrepsiln$ is sufficient. Hwever, fr ypersnic flws,  vrible $\vrepsiln$ s  functin f te lcl velcity nd sund speed is needed \citep{yee1989clss}
+\begin{equtin}
+    \vrepsiln = 0.2(|u| + |v| + |w| + c)
+\end{equtin}
+
+\prgrp{Flux recnstructin metd}
+
+One exmple f te flux recnstructin metds is te Hrten's sceme \citep{rten1984clss}, wic emplys te Re's numericl flux
+\begin{equtin}
+    \t{f}_{i+\frc{1}{2}} = \frc{1}{2} [\tilde{f}_i + \tilde{f}_{i+1} - \psi(\tilde{\lmbd}_{i+\frc{1}{2}})\Delt_{i+\frc{1}{2}}]
+\end{equtin}
+wit
+\begin{equtin}
+    \begin{gtered}
+        \tilde{f} = f + g, \,\, \tilde{\lmbd} = \lmbd + \gmm, \,\, \lmbd = \frc{\mtrm{d} f}{\mtrm{d} u}\\
+        g_i = \mtrm{minmd}(\sigm(\lmbd_{i+\frc{1}{2}})\Delt_{i+\frc{1}{2}}, \sigm(\lmbd_{i-\frc{1}{2}})\Delt_{i-\frc{1}{2}})\\
+        \Delt_{i+\frc{1}{2}} = u_{i+1} - u_i\\
+        \gmm_{i+\frc{1}{2}} =
+        \begin{cses}
+            \frc{g_{i+1} - g_i}{\Delt_{i+\frc{1}{2}}}, & \Delt_{i+\frc{1}{2}} \ne 0\\
+            0, & \Delt_{i+\frc{1}{2}} = 0\\
+        \end{cses}\\
+        \sigm(x) = \frc{1}{2}\psi(x)\\
+    \end{gtered}
+\end{equtin}
+were te secnd-rder numericl flux is cieved by mdifying te flux functin nd te men crcteristic speed in te first-rder numericl flux suc tt te sceme is secnd-rder t smt regins nd is first-rder t lcl extrem. 
+
+In dditin t te reducing f rder f ccurcy t lcl extrem,  TVD recnstructin suffers frm lck f rbust extensins t iger-rder recnstructins. Fr instnce, in slutin recnstructin metds, te recnstructin prcess is determined in ec cell $\Omeg_i$ wit ${\prtil u}/{\prtil x} = c_i$ fr cnstnt verge nd liner recnstructin. Hwever, fr iger-rder recnstructins, te system is under-determined since n enug infrmtin is prvided. Mrever, lcl extrem my be intrduced in te interir f $\Omeg_i$ wen using iger-rder plynmils. Currently, n knwn cnditins ve been estblised fr iger-rder plynmil recnstructins t be TVD. As  result, ter less restricted nnliner stbility cnditins suc s essentilly nn-scilltry r ttl vritin bunded cnditins re intrduced fr develping ig-rder nnliner scemes.
+
+\subsectin{Weigted essentilly nn-scilltry sceme}
+
+In generl, numericl pprximtin is t interplte te pprximted quntity by plynmils r ter simple functins. As different frm Glerkin metds, in wic te degrees f freedm in interpltin re built n individul bsis functins defined in n rtgnl functin spce, te degrees f freedm in interpltin f  finite difference pprximtin re bsed n individul stencil ndes. Accrding t te interpltin tery,  wider stencil enbles  iger rder f ccurcy f te interpltin, prvided te interplted quntity is smt inside te stencil.
+
+As  ig-rder pprximtin in te finite difference frmewrk inevitbly requires  wide stencil cntining multiple ndes, wen te interplted quntity is discntinuus in te stencil,  single cntinuus plynmil interpltin my intrduce scilltins int te recnstructed vrible. Tis scilltry bevir rigintes frm te inerent impssibility f pprximting  discntinuus functin by  finite series f cntinuus bsis functins. By te Weierstrss M-test,  functin series wit bslutely cnvergent expnsin cefficients will be unifrmly cnvergent. Tus, if  discntinuus functin s bslutely cnvergent expnsin cefficients, ten te discntinuus functin will be te unifrm limit f te cntinuus functins nd terefre be cntinuus, wic is  cntrdictin. Since n single finite series f cntinuus plynmils cn dequtely represent  discntinuus functin, ne my cnsider using piecewise-plynmil pprximtins insted. Piecewise plynmils nturlly dmit jump discntinuities nd re mre generic fr slutins t yperblic cnservtin lws. 
+\begin{figure}[!tbp]
+    \centering
+    \cptin{A scemtic digrm illustrting WENO recnstructin.}
+    \lbel{fig:wen_dem}
+\end{figure}
+
+As illustrted in Fig.~\ref{fig:wen_dem}, since discntinuities re usully cnfined in  nrrw regin, WENO scemes \citep{su1998essentilly} emply te cncept f dptive stencils nd divide te wide stencil int multiple cndidte stencils in te interpltin prcedure. Wile interpltins re cnducted independently in ec cndidte stencil,  cnvex cmbintin f ll te interplted vlues n cndidte stencils is dpted s te vlue f te recnstructed vrible. Cmpred wit ENO scemes, in wic nly te lclly smtest stencil is dpted, WENO scemes cmbine ll te smt cndidte stencils t cieve  iger-rder pprximtin in smt regins.
+
+In te cnvex cmbintin,  weigt is used t determine te cntributin f its crrespnding stencil t te recnstructed vlue nd is bsed n te lcl smtness f te slutin, s mesured by  smtness fctr. Te weigt fr  cndidte stencil in  smt regin pprces certin ptiml vlue t cieve  ig-rder pprximtin nd pprces zer wen te stencil cntins discntinuities t vid te interpltin crssing discntinuities. As  result, infrmtin n cndidte stencils cntining discntinuities is vided fr using, nd te recnstructin is essentilly nn-scilltry. Mrever, in smt regins, te cnvex cmbintin f ll te lw-rder pprximtins n cndidte stencils cnverges t te igest rder f pprximtin tt cn be btined n te undivided stencil. 
+
+Te cnstructin f WENO sceme is bsed n te ne-dimensinl sclr cnservtin lw
+\begin{equtin}
+    \frc{\prtil u}{\prtil t} + \frc{\prtil f(u)}{\prtil x} = 0
+\end{equtin}
+nd sclr flux splitting is cnducted t btin tw flux prts wit unique upwind directins
+\begin{equtin}
+    f(u) = f^+(u) + f^-(u), \,\, \frc{\mtrm{d} f^+(u)}{\mtrm{d} u} \ge 0, \,\, \frc{\mtrm{d} f^-(u)}{\mtrm{d} u} \le 0
+\end{equtin}
+
+Since bt te frwrd flux nd bckwrd flux re discretized in cnservtive frm, te discretiztin cn be equivlently written s
+\begin{equtin}
+    \left. \frc{\prtil f}{\prtil x} \rigt|_i = \frc{1}{\Delt x} \left[ \t{f}_{i+\frc{1}{2}} - \t{f}_{i-\frc{1}{2}} \rigt], \,\, \t{f}_{i+\frc{1}{2}} = \t{f}_{i+\frc{1}{2}}^+ + \t{f}_{i+\frc{1}{2}}^-, \,\, \t{f}_{i-\frc{1}{2}} = \t{f}_{i-\frc{1}{2}}^+ + \t{f}_{i-\frc{1}{2}}^-
+\end{equtin}
+
+Fr te recnstructin f numericl fluxes, te fift-rder finite difference WENO sceme \citep{jing1996efficient} is presented, nd iger-rder finite difference WENO scemes my be referred t \citep{blsr2000mntnicity}. Since $\t{f}_{i+{1}/{2}}^-$ nd $\t{f}_{i-{1}/{2}}^-$ re te recnstructed vlues f $f^-$ t different sptil psitins, $\t{f}_{i+{1}/{2}}^-$ is btined frm $\t{f}_{i-{1}/{2}}^-$ by substituting $i$ wit $i+1$. Similrly, $\t{f}_{i-{1}/{2}}^+$ nd $\t{f}_{i+{1}/{2}}^+$ re te recnstructed vlues f $f^+$ t different sptil psitins, $\t{f}_{i-{1}/{2}}^+$ is btined frm $\t{f}_{i+{1}/{2}}^+$ by substituting $i$ wit $i-1$. Terefre, nly te recnstructin f $\t{f}_{i+{1}/{2}}^+$ nd $\t{f}_{i-{1}/{2}}^-$ requires t be expressed. Furtermre, since te numericl flux $\t{f}_{i+{1}/{2}}^+$ nd $\t{f}_{i-{1}/{2}}^-$ re symmetric wit respect t $x_i$, nly te recnstructin f te frmer is described erein. Te ltter cn be btined vi replcing ll $+$ nd $-$ signs in te superscript nd subscript f ec vrible in te equtins by te crrespnding ppsite signs $-$ nd $+$, respectively.
+\begin{equtin}
+    \t{f}_{i+\frc{1}{2}}^{+} = \sum_{n=0}^{N} \meg_{n}^+ q_{n}^+(f_{i+n-N}^+, \dtsc, f_{i+n}^+), \,\, N=(r-1)=2
+\end{equtin}
+were
+\begin{equtin}
+    \begin{gtered}
+        q_0^+(f_{i-2}^+, \dtsc, f_{i}^+) = (2f_{i-2}^+ - 7f_{i-1}^+ + 11f_{i}^+) / 6\\
+        q_1^+(f_{i-1}^+, \dtsc, f_{i+1}^+) = (-f_{i-1}^+ + 5f_{i}^+ + 2f_{i+1}^+) / 6\\
+        q_2^+(f_{i}^+, \dtsc, f_{i+2}^+) = (2f_{i}^+ + 5f_{i+1}^+ - f_{i+2}^+) / 6\\
+        \meg_{n}^+ = \frc{\lp_n^+}{\lp_0^+ + \dtsb + \lp_N^+}, \,\, \lp_n^+ = \frc{C_n}{(\vrepsiln + IS_n^+)^2}, \,\, \vrepsiln = 10^{-6}\\
+        C_0 = \frc{1}{10}, \,\, C_1 = \frc{6}{10}, \,\, C_2 = \frc{3}{10}\\
+        IS_{0}^+ = \frc{13}{12}(f_{i-2}^+ - 2f_{i-1}^+ + f_{i}^+)^2 + \frc{1}{4}(f_{i-2}^+ - 4f_{i-1}^+ + 3f_{i}^+)^2\\
+        IS_{1}^+ = \frc{13}{12}(f_{i-1}^+ - 2f_{i}^+ + f_{i+1}^+)^2 + \frc{1}{4}(f_{i-1}^+ - f_{i+1}^+)^2\\
+        IS_{2}^+ = \frc{13}{12}(f_{i}^+ - 2f_{i+1}^+ + f_{i+2}^+)^2 + \frc{1}{4}(3f_{i}^+ - 4f_{i+1}^+ + f_{i+2}^+)^2
+    \end{gtered}
+\end{equtin}
+were $r$ is te number f cndidte stencils, $q_n$ re te $r$-t rder pprximtins f $\t{f}_{i+1/2}$ n te cndidte stencils $S_n=(x_{i+n-N},\dtsc,x_{i+n})$, $\meg_{n}$ re te ctul weigts f $q_n$, wic re determined by te smtness f slutin in te cndidte stencils $S_n$, s mesured by $IS_n$, nd $C_n$ re ptiml weigts t ensure tt te cnvex cmbintin f $q_n$ cnverges t  $(2r-1)$-t rder pprximtin f $\t{f}_{i+1/2}$ n te undivided stencil $S=(x_{i-N},\dtsc,x_{i+N})$ in smt regins.
+
+It is wrt nting tt  WENO recnstructin is  type f plynmil interpltin designed fr prblems wit piecewise smt slutins cntining discntinuities. Terefre, s interpltin metds, WENO scemes cn be used nt nly fr flux recnstructin but ls fr slutin recnstructin. In slutin recnstructin, t te interfce $x_{i+1/2}$, te left slutin stte $u^+_{i+1/2}$ nd rigt slutin stte $u^-_{i+1/2}$ re recnstructed by te interpltin functins f $\t{f}_{i+1/2}^{+}$ nd $\t{f}_{i+1/2}^{-}$, respectively. Ten, te numericl flux $\t{f}_{i+1/2}^{n}$ is recnstructed n tis jump cnditin, suc s by using te Re's numericl flux functin.
+
+\sectin{Cnvergence study}
+
+Wen slving prblems numericlly, we need t knw w well te btined numericl slutin pprximtes te true slutin. If defining te glbl errr t be te distnce between te true nd cmputed slutins, ten we need t knw w t mesure tis distnce s well s w t estimte its vlue.
+
+\subsectin{Errr mesurement}
+
+Te slutin $u(x,t)$ f  prtil differentil equtin ${\prtil u}/{\prtil t} = \Lptr u$ cn be regrded s being n element f  functin spce, nd te discrete numericl slutin $\{u^n\}$ cn be regrded s being n element f  liner vectr spce. T tis end, we cllect ll f te unknwns t  given time level $n$ int  vectr $u^n$, wic is te restrictin f te cntinuus exct slutin $u(x,t_n)$ t te mes
+\begin{equtin}
+    u^n \equiv [u_0^n, u_1^n, \dtsc, u_{I-1}^n]^{\Des{T}}
+\end{equtin}
+
+A psitive sclr sscited wit te functin spce r vectr spce cn ten be intrduced t mesure te "size" f member elements nd te "distnce" between tem. Tis kind f sclr is clled  nrm.
+
+\textit{Definitin.} Let $\Set{V}$ be  vectr spce ver $\Set{K}$. Te mp $||\cdt||$ frm $\Set{V}$ int $\Set{R}$ is  nrm n $\Set{V}$ if te fllwing xims re stisfied:
+\begin{enumerte}
+    \item $\text{(i)}\ ||\Vectr{v}|| \ge 0 \ \frll \Vectr{v} \in \Set{V} \ \text{nd}\ \text{(ii)}\ ||\Vectr{v}|| = 0 \ \text{if nd nly if}\ \Vectr{v}= 0$;
+    \item $||\lp \Vectr{v}|| = |\lp| ||\Vectr{v}|| \ \frll \lp \in \Set{K}, \ \frll \Vectr{v} \in \Set{V} \ \text{(mgeneity prperty)}$
+    \item $||\Vectr{v} + \Vectr{w}|| \le ||\Vectr{v}|| + ||\Vectr{w}|| \ \frll \Vectr{v}, \ \Vectr{w} \in \Set{V} \ \text{(tringulr inequlity)}$
+\end{enumerte}
+were $|\lp|$ dentes te bslute vlue f $\lp$ if $\Set{K} = \Set{R}$, te mdule f $\lp$ if $\Set{K} = \Set{C}$. Te pir $(\Set{V}, ||\cdt||)$ is clled  nrmed spce.
+
+Te $L_p$ nrm fr  functin spce is defined s
+\begin{equtin}
+    ||u||_p = \left[\int_{\Omeg} |u(x,t)|^p \,\mtrm{d}x \rigt]^{1/p}, \ \text{fr}\ 1 \le p < \infty
+\end{equtin}
+were $\Omeg$ is te sptil dmin f te functin spce.
+
+Te nrm n  vectr spce is similr t tt fr  functin spce.
+\begin{equtin}
+    ||u^n||_p = \left(\sum_{i=0}^{I-1} |u_i^n|^p \rigt)^{1/p}, \ \text{fr}\ 1 \le p < \infty
+\end{equtin}
+
+Ntice tt te limit s $p$ ges t infinity, $||u^n||_p$ is finite nd equls te mximum mdule f te cmpnents f $u^n$. Suc  limit defines in turn  nrm, clled te $L_{\infty}$ nrm (r mximum nrm), given by
+\begin{equtin}
+    ||u^n||_{\infty} = \left(\sum_{i=0}^{I-1} |u_i^n|^{\infty} \rigt)^{1/\infty} = \left((\mx\{|u_i^n|\})^{\infty} \rigt)^{1/\infty} = \mx\{|u_i^n|\}
+\end{equtin}
+
+Te $L_p$ nrm $||u^n||_p$ f ny given vectr $u^n$ des nt grw wit $p$:
+\begin{equtin}
+    ||u^n||_{p+q} \le ||u^n||_p
+\end{equtin}
+fr ny vectr $u^n$ nd rel numbers $p > 0$ nd $q \ge 0$.
+
+Fr te ppsite directin, fr vectrs in $\Set{C}^n$ were $0 < r < p$:
+\begin{equtin}
+    ||u^n||_p \le ||u^n||_r \le I^{(\frc{1}{r} - \frc{1}{p})} ||u^n||_p
+\end{equtin}
+Tis inequlity depends n te dimensin $I$ f te underlying vectr spce nd fllws directly frm te Cucy-Scwrz inequlity.
+
+Wen mesuring errrs $e^n = u^n - u(x,t_n)$ fr discrete dt sets, te scled $L^p$ nrm
+\begin{equtin}
+    ||e^n||_p = \left(\frc{1}{I} \sum_{i=0}^{I-1} |e_i^n|^p \rigt)^{1/p}
+\end{equtin}
+is cmmnly used, wic is cnsistent wit te integrl versin fr functins.
+
+Using te reltins between $L_p$ nrms, te scled $L_1$, $L_2$, nd $L_{\infty}$ nrms ve te reltin
+\begin{equtin}
+    ||e^n||_1 \le ||e^n||_2 \le ||e^n||_{\infty}
+\end{equtin}
+
+Wit tese preliminry cnsidertins estblised, ne is ble t quntify errrs trug mesuring distnces nd ten investigte te cnvergence f numericl scemes. It is wrt nting tt  metd is cnvergent in ne nrm but my nt in nter. Fr cnservtin lws, te nturl nrm t use is te $L_1$ nrm, s it nly requires integrting te functin, nd te cnservtin lws re essentilly integrtins. Te $L_{\infty}$ nrm cptures te lrgest pint-wise errr in te entire dmin nd ence is te mst stringent mesure. Idelly ne migt pe fr cnvergence in te $L_{\infty}$ nrm. Hwever, tis is unrelistic in pprximting discntinuus slutins. In te neigbrd f  discntinuity, te pint-wise errr generlly des nt g t zer unifrmly s te grid is refined even tug te numericl results my be perfectly stisfctry. Terefre,  metd my cnverge in te $L_1$ nrm but nt in te $L_{\infty}$ nrm. Even te $L_1$ nrm is pplied t cmputing te errr f discntinuities slutins, te expected rtes f cnvergence cn nt be bserved. Insted  "first-rder" metd cnvergences wit n errr tt is $\Order\left(\Delt ^{1/2}\rigt)$ weres  "secnd-rder" metd s n errr tt is $\Order\left(\Delt ^{2/3}\rigt)$ t best. Tese cnvergence rtes cn be prved fr very generl initil dt by n nlysis using smt pprximtins. Fr liner equtins,  mre widely used nrm is te $L_2$ nrm, s fr liner prblems Furier nlysis is pplicble nd Prsevl's reltin sttes tt te Furier trnsfrm f  functin s te sme $L_2$ nrm s te functin. Tis prperty cn simplify te nlysis f liner metds cnsiderbly.
+
+\subsectin{$L_p$-ptimistin}
+
+Mny prblems require t minimise te $L_p$-nrm f  vectr crrespnding t sme cnstrints, ence clled "$L_p$-minimistin". A stndrd minimistin prblem is frmulted s:
+\begin{equtin}
+    \min ||x||_p \text{subject t} Ax = b
+\end{equtin}
+In te cse f $L_2$ nrm, te prblem is usully knwn s lest squre ptimistin.
+
+\subsectin{Errr nlysis}
+
+One significnt issue in numericl cmputtins is wt level f grid reslutin is pprprite. Grid cnvergence study, wic is t perfrm numericl slutins n successively refined grids, is  useful prcedure fr determining te level f discretiztin errr existing in  numericl slutin. Accrding t te tery f trunctin errrs, wic mesures te difference between te cntinuus gverning equtin nd te discrete equtin,  cnsistent numericl metd suld prvide numericl slutins tt becme symptticlly less sensitive t te grid size s te mes is refined.
+
+In prctice, te level f numericl errr depends n te fetures f te flw. Te presence f discntinuities, suc s scks, slip surfces, nd interfces, develps numericl errrs n  grid in  cmplex wy nd ffects te errr estimtin prcess \citep{rce1998verifictin, berkmpf2002verifictin}. Terefre, cnvergence studies generlly require test cses wit smt nlyticl slutins t vid influence frm discntinuities, t wic vlues f derivtives re nt bunded nd te trunctin errr is nt well defined. 
+
+In generting $n$ levels f successive refined grids, te number f grid pints in te finest grid my stisfy te reltin
+\begin{equtin}
+    N = r^{n-1} m + 1
+\end{equtin}
+were $m$ is te bse number f meses, wic my be different fr ec crdinte directin. $r$ is te refinement rti, wic suld be  minimum f $r \geq 1.1$ t llw te discretiztin errr being differentited frm ter errr surces suc s cmputer rund-ff errr.
+
+Altug nn-integer refinement rti $r$ cn be used, prticulrly wen te sympttic rnge f cnvergence is limited, grid refinement wit $r=2$, wic is dubling te number f grid pints in ec crdinte directin, is cmmnly dpted fr te purpse f mintining grid similrity.
+
+Slutin errr is defined s te difference between te discrete slutin nd te exct slutin, in wic nrms suc s te mximum nrm nd $L_1$ nrm my be used fr mesuring te difference between quntities,
+\begin{equtin}
+    e = u(\Delt ) - u_{\Des{exct}} = C(\Delt ) \Delt ^p + \Des{H.O.T.}
+\end{equtin}
+were $C(\Delt )$ is  cefficient relted t Tylr series expnsin, $\Delt $ is sme mesure f grid spcing, nd $p$ is te tereticl rder f cnvergence.
+
+Wen slutins, $\{u(\Delt _n)\}$, re btined frm $n$ levels f successively refined grids wit refinement rtis $r_n = \Delt _{n-1} / \Delt _n$, n bserved rder f cnvergence, $p'$, cn be cmputed frm te errrs $\{e_n=C(\Delt _n) \Delt _n^p\}$,
+\begin{equtin}
+    p' = \frc{{\lg}_2 \frc{e_{n-1}}{e_{n}}}{{\lg}_2^{r_n}}
+\end{equtin}
+were iger-rder terms re neglected, nd $\lim_{\Delt  \t 0} C(\Delt )$ is ssumed t be  cnstnt.
+
+In cses were te nlyticl slutin is nt vilble fr determining errrs, n evlutin using reltive errr my be dpted fr btining $p'$ frm slutins using  cnstnt grid refinement rti $r$,
+\begin{equtin}
+    p' = \frc{{\lg}_2 \frc{u_{n-2} - u_{n-1}}{u_{n-1} - u_{n}}}{{\lg}_2^r}
+\end{equtin}
+
+Due t errrs intrduced frm numericl mdels, bundry cnditins, nd ter surces, te bserved rder f cnvergence is frequently lwer tn te tereticl rder f cnvergence. In dditin, te glbl rder f ccurcy is generlly estimted ne degree less tn te lcl rder f ccurcy. Te rder f ccurcy f te bundry cnditins cn be ne rder f ccurcy lwer tn te interir rder f ccurcy witut degrding te verll glbl ccurcy.
+
+T determine te errr bnd fr te quntities btined frm  specific grid slutin, Ricrdsn extrpltin metd, wic cieves  iger-rder estimte f te slutin frm  series f lwer-rder discrete vlues, cn be fund useful.
+
+Using te series expnsin reltin between numericl slutins nd te exct slutin, te Ricrdsn extrpltin estimtes te slutin t $\Delt  = 0$ wit $(p+1)$-t rder f ccurcy vi $p$-t rder slutins n $r$-vlue grid rti refined grids s
+\begin{equtin}
+    u(\Delt  = 0) \pprx u_{n} + \frc{u_n - u_{n-1}}{r^{p} - 1}
+\end{equtin}
+
+Ten, te btined $u(\Delt =0)$ my be used t give n errr estimte f te slutins $\{u_n\}$,
+\begin{equtin}
+    \vrepsiln = \frc{u_n - u(\Delt =0)}{u(\Delt =0)} \pprx \frc{u_{n-1} - u_n}{u_n (r^{p} - 1)}
+\end{equtin}
+
+Te errr nlysis nd Ricrdsn extrpltin re bsed n  Tylr series representtin f quntities. If scks nd ter discntinuities re presented in te slutins, te metds re invlid in te regins f discntinuities. Nneteless, tey my still be pplied t slutin functinls cmputed frm te entire flw field.
+
+Wen cnducting cnvergence studies fr unstedy prblems, te slutin errr cnsists f bt temprl nd sptil discretiztin errrs. Mrever, te temprl nd sptil discretiztin sizes re linked by te stbility cnstrints. Terefre, clse ttentin my be required in csing temprl nd sptil prmeters, prticulrly wen time nd spce re discretized by scemes wit different rder f ccurcy. Suppse tt te trunctin errr f numericl discretiztin is $\Order\left(\Delt ^p, \Delt t^q\rigt)$, te temprl step size $\Delt t$ is required t vry wit te sptil step size $\Delt $ s $\Delt t \prpt \Delt ^{p/q}$ t ld dwn te errrs frm temprl discretiztin n successively refined grids. Cnsequently, te CFL cefficient s $C_{\Des{CFL}} \prpt \Delt ^{p/q-1}$.
+
+\sectin{Vectr cnservtin lws}
+
+Wen develping metds fr te system f cnservtin lws, btining te nnliner stbility results necessry t prve cnvergence is nerly impssible. Hwever, mre nlysis is pssible in te cse f  sclr cnservtin lw. Terefre, te develpment f  numericl metd is generlly strted frm  sclr equtin nd is ten extended t systems f equtins. Even tug te nlysis nd cnvergence prfs my nt crry ver, te resulting metds re mstly very successful in prctice, s evluted by numericl experiments.
+
+\subsectin{Temprl discretiztin}
+
+In csing  numericl metd t integrte te differentil equtins trug time, mny fctrs, suc s ccurcy, stbility, strge requirements, cmputtinl cmplexity nd efficiency, re required t be cnsidered. Cmpenstins mng tese cupled fctrs must be mde s t wic criteri re mre crucil fr  prticulr prblem, since ptimizing ne my ffect nter.
+
+Tere re minly tw widely used pprces fr temprl discretiztin. One is te Lx--Wendrff discretiztin \citep{lx1960systems}, wic is estblised n te Tylr series expnsin
+\begin{equtin}
+    \Vectr{U}_i^{n+1} = \Vectr{U}_i^n + \Delt t  \frc{\prtil \Vectr{U}}{\prtil t} +  \frc{1}{2} \Delt t^2  \frc{\prtil^2 \Vectr{U}}{\prtil t^2} + \dtsb
+\end{equtin}
+nd te bservtin tt frm
+\begin{equtin}
+    \frc{\prtil \Vectr{U}}{\prtil t} = \Lptr\Vectr{U}
+\end{equtin}
+ne cn cmpute
+\begin{equtin}
+    \frc{\prtil^2 \Vectr{U}}{\prtil t^2} = \frc{\prtil (\Lptr\Vectr{U})}{\prtil t} = \Lptr(\frc{\prtil \Vectr{U}}{\prtil t}) = \Lptr(\Lptr \Vectr{U})
+\end{equtin}
+s tt
+\begin{equtin}
+    \Vectr{U}_i^{n+1} = \Vectr{U}_i^n + \Delt t \Lptr \Vectr{U} + \frc{1}{2} \Delt t^2 \Lptr(\Lptr \Vectr{U}) + \dtsb
+\end{equtin}
+were ne strts wit te temprl Tylr expnsin f te prtil differentil equtin nd ten replces temprl discretiztin wit sptil discretiztin trug cnverting ll te time derivtives int sptil derivtives wit te id f te riginl differentil equtin.
+
+Te Lx--Wendrff discretiztin results in  fully-discrete equtin. Te temprl ccurcy is determined by te number f sptil terms t pprximte in te cnverted equtin, nd te sptil ccurcy is determined by te pprximtin f sptil derivtives. Terefre, numericl scemes using te Lx--Wendrff pprc re fully-discrete metds, in wic te recnstructin f te numericl flux requires t tret temprl nd sptil ccurcy simultneusly. Te min dvntge f  fully-discrete metd is tt ig-rder temprl ccurcy cn be cieved by ne-step mrcing in time, but tese metds re difficult t derive nd re nt flexible in implementtin.
+
+Te ter pprc is t pply Runge--Kutt metds \citep{su1988efficient} fr time derivtives under te frmewrk f te metd f lines
+\begin{equtin}
+    \frc{\mtrm{d} \Vectr{U}}{\mtrm{d} t} = \Lptr_{\Delt}\Vectr{U}
+\end{equtin}
+Numericl scemes using te metd f lines re semi-discrete metds. Te semi-discrete frm is prticulrly cnvenient in develping metds wit ig rder f ccurcy, since te issues f sptil nd temprl ccurcy re decupled nd cn be cnsidered seprtely. One cn define ig-rder pprximtins t te sptil pertrs t ne instnt in time vi ig-rder interpltin in spce, nd ten cieve ig-rder temprl ccurcy by pplying  ig-rder rdinry differentil equtin slver in time. Terefre, te semi-discrete frm enbles mdulr pprximtins nd implementtins werein  rnge f fully-discrete pprximtins cn be btined by piring te semi-discrete frm wit numerus different time discretiztins.
+
+Incrprting te metd f lines, te Runge--Kutt metds mintin simplicity in cncept nd in implementtin. Wen  strng-stbility-preserving (SSP) Runge--Kutt metd \citep{gttlieb2001strng} is emplyed, gd numericl stbility cn ls be cieved. Fr instnce, te tird-rder SSP Runge--Kutt metd is given s
+\begin{equtin} \lbel{eq:tvd_rk}
+    \begin{ligned}
+        &\Vectr{U}^{(1)} = \Tptr\Vectr{U}^n\\
+        &\Vectr{U}^{(2)} = 3/4\Vectr{U}^n+1/4\Tptr\Vectr{U}^{(1)}\\
+        &\Vectr{U}^{n+1} = 1/3\Vectr{U}^n+2/3\Tptr\Vectr{U}^{(2)}\\
+        &\Tptr = (\Mtrix{I} + \Delt t \Lptr)\\
+        &C_{\Des{CFL}} = 1
+    \end{ligned}
+\end{equtin}
+Te frctinl steps in te sceme cn be rerrnged int  unified frm
+\begin{equtin}
+    \begin{gtered}
+        \Vectr{U}^{(s+1)} = C_0^s \Vectr{U}^n + C_1^s \Tptr\Vectr{U}^{(s)}, \,\, s = 0,\dtsc, 2 \\
+        \Vectr{U}^{(0)} = \Vectr{U}^n, \,\, \Vectr{U}^{n+1} = \Vectr{U}^{(3)}
+    \end{gtered}
+\end{equtin}
+were te cefficient vectrs $C_0=(0, 3/4, 1/3)^{\Des{T}}$ nd $C_1=(1, 1/4, 2/3)^{\Des{T}}$.
+
+Fr explicit scemes, te time step size $\Delt t$ is cnstrined by numericl stbility. Fr  yperblic system, $\Delt t$ is generlly relted t te Curnt--Friedrics--Lewy (CFL) number \citep{curnt1927prtil}:
+\begin{equtin} \lbel{eq:cfl}
+    \Delt t = C_{\Des{CFL}} \min_{s=x,y,z}(\frc{\Delt s}{\lmbd_s^{\Des{mx}}})
+\end{equtin}
+were $C_{\Des{CFL}}$ is te CFL cefficient nd is csen ccrding t te liner stbility cnditin f te emplyed numericl metd, $\lmbd_s^{\Des{mx}}$ is te mximum wve speed f te $s$ directin presented trugut te dmin in $[t^n, t^{n+1}]$. A prcticl cice fr $\lmbd_s^{\Des{mx}}$ is te mximum crcteristic speed t time level $n$
+\begin{equtin} \lbel{eq:dt}
+    \lmbd_s^{\Des{mx}} = \mx_{\Omeg_{i,j,k}}(|(V_s)^n_{i,j,k}| + c^n_{i,j,k}) 
+\end{equtin}
+
+
+Generlly, te time step size $\Delt t$ determined by te CFL stbility cnditin is but tw mgnitude less tn $\Delt s$, tt is, $\Delt t \pprx \Order\left(10^{-2}\Delt s\rigt)$. Terefre, te temprl trunctin errr f  tird-rder ccurte temprl sceme s
+\begin{equtin}
+    \Order\left(\Delt t^3\rigt) \pprx \Order\left(10^{-6}\Delt s^3\rigt) \pprx \Order\left(\Delt s^5\rigt)
+\end{equtin}
+were $\Delt s$ is ssumed tt $\Delt s \pprx \Order\left(10^{-3}\rigt)$, wic is generlly true fr prcticl prblems.
+
+\subsectin{Sptil discretiztin}
+
+Sptil derivtives in te gverning equtins re quntittive descriptins f cnvectin nd diffusin. As tw frms f te trnsprttin f mss, mmentum, nd energy, pprprite discretiztin f te cnvective nd diffusive fluxes is vitl t cieve n ccurte slutin. 
+
+If we define te dmin f dependence, $\Omeg_{\Des{D}}(\br{\Vectr{r}},t)$, fr  sptil pint $\br{\Vectr{r}}$ under  prticulr pertr is te set f pints $\Vectr{r}$ wse slutin dt $\Vectr{U}(\Vectr{r},t)$ culd pssibly ffect te slutin t $(\br{\Vectr{r}},t)$, ten s stted in te Curnt--Friedrics--Lewy terem \citep{curnt1927prtil},  necessry cnditin fr te stbility f numericl discretiztin is tt te numericl dmin f dependence gverned by te numericl scemes cntins te pysicl dmin f dependence gverned by te prtil differentil equtins. Oterwise, cnging te vlue f te initil dt in te excluded regin wuld ffect te true slutin but nt te numericl slutin, nd ence it is nt pssible fr te numericl slutin t cnverge t te true slutin fr ll initil dt.
+
+A pysicl numericl discretiztin suld crrectly mdel te directin frm wic crcteristic infrmtin prpgtes. Terefre, te numericl dmin f dependence suld prperly nd clsely mdel te pysicl dmin f dependence. Different differentil pertrs, suc s elliptic, prblic, yperblic, r mixed pertrs, ve different dmins f dependence nd rnges f influence, wic prperty determines te suitbility f te emplyed discretiztin scemes nd bundry cnditins. Fr exmple, in  yperblic system, infrmtin prpgtes lng crcteristics wit finite speeds. Terefre, yperblic pertrs prefer upwind discretiztin scemes becuse te dependent nd influentil znes f tese pertrs re bunded nd directinl. In cntrst, elliptic pertrs prefer centrl difference scemes since tese pertrs ve glbl dependence nd influence.
+
+\subsubsectin{Multidimensinl spce}
+
+Mst prcticl prblems re in tw r tree spce dimensins, nd gret cllenges n numericl stbility nd cmputtinl efficiency re impsed in tis extensin. Nnliner stbility in multidimensins still ve mny unreslved issues, suc s te system f cnservtin lws my n lnger be nnscilltry in multidimensins, nd enfrcing nnliner stbility cnditins in multidimensins is very difficult. As  result, ltug tere is sme interest in develping "fully multidimensinl" numericl metds tt mke use f te multidimensinl structure f te slutin lclly, suc s by sme generliztin f te Riemnn prblem, mst metds in use re develped evily n ne-dimensinl cncepts nd re ten generlized t multidimensinl prblems.
+
+\prgrp{Opertr splitting metd}
+
+Fr slving system f cnservtin lws in multidimensinl spce, ne prcticl pprc fr relxing stbility cnstrins nd decresing numericl cmplexities is t pply pertr splitting metds \citep{gldmn1996n}. Te pertr splitting tecnique represents  divide-nd-cnquer strtegy. Te riginl cmplex prtil differentil equtins re trnsfrmed int  sequence f simple subprblems by te decmpsitin f pertrs, wic furter prvides te cpbility tt different subprblems cn be effectively slved seprtely wit different pprces. Fr instnce, using implicit scemes fr stiff subprblems nd explicit scemes fr subprblems wit less stbility cnstrins.
+
+Prtil differentil equtin:
+\begin{equtin} \lbel{eq:pde}
+    \frc{\prtil \Vectr{U}}{\prtil t} = \Lptr\Vectr{U}, \,\, \Lptr = \sum_{s = 0}^{S}\Lptr_s
+\end{equtin}
+
+Differentil splitting:
+\begin{equtin} \lbel{eq:diff_split}
+    \begin{gtered}
+        \frc{\prtil \Vectr{U}}{\prtil t} = \Lptr_s\Vectr{U}^{(s)}, \,\, s = 0,\dtsc, S \\
+        \Vectr{U}^{(0)} = \Vectr{U}^n, \,\, \Vectr{U}^{n+1} = \Vectr{U}^{(S+1)}
+    \end{gtered}
+\end{equtin}
+
+Let $\Sptr_s$ dente te slutin pertr f te subprblem
+\begin{equtin}
+    \frc{\prtil \Vectr{U}}{\prtil t} = \Lptr_s\Vectr{U}^{(s)}
+\end{equtin}
+
+Ten,  cmpct frm is given s
+\begin{equtin}
+    \begin{gtered}
+        \Vectr{U}^{(s+1)} = \Sptr_s\Vectr{U}^{(s)}, \,\, s = 0,\dtsc, S \\
+        \Vectr{U}^{(0)} = \Vectr{U}^n, \,\, \Vectr{U}^{n+1} = \Vectr{U}^{(S+1)}
+    \end{gtered}
+\end{equtin}
+
+A widely used secnd-rder temprl ccurcy splitting fr te cse f tw pertrs is te Strng splitting \citep{strng1968cnstructin}
+\begin{equtin}
+    \Vectr{U}^{n+1} = \Sptr_1(\frc{\Delt t}{2})\Sptr_0(\frc{\Delt t}{2})\Sptr_0(\frc{\Delt t}{2})\Sptr_1(\frc{\Delt t}{2}) \Vectr{U}^n
+\end{equtin}
+
+Trditinlly, t reduce te cmputtinl ld resulting frm  symmetric splitting, te grup prperty f te slutin pertr, $\Sptr(\Delt t_1)\Sptr(\Delt t_2) = \Sptr(\Delt t_1 +\Delt t_2)$, is pplied t cnctente cnsecutive pertrs f te sme type \citep{strng1968cnstructin, gldmn1996n}. Cnsequently, it breks te unifrmity t te strt nd end steps f te cmputtin cycle. By bserving tt te vlue rnge f te CFL number cn be dubled, te ungruped frm preserves unifrmity wile cieving equivlent verll efficiency fr temprl integrtin r iger efficiency wen mre tn tw pertrs present.
+
+Te decmpsitin f pertrs cn be pysics-bsed splitting, in wic sub-pertrs re built n different pysicl penmen nd prcesses, r dimensin-bsed splitting. Fr  multidimensinl prblem, te dimensin-bsed splitting tecnique is useful fr reducing te multidimensinl gverning equtins int multiple ne-dimensinl gverning equtins, wic cn ten be slved sequentilly.
+
+T pply te Strng splitting fr te tree dimensinl gverning equtins, te fllwing prcedure cn be derived
+\begin{equtin}
+    \begin{ligned}
+        \Vectr{U}^{n+1} &= \Sptr_z(\frc{\Delt t}{2})\Sptr_{xy}(\Delt t)\Sptr_z(\frc{\Delt t}{2}) \Vectr{U}^n \\
+                                 &= \Sptr_z(\frc{\Delt t}{2})\Sptr_y(\frc{\Delt t}{2})\Sptr_x(\frc{\Delt t}{2})\Sptr_x(\frc{\Delt t}{2})\Sptr_y(\frc{\Delt t}{2})\Sptr_z(\frc{\Delt t}{2}) \Vectr{U}^n
+    \end{ligned}
+\end{equtin}
+
+\prgrp{Dimensin-by-dimensin pprximtin}
+
+Wen te limittin f temprl ccurcy in pertr splitting is undesirble,  dimensin-by-dimensin pprximtin \citep{lney1998cmputtinl} witut splitting cn be used. Cnsider te fllwing yperblic system
+\begin{equtin}
+    \frc{\prtil \Vectr{U}}{\prtil t}+\nbl\cdt\Tensr{F} = 0, \ \text{n}\ \Omeg \times T
+\end{equtin}
+Discretize te cntinuus pysicl dmin $\Omeg \times T$ int  discrete cmputtinl dmin $\bigcup \Omeg_{i,j,k} \times \bigcup T_n$, nd integrte n $\Omeg_{i,j,k}$ t btin  semi-discrete sceme
+\begin{equtin}
+    \int_{\Omeg_{i,j,k}} \frc{\prtil \Vectr{U}}{\prtil t} \,\mtrm{d}\Omeg = - \int_{\prtil\Omeg_{i,j,k}} \unitVectr{n} \cdt \Tensr{F} \,\mtrm{d}S
+\end{equtin}
+Intrduce cell verge slutin
+\begin{equtin}
+    \Vectr{U}_{i,j,k} \pprx \br{\Vectr{U}}_{i,j,k} \equiv \frc{1}{|\Omeg_{i,j,k}|} \int_{\Omeg_{i,j,k}} \Vectr{U}(\Vectr{r},t) \,\mtrm{d}\Omeg
+\end{equtin}
+nd numericl flux
+\begin{equtin}
+    \t{\Tensr{F}}_{i,j,k}^{n} = \Tensr{F}(\Vectr{U}(\prtil \Omeg_{i,j,k},t^n))
+\end{equtin}
+it gives
+\begin{equtin}
+    \frc{\mtrm{d} {U}_{i,j,k}}{\mtrm{d} t} = - \frc{1}{|\Omeg_{i,j,k}|} \int_{\prtil\Omeg_{i,j,k}} \unitVectr{n} \cdt \t{\Tensr{F}}_{i,j,k}^n \,\mtrm{d}S
+\end{equtin}
+
+Since te surfce integrtin is in  multidimensinl spce, te determintin f te numericl flux ver te dmin bundry inevitbly invlves te multidimensinl structure f te slutin. One wy t simplify te slutin prcess is t lclly verge nd prject te slutin nt te nrml directin nd ten slve  lcl ne-dimensinl prblem. Fr instnce, wen csing $\Omeg_{i,j,k}$ s exedrn $[x_{i-1/2}, x_{i+1/2}] \times [y_{j-1/2}, y_{j+1/2}] \times [z_{k-1/2}, z_{k+1/2}]$, it gives
+\begin{equtin}
+    \begin{ligned}
+        \frc{\mtrm{d} {U}_{i,j,k}}{\mtrm{d} t} &= - \frc{1}{\Delt x}\left((\t{\Vectr{F}}_x)^{n}_{i+\frc{1}{2},j,k} - (\t{\Vectr{F}}_x)^{n}_{i-\frc{1}{2},j,k}\rigt) - \frc{1}{\Delt y}\left((\t{\Vectr{F}}_y)^{n}_{i,j+\frc{1}{2},k} - (\t{\Vectr{F}}_y)^{n}_{i,j-\frc{1}{2},k}\rigt)\\
+        &- \frc{1}{\Delt z}\left((\t{\Vectr{F}}_z)^{n}_{i,j,k+\frc{1}{2}} - (\t{\Vectr{F}}_z)^{n}_{i,j,k-\frc{1}{2}}\rigt)
+    \end{ligned}
+\end{equtin}
+Were ec sptil pertr is pprximted n its crrespnding dimensin, nd ne-dimensinl numericl metds cn be directly pplied. Hwever, in pplying te dimensin-by-dimensin pprximtin, te stbility cnditin is restricted by  fctr f $1/s$, were $s$ is te dimensin f te prblem.
+
+\subsubsectin{Cnvective flux discretiztin}
+
+Te essentils f cnvective flux discretiztin cn lrgely be discussed using te ne-dimensinl nnliner yperblic system 
+\begin{equtin} \lbel{eq:cnvective}
+    \frc{\prtil \Vectr{U}}{\prtil t} + \frc{\prtil \Vectr{F}(\Vectr{U})}{\prtil x} = 0
+\end{equtin}
+
+Wen slving nnliner systems, te nnlinerity mkes prblems rder t nlyze, nd dditinl difficulties cn rise in numericl slutins. Fr smt slutins t nnliner prblems, te prblem cn generlly be linerized nd results frm te liner tery cn be pplied t btin cnvergence results fr nnliner prblems. Hwever, te rising f discntinuities suc s scks nd cntct discntinuities in te slutins impses stringent requirements n te mtemticl frmultin f gverning equtins s well s n te numericl scemes emplyed fr discretiztin.
+
+As jump discntinuities stisfying te entrpy cnditin, scks ve extremely tin tickness nd brupt vrying flw prperties. Wile numericl diffusin my excessively smer scks nd ffect teir mgnitude nd tickness, numericl dispersin my prduce severe scilltins t scks. Te scilltin is ls relted t te principle tt te decy f Furier cefficients f  functin t ig-frequency mdes is cntrlled by te smtness f te functin. A very smt functin will ve expnentilly decying Furier cefficients, resulting in te rpid cnvergence f te Furier series wit reltively lw frequency cmpnents. In cntrst,  discntinuus functin will ve very slwly decying Furier cefficients, cusing te Furier series t cnverge very slwly nd scilltry. Menwile, te infinite wide Furier spectrum is very prne t dispersin. Tese spurius scilltins nt nly decrese te slutin ccurcy by creting nnliner instbilities but ls my intrduce unpysicl fetures in te slutin suc s negtive mss r pressure. Terefre, t cieve nnscilltry wek slutins, nnliner stbility nlysis wit specil effrts cncerning numericl dissiptin nd dispersin needs t be estblised fr numericl scemes pplied t nnliner prblems.
+
+Wen slving prblems wit smt slutins, derivtives re lwys well defined nd ve bunded vlues. Different frms f equtins derived fr te cnservtin lws re cnsistent, s te trunctin errrs mng tem cnverge t zer fr smt slutins. Terefre, te cice between te nncnservtive frm nd te cnservtive frm f gverning equtins s well s numericl scemes is nt criticl.
+
+Hwever, fr prblems wit nnsmt slutins, trunctin errrs re nt bunded t discntinuities, different frms f equtins my n lnger cnsistent wit ec ter nd ence ve different wek slutins. A nncnservtive frm my give slutin cnverging t  functin tt is nt  wek slutin f te riginl equtin, due t tt te trnsfrm frm cnservtive frm int nncnservtive frm mdifies te sck speeds determined by te Rnkine--Hugnit cnditin. In generl, in rder t crrectly predict sck speed nd sck psitin in slving flw wit discntinuities, wic is criticl fr prcticl pplictins suc s predicting te crrect frce field rund n irfil, te cnservtive frm f gverning equtins suld be dpted, nd te cnvective flux suld ls be discretized in  cnservtive mnner. \citet{lx1960systems} swed tt  cnservtive discretiztin will gurntee tt we d nt cnverge t nn-slutins.
+
+In summry, nnliner stbility nd cnservtin prperty re especilly vitl fr slutin wit discntinuities. In ne sense, cnservtin ddresses te lctin issue f te discntinuities, nd nnliner stbility ddresses te spe issue f te discntinuities. Anter imprtnt issue in slving yperblic cnservtin lws is tt wek slutins re nt unique. A cnservtive metd wit nnliner stbility my cnverge t wek slutins vilting te entrpy cnditin. Terefre, in develping  numericl sceme, it is necessry t prve tt te btined slutin will stisfy sme discrete frm f te entrpy cnditin. A sceme tt is cnsistent wit n entrpy cnditin cn ssure tt  cnverged slutin is  pysiclly relevnt slutin. As  cnclusin, cnservtin, nnliner stbility, nd cnsistency t entrpy cnditins re essentil prperties fr estblising cnvergence t pysiclly relevnt wek slutins f nnliner yperblic cnservtin lws.  
+
+In  cnservtive discretiztin, te flux derivtive t  nde $i$ is pprximted s
+\begin{equtin} \lbel{eq:cnservtivediff}
+    \left. \frc{\prtil \Vectr{F}}{\prtil x} \rigt|_i = \frc{1}{\Delt x}\left[\t{\Vectr{F}}_{i+\frc{1}{2}}-\t{\Vectr{F}}_{i-\frc{1}{2}}\rigt]
+\end{equtin}
+were $\t{\Vectr{F}}_{i+{1}/{2}}$ is  numericl flux t cell interfce.
+
+Under te cnservtive discretiztin frmewrk, te reliztin f te numericl flux \(\t{\Vectr{F}}_{i+{1}/{2}}\) determines te underlying numericl scemes nd relted numericl prperties suc s ccurcy nd stbility. In prctice, te recnstructin f te numericl flux cn eiter be slutin-bsed r flux-bsed. In te slutin-bsed pprc, te interpltin functin f te numericl flux trets te slutin $\Vectr{U}$ s te independent vrible. Slutin recnstructin is cnducted nd ten is used fr flux evlutin. Tis pprc enbles te pssibility f explring te sptil structure f te slutin nd is ften referred t s te MUSCL pprc \citep{yee1989clss}. In te flux-bsed pprc, te interpltin functin f te numericl flux is develped by treting te flux $\Vectr{F}$ s te independent vrible. Obviusly, wen te flux $\Vectr{F}$ is  liner functin f $\Vectr{U}$, tese tw pprces re ten equivlent. 
+
+System f cnservtin lws re frequently indefinite systems wit eigenvlues f mixed sign, wic depends n te lcl dt nd my vry frm pint t pint. In dditin, te Jcbin mtrix $\Mtrix{A}$ is generlly  nnliner functin f $\Vectr{U}$. Terefre, te entire system f equtins re tigtly cupled. T extend numericl metds nd ides frm sclr cnservtin lws t system f cnservtin lws, flux splitting tecniques re ften used t fcilitte te generliztin prcess wile cnfrming t te yperblic prperties f te system.
+
+\prgrp{Flux frm: cmpnent-wise r crcteristic-wise pprximtin}
+
+Fr  yperblic system, te frm f flux used fr pprximtin cn be cmpnent-bsed r crcteristics-bsed.
+
+Wen te cmpnent-bsed flux frm is used, cmpnent-wise pprximtin is directly pplied witut decupling te system f equtins. In rder t cieve upwinding discretiztin, flux splitting metds pplied t te entire flux vectr re required. A cmpnent-wise pprximtin is simple nd cst effective but nly wrks resnbly well fr undemnding prblems wit lwer rder f ccurcy, suc s secnd r smetimes tird rder. Fr mre demnding prblems r wen te rder f ccurcy is ig, te crcteristic-wise pprximtin is needed \citep{su1998essentilly}.
+
+In te crcteristic-wise pprximtin,  nnliner yperblic system is first lclly linerised nd ten prjected nt its crcteristic fields t btin  dignlized system. Under te prjectin, te riginl cupled system is decmpsed int  system f uncupled sclr equtins, wic cn be slved by well-estblised metds fr sclr cnservtin lws.
+
+Fr  nnliner yperblic system
+\begin{equtin}\lbel{eq:nedimnn}
+    \frc{\prtil \Vectr{U}}{\prtil t}+\Mtrix{A}\frc{\prtil \Vectr{U}}{\prtil x} = 0
+\end{equtin}
+Lclly linerise te system by freezing $\Mtrix{A}$ int  cnstnt $\br{\Mtrix{A}}$
+\begin{equtin}
+    \frc{\prtil \Vectr{U}}{\prtil t}+\br{\Mtrix{A}}\frc{\prtil \Vectr{U}}{\prtil x} = 0
+\end{equtin}
+were te pprximted Jcbin mtrix $\br{\Mtrix{A}}$ s
+\begin{equtin}
+    \br{\Mtrix{A}} = \Mtrix{A}(\br{\Vectr{U}})
+\end{equtin}
+ere, $\br{\Vectr{U}}$ is  lcl verge stte evluted using  symmetric verge between te left stte $\Vectr{U}^+$ nd te rigt stte $\Vectr{U}^-$. Te symmetric verge cn be te ritmetic men
+\begin{equtin}
+    \br{\Vectr{U}} = \frc{1}{2}(\Vectr{U}^+ + \Vectr{U}^-)
+\end{equtin}
+r te Re verges \citep{re1981pprximte}
+\begin{equtin} \lbel{eq:Reverge}
+    \br{\Vectr{U}}
+    \begin{cses}
+        \br{\r} = \r^+[(1+\br{D})/2]^2\\
+        \br{u} = (u^+ + \br{D}u^-)/(1+\br{D})\\
+        \br{v} = (v^+ + \br{D}v^-)/(1+\br{D})\\
+        \br{w} = (w^+ + \br{D}w^-)/(1+\br{D})\\
+        \br{}_{\Des{T}} = ({_{\Des{T}}}^++\br{D} {_{\Des{T}}}^-)/(1+\br{D})\\
+        \br{D} = \sqrt{\r^- / \r^+}\\
+        \br{c}^2 = (\gmm-1)(\br{}_{\Des{T}}-\frc{1}{2}(\br{u}^2+\br{v}^2+\br{w}^2))\\
+        \br{p} = \br{\r}\frc{\br{c}^2}{\gmm}\\
+        \br{e}_{\Des{T}} = \br{}_{\Des{T}}-\frc{\br{p}}{\br{\r}}
+    \end{cses}
+\end{equtin}
+Intrduce crcteristic decmpsitin f te cnstnt Jcbin mtrix
+\begin{equtin}
+    \frc{\prtil \Vectr{U}}{\prtil t}+\br{\Mtrix{R}}\br{\Mtrix{\Lmbd}}\br{\Mtrix{R}}^{-1}\frc{\prtil \Vectr{U}}{\prtil x} = 0
+\end{equtin}
+Decmpse te system trug  prjectin int te crcteristic spce
+\begin{equtin}\lbel{eq:cr}
+    \frc{\prtil (\br{\Mtrix{R}}^{-1}\Vectr{U})}{\prtil t}+\br{\Mtrix{\Lmbd}}\frc{\prtil (\br{\Mtrix{R}}^{-1}\Vectr{U})}{\prtil x} = 0
+\end{equtin}
+Intrduce  cnge f vrible by defining  lcl system f crcteristic vribles
+\begin{equtin} \lbel{eq:cnge}
+    \Vectr{W} = \br{\Mtrix{R}}^{-1}\Vectr{U}
+\end{equtin}
+Ten gives  dignlized system wit $M$ decupled sclr liner cnvectin equtins
+\begin{equtin}\lbel{eq:refrmcr}
+    \frc{\prtil \Vectr{W}}{\prtil t}+\br{\Mtrix{\Lmbd}}\frc{\prtil \Vectr{W}}{\prtil x} = 0
+\end{equtin}
+T btin numericl discretiztin in  cnservtive frm, it requires t be rewritten s
+\begin{equtin}\lbel{eq:rewritecr}
+    \frc{\prtil \Vectr{W}}{\prtil t}+\frc{\prtil \Vectr{H}}{\prtil x} = 0
+\end{equtin}
+were $\Vectr{H}=\br{\Mtrix{R}}^{-1}\Vectr{F}=\br{\Mtrix{\Lmbd}}\Vectr{W}$ is te lcl crcteristic flux.
+
+Flux splitting metds pplied t ec sclr crcteristic flux cn ten be used t btin n upwinding discretiztin f te linerised yperblic system. After slutin r flux recnstructin in te crcteristic spce, te btined results in te crcteristic spce cn ten be prjected bck t te pysicl spce by te inverse prjectin
+\begin{equtin}
+    \Vectr{R} = \br{\Mtrix{R}}\Vectr{W}, \ \Vectr{F}=\br{\Mtrix{R}}\Vectr{H}
+\end{equtin}
+
+\prgrp{Flux splitting: slutin recnstructin r flux recnstructin}
+
+\subprgrp{Slutin recnstructin: flux difference splitting}
+
+A specific distributin f te slutin $\Vectr{U}$ in ec cell $\Omeg_i$ r  certin recnstructin f te left nd rigt slutin sttes $\Vectr{U}^{\pm}_{i+1/2}$ is first cnducted:
+\begin{equtin}
+    \Vectr{U}^{\pm}_{i+1/2} = \delt^{\pm}\Vectr{U}
+\end{equtin}
+
+In te cse f nn-rtgnl cells, nce te dt is recnstructed witin ec cell, te cells re still presumed t interct in  ne-dimensinl mnner by excnging wves nrml t teir interfces. Ten,  jump cnditin exists t te interfce $x_{i+{1}/{2}}$, nd te numericl flux needs t be recnstructed n tis jump cnditin
+\begin{equtin}
+    \t{\Vectr{F}}_{i+\frc{1}{2}}^n = \t{\Vectr{F}}(\Vectr{U}_{i+\frc{1}{2}}^+,\Vectr{U}_{i+\frc{1}{2}}^-)
+\end{equtin}
+
+T del wit tis jump cnditin,  lcl Riemnn prblem cn be estblised t split flux differences crss te interfce nd t cnstruct te numericl flux. Trug estblising nd slving lcl Riemnn prblems, te yperblic prperties f te system re ten nturlly dmitted nd integrted int numericl slutins. 
+
+Hwever, fr te system f cnservtin lws, cquiring exct numericl slutins f te Riemnn prblem t ec interfce $x_{i+{1}/{2}}$ requires itertin nd is unduly time-cnsuming. A mre effective pprc is t use n upwind numericl flux functin s n pprximte Riemnn slver t select te upwind stte, suc s te HLLC numericl flux functin \citep{tr1994restrtin, tr1999riemnn} r te Re's numericl flux fr te system f cnservtin lws, wic is derived by te inverse prjectin f te Re's numericl flux pplied t te crcteristic fields f te system fter  lcl lineriztin f te system.
+\begin{equtin}
+    \t{\Vectr{F}}_{\Des{Re}}(\Vectr{U}^+,\Vectr{U}^-) = \frc{1}{2}[\Vectr{F}(\Vectr{U}^+) + \Vectr{F}(\Vectr{U}^-) - \br{\Mtrix{R}} \psi(\br{\Mtrix{\Lmbd}}) \br{\Mtrix{R}}^{-1} (\Vectr{U}^- - \Vectr{U}^+)]
+\end{equtin}
+
+In dditin t being interpreted s selecting te upwind flux ccrding t te lcl directin f infrmtin flw, Re's numericl flux ls represents  centrl difference pprximtin wit dditinl rtificil viscsity t stbilize te slutin, in wic $\psi(\br{\Mtrix{\Lmbd}})$ is te cefficient f rtificil viscsity wit entrpy fix.
+
+\subprgrp{Flux recnstructin: flux vectr splitting}
+
+One simple wy f intrducing upwinding discretiztin int  yperblic system is t split te cnvective flux int  frwrd flux $\Vectr{F}^+$ nd  bckwrd flux $\Vectr{F}^-$ wit ec prt dminted by  unique upwind directin
+\begin{equtin}
+    \Vectr{F} = \Vectr{F}^+ + \Vectr{F}^-
+\end{equtin}
+were te Jcbin mtrix ${\mtrm{d} \Vectr{F}^+}/{\mtrm{d} \Vectr{U}}$ s n negtive eigenvlues, nd te Jcbin mtrix ${\mtrm{d} \Vectr{F}^-}/{\mtrm{d} \Vectr{U}}$ s n psitive eigenvlues. If bt te frwrd nd bckwrd flux re discretized in  cnservtive frm
+\begin{equtin} \lbel{eq:fluxvectrsplit}
+    \left.\frc{\prtil \Vectr{F}}{\prtil x}\rigt|_i = \left.\frc{\prtil \Vectr{F}^+}{\prtil x}\rigt|_i+\left.\frc{\prtil \Vectr{F}^-}{\prtil x}\rigt|_i, \,\,
+    \left.\frc{\prtil \Vectr{F}^{\pm}}{\prtil x}\rigt|_i = \frc{1}{\Delt x} \left[\t{\Vectr{F}}_{i+\frc{1}{2}}^{\pm}-\t{\Vectr{F}}_{i-\frc{1}{2}}^{\pm}\rigt]
+\end{equtin}
+it cn be rerrnged s
+\begin{equtin} \lbel{eq:rerrnge}
+    \left. \frc{\prtil \Vectr{F}}{\prtil x} \rigt|_i = \frc{1}{\Delt x}\left[\t{\Vectr{F}}_{i+\frc{1}{2}}-\t{\Vectr{F}}_{i-\frc{1}{2}}\rigt], \,\,
+    \t{\Vectr{F}}_{i+\frc{1}{2}} = \t{\Vectr{F}}^+_{i+\frc{1}{2}} + \t{\Vectr{F}}^-_{i+\frc{1}{2}} 
+\end{equtin}
+were te frwrd nd bckwrd numericl flux re recnstructed n te frwrd nd bckwrd flux field, respectively. Tt is,
+\begin{equtin} \lbel{eq:upwinddiff}
+    \t{\Vectr{F}}_{i+\frc{1}{2}}^{\pm} = \delt^{\pm}\Vectr{F}^{\pm}
+\end{equtin}
+were $\delt^+$ nd $\delt^-$ re upwind-bised interpltin scemes.
+
+Widely used pprces fr btining te frwrd nd bckwrd fluxes re Lx--Friedrics splitting \citep{lx1957yperblic}, Steger--Wrming splitting \citep{steger1981flux}, vn Leer splitting \citep{vn1982flux}, nd Advectin Upstrem Splitting Metd \citep{liu1996sequel}.
+
+Lx--Friedrics splitting nd Steger--Wrming splitting use te mgeneity prperty f te flux functin, nd te splitting f flux re cnducted trug crcteristic speed (eigenvlue) splitting 
+\begin{equtin}
+    \begin{ligned}
+        \Vectr{F}
+        &= \Mtrix{A}\Vectr{U} \\
+        &= \Mtrix{R} \Mtrix{\Lmbd} \Mtrix{R}^{-1}\Vectr{U} \\
+        &= \Mtrix{R} (\Mtrix{\Lmbd}^+ + \Mtrix{\Lmbd}^-) \Mtrix{R}^{-1}\Vectr{U} \\
+        &= \Mtrix{R} \Mtrix{\Lmbd}^+ \Mtrix{R}^{-1}\Vectr{U} + \Mtrix{R} \Mtrix{\Lmbd}^- \Mtrix{R}^{-1}\Vectr{U} \\
+        &= \Mtrix{A}^+ \Vectr{U} + \Mtrix{A}^- \Vectr{U} \\
+        &= \Vectr{F}^+ + \Vectr{F}^-
+    \end{ligned}
+\end{equtin}
+
+Te difference is t determine te splitting f crcteristic speeds
+\begin{equtin}
+    \Mtrix{\Lmbd} = \Mtrix{\Lmbd}^+ + \Mtrix{\Lmbd}^-, \,\, \Mtrix{\Lmbd}^{\pm} = \Dig\{\lmbd^{\pm}\}, \,\, \lmbd^+_m \ge 0, \,\, \lmbd^-_m \le 0
+\end{equtin}
+
+Steger--Wrming splitting
+\begin{equtin}
+    \lmbd^{\pm}_m = \frc{1}{2}(\lmbd_m \pm (\lmbd_m^2+\vrepsiln^2)^{1/2})
+\end{equtin}
+were $\vrepsiln$ is  smll cnstnt t imprve smtness f te crcteristic speeds fter splitting, s  lck f smtness cn leds t numericl instbility.
+
+Lx--Friedrics splitting
+\begin{equtin}
+    \lmbd^{\pm}_m = \frc{1}{2}(\lmbd_m \pm \lmbd^*)
+\end{equtin}
+were $\lmbd^*=|V_x|+c$ is clled te lcl Lx--Friedrics splitting, $\lmbd^*=\mx\limits_{x}(|V_x|+c)$ is clled te glbl Lx--Friedrics splitting.
+
+Lx--Friedrics splitting is te smtest wile te mst dissiptive crcteristic speed splitting metd. Smtness in flux splitting is imprtnt fr ig-rder numericl scemes t retin te rder f ccurcy nd reduce numericl instbility \citep{su1998essentilly}.
+
+Different splitting metds f crcteristic speeds generlly cn be unified s
+\begin{equtin}
+    \Mtrix{\Lmbd}^{\pm} = \frc{1}{2}(\Mtrix{\Lmbd} \pm \Mtrix{\Lmbd}^*)
+\end{equtin}
+Terefre,
+\begin{equtin}
+    \Vectr{F}^{\pm} = \Mtrix{A}^{\pm} \Vectr{U} = \Mtrix{R} \Mtrix{\Lmbd}^{\pm} \Mtrix{R}^{-1}\Vectr{U} = \Mtrix{R} (\frc{1}{2}(\Mtrix{\Lmbd} \pm \Mtrix{\Lmbd}^*)) \Mtrix{R}^{-1}\Vectr{U} = \frc{1}{2}(\Vectr{F} \pm \Mtrix{R} \Mtrix{\Lmbd}^* \Mtrix{R}^{-1}\Vectr{U})
+\end{equtin}
+Fr Lx--Friedrics splitting, $\Mtrix{\Lmbd}^*=\lmbd^*\Mtrix{I}$, ence,
+\begin{equtin}
+    \Vectr{F}^{\pm} = \frc{1}{2}(\Vectr{F} \pm \lmbd^*\Vectr{U})
+\end{equtin}
+An upwind-bised recnstructin f $\t{\Vectr{F}}_{i+\frc{1}{2}}^{\pm}$ is equivlent t dding rtificil viscsity int te gverning equtins
+\begin{equtin}
+    \begin{ligned}
+        \t{\Vectr{F}}_{i+\frc{1}{2}}^{\pm} &= \delt^{\pm}\Vectr{F}^{\pm} \\
+                                               &= \frc{1}{2}\left[\delt^+ (\Vectr{F} + \lmbd^* \Vectr{U}) + \delt^- (\Vectr{F} - \lmbd^* \Vectr{U})\rigt] \\
+                                               &= \frc{1}{2}\left[\delt^+ \Vectr{F} + \delt^- \Vectr{F} - \lmbd^* (\delt^- \Vectr{U} - \delt^+ \Vectr{U})\rigt] \\
+                                               &= \delt^0_{1} \Vectr{F} - \lmbd^*\delt^0_{2}\Vectr{U}
+    \end{ligned}
+\end{equtin}
+were $\delt^0_{1}$ nd $\delt^0_{2}$ represent centrl difference pprximtin fr te first-rder nd secnd-rder derivtives, respectively.
+
+Terefre, flux difference splitting nd flux vectr splitting cn bt be represented s  centrl difference pprximtin wit dditinl rtificil viscsity t stbilize te slutin. Te primry difference is but csing te cefficient f rtificil viscsity. Mrever, wen te crcteristic-wise pprximtin is used, flux difference splitting wit Re's numericl flux functin dpting  cnstnt $\psi(x) = \lmbd^*$ is equivlent t flux vectr splitting wit Lx--Friedrics crcteristic speed splitting.
+
+Nte tt cmpnent-wise flux vectr splitting des nt decuple te system f equtins. In dditin, ltug te frwrd nd bckwrd flux resulted frm crcteristic speed splitting ve psitive nd negtive eigenvlues \citep{steger1981flux}, respectively, tese eigenvlues re nt identicl t tse f $\Mtrix{A}^{\pm}$:
+\begin{equtin} \lbel{eq:mdify}
+    \frc{\mtrm{d} \Vectr{F}^{\pm}}{\mtrm{d} \Vectr{U}} \neq \Mtrix{A}^{\pm}
+\end{equtin}
+
+\prgrp{Implementtin prcedure}
+
+In summry, t extend sclr metds t  nnliner system f equtins nd t ensure upwinding discretiztin, tw flux frms wit severl flux splitting tecniques cn be used. In generl, t ennce numericl stbility fr reslving strng discntinuities nd vid numericl errrs prpgting mng cupled equtins, te crcteristic-wise pprximtin wit flux splitting is suggested. Terefre, te nnliner system is lclly linerised t te neigbrd f ec interfce $x_{i+1/2}$ vi  lcl "freezing" Jcbin mtrix btined frm symmetric verge nd is ten prjected nt its crcteristic fields t btin  crcteristic flux frm wit  set f uncupled sclr equtins. Aided wit eiter te flux difference splitting r te flux vectr splitting, numericl scemes suc s TVD nd WENO re ten pplied t ec sclr equtin fr te recnstructin f numericl fluxes. At lst, te recnstructed numericl fluxes in te crcteristic spce re prjected bck t te pysicl spce by n inverse prjectin. Tis prcedure, wic is detiled in \citep{su1998essentilly}, is briefly summrized s fllws.
+
+\subprgrp{Crcteristic-wise pprximtin wit flux difference splitting}
+
+At ec interfce $x_{i+1/2}$:
+\begin{enumerte}
+    \item Evlute te verge stte $\Vectr{U}_{i+{1}/{2}}$ by  symmetric verge, suc s ritmetic men r Re verge, f te left nd rigt slutin sttes
+    \item Decmpse $\br{\Mtrix{A}} = \Mtrix{A}(\br{\Vectr{U}}) = \Mtrix{A}(\Vectr{U}_{i+{1}/{2}}) = \Mtrix{R}_{i+{1}/{2}} \Mtrix{\Lmbd}_{i+{1}/{2}} \Mtrix{R}_{i+{1}/{2}}^{-1}$
+    \item Cnstruct lcl crcteristic vribles $\Vectr{W}_{n} = \Mtrix{R}_{i+{1}/{2}}^{-1} \Vectr{U}_{n}$, $n=i-N, \dtsc, i+N+1$
+    \item Slutin recnstructin fr $\Vectr{W}_{i+{1}/{2}}^{+}$ nd $\Vectr{W}_{i+{1}/{2}}^{-}$
+    \item Cnstruct crcteristic numericl flux vi Riemnn slvers suc s Re's flux
+        \begin{equtin}
+            \t{\Vectr{H}}_{\Des{Re}}(\Vectr{W}^+,\Vectr{W}^-) = \frc{1}{2}[\Mtrix{\Lmbd}(\Vectr{W}^+ + \Vectr{W}^-) - \psi(\Mtrix{\Lmbd})(\Vectr{W}^- - \Vectr{W}^+)]
+        \end{equtin}
+    \item Trnsfrm bck t pysicl spce by inverse prjectin $\t{\Vectr{F}}_{i+{1}/{2}} = \Mtrix{R}_{i+{1}/{2}}\t{\Vectr{H}}_{i+{1}/{2}}$
+\end{enumerte}
+
+\subprgrp{Crcteristic-wise pprximtin wit flux vectr splitting}
+
+At ec interfce $x_{i+1/2}$:
+\begin{enumerte}
+    \item Evlute te verge stte $\Vectr{U}_{i+{1}/{2}}$ by  symmetric verge, suc s ritmetic men r Re verge, f te left nd rigt slutin sttes
+    \item Decmpse $\br{\Mtrix{A}} = \Mtrix{A}(\br{\Vectr{U}}) = \Mtrix{A}(\Vectr{U}_{i+{1}/{2}}) = \Mtrix{R}_{i+{1}/{2}} \Mtrix{\Lmbd}_{i+{1}/{2}} \Mtrix{R}_{i+{1}/{2}}^{-1}$
+    \item Cnstruct lcl crcteristic vribles $\Vectr{W}_{n} = \Mtrix{R}_{i+{1}/{2}}^{-1} \Vectr{U}_{n}$, $n=i-N, \dtsc, i+N+1$
+    \item Perfrm flux vectr splitting $\Mtrix{\Lmbd}_{i+{1}/{2}} = \Mtrix{\Lmbd}^{\pm}_{i+{1}/{2}}$
+    \item Cnstruct lcl crcteristic fluxes $\Vectr{H}_{n}^{\pm} = \Mtrix{\Lmbd}_{i+{1}/{2}}^{\pm} \Mtrix{R}_{i+{1}/{2}}^{-1} \Vectr{U}_{n} = \Mtrix{\Lmbd}_{i+{1}/{2}}^{\pm} \Vectr{W}_{n}$
+    \item Flux recnstructin fr $\t{\Vectr{H}}_{i+{1}/{2}}^{+}$ nd $\t{\Vectr{H}}_{i+{1}/{2}}^{-}$
+    \item Inverse prjectin $\t{\Vectr{F}}_{i+{1}/{2}} = \Mtrix{R}_{i+{1}/{2}}\t{\Vectr{H}}_{i+{1}/{2}} = \Mtrix{R}_{i+{1}/{2}} (\t{\Vectr{H}}_{i+{1}/{2}}^+ + \t{\Vectr{H}}_{i+{1}/{2}}^-)$
+\end{enumerte}
+
+\subsubsectin{Diffusive flux discretiztin}
+
+T cnfrm wit pysicl nd mtemticl prperties, diffusive fluxes re cmmnly discretized by centrl difference scemes. A cnservtive discretiztin f te diffusive fluxes invlves cnsecutive differentitin, wic my led t n even-dd decupling issue \citep{pirzzli2011numericl, brem2015lclly}. In rder t vid dd-even decupling, ne pssible wy is t expnd te cnsecutive derivtives \citep{pirzzli2011numericl}, fr instnce,
+\begin{equtin} \lbel{eq:diffusiveflux}
+    \frc{\prtil \tu_{ij}}{\prtil x_k} = \frc{\prtil \mu}{\prtil x_k}\left(\frc{\prtil V_i}{\prtil x_j} + \frc{\prtil V_j}{\prtil x_i} - \frc{2}{3}\frc{\prtil V_l}{\prtil x_l}\delt_{ij}\rigt)
+    + \mu\left(\frc{\prtil^2 V_i}{\prtil x_j \prtil x_k} + \frc{\prtil^2 V_j}{\prtil x_i \prtil x_k} - \frc{2}{3} \frc{\prtil^2 V_l}{\prtil x_l \prtil x_k}\delt_{ij}\rigt)
+\end{equtin}
+Dedicted centrl difference discretiztin is pplied t ec derivtive term n te rigt-nd side.
+
+Hwever, by crefully devising te recnstructin functin,  cnservtive discretiztin frm fr te diffusive fluxes is ble t be cieved witut prducing dd-even decupling.
+\begin{equtin}
+    \left. \frc{\prtil \Vectr{F}^{\Des{v}}}{\prtil x} \rigt|_i = \frc{1}{\Delt x}\left[\t{\Vectr{F}}^{\Des{v}}_{i+\frc{1}{2}}-\t{\Vectr{F}}^{\Des{v}}_{i-\frc{1}{2}}\rigt]
+\end{equtin}
+\begin{figure}[!tbp]
+    \centering
+    \cptin{A scemtic digrm illustrting interfcil diffusive flux recnstructin.}
+    \lbel{fig:diffusive_flux_dem}
+\end{figure}
+
+Fr instnce, fr  secnd-rder centrl difference discretiztin, te interfcil flux $\t{\Vectr{F}}^{\Des{v}}_{i+{1}/{2}}$ is recnstructed n te discretized spce $[i, i+1] \times [j-1, j+1] \times [k-1, k+1]$, s illustrted in Fig.~\ref{fig:diffusive_flux_dem}. Let $\pi$ dente  pysicl quntity in $\Vectr{F}^{\Des{v}}$, in rder t vid even-dd decupling resulting frm pplying cnsecutive derivtive discretiztin, te fllwing recnstructins cn be dpted:
+\begin{equtin}
+    \begin{ligned}
+        \pi_{i+\frc{1}{2}, j, k} &= \frc{\pi_{i, j, k} + \pi_{i+1, j, k}}{2} \\
+        \left.\frc{\prtil \pi}{\prtil x}\rigt|_{i+\frc{1}{2}, j, k} &= \frc{\pi_{i+1, j, k} - \pi_{i, j, k}}{\Delt x} \\
+        \left.\frc{\prtil \pi}{\prtil y}\rigt|_{i+\frc{1}{2}, j, k} &= \frc{\pi_{i, j+1, k} + \pi_{i+1, j+1, k} - \pi_{i, j-1, k} - \pi_{i+1, j-1, k}}{4\Delt y} \\
+        \left.\frc{\prtil \pi}{\prtil z}\rigt|_{i+\frc{1}{2}, j, k} &= \frc{\pi_{i, j, k+1} + \pi_{i+1, j, k+1} - \pi_{i, j, k-1} - \pi_{i+1, j, k-1}}{4\Delt z}
+    \end{ligned}
+\end{equtin}
+
+\subsectin{Cmputtin ccelertin}
+
+Cnservtive discretiztin f fluxes enbles n ccelertin tecnique tt cn reduce nerly lf f te cmputtinl wrk by using te fct tt te sme interfcil flux is sred by te tw neigbring cells r ndes
+\begin{equtin}
+    \t{\Vectr{F}}_{s-\frc{1}{2}} = \t{\Vectr{F}}_{(s-1)+\frc{1}{2}}
+\end{equtin}
+were flux $\Vectr{F}$ is eiter  cnvective flux r  diffusive flux, nd $s$ is ne f te $i$, $j$, $k$ index.
+
+Insted f using fce-bsed cmputtin, wic sweeps trug cell fces nd ssigns te cmputed interfcil flux t cells sring te interfce, te ccelertin metd cn be directly implemented in nde-bsed cmputtin, wic is mre nturl fr  structured grid nd s dvntges in cmputing flw wit surce terms. Wen cmputing te $\Sptr_s$ slutin pertr fr  multidimensinl prblem wit dimensinl-splitting r te $\Lptr_s$ sptil pertr fr  multidimensinl prblem wit dimensin-by-dimensin pprximtin, if te $s$ index is rrnged s te innermst lp f te sptil sweep fr cmputing $\Sptr_s$ r $\Lptr_s$, ten nly te interfcil flux $\t{\Vectr{F}}_{s+1/2}$ is lwys required t be cmputed wile $\t{\Vectr{F}}_{s-1/2}$ cn be inerited frm te previus nde $(s-1)$ unless te nde $(s-1)$ is  bundry nde. If $(s-1)$ is  bundry nde, ten $\t{\Vectr{F}}_{s-1/2}$ requires t be cmputed. Wen te type f ec cmputtinl nde is clssified in dvnce, te implementtin f tis ccelertin tecnique is strigtfrwrd, nd te cmputtinl vered f te implementtin is ne single cnditinl sttement.
+
+\subsectin{Bundry cnditin nd tretment}
+
+Fr  cmputtinl dmin wit irregulr bundries,  mp frm curviliner grid t Crtesin grid my be cnducted wen te irregulrity f te dmin is nt strng. Oterwise, insted f using bdy-fitted unstructured grids,  vible lterntive is t dpt te immersed bundry pprc, in wic irregulr dmins re ble t be discretized n generic Crtesin grids.
+

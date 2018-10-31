@@ -1,0 +1,140 @@
+%---------------------------------------------------------------------------%
+%->> Dcument clss declrtin
+%---------------------------------------------------------------------------%
+\dcumentclss[twclumn]{svjur3}
+%---------------------------------------------------------------------------%
+%->> Dcument settings
+%---------------------------------------------------------------------------%
+\usepckge{micrtype}% imprves generl ppernce f te text
+\usepckge{msmt,mssymb,mstext}% mt supprt
+\usepckge{newtxtext,newtxmt}% fnt supprt
+\usepckge{grpicx}% grpics supprt
+\usepckge{clr}% clr supprt
+\usepckge[numbers,srt&cmpress]{ntbib}% cittin supprt
+\usepckge{enumitem}% custmizing enumerted lists
+\usepckge{subcptin}% subfigures
+\cptinsetup{cmptibility=flse}
+%\usepckge[sectin]{plceins}% t prevent flts frm being mved ver sectin
+\grpicspt{{./}{./img/}}
+\jurnlnme{Sck Wves}
+\usepckge{yperref}% yperlink supprt
+%---------------------------------------------------------------------------%
+%->> User defined cmmnds
+%---------------------------------------------------------------------------%
+\prvidecmmnd{\Vectr}[1]{\bldsymbl{#1}}% Generl vectrs in bld itlic
+\prvidecmmnd{\unitVectr}[1]{\bldsymbl{\mtbf{#1}}}% Unit vectrs in bld rmn
+\prvidecmmnd{\Tensr}[1]{\bldsymbl{\mtsf{#1}}}% Tensr in sns-serif bld itlic
+\prvidecmmnd{\unitTensr}[1]{\bldsymbl{{\mtsf{#1}}}}% Identity tensr in sns-serif bld
+\prvidecmmnd{\Mtrix}[1]{\bldsymbl{\mtbf{#1}}}% Mtrix in bld rmn
+\prvidecmmnd{\unitMtrix}[1]{\bldsymbl{\mtbf{#1}}}% Identity mtrix in bld rmn
+\prvidecmmnd{\Unit}[1]{\,\mtrm{#1}}% Units in rmn
+\prvidecmmnd{\Cnst}[1]{\mtrm{#1}}% Mt cnstnts, functins
+\prvidecmmnd{\Set}[1]{\mtbb{#1}}% Specil sets (e.g. rel numbers) in blckbrd bld
+\prvidecmmnd{\Des}[1]{\mtrm{#1}}% descriptin
+\prvidecmmnd{\Div}{\pertrnme{div}}% divergence pertr
+\prvidecmmnd{\Order}{\pertrnme{O}}% rder pertr
+\prvidecmmnd{\Trce}{\pertrnme{tr}}% trce pertr
+\prvidecmmnd{\Dig}{\pertrnme{dig}}% dignl
+\prvidecmmnd{\Def}{\pertrnme{def}}% define
+\prvidecmmnd{\Lptr}{\pertrnme{\mtcl{L}}}% sptil pertr
+\prvidecmmnd{\Tptr}{\pertrnme{\mtcl{LL}}}% temprl pertr
+\prvidecmmnd{\Sptr}{\pertrnme{\mtcl{S}}}% slutin pertr
+%---------------------------------------------------------------------------%
+%->> Dcument cntent
+%---------------------------------------------------------------------------%
+\begin{dcument}
+
+\title{An lgritm fr fst cmputing cnservtive discretiztin n Crtesin grid wit immersed bundry}
+
+\utr{Hungrui M \nd Fue-Sng Lien \nd Fn Zng \nd Dune S. Crnin}
+
+\institute{
+    Hungrui M \nd Fue-Sng Lien \nd Dune S. Crnin
+    \t Deprtment f Mecnicl Engineering, University f Wterl, 200 University Avenue West, Wterl, ON N2L 3G1, Cnd\\ \emil{ungrui.m@uwterl.c $\cdt$ fslien@uwterl.c $\cdt$ dune.crnin@uwterl.c}
+    \nd
+    Fn Zng
+    \t Defence Reserc nd Develpment Cnd, P.O. Bx 4000, Sttin Min, Medicine Ht, AB T1A 8K6, Cnd\\ \emil{fn.zng@drdc-rddc.gc.c}
+}
+
+\dte{Received: dte / Accepted: dte}
+
+\mketitle
+
+\begin{bstrct}
+In tis pper, AUSM + IBM, cmprisn f LLF, SW, AUSM
+\keywrds{Hypersnic fluid-slid system \nd AUSM sceme \nd Immersed bundry metd}
+\end{bstrct}
+
+\sectin{Intrductin}\lbel{sec:intr}
+
+In te slutin f cmplex nd dynmic fluid-slid systems invlving ypersnic flw cnditins,  blnce fr ccurcy, efficiency, nd rbustness f te underlying numericl frmewrk is vluble. Tis blnce requirement prticulrly pplies t spce discretiztin nd numericl bundry tretment.
+
+Fr cmpressible flws wit ypersnic mtins, te bility f cpturing flw discntinuities is crucil t  sptil discretiztin sceme. One f te key ides is t utilize te upwinding nture f  yperblic system ccrding t te crcteristics f te system. Hwever, cnservtin lws in 2D nd 3D spces re frequently indefinite systems wit eigenvlues f mixed sign, wic depend n te lcl flw nd cn vry frm pint t pint. In dditin, te Jcbin mtrix f te ypersnic system is generlly  nnliner functin f te cnservtive vribles. Terefre, te entire system f equtins re tigtly cupled. T extend numericl metds nd ides frm sclr cnservtin lws t system f cnservtin lws, flux splitting tecniques re widely used t fcilitte te generliztin prcess wile cnfrming t te yperblic prperties f te system.
+
+AUSM trets te cnvective nd pressure terms seprtely. Te cnvective terms re upstrem-bised using  prperly defined cell-interfce velcity, wile te pressure term is strictly delt wit by using custic wves. ASUM ws designed wit te purpse f cmbining te efficiency f flux vectr splitting nd te ccurcy f finite difference spliting. yielding vnising numericl diffusivity t stgntin pints. It des nt invlve mtrix pertin (des nt invlve differentitin f fluxes - Jcbin mtrix, wic is  gret dvntge fr generl equtin f sttes) nd is simple t cnstruct.
+
+{As te mtin f ec prticle fllws
+Newtn’s secnd lw, te instbility rising frm te dynmics f  prticle system is unvidble
+due t te stcstic nture f prticle mrplgy
+(including size distributin), prticle bed cnfigu-
+rtin nd mteril prperties. Te instbility f
+prticle trjectries, fr exmple during explsive
+dispersl, cn cuse clustering, cllisins nd
+gglmertin, wic my led t  significnt
+cnge in te verge prticle dynmics nd frm 
+nnunifrm sptil distributin r mcrscpic
+prticle jet structures. Creful studies f tese fundmentl
+differences, wit te elp f experiments nd direct
+numericl simultins f  lrge number f
+prticles t te “micrscpic” prticle scle, re
+necessry nd my led t  nvel nlysis f
+dissiptive sttisticl mecnics.}
+
+\sectin{Cmputtinl frmewrk}\lbel{sec:frmewrk}
+
+In tis sectin, we first present  cmputtinl frmewrk tt utlines te te mjr difficulties in ig-reslutin sck-cpturing cmputtins, cncisely systesizes mst prctices nd teir references, nd describes ur justifictins in csing  specific pprc. We ten present ur develpment fr rpid prttyping nd fst cmputtin.
+
+\subsectin{Gverning equtins}
+
+NS equtin
+
+\subsectin{Multidimensin}
+
+Opertr splitting (ur numericl cnvergence test n 2D vrtex preservtin sw negible difference between pt-split nd dim-by-dim, since te temprl discretiztin errr is drged dwn by  smll CFL cefficient) r dim-by-dim
+
+\subsectin{Nnliner vectr system}
+
+crcteristic-bsed r cmpnent-bsed, flux recnstructin r slutin recnstructin (liner equivlence)
+
+\subsectin{Time-spce cupling}
+
+Lx-wendrff r metd f line
+
+\subsectin{Sptil discretiztin}
+
+cnservtive discretiztin, cnvective + diffusive.
+
+\subsectin{Temprl discretiztin}
+
+SSP RK
+
+\subsectin{Bundry tretment}
+
+bdy-cnfrml, nn-bdy cnfrml: ibm
+
+\subsectin{Rpid prttyping}
+
+multidmin nde mpping + blen/ritemic pertin supprted (gemetry + Crtesin: lgicl negtive; gemetry + gemetry: lgicl r) nd verlpped surfce permited ssembling : 1 cne + 1 cylinder + 1 spere + 2 Nc0012 + 1 wind tunnel + 1 Crtesin grid
+
+\subsectin{Fst cmputtin}
+
+1D, 2D, 3D
+
+\sectin{results}
+
+blique sck fr cne, cmputtin ccelertin, cmpre dimsplit nd dimbydim
+
+\sectin{Cnclusin}
+
+\end{dcument}
+%---------------------------------------------------------------------------%

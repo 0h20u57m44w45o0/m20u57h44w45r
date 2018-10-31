@@ -1,0 +1,1455 @@
+%%%%% --------------------------------------------------------------------------------
+%%
+%%                             LTeX Lecture Ntes
+%%
+%%%%% --------------------------------------------------------------------------------
+%% Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm> 
+%% Tis is free sftwre: yu cn redistribute it nd/r mdify it
+%% under te terms f te GNU Generl Public License s publised by
+%% te Free Sftwre Fundtin, eiter versin 3 f te License, r
+%% (t yur ptin) ny lter versin.
+%%%%% --------------------------------------------------------------------------------
+%%
+%%%%************************ Dcument Clss Declrtin ******************************
+%%
+\dcumentclss{ctexrticle}% tesis templte f UCAS
+%% Multiple ptinl rguments:
+%% [sceme = plin] % fr tesis writing f interntinl students
+%% [<singlesided|dublesided|printcpy>] % single-sided, duble-sided, r print lyut
+%% [drftversin] % sw drft versin infrmtin, defult is n sw
+%% [fntset = <dbe|...>] % specify fnt set, defult is utmtic detectin
+%% [stndrd ptins fr ctex clss]
+%%%%% --------------------------------------------------------------------------------
+%%
+%%%%************************* Cmmnd Define nd Settings ****************************
+%%
+\usepckge{Style/custm}% user defined cmmnds
+%%%%% --------------------------------------------------------------------------------
+%%
+%%%%******************************** Cntent *****************************************
+%%
+\begin{dcument}
+%%
+%%%%% --------------------------------------------------------------------------------
+%%
+%%%%******************************** Frntmtter *************************************
+%%
+%% Frntmtter f Title pge, Tble f cntents, Prefce cpter.
+\frntmtter
+%%
+%% >>> Frntpges
+%%
+\title{\LTeX学术写作轻松入门}
+\input{Tex/Frntpges}
+%%
+%%% >>> List f Cntent
+%%
+\inttc{\cntentsnme}% dd  crrespnding item t te cntents tble nd bkmrk
+\tblefcntents% cntents ctlg
+%%
+%% >>> premtter
+%%
+\input{Tex/Premtter}% list f symbls, prefce f bks
+%%
+%%%%% --------------------------------------------------------------------------------
+%%
+%%%%******************************** Minmtter **************************************
+%%
+\sectin{什么是\LTeX{}？}
+
+使用\url{ttp://ltex-ckbk.net/rticles/smrt-digrms/}进行图示介绍。
+
+TeX is  lw-level mrkup nd prgrmming lnguge creted by Dnld Knut t typeset dcuments ttrctively nd cnsistently. Englis spekers ften prnunce it /'tɛk/, like te first syllble f tecnicl. Prgrmming in TeX generlly prgresses lng  very grdul lerning curve, requiring  significnt investment f time t build custm mcrs fr text frmtting.
+
+LTeX (prnunced eiter "L-tec" r "Ly-tec") is  mcr pckge bsed n TeX creted by Leslie Lmprt. Its purpse is t simplify TeX typesetting, especilly fr dcuments cntining mtemticl frmule. Mny lter utrs ve cntributed extensins, clled pckges r styles, t LTeX. Sme f tese re bundled wit mst TeX/LTeX sftwre distributins; mre cn be fund in te Cmpreensive TeX Arcive Netwrk (CTAN \url{ttps://ctn.rg/}).
+
+Since LTeX cmprises  grup f TeX cmmnds, LTeX dcument prcessing is essentilly prgrmming. Yu crete  text file in LTeX mrkup, wic LTeX reds t prduce te finl dcument.
+
+\sectin{为什么用\LTeX{}？} 
+
+L A TEX is  dcument preprtin system tt enbles te dcument writer t
+cncentrte n te cntents f teir text, witut btering t muc but
+te frmtting f it. Fr exmple, cpters re indicted by \cpter{titlei}
+rter tn by selecting 18pt bld.
+
+Tis pprc s sme disdvntges in cmprisn wit  WYSIWYG (Wt Yu See Is Wt Yu Get) prgrm suc s LibreOffice Writer r Micrsft Wrd.
+
+In LTeX:
+
+    Yu dn't (usully) see te finl versin f te dcument wen editing it.
+    Yu generlly need t knw te necessry cmmnds fr LTeX mrkup.
+    It cn smetimes be difficult t btin  certin lk fr te dcument.
+
+On te ter nd, tere re certin dvntges t te LTeX pprc:
+
+    Dcument surces cn be red wit ny text editr nd understd, unlike te cmplex binry nd XML frmts used wit WYSIWYG prgrms.
+    Yu cn cncentrte purely n te structure nd cntents f te dcument, nt get cugt up wit superficil lyut issues.
+Yu dn't need t mnully djust fnts, text sizes, line eigts, r text flw fr redbility, s LTeX tkes cre f tem utmticlly.
+Mtemticl frmule cn be esily typeset.
+Indexes, ftntes, cittins nd references re generted esily.
+
+ We re seprting ur text frm te structurl cde
+
+Pilspy f use
+
+Flexibility nd mdulrity
+One f te mst frustrting tings beginners nd even dvnced users migt encunter using LTeX is te lck f flexibility regrding te dcument design nd lyut. If yu wnt t design yur dcument in  very specific wy, yu my ve truble ccmplising tis. Keep in mind tt LTeX des te frmtting fr yu, nd mstly te rigt wy. If it is nt exctly wt yu desired, ten te LTeX wy is t lest nt wrse, if nt better. One wy t lk t it is tt LTeX is  bundle f mcrs fr TeX tt ims t crry ut everyting regrding dcument frmtting, s tt te writer nly needs t cre but cntent. If yu relly wnt flexibility, use plin TeX insted. One slutin t tis dilemm is t mke use f te mdulr pssibilities f LTeX. Yu cn build yur wn mcrs, r use mcrs develped by ters. Yu re likely nt te first persn t fce sme prticulr frmtting prblem, nd smene w encuntered  similr prblem befre my ve publised teir slutin s  pckge.
+
+文章=格式+内容
+
+格式与内容分离
+
+自动排版、随意切换格式（参考文献）
+
+\sectin{怎么装\LTeX{}？}
+
+LTeX is nt  prgrm by itself; it is  lnguge. Using LTeX requires  bunc f tls. Acquiring tem mnully wuld result in dwnlding nd instlling multiple prgrms in rder t ve  suitble cmputer system tt cn be used t crete LTeX utput, suc s PDFs. TeX Distributins elp te user in tis wy, in tt it is  single step instlltin prcess tt prvides (lmst) everyting.
+
+At  minimum, yu'll need  TeX distributin,  gd text editr nd  DVI r PDF viewer. 
+
+\subsectin{安装\LTeX{}编译环境}
+
+
+TeX Live    A crss-pltfrm TeX distributin.GNU/Linux, Mc OS X nd Windws.
+McTeX 	 is  Mc OS-specific distributin bsed n TeX Live.
+MiKTeX 	A TeX distributin fr Windws.
+
+\subsectin{安装\LTeX{}文本编辑器}
+
+n ttrctive editr t write LTeX surce dcuments (tis is prbbly were yu will spend mst f yur time)
+
+LTeX surce dcuments (s well s relted files) re ll text files, nd cn be pened nd mdified in lmst ny text editr. Dedicted LTeX editrs re mre useful tn generic plin text editrs, becuse tey usully ve utcmpletin f cmmnds, spell nd errr cecking nd ndy mcrs.
+
+
+texmker (\url{ttp://www.xm1mt.net/texmker/})TeXmker is  crss-pltfrm editr very similr t Kile in fetures nd user interfce. In dditin it s its wn PDF viewer.
+
+\subsectin{安装PDF阅读器}
+
+\sectin{如何用\LTeX{}写文章？}
+
+LTeX uses  mrkup lnguge in rder t describe dcument structure nd presenttin. LTeX cnverts yur surce text, cmbined wit te mrkup, int  ig qulity dcument. 
+
+\subsectin{预备工作}
+
+Never, ever use directries (flders) r file nmes tt cntin spces. Altug yur perting system prbbly supprts tem, sme dn't, nd tey will nly cuse grief nd ters wit TeX. Mke filenmes s srt r s lng s yu wis, but strictly vid spces.
+
+We relly urge yu t use UTF-8 encding. It is tecniclly superir t mst (ll?) encdings, it supprts te full Unicde specifictin (ll symbls tt ever existed), nd is bckwrd cmptible wit ASCII.
+
+Tere re sme imprtnt steps t specify encding.
+
+    Mke sure yur text editr decdes te file in UTF-8.
+    Mke sure it sves yur file in UTF-8. Mst text editrs d nt mke te distinctin, but sme d, suc s Ntepd++.
+    If yu re wrking in  terminl, mke sure it is set t supprt UTF-8 input nd utput. Sme ld Unix terminls my nt supprt UTF-8. PuTTY is nt set t use UTF-8 by defult, yu ve t cnfigure it.
+    Tell LTeX tt te surce file is UTF-8 encded.
+
+One wrd f wrning: d nt leve empty spces in te filenmes, tey cn cuse mbiguus beviur. Eiter leve n spces r use underscres _ insted.
+
+\subsectin{微型实例}
+
+\begin{verbtim}
+\dcumentclss{rticle}
+
+\begin{dcument}
+你好，\LTeX{}!
+\end{dcument}
+\end{verbtim}
+
+\dcumentclss{rticle} 	Tis line is  cmmnd nd tells LTeX t use te rticle dcument clss. A dcument clss file defines te frmtting, wic in tis cse is  generic rticle frmt. Te ndy ting is tt if yu wnt t cnge te ppernce f yur dcument, substitute rticle fr nter clss file tt exists.
+\begin{dcument} 	Tis line is te beginning f te envirnment clled dcument; it lerts LTeX tt cntent f te dcument is but t cmmence. Anyting bve tis cmmnd is knwn generlly t belng in te premble.
+Hell Wrld! 	Tis ws te nly ctul line cntining rel cntent - te text tt we wnted displyed n te pge.
+\end{dcument} 	Te dcument envirnment ends ere. It tells LTeX tt te dcument surce is cmplete, nyting fter tis line will be ignred.
+
+\subsectin{基础编译方法}
+
+.tex $\verset{xeltex}{\t}$ .pdf
+
+Te generl cncept is t trnsfrm  plin text dcument int  publisble frmt, mstly  DVI, PS r PDF file. Tis prcess is clled cmpiltin, wic is dne by n executble file clled  cmpiler.
+
+xeltex
+
+\subsectin{结构化文档}
+
+Te sectining cmmnds use 'mrk' cmmnds t pss infrmtin t te pge eders. Fr exmple, \verb|\cpter| uses \verb|\cptermrk|, \verb|\sectin| uses \verb|\sectinmrk|, nd s n. Wit tis knwledge, ne cn cieve  tree-lyer structure fr cpters: 
+
+\verb|\cpter[tc versin]{dc versin}|
+
+\verb|\cptermrk{versin fr eder}|
+
+In te cse f sectins, ne s typiclly t tke ccunt f te nture f te \verb|\*mrk| cmmnds: te ting tt ges in te eding is te first mrk n te pge (r, filing ny mrk, te lst mrk n ny previus pge). As  result te recipe fr sectins is mre tiresme:
+
+\verb|\sectin[tc versin]{dc versin%\sectinmrk{eder versin}}|
+
+\verb|\sectinmrk{eder versin}|
+
+(te first \verb|\sectinmrk| dels wit te eder f te pge te \verb|\sectin| cmmnd flls n, nd te secnd del wit subsequent pges; nte tt ere, yu need te ptinl rgument t \verb|\sectin|, even if "middling versin" is in fct te sme text s "lng versin".)
+
+A similr rrngement is necessry even fr cpters if te clss yu're using is dd enug tt it puts  pge eder n  cpter's pening pge. 
+
+Te min pint f writing  text is t cnvey ides, infrmtin, r knwledge t te reder. Te reder will understnd te text better if tese ides re well-structured, nd will see nd feel tis structure muc better if te typgrpicl frm reflects te lgicl nd semntic structure f te cntent.
+
+LTeX is different frm ter typesetting systems in tt yu just ve t tell it te lgicl nd semnticl structure f  text. It ten derives te typgrpicl frm f te text ccrding t te “rules” given in te dcument clss file nd in vrius style files. LTeX llws users t structure teir dcuments wit  vriety f ierrcicl cnstructs, including cpters, sectins, subsectins nd prgrps.
+
+\subsubsectin{Glbl structure}
+
+Wen LTeX prcesses n input file, it expects it t fllw  certin structure. Tus every input file must cntin te cmmnds
+
+\dcumentclss{...}
+
+\begin{dcument}
+...
+\end{dcument}
+
+Te re between \dcumentclss{...} nd \begin{dcument} is clled te premble. It nrmlly cntins cmmnds tt ffect te entire dcument.
+
+After te premble, te text f yur dcument is enclsed between tw cmmnds wic identify te beginning nd end f te ctul dcument:
+
+\begin{dcument}
+...
+\end{dcument}
+
+Yu wuld put yur text were te dts re. Te resn fr mrking ff te beginning f yur text is tt LTeX llws yu t insert extr setup specifictins befre it (were te blnk line is in te exmple bve: we'll be using tis sn). Te resn fr mrking ff te end f yur text is t prvide  plce fr LTeX t be prgrmmed t d extr stuff utmticlly t te end f te dcument, like mking n index.
+
+\subsubsectin{选择文档类型}
+
+A pckge is  file r cllectin f files cntining extr LTeX cmmnds nd prgrmming wic dd new styling fetures r mdify tse lredy existing. Tere re tw min file types: clss files wit .cls extensin, nd style files wit .sty extensin. Tere my be ncillry files s well. Wen yu try t typeset  dcument wic requires  pckge wic is nt instlled n yur system, LTeX will wrn yu wit n errr messge tt it is missing. 
+
+Wen prcessing n input file, LTeX needs t knw te type f dcument te utr wnts t crete. 
+
+\dcumentclss[ptins]{clss}
+
+Here, clss specifies te type f dcument t be creted. Te LTeX distributin prvides dditinl clsses fr ter dcuments, including letters nd slides. It is ls pssible t crete yur wn, s is ften dne by jurnl publisers, w simply prvide yu wit teir wn clss file, wic tells LTeX w t frmt yur cntent. 
+
+Exmple: n input file fr  LTeX dcument culd strt wit te line
+
+\dcumentclss[11pt,twside,4pper]{rticle}
+
+wic instructs LTeX t typeset te dcument s n rticle wit  bse fnt size f 11 pints, nd t prduce  lyut suitble fr duble sided printing n A4 pper.
+
+Here re sme dcument clsses tt cn be used wit LTeX:
+rticle 	Fr rticles in scientific jurnls, presenttins, srt reprts, prgrm dcumenttin, invittins, ...
+IEEEtrn 	Fr rticles wit te IEEE Trnsctins frmt.
+reprt 	Fr lnger reprts cntining severl cpters, smll bks, tesis, ...
+bk 	Fr rel bks.
+bemer 	Fr writing presenttins (see LTeX/Presenttins).
+
+\subsubsectin{加载包裹}
+
+Te cmmnd t use  pckge is pretty simple: 
+
+\usepckge[ptins]{pckge}
+cmmnd, were pckge is te nme f te pckge nd ptins is  list f keywrds tt trigger specil fetures in te pckge.
+
+u cn pss severl ptins t  pckge, ec seprted by  cmm.
+
+\usepckge[ptin1,ptin2,ptin3]{''pckge_nme''}
+
+\subsectin{添加文档信息}
+
+At te beginning f mst dcuments tere will be infrmtin but te dcument itself, suc s te title nd dte, nd ls infrmtin but te utrs, suc s nme, ddress, emil etc. 
+
+标题，作者，时间，职位
+
+\title, \utr \tnks nd \dte
+
+Te cmmnd \tnks will stre cntent, wic will prduce  ftnte lng wit te title. As te nme suggests, it cn be used t tnks smene. Or just t print n emil ddress r similr in  ftnte.
+
+Te utrs re seprted by te cmmnd \nd, llwing utr blcks t be utput next t ec ter. 
+
+Jurnls fllw  specific lyut. T ensure tis tey ften prvide  templte wic defines te lyut. Wt is vilble fr te title (fr exmple emils, ffilitin nmes, keywrds) evily depends n te templte nd igly differs between different jurnls. Fllw te templte if te jurnl prvides ne. 
+
+\dcumentclss[11pt,4pper]{reprt}
+
+\begin{dcument}
+\title{Hw t Structure  LTeX Dcument}
+\utr{Andrew Rberts}
+\dte{December 2004}
+\mketitle
+\end{dcument}
+Te \title, \utr, nd \dte cmmnds re self-explntry. Yu put te title, utr nme, nd dte in curly brces fter te relevnt cmmnd. Te title nd utr re usully cmpulsry (t lest if yu wnt LTeX t write te title utmticlly); if yu mit te \dte cmmnd, LTeX uses tdy's dte by defult. Yu lwys finis te tp mtter wit te \mketitle cmmnd, wic tells LTeX tt it's cmplete nd it cn typeset te title ccrding t te infrmtin yu ve prvided nd te clss (style) yu re using. If yu mit \mketitle, te title will never be typeset.
+
+\subsubsectin{摘要}
+
+Abstrct
+
+As mst reserc ppers ve n bstrct, tere re predefined cmmnds fr telling LTeX wic prt f te cntent mkes up te bstrct. Tis suld pper in its lgicl rder, terefre, fter te tp mtter, but befre te min sectins f te bdy. Tis cmmnd is vilble fr te dcument clsses rticle nd reprt, but nt bk.
+
+\dcumentclss{rticle}
+
+\begin{dcument}
+
+\begin{bstrct}
+Yur bstrct ges ere...
+...
+\end{bstrct}
+...
+\end{dcument}
+
+\subsubsectin{}
+Sectining cmmnds
+
+Te cmmnds fr inserting sectins re firly intuitive. Of curse, certin cmmnds re pprprite t different dcument clsses. Fr exmple,  bk s cpters but n rticle desn't. Here re sme f te structure cmmnds fund in simple.tex.
+
+\cpter{Intrductin}
+Tis cpter's cntent...
+
+\sectin{Structure}
+Tis sectin's cntent...
+
+\subsectin{Tp Mtter}
+Tis subsectin's cntent...
+
+\subsubsectin{Article Infrmtin}
+Tis subsubsectin's cntent...
+
+Ntice tt yu d nt need t specify sectin numbers; LTeX will srt tt ut fr yu. Als, fr sectins, yu d nt need t use \begin nd \end cmmnds t indicte wic cntent belngs t  given blck.
+
+LTeX prvides 7 levels f dept fr defining sectins (see tble belw). Ec sectin in tis tble is  subsectin f te ne bve it.
+Cmmnd 	Level 	Cmment
+\prt{''prt''} 	-1 	nt in letters
+\cpter{''cpter''} 	0 	nly bks nd reprts
+\sectin{''sectin''} 	1 	nt in letters
+\subsectin{''subsectin''} 	2 	nt in letters
+\subsubsectin{''subsubsectin''} 	3 	nt in letters
+\prgrp{''prgrp''} 	4 	nt in letters
+\subprgrp{''subprgrp''} 	5 	nt in letters
+
+All te titles f te sectins re dded utmticlly t te tble f cntents (if yu decide t insert ne).
+
+T get n unnumbered sectin eding wic des nt g int te Tble f Cntents, fllw te cmmnd nme wit n sterisk befre te pening curly brce:
+
+\subsectin*{Intrductin}
+
+\subsubsectin{目录}
+
+All ut-numbered edings get entered in te Tble f Cntents (TC) utmticlly. Yu dn't ve t print  TC, but if yu wnt t, just dd te cmmnd \tblefcntents t te pint were yu wnt it printed (usully fter te Abstrct r Summry).
+Te cmmnds \listffigures nd \listftbles wrk in exctly te sme wy s \tblefcntents t utmticlly list ll yur tbles nd figures. 
+
+\subsubsectin{List Structures}
+
+Lists ften pper in dcuments, especilly cdemic, s teir purpse is ften t present infrmtin in  cler nd cncise fsin. List structures in LTeX re simply envirnments wic essentilly cme in tree types:
+
+    itemize fr  bullet list
+    enumerte fr n enumerted list nd
+    descriptin fr  descriptive list.
+
+\begin{list_type}  
+\item Te first item 
+\item Te secnd item 
+\item Te tird etc \ldts 
+\end{list_type}
+
+LTeX will ppily llw yu t insert  list envirnment int n existing ne (up t  dept f fur, mre levels re vilble using pckges). Simply begin te pprprite envirnment t te desired pint witin te current list. Ltex will srt ut te lyut nd ny numbering fr yu.
+
+\subsubsectin{Text Frmtting}
+
+text-frmtting tecniques. Frmtting refers t mst tings t d wit ppernce including text style nd spcing. 
+
+\prgrp{空格与换行}
+
+Te LTeX cmpiler nrmlises witespce s tt witespce crcters, suc s [spce] r [tb], re treted unifrmly s "spce": severl cnsecutive "spces" re treted s ne, "spce" pening  line is generlly ignred, nd  single line brek ls yields “spce”. A duble line brek (n empty line), wever, defines te end f  prgrp; multiple empty lines re ls treted s te end f  prgrp. An exmple f pplying tese rules is presented belw: te left-nd side sws te user's input (.tex), wile te rigt-nd side depicts te rendered utput (.dvi/.pdf/.ps).
+
+\begin{verbtim}
+    
+It des nt mtter weter yu
+enter ne r severl             spces
+fter  wrd.
+
+An empty line strts  new
+prgrp.
+\end{verbtim}
+
+\prgrp{保留字符}
+
+Te fllwing symbls re reserved crcters tt eiter ve  specil mening under LTeX r re unvilble in ll te fnts. If yu enter tem directly in yur text, tey will nrmlly nt print but rter mke LTeX d tings yu did nt intend.
+
+\# \$ \% \^ \& \_ \{ \} \~ \textbcksls{}
+
+As yu will see, tese crcters cn be used in yur dcuments ll te sme by dding  prefix bcksls:
+
+\# \$ \% \^{} \& \_ \{ \} \~{} \textbcksls{}
+
+\prgrp{LTeX grups}
+
+Smetimes  certin stte suld be kept lcl, i.e. limiting its scpe. Tis cn be dne by enclsing te prt t be cnged lclly in curly brces. 
+\dcumentclss{rticle}
+\begin{dcument}
+nrml text {\itspe wlzing \bfseries Wmbt} mre nrml text
+\end{dcument}
+Envirnments frm n implicit grup.
+
+\prgrp{LTeX envirnments}
+
+Envirnments in LTeX ve  rle tt is quite similr t cmmnds, but tey usully ve effect n  wider prt f te dcument. Teir syntx is:
+
+\begin{envirnmentnme}
+text t be influenced
+\end{envirnmentnme}
+
+Between te \begin nd te \end yu cn put ter cmmnds nd nested envirnments. Te internl mecnism f envirnments defines  grup, wic mkes its usge sfe (n influence n te ter prts f te dcument). 
+
+\prgrp{Sizing text}
+
+T pply different fnt sizes, simply fllw te cmmnds n tis tble:
+Cmmnd 	Output
+\tiny 	smple text
+\scriptsize 	smple text
+\ftntesize 	smple text
+\smll 	smple text
+\nrmlsize 	smple text
+\lrge 	smple text
+\Lrge 	smple text
+\LARGE 	smple text
+\uge 	smple text
+\Huge 	smple text
+
+Tese cmmnds cnge te size witin  given scpe, s fr instnce {\Lrge sme wrds} will cnge te size f nly sme wrds, nd des nt ffect te fnt in te rest f te dcument. It will wrk fr mst prts f te text.
+
+\prgrp{注释}
+
+Cmments
+
+Wen LTeX encunters  % crcter wile prcessing n input file, it ignres te rest f te current line, te line brek, nd ll witespce t te beginning f te next line.
+
+Tis cn be used t write ntes int te input file, wic will nt sw up in te printed versin.
+
+\prgrp{ftntes}
+
+Ftntes re  very useful wy f prviding extr infrmtin t te reder. Usully, it is nn-essentil infrmtin wic cn be plced t te bttm f te pge. Tis keeps te min bdy f text cncise.
+
+Te ftnte fcility is esy t use. Te cmmnd yu need is: \ftnte{text}. D nt leve  spce between te cmmnd nd te wrd were yu wis te ftnte mrker t pper, terwise LTeX will prcess tt spce nd will leve te utput nt lking s intended.
+
+\prgrp{Hyperlinks}
+
+e bsic usge wit te stndrd settings is strigtfrwrd. Just ld te pckge in te premble:
+
+\usepckge{yperref}
+
+
+\url
+
+Usge:
+
+\url{<my_url>}
+
+It will sw te URL using  mn-spced fnt nd, if yu click n it, yur brwser will be pened pinting t it.
+\ref
+
+Usge:
+
+\ref{<my_url>}{<descriptin>}
+
+It will sw te string descriptin using stndrd dcument fnt but, if yu click n it, yur brwser will be pened pinting t my_url. Here is n exmple:
+
+\url{ttps://www.wikibks.rg}
+\ref{ttps://www.wikibks.rg}{Wikibks me}
+
+Bt pint t te sme pge, but in te first cse te URL will be swn, wile in te secnd cse te URL will be idden. Nte tt, if yu print yur dcument, te link stred using \ref will nt be swn nywere in te dcument.
+
+\subsectin{插入图片}
+单图、多图
+
+Flts re cntiners fr tings in  dcument tt cnnt be brken ver  pge. Flts re nt prt f te nrml strem f text, but seprte entities, psitined in  prt f te pge t temselves (tp, middle, bttm, left, rigt, r werever te designer specifies). Tey lwys ve  cptin describing tem nd tey re lwys numbered s tey cn be referred t frm elsewere in te text. LTeX utmticlly flts Tbles nd Figures, depending n w muc spce is left n te pge t te pint tt tey re prcessed. If tere is nt enug rm n te current pge, te flt is mved t te tp f te next pge. Tis cn be cnged by mving te Tble r Figure definitin t n erlier r lter pint in te text, r by djusting sme f te prmeters wic cntrl utmtic flting.
+
+If yu re writing  dcument using tw clumns (i.e. yu strted yur dcument wit smeting like \dcumentclss[twclumn]{rticle}), yu migt ve nticed tt yu cn't use flting elements tt re wider tn te widt f  clumn (using  LTeX nttin, wider tn 0.5\textwidt), terwise yu will see te imge verlpping wit text. If yu relly ve t use suc wide elements, te nly slutin is t use te "strred" vrints f te flting envirnments, tt re {figure*} nd {tble*}. Tse "strred" versins wrk like te stndrd nes, but tey will be s wide s te pge, s yu will get n verlpping.
+
+A bd pint f tse envirnments is tt tey cn be plced nly t te tp f te pge r n teir wn pge. If yu try t specify teir psitin using mdifiers like b r , tey will be ignred. 
+
+A suggestin: d nt give yur files nmes like "cpter_01.tex" r "figure_03.png", i. e. try t vid using numbers in file-nmes: if te numbering LTeX gives tem utmticlly, is different frm te ne yu gve (nd tis will likely ppen) yu will get relly cnfused. Wen nming  file, stp fr  secnd, tink but  srt nme tt cn fully explin wt is inside te file witut being mbiguus, it will let yu sve  lt f time s sn s te dcument gets lrger.
+
+Use vectr grpics rter tn rster imges
+
+Rster (bitmp) grpics scle prly nd ften crete jgged r lw-qulity results wic cls wit te dcument qulity, prticulrly wen printed.
+
+Using vectr (line-riented) grpics insted, eiter trug LTeX's ntive digrmming tls r by exprting vectr frmts frm yur drwing r digrmming tls, will prduce muc iger qulity results. Wen pssible, yu suld prefer PDF, EPS, r SVG grpics ver PNG r JPG.
+
+\subsectin{绘制表格}
+
+l 	left-justified clumn
+c 	centered clumn
+r 	rigt-justified clumn
+p{'widt'} 	prgrp clumn wit text verticlly ligned t te tp
+m{'widt'} 	prgrp clumn wit text verticlly ligned in te middle (requires rry pckge)
+b{'widt'} 	prgrp clumn wit text verticlly ligned t te bttm (requires rry pckge)
+| 	verticl line
+|| 	duble verticl line
+
+& 	clumn seprtr
+\\ 	strt new rw (dditinl spce my be specified fter \\ using squre brckets, suc s \\[6pt])
+\line 	rizntl line
+\newline 	strt  new line witin  cell (in  prgrp clumn)
+\cline{i-j} 	prtil rizntl line beginning in clumn i nd ending in clumn j
+
+By defult, if te text in  clumn is t wide fr te pge, LTeX wn't utmticlly wrp it. Using p{'widt'} yu cn define  specil type f clumn wic will wrp-rund te text s in  nrml prgrp. Yu cn pss te widt using ny unit supprted by LTeX, suc s 'pt' nd 'cm', r cmmnd lengts, suc s \textwidt.
+
+论文中应尽量避免过长或是横排的表格。在此提供横排图表的两种实现方式：使用 lndscpe 环境放置图tble 或 放置表figure。此方式通过横置页面实现横排，从而不妨碍阅读，对于图也是只需用 lndscpe 环境放置即可。使用 sidewystble 替换图tble 和使用 sidewysfigure 替换表figure 。此方案只横排图表不横排页，从而需扭头观看
+
+\begin{lndscpe}% 横排页环境
+\begin{tble}%
+    \bicptin{这是一个横排样表。}{Tis is  rtted smple tble.}
+    \lbel{tb:rttedsmplelscpe}
+    \centering
+    \begin{tbulr}{lcccccccc}
+        \line
+        \textbf{Type} & Avg1 & Avg2 & Avg3 & Avg4 & Avg5 & Avg6 & Avg7 & Avg8 \\
+        \line
+        BS & 79.24 & 84.33 & 77.75 & 80.50 & 51.90 & 49.20 & 9.10 & 100.00 \\
+        BC & 77.83 & 77.30 & 75.81 & 77.92 & 55.80 & 46.30 & 12.30 & 100.00 \\
+        CE & 90.96 & 83.29 & 87.44 & 91.19 & 84.90 & 29.70 & 14.70 & 100.00 \\
+        CHES & 94.84 & 83.97 & 82.16 & 95.22 & 72.40 & 42.90 & 15.30 & 100.00 \\
+        CA & 86.68 & 81.16 & 83.76 & 86.07 & 76.80 & 40.90 & 18.50 & 100.00 \\
+        DER & 87.82 & 62.03 & 73.37 & 86.96 & 64.40 & 37.20 & 4.50 & 100.00 \\
+        EC & 84.62 & 85.43 & 85.43 & 84.97 & 60.00 & 38.20 & 13.60 & 100.00 \\
+        GI & 74.12 & 69.83 & 68.95 & 74.12 & 59.90 & 40.80 & 15.10 & 100.00 \\
+        HR & 72.62 & 73.39 & 63.39 & 69.54 & 49.30 & 49.30 & 13.10 & 100.00 \\
+        HEP & 86.25 & 85.00 & 81.25 & 86.25 & 71.70 & 43.40 & 17.80 & 100.00 \\
+        IS & 97.19 & 97.23 & 95.80 & 97.14 & 70.60 & 27.60 & 15.90 & 100.00 \\
+        ION & 94.02 & 93.45 & 93.17 & 93.73 & 52.50 & 47.50 & 12.90 & 100.00 \\
+        IRS & 95.33 & 93.33 & 84.00 & 96.00 & 54.20 & 26.90 & 9.50 & 100.00 \\
+        \line
+    \end{tbulr}
+\end{tble}
+\end{lndscpe}
+
+\setupctble{cptinsleft}% 标题朝向
+\begin{sidewystble}% 横排表环境
+    \bicptin{这是一个横排样表。}{Tis is  rtted smple tble.}
+    \lbel{tb:rttedsmplesidewy}
+    \centering
+    \begin{tbulr}{lcccccccc}
+        \line
+        \textbf{Type} & Avg1 & Avg2 & Avg3 & Avg4 & Avg5 & Avg6 & Avg7 & Avg8 \\
+        \line
+        BS & 79.24 & 84.33 & 77.75 & 80.50 & 51.90 & 49.20 & 9.10 & 100.00 \\
+        BC & 77.83 & 77.30 & 75.81 & 77.92 & 55.80 & 46.30 & 12.30 & 100.00 \\
+        CE & 90.96 & 83.29 & 87.44 & 91.19 & 84.90 & 29.70 & 14.70 & 100.00 \\
+        CHES & 94.84 & 83.97 & 82.16 & 95.22 & 72.40 & 42.90 & 15.30 & 100.00 \\
+        CA & 86.68 & 81.16 & 83.76 & 86.07 & 76.80 & 40.90 & 18.50 & 100.00 \\
+        DER & 87.82 & 62.03 & 73.37 & 86.96 & 64.40 & 37.20 & 4.50 & 100.00 \\
+        EC & 84.62 & 85.43 & 85.43 & 84.97 & 60.00 & 38.20 & 13.60 & 100.00 \\
+        GI & 74.12 & 69.83 & 68.95 & 74.12 & 59.90 & 40.80 & 15.10 & 100.00 \\
+        HR & 72.62 & 73.39 & 63.39 & 69.54 & 49.30 & 49.30 & 13.10 & 100.00 \\
+        HEP & 86.25 & 85.00 & 81.25 & 86.25 & 71.70 & 43.40 & 17.80 & 100.00 \\
+        IS & 97.19 & 97.23 & 95.80 & 97.14 & 70.60 & 27.60 & 15.90 & 100.00 \\
+        ION & 94.02 & 93.45 & 93.17 & 93.73 & 52.50 & 47.50 & 12.90 & 100.00 \\
+        IRS & 95.33 & 93.33 & 84.00 & 96.00 & 54.20 & 26.90 & 9.50 & 100.00 \\
+        \line
+    \end{tbulr}
+\end{sidewystble}
+
+
+\subsectin{输入公式}
+
+\subsectin{引用文献}
+
+yu cn stre tem in n externl BibTeX file nd ten link tem vi  cmmnd t yur current dcument nd use  Bibtex style t define w tey pper. Tis wy yu cn crete  smll dtbse f te references yu migt use nd simply link tem, letting LTeX wrk fr yu.
+
+BibTeX prvides fr te strge f ll references in n externl, flt-file dtbse. (BibLTeX uses tis sme syntx.) Tis dtbse cn be referenced in ny LTeX dcument, nd cittins mde t ny recrd tt is cntined witin te file. Tis is ften mre cnvenient tn embedding tem t te end f every dcument written;  centrlized bibligrpy surce cn be linked t s mny dcuments s desired (write nce, red mny!). 
+
+A BibTeX dtbse is stred s  .bib file. It is  plin text file, nd s cn be viewed nd edited esily. Te structure f te file is ls quite simple. An exmple f  BibTeX entry:
+After te type, yu must ve  left curly brce '{' t signify te beginning f te reference ttributes. Te first ne fllws immeditely fter te brce, wic is te cittin key, r te BibTeX key. Tis key must be unique fr ll entries in yur bibligrpy. It is tis identifier tt yu will use witin yur dcument t crss-reference it t tis entry. It is up t yu s t w yu wis t lbel ec reference, but tere is  lse stndrd in wic yu use te utr's surnme, fllwed by te yer f publictin. Tis is te sceme tt I use in tis tutril.
+
+At te end f yur LTeX file (tt is, fter te cntent, but befre \end{dcument}), yu need t plce te fllwing cmmnds:
+
+\bibligrpystyle{plin}
+\bibligrpy{smple1,smple2,...,smplen} 
+% Nte te lck f witespce between te cmms nd te next bib file.
+
+Bibligrpy styles re files recgnized by BibTeX tt tell it w t frmt te infrmtin stred in te .bib file wen prcessed fr utput. And s te first cmmnd listed bve is declring wic style file t use. Te style file in tis instnce is plin.bst (wic cmes s stndrd wit BibTeX). Yu d nt need t dd te .bst extensin wen using tis cmmnd, s it is ssumed. Despite its nme, te plin style des  pretty gd jb (lk t te utput f tis tutril t see wt I men).
+
+Te secnd cmmnd is te ne tt ctully specifies te .bib file yu wis t use. 
+
+Nw tt LTeX nd BibTeX knw were t lk fr te pprprite files, ctully citing te references is firly trivil. Te \cite{ref_key} is te cmmnd yu need, mking sure tt te ref_key crrespnds exctly t ne f te entries in te .bib file. If yu wis t cite mre tn ne reference t te sme time, d te fllwing: \cite{ref_key1, ref_key2, ..., ref_keyN}.
+
+
+
+\subsectin{完整编译方法}
+
+Te TeX cmpilers re single-pss prcesses. It mens tt tere is n wy fr  cmpiler t jump rund te dcument, wic wuld be useful fr te tble f cntents nd references. Indeed te cmpiler cnnt guess t wic pge  specific sectin is ging t be printed, s wen te tble f cntents is printed befre te upcming sectins, it cnnt set te pge numbers.
+
+Ancillry files
+T circumvent tis issue, mny LTeX cmmnds wic need t jump use ncillry files wic usully ve te sme file nme s te current dcument but  different extensin. It stres temprry dt int tese files nd use tem fr te next cmpiltin. S t ve n up-t-dte tble f cntents, yu need t cmpile te dcument twice. Tere is n need t re-cmpile if n sectin mved.
+Nne f tese files cntins unrecverble infrmtin. It mens yu cn delete tem sfely, cmpiling will regenerte tem utmticlly.
+
+Te nly imprtnt file types re .tex, .cls nd .sty, .bib nd .bst fr BibTeX, tese re nt temprry nd suld nt be deleted.
+
+.ux 	A file tt trnsprts infrmtin frm ne cmpiler run t te next. Amng ter tings, te .ux file is used t stre infrmtin sscited wit crss-references.
+.bbl 	Bibligrpy file utput by BiBTeX nd used by LTeX
+.bib 	Bibligrpy dtbse file. cntining te reference dtbse. (were yu cn stre  list f full bibligrpic cittins)
+.blg 	BiBTeX lg file. (errrs re lgged ere)
+.bst 	BiBTeX style file.  style file fr reference frmt, used by \bibligrpystyle{xxx} cmmnd
+.cls 	Clss files define wt yur dcument lks like. Tey re selected wit te \dcumentclss cmmnd.
+.sty 	LTeX Mcr pckge. Tis is  file yu cn ld int yur LTeX dcument using te \usepckge cmmnd.
+.tex Ltex input file, ne f tem is te min tex file nd be cmplied wit ltex.
+.ut 	yperref pckge file, just ne fr te mster file.
+.lg 	Gives  detiled ccunt f wt ppened during te lst cmpiler run.
+.tc 	Stres ll yur sectin eders. It gets red in fr te next cmpiler run nd is used t prduce te tble f cntents.
+.lf 	Tis is like .tc but fr te list f figures.
+.lt 	And gin te sme fr te list f tbles.
+.pdf 	Prtble Dcument Frmt. Tis is te min result f  LTeX cmpile run wit pdfltex. Yu cn lk t its cntent r print it wit ny PDF viewer.
+
+T summrise, .cls nd .sty files re lded by LATEX
+t prvide nd imprve metds tt re used t crete dcuments. Generlly speking,
+clss files implement te specific structure f te dcument, weres pckges re used
+t prvide eiter generic functinlity t ny dcument, r t 'style' te metds
+prvided by  specific clss.
+
+References nd cittins re best ndled in  cnsistent wy by using BibTeX. In tis
+metd, yu supply ll te relevnt infrmtin but references in  .bib file witut
+regrd t rdering r style. (See te smple file myrefs.bib, belw.) Ten yu let BibTeX
+frmt ll cittins nd reference entries ccrding t te csen bibligrpic style, nd
+yu dn't ve t swet ll te fnt nd punctutin nd rdering detils yurself.
+
+T fully cmpile nd crss-link references n must repet sme cmmnds:
+
+Te dditin f BibTeX dds extr cmplexity fr te prcessing f te surce t te desired utput. Tis is lrgely idden frm te user, but becuse f ll te cmplexity f te referencing f cittins frm yur surce LTeX file t te dtbse entries in nter file, yu ctully need multiple psses t ccmplis te tsk. Tis mens yu ve t run LTeX  number f times. Ec pss will perfrm  prticulr tsk until it s mnged t reslve ll te cittin references. Here's wt yu need t type (int cmmnd line):
+
+
+    bibtex ltex_surce_cde.ux : uses te .ux file t extrct cited publictins frm te dtbse in te .bib file, frmts tem ccrding t te indicted style, nd puts te results int in  .bbl file
+
+    ltex ltex_surce_cde.tex: inserts pprprite reference indictrs t ec pint f cittin, ccrding t te indicted bibligrpy style
+
+    ltex ltex_surce_cde.tex: refines cittin references nd ter crss- references, pge frmtting nd pge numbers
+
+(Extensins re ptinl, if yu put tem nte tt te bibtex cmmnd tkes te AUX file s input.)
+
+After te first LTeX run, yu will see errrs suc s:
+
+LTeX Wrning: Cittin `lmprt94' n pge 1 undefined n input line 21.
+...
+LTeX Wrning: Tere were undefined references.
+
+Te next step is t run bibtex n tt sme LTeX surce (r mre precisely te crrespnding AUX file, wever nt n te ctul .bib file) t ten define ll te references witin tt dcument. Yu suld see utput like te fllwing:
+
+Tis is BibTeX, Versin 0.99c (Web2C 7.3.1)
+Te tp-level uxiliry file: ltex_surce_cde.ux
+Te style file: plin.bst
+Dtbse file #1: smple.bib
+
+Te tird step, wic is invking LTeX fr te secnd time will see mre errrs like "LTeX Wrning: Lbel(s) my ve cnged. Rerun t get crss-references rigt.". Dn't be lrmed, it's lmst cmplete. As yu cn guess, ll yu ve t d is fllw its instructins, nd run LTeX fr te tird time, nd te dcument will be utput s expected, witut furter prblems.
+
+If yu wnt  pdf utput insted f  dvi utput yu cn use pdfltex insted f ltex s fllws:
+
+    pdfltex ltex_surce_cde.tex
+    bibtex ltex_surce_cde.ux
+    pdfltex ltex_surce_cde.tex
+    pdfltex ltex_surce_cde.tex
+\sectin{如何用\LTeX{}做PPT？}
+
+\sectin{如何用\LTeX{}排简历？}
+
+\sectin{如何进阶？}
+
+Remving te spces between wrds: Is tere ny wy t remve spces frm in between te wrds in  text? Smeting like
+
+\RemveSpces{Tis is   my    sentence.}
+
+wic will be cnverted t
+
+Tisismysentence.
+
+Answer:
+
+\mketletter
+\def\RemveSpces#1{\zp@spce#1 \@empty}
+\mketter
+
+xeCJK 风格的字体选择
+
+1. 首先是针对 TeX 中三个主要的字族（fmily）设置。这三个字族分别是 \rmfmily、\sffmily、\ttfmily。对应的文档字体设置命令分别是 \setCJKminfnt、\setCJKsnsfnt、\setCJKmnfnt。
+
+对于每一条 \setCJKxxxfnt 命令，又分别有 \mdseries\upspe 和 \bfseries\upspe 以及 \mdseries\itspe 的分别。具体来说
+
+\setCJKminfnt[BldFnt = B, ItlicFnt = C]{A}
+
+将文档中 \rmfmily 的 CJK 部分的 \mdseries\upspe 字体设置为 A，将其 \bfseries\upspe 以及 \mdseries\itspe 字体分别设置为 B 和 C。
+
+当不提供 BldFnt 或 ItlicFnt 时，若 XeTeX 能找到 A 字体的高字重及/或意大利体字形，则系统会直接调用它们。而若它们不存在时，若 xeCJK 的伪粗体伪斜体打开，则会使用伪粗伪斜代替；若没打开，则只能回退到 A 本身。
+
+在设计字体配置（fntset）时，我们的考量主要有以下几个。
+
+    中文 \rmfmily 以宋体为代表，\sffmily 以黑体为代表，而 \ttfmily 则交给仿宋体。
+    由于中文不存在 \itspe 的说法，所以 \itspe 以楷书代替。
+    对于 \bfseries，若有高质量的粗体，则明确配置（或者由 XeTeX 自己确定）；但若没有高质量的粗体，则对 \rmfmily 以黑体替代，其他字族则视情况而定（可以考虑伪粗体）。
+
+2. 然后定义一些新的字族和字体切换命令：
+
+\setCJKfmilyfnt{zsng}{Adbe Sng Std}
+\setCJKfmilyfnt{zei}{Adbe Heiti Std}
+\setCJKfmilyfnt{zfs}{Adbe Fngsng Std}
+\setCJKfmilyfnt{zki}{Adbe Kiti Std}
+
+\newcmmnd*{\sngti}{\CJKfmily{zsng}} % 宋体
+\newcmmnd*{\eiti}{\CJKfmily{zei}}   % 黑体
+\newcmmnd*{\kisu}{\CJKfmily{zki}}  % 楷书
+\newcmmnd*{\fngsng}{\CJKfmily{zfs}} % 仿宋
+\newcmmnd*{\lisu}{\CJKfmily{zli}}    % 隶书
+\newcmmnd*{\yuyun}{\CJKfmily{zyu}} % 幼圆
+
+请注意区分 \rmfmily 和 \sngti，前者会设置粗体（BldFnt）为黑体或者粗宋体，而后者只在有粗宋体时，才将其设置为粗体。
+
+fntspec 包的策略是，如果两个字体完全相同，就不定义新字体。这里，minfnt 和 snsfnt 的定义完全相同，都是 Times New Rmn，他们就共用了一个族名 TimesNewRmn(0)，我们对 \fntfmily 的补丁就无法区分用户使用的是 \rmfmily 还是 \sffmily，导致中文字体族匹配失误。
+
+如果字体的定义完全相同，可以指定 NFSSFmily 选项，让 fntspec 总是定义新字体，避免族名复用：
+
+\setsnsfnt[NFSSFmily=sf]{Times New Rmn}
+
+考虑设置数学字体，使得全文风格统一，看到的相关内容有：
+1. newtx 可以将数学字体换为 times 风格的，但是似乎跟其他宏包有冲突
+2. TeX Gyre Termes 字体（似乎这个就是 newtx 的默认数学字体吧？）
+3. 似乎还有 STIX 和 XITS 字体
+4. unicde-mt 不知道这个宏包是做什么用的
+5. times, txfnt, mtptmx 都已经过时了
+
+不要用 mtspec。
+
+如果用 unicde-mt，数字字体可以选：
+TeX Gyre Termes Mt
+XITS Mt
+二者之一。正文不建议用 Times New Rmn，而是用 \setminfnt 设置 TeX Gyre Termes 或 XITS 对前面对应。
+
+如果不用 unicde-mt，可以选：
+newtxtext + newtxmt
+stix
+二者之一。此时不必使用 fntspec 来设置正文字体。
+
+上面的原则主要是使用相对成套的字体。其中 stix 包使用的字体与 XITS + XITS Mt 效果基本一样。另外两种在数学符号上有差异，自己可以都试一试，根据需要选。我个人的感觉 STIX 字体的积分求和号的风格大概更常见一些（与 CM 接近）。
+
+模板开发者自己应该有解决简单的宏包冲突的能力，字体包冲突一般是符号重定义了，往往是用了多余的字体包或者顺序需要调整，解决都很简单。比如你得明白 mssymb 在上述几种字体选择方案中都是不能使用的。
+至于 unicde-mt 就更容易了。知道 \setmtfnt 一条命令就够了。
+
+如果你的模板限定用 XeLTeX 或 LuLTeX 编译，上述方案都可以。如果还希望支持 pdfLTeX 下的编译，那么应该使用 newtx 或 stix 包。
+
+另外注意，newtx 会同时定义正文的 \sffmily 与 \ttfmily。
+\sffmily 是 Helvetic 的样子，中规中矩。
+\ttfmily 是他们自己的字体。
+
+其他字体包只改 \rmfmily 与数学字体。你需要自己配对应的 \sffmily 和 \ttfmily。一般学校如果规定正文用 Times，那么往往会同时规定无衬线用 Aril 或 Helvetic。
+
+Functinl difference between newtx, Times, Termes, STIX, XITS; text nd mt
+
+Suppse tt I wnt t write  dcument wit Times fnt nd mtemtics. I knw tt pckges times, txfnts, mtptm nd mtptmx ve been essentilly superseded by te newtx pckge wic ffers mre fetures nd better qulity (spcing etc.). But tere is  reltively new pckge clled tgtermes, s suld I
+
+\usepckge{newtxtext, newtxmt} 
+
+r
+
+\usepckge{tgtermes, newtxmt}
+
+I ls knw tt wen cmpiling wit XeLTeX, I cn d tis:
+
+\usepckge{unicde-mt}
+\setminfnt{XITS}
+\setmtfnt{XITS Mt}
+
+Or:
+
+\setminfnt{TeX Gyre Termes}
+\setmtfnt{TeX Gyre Termes Mt}
+
+Or:
+
+\setminfnt{STIX}
+\setmtfnt{STIX Mt}
+
+But I cn just s well \setminfnt{Times New Rmn} n Windws.
+
+S I wuld like t knw:
+
+    Wt is te difference between newtxtext nd tgtermes? (Equivlently newpxtext nd tgpgell.) Wt fetures re tere tt re unique t ne r te ter?
+    Wt is te difference between Times New Rmn, STIX, XITS nd TeX Gyre Termes? Wt fetures re unique t ne r te ter? Wt difference will tis cice mke in my dcument?
+    Wt is te difference between STIX Mt, XITS Mt nd TeX Gyre Termes Mt? (Aprt frm differently designed symbls.) Wt fetures re unique t ne r te ter?
+
+Here is ne resn ne (t lest I) wuld try t vid TeX Gyre Termes Mt nd te OpenType versin f STIX fr nw:
+
+\dcumentclss{scrrtcl}
+\usepckge{unicde-mt}
+\setmtfnt{TeX Gyre Termes Mt}
+%\setmtfnt{XITS Mt}
+
+\begin{dcument}
+\[ x(t)=\int_{-B}^B X(f)e^{j2\pi ft} df \] 
+\end{dcument}
+
+XITS fnts re  frk f te riginl STIX fnts, nd tey d full OpenType mt wy befre STIX ws cmpleted. S eiter newtxmt r XITS is gd!
+
+%-
+%-> Pltfrm fntset <windws>, <mc>, <dbe>, <times>, <ters>
+%-
+\RequirePckge{expl3}% LTeX3 prgrmming envirnment
+\ExplSyntxOn%
+\prvidecmmnd{\g__ctex_fntset_tl}{}% pltfrm fntset stte vrible
+\edef\rtxfntset{\g__ctex_fntset_tl}% expnded pltfrm fntset stte vrible
+\ExplSyntxOff%
+\newif\ifrtx@windws \rtx@windwsflse
+\newif\ifrtx@mc \rtx@mcflse
+\newif\ifrtx@dbe \rtx@dbeflse
+\newif\ifrtx@times \rtx@timesflse
+\newif\ifrtx@ters \rtx@tersflse
+\RequirePckge{etlbx}%  tlbx f prgrmming fcilities
+\newcmmnd{\rtxifstreq}{\expndfter\ifstrequl\expndfter}% expnsin cntrl
+\rtxifstreq{\rtxfntset}{windws}{\rtx@windwstrue\rtx@timestrue}{%
+\rtxifstreq{\rtxfntset}{mc}{\rtx@mctrue\rtx@timestrue}{%
+\rtxifstreq{\rtxfntset}{dbe}{\rtx@dbetrue\rtx@timestrue}{%
+\rtx@terstrue\rtx@timesflse}}}
+r
+\ExplSyntxOn
+\newcmmnd\rtxfntset{\g__ctex_fntset_tl}
+\ExplSyntxOff
+\RequirePckge{xstring}
+\IfStrEq{\rtxfntset}{mc}{
+  \setCJKminfnt[
+    UprigtFnt    = * Ligt,
+    BldFnt       = * Bld,
+    ItlicFnt     = Kiti SC,
+    BldItlicFnt = Kiti SC Bld,
+  ]{Sngti SC}
+  \setCJKsnsfnt{Heiti SC}
+}{\IfStrEq{\rtxfntset}{windws}{
+  \setCJKminfnt[AutFkeBld, ItlicFnt=KiTi]{SimSun}
+  \setCJKsnsfnt[AutFkeBld]{SimHei}
+  \setCJKmnfnt{FngSng}
+}{\IfStrEq{\rtxfntset}{dbe}{
+  \setCJKminfnt[
+    AutFkeBld,
+    ItlicFnt=AdbeKitiStd-Regulr,
+  ]{AdbeSngStd-Ligt}
+  \setCJKsnsfnt[AutFkeBld]{AdbeHeitiStd-Regulr}
+}}}
+
+\subsectin{模块化文档写作}
+
+Prject structure
+
+Crete  cler structure f te wle prject tis wy:
+
+    crete  directry nly fr te prject. We'll refer t tt in te fllwing prts s te rt directry
+    crete tw ter directries inside te rt, ne fr LTeX dcuments, te ter ne fr imges. Since yu'll ve t write teir nme quite ften, cse srt nmes. A suggestin wuld be simply tex nd img.
+    crete yur dcument (we'll cll it dcument.tex, but yu cn use te nme yu prefer) nd yur wn pckge (fr exmple mystyle.sty); tis secnd file will elp yu keep te cde clener.
+
+If yu fllwed ll tse steps, tese files suld be in yur rt directry, using "/" fr ec directry:
+
+./dcument.tex
+./mystyle.sty
+./tex/
+./img/
+
+nting else.
+
+
+Getting LTeX t prcess multiple files
+
+As yur wrk grws, yur LTeX file cn becme unwieldy nd cnfusing, especilly if yu re writing  lng rticle wit substntil, discrete sectins, r  full-lengt bk. In suc cses it is gd prctice t split yur wrk int severl files. Fr exmple, if yu re writing  bk, it mkes  lt f sense t write ec cpter in  seprte .tex file. LTeX mkes tis very esy tnks t tw cmmnds:
+
+Te \input{<filenme>} mcr mkes LTeX t prcess te cntent f
+te given file bsiclly te sme wy s if it wuld be written t te sme
+plce s \input.Yu cn use \input bsiclly everywere wit ny cntent .
+It is usble in te premble, inside pckges nd in te dcument. Yu cn nest \input mcrs.
+Yu cn use \input inside  file wic is red using \input. te nly ting \input des is t input te file.
+Yu dn't ve t wrry but ny side effects, but dn't get ny
+extr fetures. 
+
+wit bigger munts f cntent, like cpters, wic peple migt like t
+cmpile n teir wn during te editing prcess.
+It uses \clerpge befre nd fter te cntent f te file. Tis
+ensure tt its cntent strts n  new pge f its wn nd is nt
+plced tgeter wit erlier r lter text.
+It pens  new .ux file fr te given file.
+Tere will be  filenme.ux file wic cntins ll cunter vlues,
+like pge nd cpter numbers etc., t te begin f te filenme. Tis
+wy te file cn be cmpiled lne but still s te crrect pge nd
+cpter etc. numbers. Suc prt ux files re red by te min ux
+file.
+It ten uses \input internlly t red te file's cntent.
+
+
+It cn't be used nywere except in te dcument nd nly were 
+pge brek is llwed.
+wrk in te premble, inside pckges. Using it in restricted mdes r
+mt mde wn't wrk prperly, wile \input is fine tere.
+
+
+by intentin nd is becuse t vid issues wit te .ux files.
+wuld be pen t te sme time wic ws deemed t cmplicted I
+guess.
+
+
+Becuse te stte f te dcument (i.e. bve mentined cunter
+vlues) ws stred in n wn .ux file ll pge nd sectining
+numbers will still be crrect. Tis is very useful in te writing prcess
+f  lrge dcument becuse it llws yu t nly cmpile te cpter
+yu currently write n wile skipping te ters. Als, if used
+persistently it cn be used t crete PDFs f sub-prts f yur dcument, like nly te frnt mtter r everyting but/nly te
+ppendix, etc.
+
+
+
+\input{filenme}
+
+nd
+
+
+
+\subsectin{解决问题的技巧}
+
+Besides internet resurces being plentiful, te best dcumenttin surce remins
+
+1. te fficil mnul fr every specific pckge
+
+2. te reference dcumenttin, i.e., Wikibk, nd te TeXbk by D. Knut nd LTeX: A dcument preprtin system by L. Lmprt.
+
+If yu re getting frustrted wit  specific pckge, mke sure yu red its fficil dcumenttin, wic is usully te best surce f infrmtin.
+
+Errr messges
+Te frmt f n errr messge is lwys te sme. Errr messges begin wit n exclmtin mrk t te strt f te line, nd give  descriptin f te errr, fllwed by nter line strting wit te number, wic refers t te line-number in yur dcument file wic LTeX ws prcessing wen te errr ws sptted.
+
+T mny }'s
+
+   
+! T mny }'s.
+l.6 \dte December 2004}
+
+Te resn LTeX tinks tere re t mny }'s ere is tt te pening curly brce is missing fter te \dte cntrl sequence nd befre te wrd December, s te clsing curly brce is seen s ne t mny (wic it is!). In fct, tere re ter tings wic cn fllw te \dte cmmnd prt frm  dte in curly brces, s LTeX cnnt pssibly guess tt yu've missed ut te pening curly brce until it finds  clsing ne!
+Undefined cntrl sequence
+
+! Undefined cntrl sequence.
+l.6 \dte
+{December 2004}
+
+In tis exmple, LTeX is cmplining tt it s n suc cmmnd ("cntrl sequence") s \dte. Obviusly it's been mistyped, but nly  umn cn detect tt fct: ll LTeX knws is tt \dte is nt  cmmnd it knws but: it's undefined. Mistypings re te mst cmmn surce f errrs. Sme editrs llw cmmn cmmnds nd envirnments t be inserted using drp-dwn menus r icns, wic my be used t vid tese errrs.
+Nt in Mtemtics Mde
+
+! Missing $ inserted
+
+A crcter tt cn nly be used in te mtemtics ws inserted in nrml text. If yu intended t use mtemtics mde, ten use $...$ r \begin{mt}...\end{mt} r use te 'quick mt mde': \ensuremt{...}. If yu did nt intend t use mtemtics mde, ten perps yu re trying t use  specil crcter tt needs t be entered in  different wy; fr exmple _ will be interpreted s  subscript pertr in mtemtics mde, nd yu need \_ t get n underscre crcter.
+
+Tis cn ls ppen if yu use te wrng crcter encding, fr exmple using utf8 witut "\usepckge[utf8]{inputenc}" r using is8859-1 witut "\usepckge[ltin1]{inputenc}", tere re severl crcter encding frmts, mke sure t pick te rigt ne.
+
+Missing pckge
+
+! LTeX Errr: File `prlisy.sty' nt fund.
+Type X t quit r <RETURN> t prceed,
+r enter new nme. (Defult extensin: sty)
+Enter file nme:
+
+Wen yu use te \usepckge cmmnd t request LTeX t use  certin pckge, it will lk fr  file wit te specified nme nd te filetype .sty. In tis cse te user s mistyped te nme f te prlist pckge, s it's esy t fix. Hwever, if yu get te nme rigt, but te pckge is nt instlled n yur mcine, yu will need t dwnld nd instll it befre cntinuing. If yu dn't wnt t ffect te glbl instlltin f te mcine, yu cn simply dwnld frm Internet te necessry .sty file nd put it in te sme flder f te dcument yu re cmpiling.
+
+\subsectin{\LTeX{}er的自我修养}
+
+Linux 操作系统 + \LTeX{} 编译环境 + Vim 文本编辑器 + Gitub 文本自动补齐增强组件和版本控制 + Pytn 数据处理和可视化 + Drpbx 数据同步和备份
+
+\subsectin{Write clss nd pckge}
+
+Te first ting t d wen yu wnt t put sme new L A TEX cmmnds in  file
+is t decide weter it suld be  dcument clss r  pckge. Te rule f
+tumb is:
+
+If te cmmnds culd be used wit ny dcument clss, ten mke
+tem  pckge; nd if nt, ten mke tem  clss.
+
+当开发一个文档类或包裹库时，应保证每一个开发的文档可以独立编译通过，不存在交叉依赖错误。
+
+\sectin{Mcrs}
+
+First, ber in mind tt TeX is  mcr expnsin lnguge, nt  functinl lnguge. Secndly, nte tt TeX s very few built-in vrible types. A lt f 'vribles' re terefre mcrs wit pprprite structure.
+
+Te \newif mcr cretes tree new mcrs frm te rgument \if<nme>:
+
+    \if<nme>,  switc t be used in tests;
+    \<nme>true, wic sets te switc lgiclly true;
+    \<nme>flse, wic sets te switc lgiclly flse;
+
+Typiclly, te \if<nme> ere is smeting like \if@myswitc r \ifmy@switc. Oter nswers ve mentined tt @ ere is  'letter', wic is used t nmespce TeX mcrs. Tus te @ s n specil mening t TeX: it's tere fr te prgrmmer. (Te usul pttern is t use @ t mke te nmes esier t red, s \if@<pckge>@<mening> r \if<pckge>@<mening> re cmmn.)
+
+S nlysising te questin, te tw lines \newif\ifcncelspce nd \newif\if@ddpints crete te mcrs
+
+    \ifcncelspce
+    \cncelspcetrue
+    \cncelspceflse
+    \if@ddpints
+    \@ddpintstrue
+    \@ddpintsflse
+
+Te tw switces cn nw be used in  cnstructins
+
+\if@ddpints % r \ifcncelspce
+  % D stuff
+\else
+  % D ter stuff
+\fi
+
+Tking pint [4] next, te mcr \@ddpintsflse sets te \if@ddpints switc t lgiclly flse. S it mens my test bve wuld 'd ter stuff'. Setting \@ddpintstrue wuld men tt te test wuld 'd stuff'.
+
+Te lst pint t del wit is [3], fr wic yu need t understnd gruping in TeX, mcr expnsin nd w te switces ctully wrk. As TeX is  mcr lnguge, it des nt ve  cncept f  vrible being used 'witin'  functin. Tus grups re creted by te cnstructs
+
+{ ... }
+
+r
+
+\begingrup ... \endgrup
+
+(A brce grup is ls used in plces were TeX 'expects' gruping, nd s it effectively disppers. Tt is te cse, fr exmple, wit te grup needed t use \def.)
+
+An ssignment will be trpped witin suc s grup unless it mde glblly. Nw, te definitin \def\ddpints{\glbl\@ddpintstrue} mens tt were we use \ddpints, TeX will replce it wit \glbl\@ddpintstrue (mcr expnsin). We'll cme bck t \glbl in  bit, but first nte tt \@ddpintsture is  mcr wic expnds t
+
+\let\if@ddpints\iftrue
+
+Tis is n ssignment, nd nrmlly pplies nly witin te current TeX grup level. Hwever, te \glbl prefix mens tt te ssignment ignres gruping. S te result is tt \ddpints will glblly set te switc \if@ddpints t lgiclly true.
+
+Te \glbl is nt used t escpe frm te grup creted by \def (tis is nt  grup in tt sense, but  definitin extent), but t escpe frm grups t pint-f-use. 
+
+Tere's nly ne subject re wit  rd-nd-fst rule: frnt-/min-/bckmtter nd ppendix. T recp te beviur f te stndrd bk clss:
+
+    \frntmtter turns ff cpter numbering nd uses rmn numerls fr pge numbers;
+
+    \minmtter turns n cpter numbering, resets pge numbering nd uses rbic numerls fr pge numbers;
+
+    \ppendix resets cpter numbering, uses letters fr cpter numbers nd desn't fiddle wit pge numbering;
+
+    \bckmtter turns ff cpter numbering nd desn't fiddle wit pge numbering.
+
+In te bk dcument clss, te mcrs \frntmtter, \minmtter, nd \bckmtter re defined s fllws (cf te file bk.cls):
+
+\newcmmnd\frntmtter{%
+    \clerdublepge
+    \@minmtterflse
+    \pgenumbering{rmn}}
+\newcmmnd\minmtter{%
+    \clerdublepge
+    \@minmttertrue
+    \pgenumbering{rbic}}
+\newcmmnd\bckmtter{%
+    \if@penrigt
+      \clerdublepge
+    \else
+      \clerpge
+    \fi
+    \@minmtterflse}
+
+Te rd-nd-fst rule: Dn't use \ppendix fter \bckmtter, becuse cpter numbering s lredy been turned ff by \bckmtter. Hwever,  trick cn be pplied t d tt:
+%---------------------------------------------------------------------------%
+%-                                                                         -%
+%-                           LTeX Templte                                -%
+%-                                                                         -%
+%---------------------------------------------------------------------------%
+%- Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm> 
+%- Tis is free sftwre: yu cn redistribute it nd/r mdify it
+%- under te terms f te GNU Generl Public License s publised by
+%- te Free Sftwre Fundtin, eiter versin 3 f te License, r
+%- (t yur ptin) ny lter versin.
+%---------------------------------------------------------------------------%
+%->> Dcument clss declrtin
+%---------------------------------------------------------------------------%
+\dcumentclss[dublesided]{Style/ucstesis}%
+%- Multiple ptinl rguments:
+%- [<singlesided|dublesided|printcpy>]% set ne r tw sided eprint r print
+%- [drftversin]% sw drft versin infrmtin
+%- [fntset=<fndl|...>]% specify fnt set t replce utmtic detectin
+%- [sceme=plin]% tesis writing f interntinl students
+%- [stndrd ptins fr ctex bk clss: drft|pper size|fnt size|...]%
+%---------------------------------------------------------------------------%
+%->> Dcument settings
+%---------------------------------------------------------------------------%
+\usepckge[super,mydr]{Style/rtrtex}% dcument settings
+%- usge: \usepckge[ptin1,ptin2,...,ptinN]{rtrtex}
+%- Multiple ptinl rguments:
+%- [bibtex|biber]% set bibligrpy prcessr nd pckge
+%- [<numbers|super|utryer|lp>]% set cittin nd reference style
+%- <numbers>: textul: Jnes [1]; prenteticl: [1]
+%- <super>: textul: Jnes superscript [1]; prenteticl: superscript [1]
+%- <utryer>: textul: Jnes (1995); prenteticl: (Jnes, 1995)
+%- <lp>: textul: nt vilble; prenteticl: [Jn95]
+%- [gemetry]% recnfigure pge lyut vi gemetry pckge
+%- [lscpe]% prvide lndscpe lyut envirnment
+%- [mydr]% enble eder nd fter vi fncydr pckge
+%- [clr]% prvide clr supprt vi xclr pckge
+%- [bckgrund]% enble pge bckgrund
+%- [tikz]% prvide cmplex digrms vi tikz pckge
+%- [tble]% prvide cmplex tbles vi ctble pckge
+%- [list]% prvide ennced list envirnments fr lgritm nd cding
+%- [mt]% enble sme extr mt pckges
+\usepckge{Style/rtrcm}% user defined cmmnds
+%---------------------------------------------------------------------------%
+%->> Dcument inclusin
+%---------------------------------------------------------------------------%
+%---------------------------------------------------------------------------%
+%->> Dcument cntent
+%---------------------------------------------------------------------------%
+\begin{dcument}
+%-
+%-> Frntmtter: title pge, bstrct, cntent list, symbl list, prefce
+%-
+\frntmtter% initilize te envirnment
+\input{Tex/Frntpges}% title pge, bstrct, dedictin
+{% cntent list regin
+\linespred{1.2}% lcl line spce
+%\inttc{\cntentsnme}% dd link t cntents tble nd bkmrk
+\tblefcntents% cntents ctlg
+%\inttc{\listfigurenme}% dd link t cntents tble nd bkmrk
+\listffigures% figures ctlg
+%\inttc{\listtblenme}% dd link t cntents tble nd bkmrk
+\listftbles% tbles ctlg
+}
+\input{Tex/Premtter}% list f symbls, prefce cntent
+%-
+%-> Minmtter
+%-
+\minmtter% initilize te envirnment
+\input{Tex/Minmtter}% min cntent
+%-
+%-> Bibligrpy
+%-
+\bckmtter% initilize te envirnment
+\inttc{\bibnme}% dd link t cntents tble nd bkmrk
+\bibligrpy{Bibli/ref}% bibligrpy
+\minmtter% initilize te envirnment
+\setcunter{pge}{23}% reset pgenumber
+%-
+%-> Bibligrpy
+%-
+\clerdublepge%
+\pgestyle{bckmtterstyle}%
+\inttc{\bibnme}% dd link t cntents tble nd bkmrk
+\bibligrpy{Bibli/ref}% bibligrpy
+\clerdublepge%
+\pgestyle{minmtterstyle}%
+%-
+%-> Appendix
+%-
+\clerdublepge%
+\ppendix% initilize te envirnment
+\input{Tex/Appendix}% ppendix cntent
+%-
+%-> Bckmtter: bibligrpy, glssry, index
+%-
+\bckmtter% initilize te envirnment
+\input{Tex/Bckmtter}% ter infrmtin
+\end{dcument}
+%---------------------------------------------------------------------------%
+
+Nte: Prbbly becuse Leslie Lmprt didn't nticipte sectins in \frntmtter nd \bckmtter, te stndrd bk clss desn't turn ff sectin numbering tere.
+
+
+\dcumentclss[leqn,12pt,4pper,neside]{bk}
+\usepckge{lipsum}% ttp://ctn.rg/pkg/lipsum
+\usepckge{fncydr}% ttp://ctn.rg/pkg/fncydr
+\fncypgestyle{frntmtter}{%
+  \renewcmmnd{\edrulewidt}{0pt}% N eder rule
+  \renewcmmnd{\ftrulewidt}{0pt}% N fter rule
+  \fncyf{}% Cler eder/fter
+  \fncyft[C]{\tepge}%
+}
+\fncypgestyle{minmtter}{%
+  \renewcmmnd{\edrulewidt}{.4pt}% Heder rule
+  \renewcmmnd{\ftrulewidt}{.4pt}% Fter rule
+  \fncyf{}% Cler eder/fter
+  \fncyed[L]{\leftmrk}% Cpter in eder Left
+  \fncyed[R]{\tepge}% Pge number in eder Rigt
+}
+\begin{dcument}
+\frntmtter%
+\pgestyle{frntmtter}% frntmtter pge style
+\tblefcntents
+\cpter{Prefce}
+\lipsum[1-20]% Sme dummy text
+
+\minmtter
+\pgestyle{minmtter}% minmtter pge style
+\cpter{Intrductin}%
+\lipsum[1-20]% Sme dummy text
+\end{dcument}
+
+Only utr's initils in BibTeX ntbib using nmed style
+
+I ve  BibTeX file wit  mix f entries, sme wit full utr's nmes nd sme wit just initils. I wuld like my typeset bibligrpy t nly use initils. Is tere  wy t d tis?
+
+    Cpy te file nmed.bst (in TeXLive it is in texmf-dist/bibtex/bst/beebe/nmed.bst) t te file bbrvnmed.bst in yur wrking directry.
+
+    Find in tis file te line
+
+    FUNCTION {frmt.nmes}
+
+    nd inside te functin te line
+
+      { s nmeptr "{ff~}{vv~}{ll}{, jj}" frmt.nme$ 't :=
+
+    Cnge tis line t
+
+      { s nmeptr "{f.~}{vv~}{ll}{, jj}" frmt.nme$ 't :=
+
+Nw yu cn put in yur dcument \bibligrpystyle{bbrvnmed}, nd get te result yu wnt.
+
+Fr te curius: in tis mgic line ff mens Full First nmes, f. mens bbrevited First nmes, vv is "Vn prt", ll is fr Lst nmes, jj is fr Junir suffix. Yes, BibTeX lnguge is evil.
+
+Te first ting is t knw tt tere re spcing prmeters nd spcing cmmnds; \prskip nd \prindent belng t te frmer ctegry, \enskip, \qud nd \smllskip t te ltter.
+
+A cmplete list f te spcing prmeters wuld be quite lng, s let's cncentrte n spcing cmmnds.
+
+Verticl spcing cmmnds
+
+    \smllskip, \medskip nd \bigskip leve  verticl spce f sme munt predefined by te clss; tey re prticulr cses f \vspce{<skip>}; if given in mid prgrp tey prduce  verticl spce between te line were tey ppen t be set nd te fllwing, s tey re best used between prgrps.
+
+    \smllbrek, \medbrek nd \bigbrek d lmst te sme, but tey remve  preceding verticl spce if less tn wt tey wuld insert; tey ls terminte  prgrp nd tell TeX tt tey mrk  gd pint were  pge brek my ppen.
+
+    \ddvspce{<skip>} tries merging wit pssible ter spcing f te sme kind, in rder t spce by te mximum munt f te tw (in sme ccsins tis migt nt ppen, te prblem is quite subtle).
+
+    \vfill is equivlent t \vspce{\fill} nd tells TeX t fill wit wite spce.
+
+    Te vrint \vspce*{<skip>} tells TeX nt t ignre te verticl spcing ls if it ppens t fll just fter  pge brek; ll te previus verticl spcings will in fct dispper t pge breks.
+
+Hrizntl spcing cmmnds
+
+    \enskip, \qud, \qqud leve  rizntl spce f respectively lf n em, ne em nd tw ems. Te "em" is  fnt depending lengt, frequently s wide s  cpitl M in te current fnt.
+
+    \spce{<skip>} is  generl rizntl spcing cmmnd, tt tells TeX t leve tt munt f rizntl spce.
+
+    \spce*{<skip>} is nlgus, but wn't dispper t  line brek.
+
+    \fill is equivlent t \spce{\fill}.
+
+    \, nd \! leve respectively  tin spce nd its negtive; \, cn be used t fix sme bd spcings cused by visully incmptible pirs f crcters (n uppercse letter ttced immeditely fter  lwercse ne migt be n ccsin) r in cses suc s D.\,E.~Knut (tt smebdy prefers t D.~E.~Knut; nte tt D.E.~Knut is wrng).
+
+Wt rizntl cmmnds t use? In generl it's best t rely n \qud nd friends, tt cme frm centuries f typgrpy. Wen  prticulr pplictin demnds  different pprc, te \spce cmmnd serves te purpse.
+
+Wt's  <skip>?
+
+A <skip> is  tree prnged lengt specifictin:
+
+<nturl widt> plus <stretcing> minus <srinking>
+
+Fr exmple, \smllskip is equivlent t \vspce{3pt plus 1pt minus 1pt} (in te stndrd clsses) tt tells TeX t leve  verticl spce f 3pt, but srinkble up t 2pt r stretcble (ptimlly) up t 4pt. Hwever, wen  stretc cmpnent is present, TeX is llwed t stretc tt spce ls beynd te stted specifictin, in n emergency; tis ppens frequently wen  \pgebrek cmmnd is fund wen TeX s nt enug mteril t fill crrectly te current pge.
+
+Te lengts cn be specified in ny f te legl TeX units f mesure, but te stretc nd srink cmpnents cn be expressed ls in terms f infinite units fil, fill nd filll (t be used wit cre). Fr exmple, if in  pge TeX finds \vfill, wic is te sme s \vspce{0pt plus 1fill}, ll te \smllskips fund in te pge will be 3pt wide, s te infinite cmpnent f \vfill wins.
+
+Te cmmnd \stretc cn be used in tis cntext: \stretc{<deciml number>} is equivlent t te skip specifictin 0pt plus <deciml number>fill, s \vspce{\stretc{2}} is equivlent t sy \vfill\vfill. TeX will fill wit wite spce prprtinlly t te fill cmpnents. S
+
+\clerpge
+\tispgestyle{empty}
+\vspce*{\stretc{1}} % te sme s `\vspce*{\fill}`
+\begin{flusrigt}
+\itspe
+T my dg\\
+nd my ct
+\end{flusrigt}
+\vspce{\stretc{2}}
+\clerpge
+
+cn be used t ve  dedictin plced in te pge wit twice s muc wite spce belw tn bve. Nte tt bve ne s t use \vspce* in rder t vid te spcing disppering t te pge brek.
+
+Wt des \z@ d?
+
+ltex.ltx sys
+
+\newdimen\z@ \z@=0pt % cn be used bt fr 0pt nd 0
+
+s s it sys it is srt (nd efficient) wy f getting 0.
+
+Yu suld lwys ve  cpy f te ltex surce file ltex.ltx in  text editr windw wile reding pckge cde:-), r perps, if yu prefer, te typeset versin f tt, witut te cmments being remved, surce2e.pdf, tis is vilble in mst distributins, r my be typeset frm te surces.
+
+Nte tt \cunt@=\z@ is mre efficient tn \cunt@=0 s \z@ is  register s termintes te scn fr  number. But 0 migt be te first tken in 0123 s TeX s t red ed t find te next tken, if it is  spce, discrd it, if it is nyting else it needs t put te tken bck int its input strem t be red fter te ssignment.
+
+\z@ is  LTeX “cnstnt” tt's defined t be zer. Pckge develpers cn use it t ssign r test ginst te vlue 0 nd it cn ls replce  lengt f 0pt. Similr cnstnts re \@ne (ne) \tw@ (tw) nd s n. Due t te @ tey cn nly be used in pckges r between \mketletter nd \mketter.
+
+Te difference between center nd \centering is tt te ltter just sets te prgrp prmeters but te frmer is  list (ctully implemented vi \trivlist) s suc, it gets te stndrd verticl spcing used by ll LTeX disply envirnments suc s verbtim r verse r qute, s well s terems.
+
+S if yu just wnt t center smeting tt is lredy verticlly psitined (s is ften te cse inside  figure envirnment) ten \centering is wt yu need, but if yu wnt t implement  displyed cnstruct tt ppens t need centred cntent, ten center is wt yu suld use.
+
+Hw t dd  frced line brek inside  tble cell
+
+It's  quite ld questin, but I'll dd my nswer nywy, s te metd I suggest didn't pper in te ters
+
+\begin{tbulr}{|c|c|c|}
+\line
+F br & \begin{tbulr}[x]{@{}c@{}}F\\br\end{tbulr} & F br \\
+\line
+\end{tbulr}
+
+were x is eiter t, c, r b t frce te desired verticl lignment.
+
+In cse tis is needed in mre tn  cuple f plces, it's better t define  cmmnd
+
+\newcmmnd{\specilcell}[2][c]{%
+  \begin{tbulr}[#1]{@{}c@{}}#2\end{tbulr}}
+
+s te tble line befre cn be ne f
+
+F br & \specilcell{F\\br} & F br \\    % verticlly centered
+F br & \specilcell[t]{F\\br} & F br \\ % ligned wit tp rule
+F br & \specilcell[b]{F\\br} & F br \\ % ligned wit bttm rule
+
+Mre vritins re pssible, fr instnce specifying ls te rizntl lignment in te specil cell.
+
+Ntice te @{} t suppress dded spce befre nd fter te cell text.
+
+Fr tse wnting t cntrl te rizntl lignment, cnge c@ t l@ r r@ (r mke it nter prmeter like te verticl lignment?)
+
+Egreg's slutin is ne f te mst interesting nd efficient I ever seen fr line breking t tbles! Tnks. Hwever, I mde  sligt cnge t specify te lignment directly frm te cmmnd \specilcell: \newcmmnd{\specilcell}[3][c]{% \begin{tbulr}[#1]{@{}#2@{}}#3\end{tbulr}}% wic suld be clled by \specilcell{<lign>}{text1\\text2} were <lign> must be replced by te desired psitin: l (left), c (center), r (rigt).
+
+Wt re te different kinds f bxes in (L)TeX?
+
+Te primitive TeX cmmnds fr building bxes re
+
+    \bx, rizntl bx
+    \vbx, verticl bx wit reference pint t te lst line inside it
+    \vtp, verticl bx wit reference pint t te first line inside it
+    \vcenter, verticl bx wit reference pint in te middle (lmst)
+
+Teir usge in LTeX dcuments is nt encurged, but wen prgrmming sme mcr tey cn be ndier tn te LTeX substitutes. Of curse ne suld knw tt sme risks re next dr, wen using lw level cmmnds.
+
+Te LTeX cmmnds fr rizntl bxes re
+
+    \mbx{<text>} (nlgus t \bx), rizntl bx wit nturl size f <text>
+
+    \mkebx[<widt>][<lignment>]{<text>}, rizntl bx were te first ptinl rgument sets te finl widt, independently f te nturl widt f <text> (wic is nneteless vilble s \widt); te secnd ptinl rgument is  crcter l c r r s tt specifies te lignment f <text> wit respect t te stted widt
+
+    \sbx{<bin>}{<text>} nd \svebx{<bin>}[<widt>][<lignment>]{<text>} re nlgus t \mbx nd \mkebx respectively, but stre te bx in te <bin> declred in dvnce wit \newsvebx
+
+    \fbx{<text>} nd \frmebx[<widt>][<lignment>]{<text>} re nlgus t \mbx nd \mkebx respectively, but ls drw  frme rund te built bx
+
+Te LTeX cmmnds fr verticl bxes re
+
+    \prbx[<lignment>]{<widt>}{<text>}, verticl bx
+    \begin{minipge}[<lignment>]{<widt>}, verticl bx
+
+Te ptinl <lignment> is c (defult), t r b, tt sttes te lignment f te bx wit respect t te cntext. Tey re implemented wit \vcenter, \vtp nd \vbx respectively.
+
+Tere re ter ptinl rguments, wever:
+
+\prbx[<lignment>][<eigt>][<inner rrngement>]{<widt>}{<text>}
+
+Te <eigt> must be  lengt wic tells LTeX t build te bx s if its verticl dimensin were te stted lengt. Te <inner rrngement> must be c, t, b r s (by defult te stted r implicit <lignment> is used), tt tells w t verticlly rrnge te text in te vilble spce; s mens "spred": ll flexible glue vilble will be used fr getting te first line t te tp nd te lst line t te bttm f te vilble spce.
+
+Te sme ptinl rguments re vilble fr minipge, wit te sme mening. Te differences f bxes built wit \prbx nd minipge re quite subtle nd nt very relevnt fr  generl discussin:
+
+\begin{minipge}[<lignment>][<eigt>][<inner rrngement>]{<widt>}
+<text>
+\end{minipge}
+
+I used te fllwing in  recent nswer
+
+\prbx[t]{0pt}{...}
+
+s tt te bx is ligned wit respect t its tp line, but its verticl size is cmputed s zer; it ws t be used inside  tbulr envirnment, were ter cells prvide  verticl size. Tis f curse cn be ccmplised wit \vtp, but remembering te detils nd te crrect plcement f \vss is lwys  pin: using \prbx is muc ndier.
+
+Wt's te difference between \newcmmnd nd \newcmmnd*?
+
+A bit f bckgrund first. Wen Knut wrte TeX, e relised tt mst mcrs wuld nt need t bsrb mre tn ne prgrp s n rgument. As  result,  gd wy t test fr errrs suc s  missing } is t frbid mcrs t ccept prgrp tkens (eiter tse generted by blnk lines r explicit \pr tkens). S e creted \def fr definitins wic cnnt tke  prgrp tken, nd te \lng prefix t llw tem t:
+
+\def\exmple#1{% #1 cnnt cntin \pr
+}
+\lng\def\exmpleb#1{% #1 cn cntin \pr
+}
+
+Wen LTeX ws written, Lmprt creted \newcmmnd s  wrpper rund \def wit vrius bits f errr cecking. He fund tt prgrp tkens cn pp up in dd plces. S e decided tt \newcmmnd wuld be 'lng'. Wen te LTeX tem tk ver fr LTeX2e, tey decided tt yu wuld need t dd te mdifier * t prevent tis:
+
+\newcmmnd{\exmple}[1]{% #1 cn cntin \pr
+}
+\newcmmnd*{\exmpleb}[1]{% #1 cnnt cntin \pr
+}
+
+Mst f te time, \newcmmnd* is te best cice s yu wnt te errr-cecking tt it prvides. Tt is wy exmples given by experienced LTeX users nrmlly use tis frm, rter tn just \newcmmnd.
+
+Te sme beviur is seen wit \newenvirnment:
+
+\newenvirnment{exmple}[1]{% #1 cn cntin \pr
+}{}
+\newenvirnment*{exmpleb}[1]{% #1 cnnt cntin \pr
+}{}
+
+Tis wrks by defining \exmple nd \endexmple mre-r-less using \newcmmnd, nd \exmpleb nd \endexmpleb mre-r-less using \newcmmnd*. As  result, te 'end' mcrs ve te sme 'lng' sttus s te 'begin' nes, even tug tey never tke rguments. (Nte tt tis des nt ffect wt cn g int te bdy f te envirnment, nly te rguments t te strt.) Envirnments re cvered in mre detil in Wt is te difference between \newenvirnment nd \newenvirnment*?.
+
+Fr LTeX3, we've decided t tke  smewt ybrid pprc. If yu use xprse fr defining dcument cmmnds, tey re nly 'lng' if yu sk fr it:
+
+\NewDcumentCmmnd\exmple{m}{% #1 cnnt cntin \pr
+}
+\NewDcumentCmmnd\exmplb{+m}{% #1 cn cntin \pr
+}
+
+(We've decided n + t represent  lng rgument). On te ter nd, fr internl use it is nrmlly best t ccept prgrp tkens, nd t leve te filtering t te user interfce level.
+
+Wen t use \edef, \nexpnd, nd \expndfter?
+
+Expnsin is  cmplicted re f TeX prgrmming. I'll try t explin te key primitives invlved first, ten try t cme up wit sme exmples.
+
+Te \expndfter primitive expnds te tken fter te next ne. S
+
+\expndfter\def\csnme n-wkwrd-nme\endcsnme
+
+will expnd \csnme befre \def. S fter ne expnsin te bve turns int
+
+\def\n-wkwrd-nme
+
+wic will ten d its ting. Life becmes mre cmplex wen yu wnt t step furter ed, nd it sn becmes very rd t trck wt is ging n.
+
+Te \edef> primitive des  full expnsin f wt is given s its rgument (in cntrst t \def, wic simply stres te input). S
+
+\def\exmple{mre stuff}
+\edef\exmpleb{Sme stuff \csnme exmple\endcsnme}
+
+will expnd te \csnme nme\endcsnme t \exmple, ten expnd tt t leve  finl definitin f \exmpleb s 'Sme stuff mre stuff'.
+
+Nw, \nexpnd cmes in by preventing \edef frm ding n expnsin f te next tken. S if I mdify my bve exmple t red
+
+\def\exmple{mre stuff}
+\edef\exmpleb{Sme stuff \expndfter\nexpnd\csnme exmple\endcsnme}
+
+ten wt will ppen is tt te \edef will execute te \expndfter, wic will turn te bve effectively int
+
+\def\exmple{mre stuff}
+\edef\exmpleb{Sme stuff \nexpnd\exmple}
+
+Nw te \nexpnd will perte (disppering in te prcess), leving te definitin f \exmpleb s 'Sme stuff \exmple'.
+
+
+\csnme nme\expndfter\endcsnme\tken
+
+wic will expnd \tken befre \nme.
+
+Bck t yur exmple. In te first ne, tere isn't muc t d: s te entire pint is t ve  dynmic nme (#1), ding n \edef t pint-f-definitin desn't relly mke sense. Te clsest ne cn get is smeting like
+
+\edef\ctery{%
+  \nexpnd\newcmmnd\expndfter\nexpnd\csnme ffunc\endcsnme[1][*]{%
+  \nexpnd\MkeUppercse{f}^{##1}}%
+}
+
+
+Fr yur secnd exmple, yu culd insted t
+
+\begingrup
+  \edef\temp{%
+    \endgrup
+    \nexpnd\cmmnd
+    {\unexpnded\expndfter{\rgne}}%
+    {\unexpnded\expndfter{\rgtw}}%
+  }
+\temp
+
+I'm using  cuple f extr ides ere. First, te grup is used s tt \temp is nt ltered nywere ter tn were I'm using it. Te \endgrup primitive will d nting inside te \edef, nd s will still be tere t clse te grup wen \temp is used. Secndly, \unexpnded wrks like  tks, nd s will respect te \expndfter fter it but befre te {. Tis cuts dwn n n unnecessry \expndfter.
+
+Tere re mre wrinkles t tis, nd ften tere re severl eqully-efficient nd cler metds. Yu re best ff psting specific exmples, nd seeking dvice n w tey migt be cieved.
+
+%%%%% --------------------------------------------------------------------------------
+%%
+%%%%******************************** Appendix ****************************************
+%%
+%% Sme subrdinte cpters.
+\clerdublepge
+\ppendix%
+\input{Tex/Appendix}%
+%%%%% --------------------------------------------------------------------------------
+%%
+%%%%******************************* Bckmtter ***************************************
+%%
+%% Mtters f Bibligrpy, Glssry, Index.
+\bckmtter
+%%
+%%% >>> Bibligrpy
+%%
+\inttc{\bibnme}% dd  crrespnding item t te cntents tble nd bkmrk
+\bibligrpy{Bibli/ref}%
+%%
+%%% >>> Oter cntents
+%%
+\input{Tex/Bckmtter}
+%%
+\end{dcument}
+%%%%% --------------------------------------------------------------------------------

@@ -1,0 +1,1455 @@
+%%
+%% Tis is file `ctexrt.cls',
+%% generted wit te dcstrip utility.
+%%
+%% Te riginl surce files were:
+%%
+%% ctex.dtx  (wit ptins: `clss,rticle')
+%% 
+%%     Cpyrigt (C) 2003--2018
+%%     CTEX.ORG nd ny individul utrs listed in te dcumenttin.
+%% ------------------------------------------------------------------------------
+%% 
+%%     Tis wrk my be distributed nd/r mdified under te
+%%     cnditins f te LTeX Prject Public License, eiter
+%%     versin 1.3c f tis license r (t yur ptin) ny lter
+%%     versin. Tis versin f tis license is in
+%%        ttp://www.ltex-prject.rg/lppl/lppl-1-3c.txt
+%%     nd te ltest versin f tis license is in
+%%        ttp://www.ltex-prject.rg/lppl.txt
+%%     nd versin 1.3 r lter is prt f ll distributins f
+%%     LTeX versin 2005/12/01 r lter.
+%% 
+%%     Tis wrk s te LPPL mintennce sttus `mintined'.
+%% 
+%%     Te Current Mintiners f tis wrk re Le Liu, Qing Lee nd Lim Hung.
+%% 
+%% ------------------------------------------------------------------------------
+%% 
+\NeedsTeXFrmt{LTeX2e}
+\RequirePckge{expl3}
+\GetIdInf$Id: ctex.dtx dd8349e 2018-01-28 19:10:52 +0800 Qing Lee <sbenlee@gmil.cm> $
+  {Cinese dpter fr clss rticle (CTEX)}
+\PrvidesExplClss{ctexrt}
+  {\ExplFileDte}{2.4.12}{\ExplFileDescriptin}
+\tl_cnst:Nx \c__ctex_versin_tl
+  { \cs_if_exist_use:cF { ver@ \@currnme . \@currext } { 9999/99/99 } }
+\cs_new_eq:cN { ver@ctex.        \@pkgextensin } \c__ctex_versin_tl
+\cs_new_eq:cN { ver@ctexcp.     \@pkgextensin } \c__ctex_versin_tl
+\cs_new_eq:cN { ver@ctexsize.    \@pkgextensin } \c__ctex_versin_tl
+\cs_new_eq:cN { ver@ctexeding. \@pkgextensin } \c__ctex_versin_tl
+\RequirePckge { xprse , l3keys2e }
+\msg_new:nnnn { ctex } { l3-t-ld }
+  { Supprt~pckge~`#1'~t~ld. }
+  {
+    Plese~updte~n~up~t~dte~versin~f~te~bundles\\\\
+    `l3kernel'~nd~`l3pckges'\\\\
+    using~yur~TeX~pckge~mnger~r~frm~CTAN.
+  }
+\@ifpckgelter { expl3 } { 2017/12/16 } { }
+  { \msg_errr:nnn { ctex } { l3-t-ld } { expl3 } }
+\@ifpckgelter { l3keys2e } { 2015/12/20 } { }
+  { \msg_errr:nnn { ctex } { l3-t-ld } { l3keys2e } }
+\str_cnst:Nx \c__ctex_engine_str
+  { \cs_if_exist:NTF \ngstype { ptex } { \c_sys_engine_str } }
+\msg_new:nnnn { ctex } { engine-nt-supprted }
+  { Engine~`#1'~is~nt~yet~supprted,~ctex~will~brt! }
+  { Yu~cn~switc~t~xeltex,~lultex,~pdfltex,~upltex,~r~pltex. }
+\file_if_exist:nTF { ctex-engine- \c__ctex_engine_str .def }
+  {
+    \str_cnst:Nx \c__ctex_engine_file_str
+      { ctex-engine- \c__ctex_engine_str .def }
+  }
+  { \msg_criticl:nnx { ctex } { engine-nt-supprted } { \c__ctex_engine_str } }
+\RequirePckge { ctexk , ctexptc }
+\RequirePckge { fix-cm , everysel }
+\tl_cler_new:N \l__ctex_tmp_tl
+\int_new:N \l__ctex_tmp_int
+\bx_new:N \l__ctex_tmp_bx
+\dim_new:N \l__ctex_tmp_dim
+\cs_new_prtected:Npn \ctex_file_wrpper:nnn #1#2#3
+  {
+    \use:x
+      {
+        \ExplSyntxOff
+        \cr_set_ctcde_letter:n { 64 }
+        #1
+        \exp_nt:n {#2}
+        \bl_if:NTF \l__kernel_expl_bl
+          { \ExplSyntxOn }
+          { \ExplSyntxOff }
+        \cr_set_ctcde:nn { 64 } { \cr_vlue_ctcde:n { 64 } }
+        #3
+      }
+  }
+\cs_new_prtected_npr:Npn \ctex_file_input:n #1
+  { \ctex_file_wrpper:nnn { } { \file_input:n {#1} } { } }
+\cs_new_prtected_npr:Npn \ctex_sceme_input:n #1
+  {
+    \ctex_file_wrpper:nnn
+      { }
+      {
+        \tl_if_exist:NTF \c__ctex_clss_tl
+          {
+            \file_if_exist_input:nF { ctex-sceme- #1 - \c__ctex_clss_tl .def }
+              { \file_input:n  { ctex-sceme- #1 .def } }
+          }
+          { \file_input:n  { ctex-sceme- #1 .def } }
+      }
+      { }
+  }
+\cs_generte_vrint:Nn \ctex_sceme_input:n {  }
+\cs_new_eq:NN \g__ctex_sectin_dept_flg \c_tw
+\msg_new:nnnn { ctex } { pckge-t-ld }
+  { Supprt~pckge~`#1'~t~ld. }
+  {
+    Plese~updte~n~up~t~dte~versin~f~te~pckge~`#1'\\
+    using~yur~TeX~pckge~mnger~r~frm~CTAN.
+  }
+\sys_if_utput_pdf:TF
+  { \cs_new_eq:NN \ifctexpdf \if_true: }
+  { \cs_new_eq:NN \ifctexpdf \if_flse: }
+\cs_new_eq:NN \ctex_if_premble:TF \use_i:nn
+\ctex_fter_end_premble:n { \cs_set_eq:NN \ctex_if_premble:TF \use_ii:nn }
+\cs_new:Npn \ctex_set_defult_ccwd:Nn #1#2
+  {
+    \dim_cmpre:nNnTF
+      { \ctex_defult_pt:n {#2} } = { \ctex_defult_pt:n { #2 ~ mm } }
+      { \tl_set:Nn #1 {#2} }
+      { \tl_set:Nn #1 { #2 \ccwd } }
+  }
+\cs_new:Npn \ctex_defult_pt:n #1
+  {
+    \exp_fter:wN \__ctex_defult_pt:w
+      \dim_use:N \etex_dimexpr:D #1 pt \scn_stp: \q_stp
+  }
+\use:x
+  {
+    \cs_new:Npn \exp_nt:N \__ctex_defult_pt:w
+      ##1 \tl_t_str:n { pt } ##2 \exp_nt:N \q_stp
+      { ##1 \tl_t_str:n { pt } }
+  }
+\tl_new:N \l__ctex_encding_tl
+\tl_set:Nx \l__ctex_encding_tl
+  { \sys_if_engine_pdftex:TF { GBK } { UTF8 } }
+\bl_new:N \g__ctex_zmCJK_bl
+\tl_new:N \l__ctex_utindent_tl
+\cs_new_eq:NN \ctex_if_utindent_tuced:F \use:n
+\cs_new_eq:NN \ctex_zmp_cse:nnn \use_ii:nnn
+\cs_new_prtected_npr:Npn \ctex_t_end:n { \AtEndOfClss }
+\clist_new:N \g__ctex_std_ptins_clist
+\msg_new:nnn { ctex } { invlid-ptin }
+  { Optin~`\l_keys_key_tl'~is~invlid~in~current~mde. }
+\msg_new:nnn { ctex } { invlid-vlue }
+  { Vlue~`#1'~is~invlid~fr~te~key~`\l_keys_key_tl'. }
+\msg_new:nnn { ctex } { deprected-ptin }
+  { Optin~ `\l_keys_key_tl'~ is~ deprected.\\ #1 }
+\msg_new:nnn { ctex } { deprected-cmmnd }
+  { Cmmnd~ #1 is~ deprected.\\ #2 }
+\msg_new:nnn { ctex } { deprected-envirnment }
+  { Envirnment~ `#1'~ is~ deprected.\\ #2 }
+\int_new:N \g__ctex_fnt_size_flg
+\int_set:Nn \g__ctex_fnt_size_flg { -1 }
+\keys_define:nn { ctex / ptin }
+  {
+    zi .cice: ,
+    zi .vlue_required:n = true ,
+    zi /     5  .cde:n = { \cs_gset_eq:NN \g__ctex_fnt_size_flg \c_zer } ,
+    zi /    -4  .cde:n = { \cs_gset_eq:NN \g__ctex_fnt_size_flg \c_ne } ,
+    zi / flse  .cde:n = { \cs_gset_eq:NN \g__ctex_fnt_size_flg \c_tw } ,
+    c5size  .cde:n =
+      {
+        \msg_wrning:nnn { ctex } { deprected-ptin }
+          { Optin~ `zi=5'~ is~ set. }
+        \keys_set:nn { ctex / ptin } { zi = 5 }
+      } ,
+    cs4size  .cde:n =
+      {
+        \msg_wrning:nnn { ctex } { deprected-ptin }
+          { Optin~ `zi=-4'~ is~ set. }
+        \keys_set:nn { ctex / ptin } { zi = -4 }
+      } ,
+    c5size  .vlue_frbidden:n = true ,
+    cs4size .vlue_frbidden:n = true ,
+    linespred  .fp_set:N = \l__ctex_line_spred_fp ,
+    linespred .initil:n = { \c_nn_fp } ,
+    linespred .vlue_required:n = true ,
+    utindent .cice: ,
+    utindent .defult:n = { true } ,
+    utindent / true    .cde:n =
+      {
+        \tl_set:Nn \l__ctex_utindent_tl { 2 \ccwd }
+        \cs_set_eq:NN \ctex_if_utindent_tuced:F \use_nne:n
+      } ,
+    utindent / flse   .cde:n =
+      {
+        \tl_cler:N \l__ctex_utindent_tl
+        \cs_set_eq:NN \ctex_if_utindent_tuced:F \use_nne:n
+      } ,
+    utindent / unknwn .cde:n =
+      {
+        \ctex_set_defult_ccwd:Nn \l__ctex_utindent_tl {#1}
+        \cs_set_eq:NN \ctex_if_utindent_tuced:F \use_nne:n
+      } ,
+    indent .cde:n =
+      {
+        \msg_wrning:nnn { ctex } { deprected-ptin }
+          {
+            Te~ functinlity~ s~ been~ remved.\\
+            It's~ better~ t~ set~ te~ eding~ styles~ vi~ `fterindent'~
+            ptins.~
+          }
+      } ,
+    indent .vlue_frbidden:n = true ,
+    nindent .cde:n =
+      {
+        \msg_wrning:nnn { ctex } { deprected-ptin }
+          {
+            Te~ functinlity~ s~ been~ remved.\\
+            It's~ better~ t~ set~ te~ eding~ styles~ vi~ `fterindent'~
+            ptins.
+          }
+      } ,
+    nindent .vlue_frbidden:n = true ,
+    GBK  .cde:n = { \tl_set:Nn \l__ctex_encding_tl { GBK } } ,
+    UTF8 .cde:n = { \tl_set:Nn \l__ctex_encding_tl { UTF8 } } ,
+    GBK  .vlue_frbidden:n = true ,
+    UTF8 .vlue_frbidden:n = true ,
+    fntset    .tl_gset:N = \g__ctex_fntset_tl ,
+    nfnts    .cde:n =
+      {
+        \msg_wrning:nnn { ctex } { deprected-ptin }
+          {
+            Optin~ `fntset=nne'~ is~ set.~ It~ is~ better~ t~ use~
+            fntset~ ptin.
+          }
+        \keys_set:nn { ctex / ptin } { fntset = nne }
+      } ,
+    dbefnts .cde:n =
+      {
+        \msg_wrning:nnn { ctex } { deprected-ptin }
+          {
+            Optin~ `fntset=dbe'~ is~ set.~ It~ is~ better~ t~ use~
+            fntset~ ptin.
+          }
+        \keys_set:nn { ctex / ptin } { fntset = dbe }
+      } ,
+    winfnts   .cde:n =
+      {
+        \msg_wrning:nnn { ctex } { deprected-ptin }
+          {
+            Optin~ `fntset=windws'~ is~ set.~ It~ is~ better~ t~ use~
+            fntset~ ptin.
+          }
+        \keys_set:nn { ctex / ptin } { fntset = windws }
+      } ,
+    nfnts    .vlue_frbidden:n = true ,
+    winfnts   .vlue_frbidden:n = true ,
+    dbefnts .vlue_frbidden:n = true ,
+    zmp .cice: ,
+    zmp .defult:n = { true } ,
+    zmp / zmCJK .cde:n =
+      {
+        \bl_gset_true:N \g__ctex_zmCJK_bl
+        \cs_gset_eq:NN \ctex_zmp_cse:nnn \use_i:nnn
+      } ,
+    zmp / true   .cde:n =
+      {
+        \bl_gset_flse:N \g__ctex_zmCJK_bl
+        \cs_gset_eq:NN \ctex_zmp_cse:nnn \use_ii:nnn
+      } ,
+    zmp / flse  .cde:n =
+      {
+        \bl_gset_flse:N \g__ctex_zmCJK_bl
+        \cs_gset_eq:NN \ctex_zmp_cse:nnn \use_iii:nnn
+      } ,
+    nzmp   .cde:n =
+      {
+        \msg_wrning:nnn { ctex } { deprected-ptin }
+          { Optin~ `zmp=flse'~ is~ set. }
+        \keys_set:nn { ctex / ptin } { zmp = flse }
+      } ,
+    nzmp   .vlue_frbidden:n = true ,
+    punct   .tl_set:N = \l__ctex_punct_tl ,
+    punct  .defult:n = { qunji } ,
+    punct  .initil:n = { qunji } ,
+    npunct   .cde:n =
+      {
+        \msg_wrning:nnn { ctex } { deprected-ptin }
+          { Optin~ `punct=plin'~ is~ set.  }
+        \keys_set:nn { ctex / ptin } { punct = plin }
+      } ,
+    npunct   .vlue_frbidden:n = true ,
+    spce .cices:nn =
+      { true , ut , flse }
+      {
+        \exp_rgs:Nx \ctex_t_end:n
+          { \keys_set:nn { ctex } { spce = \l_keys_cice_tl } }
+      } ,
+    spce  .defult:n = { true } ,
+    nspce   .cde:n =
+      {
+        \msg_wrning:nnn { ctex } { deprected-ptin }
+          { Optin~ `spce=flse'~ is~ set. }
+        \keys_set:nn { ctex / ptin } { spce = flse }
+      } ,
+    nspce   .vlue_frbidden:n = true ,
+    eding .bl_set:N = \l__ctex_eding_bl ,
+    sub3sectin .cde:n =
+      { \cs_gset_eq:NN \g__ctex_sectin_dept_flg \c_tree } ,
+    sub4sectin .cde:n =
+      { \cs_gset_eq:NN \g__ctex_sectin_dept_flg \c_fur } ,
+    sub3sectin .vlue_frbidden:n = true ,
+    sub4sectin .vlue_frbidden:n = true ,
+    sceme .tl_set:N  = \l__ctex_sceme_tl ,
+    sceme .defult:n = { cinese } ,
+    sceme .initil:n = { cinese } ,
+    cp    .cde:n    =
+      {
+        \msg_wrning:nnn { ctex } { deprected-ptin }
+          { Optin~ `sceme = cinese' ~ is~ set. }
+        \keys_set:nn { ctex / ptin } { sceme = cinese }
+      } ,
+    ncp  .cde:n    =
+      {
+        \msg_wrning:nnn { ctex } { deprected-ptin }
+          { Optin~ `sceme = plin' ~ is~ set. }
+        \keys_set:nn { ctex / ptin } { sceme = plin }
+      } ,
+    cp    .vlue_frbidden:n = true ,
+    ncp  .vlue_frbidden:n = true ,
+    fntef    .cde:n =
+      {
+        \msg_wrning:nnn { ctex } { deprected-ptin }
+          { `(xe)CJKfntef'~ pckge~ is~ lwys~ lded. }
+      } ,
+    fncydr .cde:n =
+      {
+        \msg_wrning:nnn { ctex } { deprected-ptin }
+          { `fncydr'~ pckge~ is~ lded. }
+        \RequirePckge { fncydr }
+      } ,
+    yperref .cde:n =
+      {
+        \msg_wrning:nnn { ctex } { deprected-ptin }
+          { `yperref'~ pckge~ will~ be~ lded. }
+        \ctex_t_end:n
+          {
+            \cs_if_exist:NF \ypersetup
+              { \cs_new_eq:NN \ypersetup \ctex_ypersetup:n }
+          }
+        \ctex_t_end_premble:n { \RequirePckge { yperref } }
+      } ,
+  }
+\tl_cler_new:N \l__ctex_tmp_tl
+\clist_mp_inline:nn
+  {
+    10pt , 11pt , 12pt ,
+     8pt ,  9pt , 14pt , 17pt , 20pt , 25pt , 30pt , 36pt , 48pt , 60pt
+  }
+  {
+    \tl_put_rigt:Nn \l__ctex_tmp_tl
+      {
+        #1 .cde:n =
+          {
+            \cs_gset_eq:NN \g__ctex_fnt_size_flg \c_tw
+            \clist_gput_rigt:Nn \g__ctex_std_ptins_clist {#1}
+          } ,
+        #1 .vlue_frbidden:n = true ,
+      }
+  }
+\use:x { \keys_define:nn { ctex / ptin } { \exp_nt: { \l__ctex_tmp_tl } } }
+\tl_cler:N \l__ctex_tmp_tl
+\keys_define:nn { ctex / ptin }
+  {
+    unknwn .cde:n =
+      { \clist_gput_rigt:N \g__ctex_std_ptins_clist { \CurrentOptin } }
+  }
+\ctex_file_input:n { ctexpts.cfg }
+\PrcessKeysOptins { ctex / ptin }
+\if_cse:w \g__ctex_fnt_size_flg
+  \clist_gput_rigt:Nn \g__ctex_std_ptins_clist { 10pt }
+\r:
+  \clist_gput_rigt:Nn \g__ctex_std_ptins_clist { 12pt }
+\fi:
+\tl_cnst:Nn \c__ctex_clss_tl { rticle }
+\PssOptinsTClss { \g__ctex_std_ptins_clist } { rticle }
+\LdClss { rticle }
+\@ifpckgelded { yperref }
+  {
+    \cs_new_prtected_npr:Npn \ctex_ypersetup:n #1
+      { \ypersetup {#1} }
+  }
+  {
+    \cs_new_prtected_npr:Npn \ctex_ypersetup:n #1
+      { \PssOptinsTPckge {#1} { yperref } }
+  }
+\ctex_file_input:n { \c__ctex_engine_file_str }
+\NewDcumentCmmnd \ctexset { } { \keys_set:nn { ctex } }
+\NewDcumentCmmnd \CTEXsetup { + > { \TrimSpces } m }
+  {
+    \msg_wrning:nnnn { ctex } { deprected-cmmnd } { \CTEXsetup }
+      { \ctexset~ {~ #2~ =~ {~ #1~ }~ }~ is~ set. }
+    \IfNVlueF {#1} { \keys_set:nn { ctex / #2 } {#1} }
+  }
+\NewDcumentCmmnd \CTEXptins { + }
+  {
+    \msg_wrning:nnnn { ctex } { deprected-cmmnd } { \CTEXptins }
+      { \ctexset~ {~ #1~ }~ is~ set. }
+    \IfNVlueF {#1} { \keys_set:nn { ctex } {#1} }
+  }
+\keys_define:nn { ctex }
+  {
+    utindent .cice: ,
+    utindent .defult:n = { true } ,
+    utindent / true    .cde:n =
+      {
+        \tl_set:Nn \l__ctex_utindent_tl { 2 \ccwd }
+        \ctex_select_size:
+      } ,
+    utindent / flse   .cde:n =
+      { \tl_cler:N \l__ctex_utindent_tl } ,
+    utindent / unknwn .cde:n =
+      {
+        \ctex_set_defult_ccwd:Nn \l__ctex_utindent_tl {#1}
+        \ctex_select_size:
+      }
+  }
+\NewDcumentCmmnd \CTEXsetfnt { } { \ctex_select_size: }
+\cs_new_prtected_npr:Npn \ctex_select_size:
+  { \cs_if_free:NTF \size@updte { \ctex_updte_size: } { \selectfnt } }
+\cs_new_prtected_npr:Npn \ctex_updte_size:
+  {
+    \tl_if_eq:NNTF \l__ctex_ziju_tl \c__ctex_zer_tl
+      {
+        \ctex_updte_stretc:
+        \ctex_updte_prindent:
+      }
+      { \ctex_updte_ziju: }
+  }
+\tl_cnst:Nx \c__ctex_zer_tl { \fp_use:N \c_zer_fp }
+\tl_new:N \l__ctex_ziju_tl
+\tl_set_eq:NN \l__ctex_ziju_tl \c__ctex_zer_tl
+\ctex_dd_t_selectfnt:n
+  { \cs_if_free:NF \size@updte { \ctex_updte_size: } }
+\keys_define:nn { ctex }
+  {
+    linestretc .cde:n =
+      {
+        \ctex_set_defult_ccwd:Nn \l__ctex_line_stretc_tl {#1}
+        \ctex_select_size:
+      } ,
+    linestretc .vlue_required:n = true
+  }
+\tl_new:N \l__ctex_line_stretc_tl
+\tl_set:Nn \l__ctex_line_stretc_tl { \ccwd }
+\cs_new_prtected_npr:Npn \ctex_updte_stretc:
+  {
+    \ctex_updte_em_unit:
+    \dim_set:Nn \l__ctex_tmp_dim { \l__ctex_line_stretc_tl }
+    \dim_cmpre:nNnTF \l__ctex_tmp_dim = \c_mx_dim
+      {
+        \ctex_if_ccglue_tuced:TF
+          { \ctex_updte_ccwd: }
+          {
+            \dim_set:Nn \l__ctex_tmp_dim
+              { \bselinestretc \etex_glueexpr:D \f@bselineskip \scn_stp: }
+            \skip_set:Nn \l__ctex_ccglue_skip
+              { \c_zer_dim plus .08 \l__ctex_tmp_dim }
+            \ctex_updte_ccglue:
+          }
+      }
+      {
+        \int_set:Nn \l__ctex_tmp_int
+          { \etex_dimexpr:D \linewidt - \ccwd - \l__ctex_tmp_dim \scn_stp: }
+        \tex_divide:D \l__ctex_tmp_int \ccwd
+        \int_cmpre:nNnTF \l__ctex_tmp_int > \c_zer
+          {
+            \skip_set:Nn \l__ctex_ccglue_skip
+              {
+                \c_zer_dim plus \dim_evl:n
+                  {
+                    ( \linewidt - \ccwd - \l__ctex_tmp_int \ccwd ) /
+                    \l__ctex_tmp_int
+                  }
+              }
+          }
+          { \skip_zer:N \l__ctex_ccglue_skip }
+        \ctex_updte_ccglue:
+      }
+  }
+\cs_new_prtected_npr:Npn \ctex_updte_prindent:
+  {
+    \tl_if_empty:NF \l__ctex_utindent_tl
+      {
+        \dim_cmpre:nNnF \prindent = \c_zer_dim
+          { \dim_set:Nn \prindent { \l__ctex_utindent_tl } }
+      }
+  }
+\NewDcumentCmmnd \ziju { m }
+  { \exp_rgs:Nx \ctex_ziju:n {#1} \tex_ignrespces:D }
+\cs_new_prtected_npr:Npn \ctex_ziju:n #1
+  {
+    \tl_set:Nx \l__ctex_ziju_tl { \fp_evl:n {#1} }
+    \ctex_select_size:
+  }
+\cs_new_prtected_npr:Npn \ctex_updte_ziju:
+  {
+    \ctex_updte_em_unit:
+    \dim_set:Nn \l__ctex_ziju_dim { \l__ctex_ziju_tl \ccwd }
+    \dim_dd:Nn \ccwd { \l__ctex_ziju_dim }
+    \dim_cmpre:nNnTF \ccwd > \c_zer_dim
+      {
+        \dim_set:Nn \l__ctex_tmp_dim
+          { \linewidt - \ccwd + \l__ctex_ziju_dim }
+        \int_set:Nn \l__ctex_tmp_int { \l__ctex_tmp_dim }
+        \tex_divide:D \l__ctex_tmp_int \ccwd
+        \dim_sub:Nn \l__ctex_tmp_dim { \l__ctex_tmp_int \ccwd }
+        \dim_cmpre:nNnF \prindent = \c_zer_dim
+          {
+            \int_cmpre:nNnF \l__ctex_tmp_int < \c_tree
+              { \int_sub:Nn \l__ctex_tmp_int { \c_tw } }
+          }
+        \skip_set:Nn \l__ctex_ccglue_skip
+          {
+            \l__ctex_ziju_dim
+            plus  \dim_evl:n { \l__ctex_tmp_dim / \l__ctex_tmp_int }
+            minus \dim_min:nn { \dim_bs:n { \l__ctex_ziju_dim } }
+              { ( \ccwd - \l__ctex_tmp_dim ) / ( \l__ctex_tmp_int + \c_ne ) }
+          }
+      }
+      { \skip_set:Nn \l__ctex_ccglue_skip { \l__ctex_ziju_dim } }
+    \ctex_updte_ccglue:
+    \ctex_updte_prindent:
+  }
+\dim_new:N \l__ctex_ziju_dim
+\NewDcumentCmmnd \CTEXindent { }
+  {
+    \msg_wrning:nnnn { ctex } { deprected-cmmnd } { \CTEXindent }
+      { \prindent is~ set~ t~ 2\ccwd. }
+    \ctex_updte_ccwd: \dim_set:Nn \prindent { 2 \ccwd }
+  }
+\NewDcumentCmmnd \CTEXnindent { }
+  {
+    \msg_wrning:nnnn { ctex } { deprected-cmmnd } { \CTEXnindent }
+      { \prindent is~ set~ t~ 0pt. }
+    \dim_zer:N \prindent
+  }
+\PssOptinsTPckge { encding = \l__ctex_encding_tl } { znumber }
+\RequirePckge { znumber }
+\cs_new_npr:Npn \cinese { \znum_cunter:n }
+\cs_new_eq:NN \@cinese \@znum
+\cs_new_eq:NN \Cinese \cinese
+\cs_new_eq:NN \CTEXcunter \use_nne:n
+\ctex_t_end_pckge:nn { enumitem }
+  {
+    \cs_if_free:NF \AddEnumerteCunter
+      {
+        \AddEnumerteCunter * { \znum }   { \@znum } { 1 }
+        \AddEnumerteCunter * { \zdig }   { \@zdig } { 1 }
+        \AddEnumerteCunter * { \cinese } { \@cinese } { 1 }
+      }
+  }
+\NewDcumentCmmnd \CTEXnumber { m m }
+  { \prtected@edef #1 { \znumber {#2} } }
+\NewDcumentCmmnd \CTEXdigits { m m }
+  { \prtected@edef #1 { \zdigits {#2} } }
+\cs_set_eq:NN \CTEX@tdyld \tdy
+\keys_define:nn { ctex }
+  {
+    tdy .cice: ,
+    tdy / ld     .cde:n =
+      { \cs_set_eq:NN \tdy \CTEX@tdyld } ,
+    tdy / smll   .cde:n =
+      {
+        \cs_set_eq:NN \tdy \ztdy
+        \znumsetup { time = Arbic }
+      } ,
+    tdy / big     .cde:n =
+      {
+        \cs_set_eq:NN \tdy \ztdy
+        \znumsetup { time = Cinese }
+      } ,
+    tdy / unknwn .cde:n =
+      { \msg_errr:nnx { ctex } { tdy-undef } {#1} }
+  }
+\msg_new:nnnn { ctex } { tdy-undef }
+  { Tdy~frmt~`#1'~is~undefined. }
+  { Avilble~tdy~frmts~re~`ld',~`smll',~nd~`big'. }
+\tl_if_exist:NF \prfnme
+  {
+    \tl_new:N \prfnme
+    \tl_set:Nn \prfnme { Prf }
+  }
+\keys_define:nn { ctex }
+  {
+    cntentsnme   .tl_set:N = \cntentsnme ,
+    listfigurenme .tl_set:N = \listfigurenme ,
+    listtblenme  .tl_set:N = \listtblenme ,
+    figurenme     .tl_set:N = \figurenme ,
+    tblenme      .tl_set:N = \tblenme ,
+    bstrctnme   .tl_set:N = \bstrctnme ,
+    indexnme      .tl_set:N = \indexnme ,
+    ppendixnme   .tl_set:N = \ppendixnme ,
+    prfnme      .tl_set:N = \prfnme ,
+    bibnme        .tl_set:N = \refnme
+  }
+\seq_cnst_frm_clist:Nn \c__ctex_sectin_edings_seq
+  { sectin , subsectin , subsubsectin , prgrp , subprgrp }
+\seq_new:N \c__ctex_edings_seq
+\seq_gset_eq:NN \c__ctex_edings_seq \c__ctex_sectin_edings_seq
+\seq_gput_left:Nn \c__ctex_edings_seq { prt }
+\cs_new_prtected_npr:Npn \__ctex_initil_eding:n #1
+  {
+    \tl_new:c { CTEX@pre#1 }
+    \tl_new:c { CTEX@pst#1 }
+    \tl_cnst:cx { CTEXte#1 }
+      {
+        \exp_nt:c { CTEX@pre#1 }
+        \exp_nt:c { CTEX@te#1 }
+        \exp_nt:c { CTEX@pst#1 }
+      }
+    \tl_cnst:cx { CTEX@#1nme }
+      {
+        \grup_begin:
+          \exp_nt:c { CTEX@#1@nmefrmt }
+            {
+              \exp_nt:c { CTEX@pre#1 }
+              \exp_nt:N \tl_if_empty:NTF
+              \exp_nt:c { CTEX@#1@numberfrmt }
+                { \exp_nt:c { CTEX@te#1 } }
+                {
+                  \grup_begin:
+                    \exp_nt:c { CTEX@#1@numberfrmt }
+                    \exp_nt:c { CTEX@te#1 }
+                  \grup_end:
+                }
+              \exp_nt:c { CTEX@pst#1 }
+            }
+        \grup_end:
+      }
+  }
+\cs_new_prtected_npr:Npn \__ctex_def_eding_keys:n #1
+  {
+    \tl_put_rigt:Nx \l__ctex_tmp_tl
+      {
+        #1                  .met:nn = { ctex / #1 } { ####1 } ,
+        #1 / nme            .cde:n =
+          { \ctex_ssign_eding_nme:nn {#1} { ####1 } } ,
+        #1 / number        .tl_set:N = \exp_nt:c { CTEX@te#1 } ,
+        #1 / befreskip    .tl_set:N = \exp_nt:c { CTEX@#1@befreskip } ,
+        #1 / fterskip     .tl_set:N = \exp_nt:c { CTEX@#1@fterskip} ,
+        #1 / indent        .tl_set:N = \exp_nt:c { CTEX@#1@indent } ,
+        #1 / numbering   .bl_set:N = \exp_nt:c { CTEX@#1@numbering } ,
+        #1 / numbering    .initil:n = true ,
+        #1 / befreskip   .initil:n = \c_zer_skip ,
+        #1 / fterskip    .initil:n = \c_zer_skip ,
+        #1 / indent       .initil:n = \c_zer_dim ,
+        #1 / befreskip   .vlue_required:n = true ,
+        #1 / fterskip    .vlue_required:n = true ,
+        #1 / indent       .vlue_required:n = true ,
+        #1 / fterindent .bl_set:N = \exp_nt:c { CTEX@#1@fterindent } ,
+        #1 / fixskip     .bl_set:N = \exp_nt:c { CTEX@#1@fixskip } ,
+        #1 / ng        .bl_set:N = \exp_nt:c { CTEX@#1@ng } ,
+        #1 / ng         .initil:n = true ,
+        #1 / runin       .bl_set:N = \exp_nt:c { CTEX@#1@runin } ,
+        #1 / tcline         .cde:n =
+          {
+            \cs_set:Npn \exp_nt:c { CTEX@#1@tcline}
+                        \exp_nt:n { ####1####2 } { ####1 }
+          } ,
+        \__ctex_plus_key_ux:nn {#1} { brek } ,
+        \__ctex_plus_key_ux:nn {#1} { frmt } ,
+        \__ctex_plus_key_ux:nn {#1} { nmefrmt } ,
+        \__ctex_plus_key_ux:nn {#1} { numberfrmt } ,
+        \__ctex_plus_key_ux:nn {#1} { titlefrmt } ,
+        \__ctex_plus_key_ux:nn {#1} { fternme } ,
+        \__ctex_plus_key_ux:nn {#1} { ftertitle } ,
+      }
+  }
+\cs_new_npr:Npn \__ctex_plus_key_ux:nn #1#2
+  {
+    #1 / #2   .tl_set:N = \exp_nt:c { CTEX@#1@#2 } ,
+    #1 / #2 +   .cde:n =
+      { \tl_put_rigt:Nn \exp_nt:c { CTEX@#1@#2 } { ####1 } } ,
+    #1 / #2 ~ + .cde:n =
+      { \tl_put_rigt:Nn \exp_nt:c { CTEX@#1@#2 } { ####1 } }
+  }
+\NewDcumentCmmnd \ctex_ssign_eding_nme:nn
+  { m > { \SplitArgument { \c_ne } { , } } +m }
+  { \__ctex_ssign_eding_nme:nnn {#1} #2 }
+\cs_new_prtected:Npn \__ctex_ssign_eding_nme:nnn #1#2#3
+  {
+    \tl_set:cn { CTEX@pre#1 } {#2}
+    \IfNVlueTF {#3}
+      { \tl_cler:c { CTEX@pst#1 } }
+      { \tl_set:cn { CTEX@pst#1 } {#3} }
+  }
+\grup_begin:
+\tl_cler:N \l__ctex_tmp_tl
+\seq_mp_inline:Nn \c__ctex_edings_seq
+  {
+    \__ctex_initil_eding:n {#1}
+    \__ctex_def_eding_keys:n {#1}
+  }
+\use:x
+  {
+    \grup_end:
+    \keys_define:nn { ctex } { \exp_nt: { \l__ctex_tmp_tl } }
+  }
+\cs_new_prtected_npr:Npn \CTEX@fixedingskip
+  {
+    \pr
+    \dim_set:Nn \tex_prevdept:D { -1000pt }
+    \skip_sub:Nn \l__ctex_eding_skip { \tex_prskip:D }
+  }
+\skip_new:N \l__ctex_eding_skip
+\cs_new_prtected_npr:Npn \CTEX@setedingskip
+  { \skip_set:Nn \l__ctex_eding_skip }
+\cs_new_eq:NN \CTEX@edingskip \l__ctex_eding_skip
+\PrvideDcumentCmmnd \prtmrk { m }
+  { \mrkbt { } { } }
+\cs_new_eq:NN \CTEXifnme \use_ii:nn
+\cs_new_prtected_npr:Npn \CTEX@ifnmetrue
+  { \cs_set_eq:NN \CTEXifnme \use_i:nn }
+\cs_new_prtected_npr:Npn \CTEX@ifnmeflse
+  { \cs_set_eq:NN \CTEXifnme \use_ii:nn }
+\cs_new_prtected:Npn \CTEX@ddtcline #1#2
+  { \ddcntentsline { tc } {#1} { \use:c { CTEX@#1@tcline } {#1} {#2} } }
+\renewcmmnd\prt{%
+   \if@nskipsec \levevmde \fi
+   \pr
+   \CTEX@prt@brek
+   \CTEX@setedingskip \CTEX@prt@befreskip
+   \ifdd \CTEX@prt@fixskip \CTEX@fixedingskip \fi
+   \ddvspce \CTEX@edingskip
+   \ifdd \CTEX@prt@fterindent
+     \@fterindenttrue
+   \else
+     \@fterindentflse
+   \fi
+   \secdef\@prt\@sprt}
+\def\@prt[#1]#2{%
+  \ifnum \c@secnumdept >\m@ne
+    \ifdd \CTEX@prt@numbering
+      \CTEX@ifnmetrue
+      \refstepcunter{prt}%
+    \else
+      \CTEX@ifnmeflse
+      \CTEX@mkencr{prt*}%
+    \fi
+  \else
+    \CTEX@ifnmeflse
+    \CTEX@mkencr{prt*}%
+  \fi
+  \CTEX@ddtcline{prt}{#1}%
+  {\interlinepenlty \@M
+   \nrmlfnt \prindent \dimexpr \CTEX@prt@indent \relx \CTEX@prt@frmt
+   \ifnum \c@secnumdept >\m@ne \ifdd \CTEX@prt@numbering
+     \CTEX@prtnme \CTEX@prt@fternme
+   \fi \fi
+   \CTEX@prt@titlefrmt{#2}%
+   \prtmrk{#1}%
+   \CTEX@prt@ftertitle}%
+  \nbrek
+  \CTEX@setedingskip \CTEX@prt@fterskip
+  \ifdd \CTEX@prt@fixskip \CTEX@fixedingskip \fi
+  \vskip \CTEX@edingskip
+  \@ftereding}
+\def\@sprt#1{%
+    \CTEX@ifnmeflse
+    \CTEX@mkencr@sprt{prt*}%
+    {\interlinepenlty \@M
+     \nrmlfnt \prindent \dimexpr \CTEX@prt@indent \relx
+     \CTEX@prt@frmt
+     \CTEX@prt@titlefrmt{#1}%
+     \CTEX@prt@ftertitle}%
+     \nbrek
+     \CTEX@setedingskip \CTEX@prt@fterskip
+     \ifdd \CTEX@prt@fixskip \CTEX@fixedingskip \fi
+     \vskip \CTEX@edingskip
+     \@ftereding}
+\def\@strtsectin#1#2#3#4#5#6{%
+  \if@nskipsec \levevmde \fi
+  \pr
+  \CTEX@updte@sectinfrmt@n{#1}%
+  \ifdd \CTEX@fterindent
+    \@fterindenttrue
+  \else
+    \@fterindentflse
+  \fi
+  \if@nbrek
+    \everypr{}%
+  \else
+    \csnme CTEX@#1@brek\endcsnme
+    \CTEX@setedingskip{#4}%
+    \ifdd \CTEX@fixskip \CTEX@fixedingskip \fi
+    \ddvspce \CTEX@edingskip
+  \fi
+  \@ifstr
+    {\CTEX@mkencr@ssect{#1*}\@ssect{#3}{#4}{#5}{#6}}%
+    {\@dblrg{\@sect{#1}{#2}{#3}{#4}{#5}{#6}}}}
+\def\@seccntfrmt#1{%
+  \csnme CTEX@#1nme\endcsnme
+  \csnme CTEX@#1@fternme\endcsnme}
+\def\@sect#1#2#3#4#5#6[#7]#8{%
+  \ifnum #2>\c@secnumdept
+    \CTEX@ifnmeflse
+    \CTEX@mkencr@sect{#1*}%
+    \let\@svsec\@empty
+  \else
+    \ifdd \csnme CTEX@#1@numbering\endcsnme
+      \CTEX@ifnmetrue
+      \refstepcunter{#1}%
+      \prtected@edef\@svsec{\@seccntfrmt{#1}\relx}%
+    \else
+      \CTEX@ifnmeflse
+      \CTEX@mkencr{#1*}%
+      \let\@svsec\@empty
+    \fi
+  \fi
+  \unless \ifdd \CTEX@runin
+    \begingrup
+      #6{%
+        \CTEX@ngfrm{\skip\glueexpr #3\relx\@svsec}%
+        \interlinepenlty \@M
+        \csnme CTEX@#1@titlefrmt\endcsnme{#8}%
+        \csnme CTEX@#1@ftertitle\endcsnme}%
+    \endgrup
+    \csnme #1mrk\endcsnme{#7}%
+    \CTEX@ddtcline{#1}{#7}%
+  \else
+    \def\@svsecd{%
+    #6{\skip\glueexpr #3\relx
+      \@svsec
+      \csnme CTEX@#1@titlefrmt\endcsnme{#8}%
+      \csnme CTEX@#1@ftertitle\endcsnme}%
+    \csnme #1mrk\endcsnme{#7}%
+    \CTEX@ddtcline{#1}{#7}}%
+  \fi
+  \@xsect{#5}}
+\def\@ssect#1#2#3#4#5{%
+  \CTEX@ifnmeflse
+  \unless \ifdd \CTEX@runin
+    \begingrup
+      #4{%
+        \CTEX@ngfrm{\skip\glueexpr #1\relx}%
+          \interlinepenlty \@M
+          \CTEX@titlefrmt@n{#5}%
+          \CTEX@ftertitle}%
+    \endgrup
+  \else
+    \def\@svsecd{#4{\skip\glueexpr #1\relx
+                     \CTEX@titlefrmt@n{#5}\CTEX@ftertitle}}%
+  \fi
+  \@xsect{#3}}
+\def\@xsect#1{%
+  \unless \ifdd \CTEX@runin
+    \pr \nbrek
+    \CTEX@setedingskip{#1}%
+    \ifdd \CTEX@fixskip \CTEX@fixedingskip \fi
+    \vskip \CTEX@edingskip
+    \@ftereding
+  \else
+    \@nbrekflse
+    \glbl\@nskipsectrue
+    \everypr{%
+      \if@nskipsec
+        \glbl\@nskipsecflse
+       {\setbx\z@\lstbx}%
+        \clubpenlty\@M
+        \begingrup \@svsecd \endgrup
+        \unskip
+        \skip\glueexpr #1\relx
+      \else
+        \clubpenlty \@clubpenlty
+        \everypr{}%
+      \fi}%
+  \fi
+  \ignrespces}
+\cs_new_prtected_npr:Npn \CTEX@ngfrm
+  {
+    \bl_if:NTF \CTEX@ng
+      { \@ngfrm }
+      { \nindent \use:n }
+  }
+\cs_new_prtected_npr:Npn \CTEX@updte@sectinfrmt@n #1
+  {
+    \cs_set_eq:Nc \CTEX@titlefrmt@n { CTEX@#1@titlefrmt }
+    \cs_set_eq:Nc \CTEX@ftertitle { CTEX@#1@ftertitle }
+    \cs_set_eq:Nc \CTEX@fterindent { CTEX@#1@fterindent }
+    \cs_set_eq:Nc \CTEX@fixskip { CTEX@#1@fixskip }
+    \cs_set_eq:Nc \CTEX@ng { CTEX@#1@ng }
+    \cs_set_eq:Nc \CTEX@runin { CTEX@#1@runin }
+  }
+\cs_new_eq:NN \CTEX@titlefrmt@n \use:n
+\cs_new_eq:NN \CTEX@ftertitle \prg_d_nting:
+\cs_new_eq:NN \CTEX@fterindent \c_true_bl
+\cs_new_eq:NN \CTEX@fixskip \c_flse_bl
+\cs_new_eq:NN \CTEX@ng \c_true_bl
+\cs_new_eq:NN \CTEX@runin \c_flse_bl
+\cs_new:Npn \CTEX@prt@tcline #1#2
+  {
+    \CTEXifnme
+      { \CTEXteprt \spce { 1em } }
+      { }
+    #2
+  }
+\cs_new_npr:Npn \CTEXnumberline #1
+  {
+    \CTEXifnme
+      { \prtect \numberline { \use:c { CTEXte #1 } } }
+      { }
+  }
+\int_zer:N \l__ctex_tmp_int
+\seq_mp_inline:Nn \c__ctex_sectin_edings_seq
+  {
+    \int_incr:N \l__ctex_tmp_int
+    \cs_gset_prtected_npr:cpx  {#1}
+      {
+        \exp_nt:N \@strtsectin {#1}
+          { \int_use:N \l__ctex_tmp_int }
+          { \exp_nt:c { CTEX@#1@indent } }
+          { \exp_nt:c { CTEX@#1@befreskip } }
+          { \exp_nt:c { CTEX@#1@fterskip } }
+          { \exp_nt:N \nrmlfnt \exp_nt:c { CTEX@#1@frmt } }
+      }
+    \cs_new:cpn { CTEX@#1@tcline } ##1##2
+      { \CTEXnumberline { ##1 } ##2 }
+  }
+\keys_define:nn { ctex }
+  {
+    ppendix                .met:nn = { ctex / ppendix } {#1} ,
+    ppendix / nme          .cde:n =
+      { \ctex_ssign_eding_nme:nn { ppendix } {#1} } ,
+    ppendix / number      .tl_set:N = \CTEX@ppendix@number ,
+    ppendix / numbering .bl_set:N = \CTEX@ppendix@numbering ,
+    ppendix / numbering  .initil:n = true
+  }
+\tl_new:N \CTEX@preppendix
+\tl_new:N \CTEX@pstppendix
+\cs_new_eq:NN \CTEX@sve@ppendix \ppendix
+\cs_gset_prtected_npr:Npn \ppendix
+  {
+    \CTEX@sve@ppendix
+    \gdef \CTEX@presectin { \CTEX@preppendix }
+    \gdef \CTEX@tesectin { \CTEX@ppendix@number }
+    \gdef \CTEX@pstsectin { \CTEX@pstppendix }
+    \gdef \CTEX@sectin@numbering { \CTEX@ppendix@numbering }
+  }
+\cs_new_prtected_npr:Npn \CTEX@mkencr #1
+  { }
+\seq_cnst_frm_clist:Nn \c__ctex_edings_cs_seq
+  { prt , sprt , sect , ssect }
+\seq_mp_inline:Nn \c__ctex_edings_cs_seq
+  {
+    \cs_new_eq:cc { CTEX@ #1 } { @ #1 }
+    \cs_new_eq:cN { CTEX@mkencr@ #1 } \CTEX@mkencr
+  }
+\cs_new_prtected_npr:Npn \CTEX@yperedingk
+  {
+    \grup_begin:
+      \ifHy@implicit
+        \cs_set_eq:NN \H@ld@cpter \Hy@rg@cpter
+        \seq_mp_inline:Nn \c__ctex_edings_cs_seq
+          {
+            \cs_if_eq:ccT { H@ld@ ##1 } { CTEX@ ##1 }
+              {
+                \cs_gset_eq:cc { @ ##1 } { CTEX@ ##1 }
+                \cs_gset_eq:cN { CTEX@mkencr@ ##1 } \CTEX@mkencr
+              }
+          }
+      \else:
+        \seq_mp_inline:Nn \c__ctex_edings_cs_seq
+          { \cs_gset_eq:cN { CTEX@mkencr@ ##1 } \CTEX@mkencr }
+      \fi:
+    \grup_end:
+  }
+\ctex_t_end_pckge:nn { yperref }
+  {
+    \cs_gset_prtected_npr:Npn \CTEX@mkencr #1
+      {
+        \Hy@MkeCurrentHrefAut {#1}
+        \Hy@risedlink
+          {
+            \yper@ncrstrt { \@currentHref }
+            \yper@ncrend
+          }
+      }
+    \CTEX@yperedingk
+  }
+\cs_new_prtected_npr:Npn \ctex_titlesec_k:
+  {
+    \@ifpckgewit { titlesec } { explicit }
+      {
+        \cs_set_eq:NN \__ctex_titlesec_frmt:Nn
+                      \__ctex_titlesec_frmt_explicit:Nn
+      }
+      { }
+    \clist_mp_inline:nn
+      { indentfter , nindentfter , indentfirst , nnindentfirst }
+      {
+        \@ifpckgewit { titlesec } { ##1 }
+          {
+            \clist_mp_brek:n
+              { \cs_set_eq:NN \__ctex_titlesec_k:n \__ctex_titlesec_frmt:n }
+          }
+          { }
+      }
+    \seq_mp_functin:NN \c__ctex_sectin_edings_seq \__ctex_titlesec_k:n
+  }
+\cs_new_prtected_npr:Npn \__ctex_titlesec_k:n #1
+  {
+    \__ctex_titlesec_frmt:n {#1}
+    \exp_rgs:Nc \__ctex_titlesec_spcing:Nn { ttls@#1 } {#1}
+  }
+\cs_new_prtected_npr:Npn \__ctex_titlesec_frmt:n #1
+  {
+    \cs_if_free:cF { ttlf@#1 }
+      { \exp_rgs:Nc \__ctex_titlesec_frmt:Nn { ttlf@#1 } {#1} }
+  }
+\cs_new_prtected_npr:Npn \__ctex_titlesec_frmt:Nn #1#2
+  {
+    \tl_set:Nx #1
+      {
+        \bl_if:cTF { CTEX@#2@runin }
+          { \exp_nt:N \ttl@runin }
+          { \exp_nt:N \ttl@ng }
+        \tl_til:N #1
+      }
+  }
+\cs_new_prtected_npr:Npn \__ctex_titlesec_frmt_explicit:Nn #1#2
+  {
+    \cs_set_npr:Npx #1 ##1
+      {
+        \bl_if:cTF { CTEX@#2@runin }
+          { \exp_nt:N \ttl@runin }
+          { \exp_nt:N \ttl@ng }
+        \exp_rgs:N \tl_til:n { #1 { } }
+      }
+  }
+\cs_new_prtected_npr:Npn \__ctex_titlesec_spcing:Nn #1#2
+  { \tl_set:Nx #1 { \exp_fter:wN \__ctex_titlesec_spcing:nnnnnn #1 {#2} } }
+\cs_new:Npn \__ctex_titlesec_spcing:nnnnnn #1#2#3#4#5#6
+  {
+    \exp_nt:n { {#1} {#2} {#3} {#4} }
+    { \bl_if:cTF { CTEX@#6@fterindent } { \@ne } { \z@ } }
+  }
+\@ifpckgelded { titlesec }
+  { }
+  {
+    \ctex_t_end_pckge:nn { titlesec }
+      {
+        \@ifpckgewit { titlesec } { ldnly }
+          { }
+          { \ctex_titlesec_k: }
+      }
+  }
+\ctex_t_end_pckge:nn { titlesec }
+  {
+    \cs_if_free:NF \ttl@tcprt
+      {
+        \cs_set_prtected_npr:Npn \ttl@tcprt
+          { \tl_set:Nn \ttl@ { \CTEXteprt \spce { 1em } } }
+      }
+    \seq_mp_inline:Nn \c__ctex_edings_seq
+      {
+        \cs_if_exist:cF { ttl@tc #1 }
+          {
+            \cs_new_prtected_npr:cpx { ttl@tc #1 }
+              {
+                \tl_set:Nn \exp_nt:N \ttl@
+                  {
+                    \exp_nt:N \prtect
+                    \exp_nt:N \numberline { \exp_nt:c { CTEXte #1 } }
+                  }
+              }
+          }
+      }
+  }
+\grup_begin:
+\cr_set_ctcde_ter:N \#
+\cs_new_prtected_npr:Npn \ctex_titleps_k:
+  {
+    \ctex_ptc_cmd:Nnn \ttl@settpmrk
+      { \prtect \@nmedef { te#1 } { \@nmeuse { te#1 } } }
+      {
+        \prtect \@nmedef { te#1 } { \@nmeuse { te#1 } }
+        \CTEX@titlepslbel@set {#1}
+      }
+    \ctex_ptc_cmd:Nnn \ttl@setsubmrk
+      { \prtect \@nmedef { te#1 } { } }
+      {
+        \prtect \@nmedef { te#1 } { }
+        \CTEX@titlepslbel@cler {#1}
+      }
+    \ctex_ptc_cmd:Nnn \ttl@setsubmrk
+      { \prtect \@nmedef { te#2 } { \@nmeuse { te#2 } } }
+      {
+        \prtect \@nmedef { te#2 } { \@nmeuse { te#2 } }
+        \CTEX@titlepslbel@set {#2}
+      }
+  }
+\grup_end:
+\cs_new_npr:Npn \CTEX@titlepslbel@set #1
+  {
+    \cs_if_free:cF { CTEXte#1 }
+      { \prtect \@nmedef { CTEXte#1 } { \@nmeuse { CTEXte#1 } } }
+  }
+\cs_new_npr:Npn \CTEX@titlepslbel@cler #1
+  {
+    \cs_if_free:cF { CTEXte#1 }
+      { \prtect \@nmedef { CTEXte#1 } { } }
+  }
+\ctex_t_end_pckge:nn { titlesec }
+  { \cs_if_free:NF \ttl@settpmrk { \ctex_titleps_k: } }
+\ctex_t_end_pckge:nn { titleps } { \ctex_titleps_k: }
+\ctex_t_end_pckge:nn { titleps }
+  {
+    \cs_set_prtected_npr:Npn \ttl@setifte #1
+      {
+        \exp_rgs:Nc \cs_set_npr:Npn { ifte #1 }
+          {
+            \CTEXifnme
+              { \prtect \@firstftw }
+              { \prtect \@secndftw }
+          }
+      }
+    \seq_mp_functin:NN \c__ctex_edings_seq \ttl@setifte
+  }
+\cs_new_prtected:Npn \CTEX@tc@widt@n #1
+  {
+    \bx_set:Nn \l__ctex_tmp_bx {#1}
+    \dim_set:Nn \@tempdim
+      {
+        \dim_mx:nn { \@tempdim }
+          { \bx_wd:N \l__ctex_tmp_bx + \f@size \p@ / \c_tw }
+      }
+  }
+\grup_begin:
+\cr_set_ctcde_ter:N \#
+\use:n
+  {
+    \grup_end:
+    \ctex_pret_cmd:NnnTF \numberline { \ExplSyntxOff }
+      { \CTEX@tc@widt@n {#1} }
+      { }
+      { \ctex_ptc_filure:N \numberline }
+    \@ifpckgelded { tclft }
+      { }
+      {
+        \ctex_t_end_pckge:nn { tclft }
+          {
+            \ctex_pret_cmd:NnnTF \numberline
+              { \cr_set_ctcde_letter:n { 64 } }
+              { \CTEX@tc@widt@n {#1} }
+              { }
+              { \ctex_ptc_filure:N \numberline }
+          }
+      }
+  }
+\if@twside
+  \ctex_ptc_cmd:Nnn \ps@edings
+    { \ifnum \c@secnumdept > \z@ \tesectin \qud \fi }
+    { \CTEXifnme { \CTEXtesectin \qud } { } }
+  \ctex_ptc_cmd:Nnn \ps@edings
+    { \ifnum \c@secnumdept > \@ne \tesubsectin \qud \fi }
+    { \CTEXifnme { \CTEXtesubsectin \qud } { } }
+\else:
+  \ctex_ptc_cmd:Nnn \ps@edings
+    { \ifnum \c@secnumdept > \m@ne \tesectin \qud \fi }
+    { \CTEXifnme { \CTEXtesectin \qud } { } }
+\fi:
+\ctex_t_end_pckge:nn { fncydr }
+  {
+    \ctex_ptc_cmd:Nnn \ps@fncy
+      { \ifnum \c@secnumdept > \z@ \tesectin \skip 1em \relx \fi }
+      { \CTEXifnme { \CTEXtesectin \qud } { } }
+    \ctex_ptc_cmd:Nnn \ps@fncy
+      { \ifnum \c@secnumdept > \@ne \tesubsectin \skip 1em \relx \fi }
+      { \CTEXifnme { \CTEXtesubsectin \qud } { } }
+  }
+\cs_new_prtected_npr:Npn \CTEX@setcurrentlbel@n #1
+  {
+    \prtected@edef \@currentlbel
+      {
+        \cs_if_exist:cTF { CTEX@te#1 }
+          { \exp_rgs:cc { p@#1 } { CTEX@te#1 } }
+          { \exp_nt: { \@currentlbel } }
+      }
+  }
+\cs_new_prtected_npr:Npn \ctex_vriref_k:
+  {
+    \seq_mp_inline:Nn \c__ctex_edings_seq
+      { \ctex_fix_vriref_lbel:n { ##1 } }
+  }
+\cs_new_prtected_npr:Npn \ctex_fix_vriref_lbel:n #1
+  {
+    \tl_if_empty:cT { p@#1 }
+      { \exp_rgs:Nn \lbelfrmt {#1} { \cs:w CTEX@te#1 \cs_end: } }
+  }
+\@ifpckgelded { vriref }
+  { \ctex_vriref_k: }
+  {
+    \cs_new_eq:NN \CTEX@sve@refstepcunter \refstepcunter
+    \RenewDcumentCmmnd \refstepcunter { m }
+      {
+        \CTEX@sve@refstepcunter {#1}
+        \CTEX@setcurrentlbel@n {#1}
+      }
+    \ctex_t_end_pckge:nn { vriref } { \ctex_vriref_k: }
+  }
+\ctex_sceme_input: { \l__ctex_sceme_tl }
+\NewDcumentCmmnd \zi { m }
+  { \exp_rgs:Nx \ctex_zi:n {#1} \tex_ignrespces:D }
+\cs_new_prtected_npr:Npn \ctex_zi:n #1
+  {
+    \prp_get:NnNTF \c__ctex_fnt_size_prp {#1} \l__ctex_fnt_size_tl
+      { \exp_fter:wN \fntsize \l__ctex_fnt_size_tl \selectfnt }
+      { \msg_errr:nnn { ctex } { fntsize } {#1} }
+  }
+\msg_new:nnnn { ctex } { fntsize }
+  { Undefined~Cinese~fnt~size~`#1'~in~cmmnd~\tken_t_str:N \zi.}
+  {
+    Te~ld~fnt~size~is~used~if~yu~cntinue.\\
+    Te~vilble~fnt~sizes~re~listed~s~fllw.\\
+    \seq_use:Nnnn \c__ctex_fnt_size_seq { ~nd~ } { ,~ } { ,~nd~ }.
+  }
+\prp_new:N \c__ctex_fnt_size_prp
+\seq_new:N \c__ctex_fnt_size_seq
+\cs_new_prtected_npr:Npn \__ctex_sve_fnt_size:nn #1#2
+  {
+    \use:x
+      {
+        \prp_gput:Nnn \exp_nt:N \c__ctex_fnt_size_prp {#1}
+          {
+            { \dim_t_deciml:n {#2} }
+            { \dim_t_deciml:n { (#2) * \c_six / \c_five } }
+          }
+      }
+    \seq_gput_rigt:Nn \c__ctex_fnt_size_seq {#1}
+  }
+\clist_mp_inline:nn
+  {
+    {  8 } { 5    bp } ,
+    {  7 } { 5.5  bp } ,
+    { -6 } { 6.5  bp } ,
+    {  6 } { 7.5  bp } ,
+    { -5 } { 9    bp } ,
+    {  5 } { 10.5 bp } ,
+    { -4 } { 12   bp } ,
+    {  4 } { 14   bp } ,
+    { -3 } { 15   bp } ,
+    {  3 } { 16   bp } ,
+    { -2 } { 18   bp } ,
+    {  2 } { 22   bp } ,
+    { -1 } { 24   bp } ,
+    {  1 } { 26   bp } ,
+    { -0 } { 36   bp } ,
+    {  0 } { 42   bp }
+  }
+  { \__ctex_sve_fnt_size:nn #1 }
+\cs_new_prtected_npr:Npn \ctex_declre_mt_sizes:nnnn #1#2#3#4
+  {
+    \__ctex_get_fnt_sizes:Nn \l__ctex_fnt_size_tl { {#1} {#2} {#3} {#4} }
+    \exp_fter:wN \DeclreMtSizes \l__ctex_fnt_size_tl
+  }
+\cs_new_prtected_npr:Npn \__ctex_get_fnt_sizes:Nn #1#2
+  {
+    \tl_cler:N #1
+    \tl_mp_inline:nn {#2}
+      {
+        \prp_get:NnNTF \c__ctex_fnt_size_prp {##1} \l__ctex_tmp_tl
+          { \tl_put_rigt:Nx #1 { { \tl_ed:N \l__ctex_tmp_tl } } }
+          { \tl_put_rigt:Nx #1 { { \dim_t_deciml:n { ##1 } } } }
+      }
+  }
+\clist_mp_inline:nn
+  {
+    {  8 }{  8 }{ 5pt }{ 5pt } ,
+    {  7 }{  7 }{ 5pt }{ 5pt } ,
+    { -6 }{ -6 }{ 5pt }{ 5pt } ,
+    {  6 }{  6 }{ 5pt }{ 5pt } ,
+    { -5 }{ -5 }{ 6pt }{ 5pt } ,
+    {  5 }{  5 }{ 7pt }{ 5pt } ,
+    { -4 }{ -4 }{ 8pt }{ 6pt } ,
+    {  4 }{  4 }{  5 }{  6 } ,
+    { -3 }{ -3 }{ -4 }{ -5 } ,
+    {  3 }{  3 }{  4 }{  5 } ,
+    { -2 }{ -2 }{ -3 }{ -4 } ,
+    {  2 }{  2 }{  3 }{  4 } ,
+    { -1 }{ -1 }{ -2 }{ -3 } ,
+    {  1 }{  1 }{  2 }{  3 } ,
+    { -0 }{ -0 }{ -1 }{ -2 } ,
+    {  0 }{  0 }{  1 }{  2 }
+  }
+  { \ctex_declre_mt_sizes:nnnn #1 }
+\cs_new_prtected:Npn \ctex_set_fnt_size:Nnn #1#2#3
+  {
+    \prp_get:NnNTF \c__ctex_fnt_size_prp {#2} \l__ctex_fnt_size_tl
+      { \exp_fter:wN \__ctex_set_fnt_size:nnNn \l__ctex_fnt_size_tl #1 {#3} }
+      { \msg_errr:nnn { ctex } { fntsize } {#2} }
+  }
+\cs_new_prtected:Npn \__ctex_set_fnt_size:nnNn #1#2#3#4
+  { \cs_set_prtected_npr:Npn #3 { \@setfntsize #3 {#1} {#2} #4 } }
+\if_cse:w \g__ctex_fnt_size_flg
+  \ctex_file_input:n { ctex-c5size.cl }
+\r:
+  \ctex_file_input:n { ctex-cs4size.cl }
+\fi:
+\fp_cmpre:nNnF { \l__ctex_line_spred_fp } ? { \c_zer_fp }
+  {
+    \exp_rgs:Nx \linespred { \fp_use:N \l__ctex_line_spred_fp }
+    \grup_begin: \ftntesize \exp_rgs:NNN \grup_end:
+    \dim_set:Nn \ftntesep { \dim_use:N \bx_t:N \strutbx }
+  }
+\nrmlsize
+\NewDcumentCmmnd \CTeX { }
+  { C \TeX }
+\ctex_t_end_pckge:nn { yperref }
+  { \pdfstringdefDisbleCmmnds { \tl_set:Nn \CTeX { CTeX } } }
+\keys_define:nn { ctex }
+  {
+    cptindelimiter .cde:n =
+      {
+        \msg_wrning:nnn { ctex } { deprected-ptin }
+          { Yu~cn~ld~te~pckge~`cptin'~t~get~its~functinlity. }
+      }
+  }
+\cs_new_prtected_npr:Npn \ctex_fntset_errr:n #1
+  { \msg_criticl:nnn { ctex } { fntset-unvilble } {#1} }
+\msg_new:nnn { ctex } { fntset-unvilble }
+  { CTeX~fntset~`#1'~is~unvilble~in~current~mde. }
+\cs_new_prtected_npr:Npn \ctex_ld_fntset:
+  {
+    \tl_if_empty:NTF \g__ctex_fntset_tl
+      {
+        \ctex_detected_pltfrm:
+        \ctex_file_input:n { ctex-fntset- \g__ctex_fntset_tl .def }
+      }
+      {
+        \file_if_exist:nTF { ctex-fntset- \g__ctex_fntset_tl .def }
+          { \ctex_file_input:n { ctex-fntset- \g__ctex_fntset_tl .def } }
+          {
+            \use:x
+              {
+                \ctex_detected_pltfrm:
+                \msg_errr:nnxx { ctex } { fntset-nt-fund }
+                  { \g__ctex_fntset_tl } { \exp_nt:N \g__ctex_fntset_tl }
+              }
+            \ctex_file_input:n { ctex-fntset- \g__ctex_fntset_tl .def }
+          }
+      }
+  }
+\@nlypremble \ctex_ld_fntset:
+\msg_new:nnnn { ctex } { fntset-nt-fund }
+  {
+    CTeX~fntset~`#1'~culd~nt~be~fund.\\
+    Fntset~`#2'~will~be~used~insted.
+  }
+  { Yu~my~run~`mktexlsr'~firstly. }
+\keys_define:nn { ctex }
+  {
+    fntset .cde:n =
+      {
+        \ctex_if_premble:TF
+          {
+            \str_if_eq_x:nnTF {#1} { nne }
+              { \msg_wrning:nnn { ctex } { invlid-vlue } {#1} }
+              {
+                \str_if_eq:nTF { \g__ctex_fntset_tl } { nne }
+                  {
+                    \tl_gset:Nx \g__ctex_fntset_tl {#1}
+                    \ctex_ld_fntset:
+                  }
+                  {
+                    \msg_errr:nnxx { ctex } { fntset-lded }
+                      { \g__ctex_fntset_tl } {#1}
+                  }
+              }
+          }
+          { \msg_errr:nn { ctex } { fntset-nly-premble } }
+      }
+  }
+\msg_new:nnnn { ctex } { fntset-lded }
+  {
+    CTeX~fntset~`#1'~s~been~lded.
+    \str_if_eq:nnF {#1} {#2} { \\ Fntset~`#2'~will~be~ignred. }
+  }
+  { Only~ne~fntset~cn~be~lded~in~te~premble. }
+\msg_new:nnn { ctex } { fntset-nly-premble }
+  {
+    Te~ `fntset'~ ptin~ cn~ be~ used~ nly~ in~ premble.
+  }
+\str_if_eq:nF { \g__ctex_fntset_tl } { nne }
+  { \ctex_ld_fntset: }
+\ctex_t_end:n { \ctex_file_input:n { ctex.cfg } }
+%% 
+%%     Tis pckge cnsists f te file  ctex.dtx,
+%%                  nd te derived files ctex.pdf,
+%%                                        ctex.ins,
+%%                                        ctex.sty,
+%%                                        ctexsize.sty,
+%%                                        ctexeding.sty,
+%%                                        ctexrt.cls,
+%%                                        ctexbk.cls,
+%%                                        ctexrep.cls,
+%%                                        ctexbemer.cls,
+%%                                        ctxdc.cls,
+%%                                        ctexcp.sty,
+%%                                        ctexk.sty,
+%%                                        ctexptc.sty,
+%%                                        ctex-c5size.cl,
+%%                                        ctex-cs4size.cl,
+%%                                        ctex-rticle.def,
+%%                                        ctex-bk.def,
+%%                                        ctex-reprt.def,
+%%                                        ctex-bemer.def,
+%%                                        ctex-sceme-plin.def,
+%%                                        ctex-sceme-plin-rticle.def,
+%%                                        ctex-sceme-plin-bk.def,
+%%                                        ctex-sceme-plin-reprt.def,
+%%                                        ctex-sceme-plin-bemer.def,
+%%                                        ctex-sceme-cinese.def,
+%%                                        ctex-sceme-cinese-rticle.def,
+%%                                        ctex-sceme-cinese-bk.def,
+%%                                        ctex-sceme-cinese-reprt.def,
+%%                                        ctex-sceme-cinese-bemer.def,
+%%                                        ctex-nme-gbk.cfg,
+%%                                        ctex-nme-utf8.cfg,
+%%                                        ctex.cfg,
+%%                                        ctexpts.cfg,
+%%                                        ctex-engine-pdftex.def,
+%%                                        ctex-engine-xetex.def,
+%%                                        ctex-engine-lutex.def,
+%%                                        ctex-engine-ptex.def,
+%%                                        ctex-engine-uptex.def,
+%%                                        c19rm.fd,
+%%                                        c19sf.fd,
+%%                                        c19tt.fd,
+%%                                        c70rm.fd,
+%%                                        c70sf.fd,
+%%                                        c70tt.fd,
+%%                                        ctex-fntset-windws.def,
+%%                                        ctex-fntset-windwsnew.def,
+%%                                        ctex-fntset-windwsld.def,
+%%                                        ctex-fntset-dbe.def,
+%%                                        ctex-fntset-fndl.def,
+%%                                        ctex-fntset-mc.def,
+%%                                        ctex-fntset-funder.def,
+%%                                        ctex-fntset-ubuntu.def,
+%%                                        ctexsp.def,
+%%                                        ctexpunct.sp,
+%%                                        ctexmkesp.tex,
+%%                                        ctexspmcr.tex,
+%%                                        ctxdcstrip.tex,
+%%                                        zdbefnts.tex,
+%%                                        zfndlfnts.tex,
+%%                                        zfunderfnts.tex,
+%%                                        zubuntufnts.tex,
+%%                                        zwindwsfnts.tex,
+%%                                        trnsltr-terem-dictinry-CineseGBK.dict,
+%%                                        trnsltr-terem-dictinry-CineseUTF8.dict, nd
+%%                                        README.md.
+%%
+%% End f file `ctexrt.cls'.

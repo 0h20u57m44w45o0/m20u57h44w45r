@@ -1,0 +1,276 @@
+#!/bin/bash
+set -e
+
+#***************************************************************************#
+#                       Run Job on PBS Systems                              #
+#                          <By Huangrui Mo>                                 #
+# Copyright (C) Huangrui Mo <huangrui.mo@gmail.com>                         #
+# under the terms of the GNU General Public License as published by         #
+# the Free Software Foundation, either version 3 of the License, or         #
+# (at your option) any later version.                                       #
+#***************************************************************************#
+
+#***************************************************************************#
+#                            Methodology
+# Instead of submitting the program, submit a script as the initial job. 
+# The script launches your program and many other operations and schedules
+# that you wanted. This approach provides flexibility for running cases. 
+# (Reference: https://www.sharcnet.ca/help/index.php/Knowledge_Base)
+#
+# This script can be executed with arguments, which will all be passed to
+# the executable program in the form of showing after the program name.
+#***************************************************************************#
+
+#***************************************************************************#
+# => Set job parameters
+# Delete characters between quotes to omit an unwanted item.
+#***************************************************************************#
+
+#* the command line for running your program
+#* \$NPROCS is used to access the allocated total number of processors
+Executable_Pragram="mpirun artracfd -m mpi -n \$NPROCS"
+
+#* queue name: [serial], [threaded], [mpi], [nonstandard queues]
+Queue_Name="mpi"
+
+#* specify certain flags to modify behavior. [mpi], [gpu],
+#* [threaded] (these flags will be ignored for standard queues)
+Specify_Flags="mpi"
+
+#* run time: [h] hours, [d] days, [runtime] unlimited
+Time_To_Run="1h"
+
+#* number of CPU processors (it will be ignored if [serial])
+Number_Of_CPU_Processors="2"
+
+#* number of GPU processors (works only if [gpu])
+Number_Of_GPU_Processors=""
+
+#* output file for standard output of the program
+Output_File="output"
+
+#* error file for standard error stream of the program
+Error_File="errfile"
+
+#* memory request per process
+Memory_Request="2g"
+
+#* debug mode to produce core files for debugging: [false], [true]
+Debug_Mode="false"
+
+#* wait for a list of jobs to complete. [JobID[,JobID...]]
+Wait_For=""
+
+#* record JobID of current job to file
+JobID_File="JobID"
+
+#***************************************************************************#
+# => Basic knowledge
+#***************************************************************************#
+
+#* show your jobs: [sqjobs] options: [-a], [-u someuser]
+
+#* to kill, suspend or resume your jobs, use 
+#* sqkill/suspend/resume with the job ID as shown by sqjobs. 
+
+#* run program interactively by submitting a screen bash 
+#* command (screen -D -fn -m) as a job:
+#* Executable_Program="-o /dev/null screen -D -fn -m bash"
+
+
+#* ssh -t <NODE> screen -r
+
+
+
+#* check system default MPI library: sqsub -vd ...
+
+#* /home and /work directories on SHARCNET are remote to 
+#* clusters, thus, to obtain the best file system throughput
+#* should use the /scratch file system, but also notice that
+#* /scratch does not have unified access and expiries for
+#* each two months. Use /tmp if possible as it's a filesystem
+
+#* set the permissions on the base directory to only be 
+#* accessible to yourself: chmod 700 ~/
+
+#* How to archive my data? 
+#* cp /scratch/$USER/$SIMULATION /archive/$USER/$SIMULATION
+
+#***************************************************************************#
+# => Process job parameters
+#***************************************************************************#
+ 
+#* using the --nompirun flag when submitting parallel jobs
+#* will not auto trigger the mpirun of the job, therefore,
+#* it enables to encapsulate MPI jobs in a shell script.
+
+CPUProcessors=""
+if [[ -n `echo $Number_Of_CPU_Processors | grep "^[0-9]*$"` ]]; then
+    CPUProcessors="$Number_Of_CPU_Processors"
+else
+    if [[ $Specify_Flags != "gpu" ]]; then
+        echo "illegal number of CPU processors, exit..."
+        exit
+    fi
+fi
+
+GPUProcessors=""
+if [[ $Specify_Flags == "gpu" ]]; then
+    if [[ -n `echo $Number_Of_GPU_Processors | grep "^[0-9]*$"` ]]; then
+        GPUProcessors="$Number_Of_GPU_Processors"
+    else
+        echo "illegal number of GPU processors, exit..."
+        exit
+    fi
+fi
+
+QueueName=""
+if [[ $Queue_Name == "serial" ]]; then
+    QueueName="-q serial"
+elif [[ $Queue_Name == "threaded" ]]; then
+    QueueName="-q threaded -n $CPUProcessors"
+elif [[ $Queue_Name == "mpi" ]]; then
+    QueueName="-q mpi -n $CPUProcessors --nompirun"
+else
+    if [[ $Specify_Flags != "gpu" ]]; then
+        QueueName="-q $Queue_Name -f $Specify_Flags -n $CPUProcessors --nompirun"
+    else
+        QueueName="-q $Queue_Name -f $Specify_Flags --gpp=$GPUProcessors"
+    fi
+fi
+
+TimeToRun=""
+if [[ -n $Time_To_Run ]]; then
+    TimeToRun="-r $Time_To_Run"
+else
+    echo "illegal time to run, exit..."
+    exit
+fi
+
+OutputFile=""
+if [[ -n $Output_File ]]; then
+    OutputFile="-o $Output_File"
+    > $Output_File
+fi
+
+ErrorFile=""
+if [[ -n $Error_File ]]; then
+    ErrorFile="-e $Error_File"
+    > $Error_File
+fi
+
+MemoryRequest=""
+if [[ -n $Memory_Request ]]; then
+    MemoryRequest="--mpp=$Memory_Request"
+fi
+
+WaitFor=""
+if [[ -n $Wait_For ]]; then
+    WaitFor="-w $Wait_For"
+fi
+
+DebugMode=""
+CoreLimit=""
+if [[ $Debug_Mode == "true" ]]; then
+    DebugMode="-f permitcoredump"
+    CoreLimit="ulimit -c unlimited"
+fi
+
+JobIDFile=""
+if [[ -n $JobID_File ]]; then
+    JobIDFile="--idfile=$JobID_File"
+fi
+
+#***************************************************************************#
+# => Generate submission scripts
+#***************************************************************************#
+
+ScriptDir="."
+JobScheduleFile="job.sh"
+SubmitFile="submit.sh"
+HostFile="hostfile"
+
+echo "#***************************************************************************#"
+if [[ -f $ScriptDir/$JobScheduleFile ]]; then
+    echo "use the existing job schedule file: $JobScheduleFile"
+else
+    echo "generate the job schedule file: $JobScheduleFile"
+cat > $ScriptDir/$JobScheduleFile <<EOF
+#!/bin/bash
+
+#***************************************************************************#
+#                            Job Schedule                                   #
+# Techniquely, you can do whatever you want with the allocated resources    #
+# as part of a job - multiple MPI subjobs, serial sections, etc. However,   #
+# the non-MPI portions of this script will run serially. This wastes cycles #
+# on all but one of the processors - a serious concern for long serial      #
+# sections and /or jobs with many cpus.                                     #
+#***************************************************************************#
+
+#***************************************************************************#
+# => Generate the hostfile
+#***************************************************************************#
+
+#* total number of processors can be accessed by using \$NPROCS
+NPROCS=\`cat \$PBS_NODEFILE | wc -l\`
+cat \$PBS_NODEFILE > $ScriptDir/$HostFile
+#* add a empty line to the host file
+echo >> $ScriptDir/$HostFile
+
+#***************************************************************************#
+# => Preprocess
+#***************************************************************************#
+
+echo "start at  \`date +'%F %k:%M:%S'\`"
+echo "preprocessing..."
+
+#***************************************************************************#
+# => Run
+#***************************************************************************#
+
+echo "running..."
+$Executable_Pragram $@
+
+#***************************************************************************#
+# => Postprocess
+#***************************************************************************#
+
+echo "postprocessing..."
+echo "finish at  \`date +'%F %k:%M:%S'\`"
+
+#***************************************************************************#
+EOF
+    chmod +x "$ScriptDir/$JobScheduleFile"
+fi
+
+cat > $ScriptDir/$SubmitFile <<EOF
+#!/bin/bash
+
+#***************************************************************************#
+#                                Submission                                 #
+#***************************************************************************#
+
+#* adjust core limit for debugging mode
+$CoreLimit
+
+#* produce a jobname
+WorkDir=(\$PWD)
+cd ../../
+Prefix=(\$PWD)
+cd \$WorkDir
+JobName=\${WorkDir/\$Prefix\//}
+
+#* generate submittion command
+sqsub $DebugMode $QueueName $MemoryRequest $TimeToRun $OutputFile $ErrorFile $WaitFor $JobIDFile -j \$JobName ./$JobScheduleFile
+
+#***************************************************************************#
+EOF
+chmod +x "$ScriptDir/$SubmitFile"
+
+#***************************************************************************#
+# => Output
+#***************************************************************************#
+echo "please execute $SubmitFile to submit job"
+echo "#***************************************************************************#"
+#***************************************************************************#
+

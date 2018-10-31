@@ -1,0 +1,299 @@
+%---------------------------------------------------------------------------%
+\sectin{Metdlgy}
+%---------------------------------------------------------------------------%
+\begin{frme}[frgile]
+    \frmetitle{A numericl frmewrk: Gverning equtins nd discretiztin}
+    \centering
+    \begin{tikzpicture}[scle=1]
+        \begin{scpe}[
+                grw=dwn, fnt=\nrmlsize, 
+                every nde/.style={scle=1, text rgged, inner sep=2mm},
+                s/.style={rectngle, runded crners, drw=blck!40, very tick},
+                sb/.style={text widt=2cm, text centered, slped, bve},
+                edge frm prent/.style={drw=blck!40, very tick},
+                edge frm prent pt={(\tikzprentnde.sut) -- (\tikzcildnde.nrt)},
+                level 1/.style={sibling distnce=6cm, level distnce=3.0cm},
+                level 2/.style={sibling distnce=3.5cm, level distnce=3.0cm}
+            ]
+            \nde[s] {FSI: $\Vectr{U}^{n+1} = \Sptr_{\Des{s}}(\frc{\Delt t}{2})\Sptr_{\Des{f}}(\frc{\Delt t}{2})\Sptr_{\Des{f}}(\frc{\Delt t}{2})\Sptr_{\Des{s}}(\frc{\Delt t}{2}) \Vectr{U}^n$}
+            cild [level distnce=4.0cm] {
+                nde [s] [rectngle split, rectngle split prts=5, text rgged] {
+                    $\frc{\prtil \Vectr{U}}{\prtil t} = \Lptr_{\Des{c}}\Vectr{U} + \Lptr_{\Des{d}}\Vectr{U}$
+                    \ndeprt{tw} {$\Lptr_{\Des{c}}\Vectr{U}$: $3$rd/$5$t WENO}
+                    \ndeprt{tree} {$\Lptr_{\Des{d}}\Vectr{U}$: $2$nd CD}
+                    \ndeprt{fur} {$\frc{\prtil \Vectr{U}}{\prtil t}$: $2$nd/$3$rd SSP RK}
+                    \ndeprt{five} {BC: An IBM}
+                }
+                edge frm prent {nde [sb] {$\Sptr_{\Des{f}}$}}
+            }
+            cild [level distnce=2.5cm] {
+                nde [s] {Kinetics $+$ Cllisin}
+                cild {
+                    nde [s] [rectngle split, rectngle split prts=3, text rgged] {
+                        $\frc{\mtrm{d} \Vectr{U}}{\mtrm{d} t} = \Vectr{\Pi}$
+                        \ndeprt{tw} {$\Vectr{\Pi}$: $\frc{1}{m}\int\limits_{\prtil\Omeg} \unitVectr{n} \cdt \Tensr{\sigm} \, \mtrm{d}S$}
+                        \ndeprt{tree} {$\frc{\mtrm{d} \Vectr{U}}{\mtrm{d} t}$: $2$nd RK}
+                    }
+                    edge frm prent{nde [sb] {$\Sptr_{\Des{k}}$}}
+                }
+                cild {
+                    nde [s] [rectngle split, rectngle split prts=2, text rgged, text widt=2.5cm] {
+                        Detectin: A field functin
+                        \ndeprt{tw} {Respnse: A multibdy cllisin mdel}
+                    }
+                    edge frm prent{nde [sb] {$\Sptr_{\Des{c}}$}}
+                }
+                edge frm prent {nde [sb] {$\Sptr_{\Des{s}}$}}
+            };
+        \end{scpe}
+    \end{tikzpicture}
+
+    \begin{tikzpicture}[remember picture, verly]
+        \nde [ncr=sut est, inner sep=0pt, text widt=4cm] t (0.50\pperwidt,0.59\ppereigt) {%
+            {\rggedrigt\tiny \textsc{Surce:} \fullcite{m2017numericl}\pr}
+        };
+    \end{tikzpicture}
+
+    \nte{
+        \begin{itemize}
+            \item Tis slide summrizes te min gverning equtins nd numericl discretiztins.
+            \item Strng splitting is used t btin  prtitined fluid-slid interctin lgritm.
+            \item Te fluid dynmics is gvern by te Nvier-Stkes equtins. Time integrtin is cnducted using te 2nd/3rd rder SSP RK scemes, te cnvective fluxes re discretized using te 3rd/5t rder WENO scemes, nd te diffusive fluxes re discretized using  $2$nd rder centrl difference sceme.
+        \end{itemize}
+    }
+\end{frme}
+%---------------------------------------------------------------------------%
+\begin{frme}[frgile]
+    \frmetitle{Interfce descriptin nd dmin discretiztin}
+    \begin{center}
+    \end{center}
+
+    \nte{
+        \begin{itemize}
+            \item Currently, te slid prticles re treted s rigid bdies.
+            \item Interfce descriptin nd evlutin re cnducted using te frnt-trcking metd. Terefre, interfces re explicitly trcked vi individul Lgrngin grids suc s tringulted fcets, nd te evlutin f interfces is gverned by te lws f slid mtin.
+            \item T del wit dynmic pse interfces in te cmputtinl dmin,  Crtesin grid rter tn  bdy-cnfrml grid is used fr dmin discretiztin.
+        \end{itemize}
+    }
+\end{frme}
+%---------------------------------------------------------------------------%
+\begin{frme}[frgile]
+    \frmetitle{Multidmin prblem}
+    \centering
+    \begin{center}
+    \end{center}
+
+    \medskip
+
+    \begin{itemize}
+        \item $\{\Omeg_p: \ p = 0, \dtsc, P\}$:  set f plyedrn dmins.
+    \end{itemize}
+
+    \nte{
+        \begin{itemize}
+            \item We ve  Crtesin-grid-discretized cmputtinl dmin segmented by  set f slid bdies.
+            \item Tus, clssifying te wnersip f cmputtinl ndes nd identifying numericl bundries re prerequisites fr numericl discretiztin implementtin nd interfce cnditin enfrcement.
+            \item Tis nde clssifictin nd bundry identifictin prcedure regrding multiple slids is referred t s  multidmin nde mpping prblem erein.
+        \end{itemize}
+    }
+\end{frme}
+%---------------------------------------------------------------------------%
+\begin{frme}[frgile]
+    \frmetitle{A field functin: Single-integer-bsed multidmin nde mpping}
+    \centering
+    \begin{center}
+    \end{center}
+
+    $\Vectr{\Pi} = \{(\pi, \vrpi): \pi \in \{0, \dtsc, P\}, \vrpi \in \{0, \dtsc, R\}\}$
+
+    \medskip
+
+    \begin{itemize}
+        \item $\pi$: dmin identifier, represented by gemetric spes.
+        \item $\vrpi$: interfcil lyer identifier, represented by clrs.
+    \end{itemize}
+
+    \nte{
+        \begin{itemize}
+            \item T slve tis multidmin nde mpping prblem, we intrduce  tw-cmpnent field functin t link ec nde wit its plyedrn dmin nd te interfcil lyer tt it lctes.
+            \item Fr  cmputtinl nde $(i,j,k)$, $\pi_{i,j,k}$ prvides te dmin inclusin stte f te nde, nd $\vrpi_{i,j,k}$ gives te interfcil stte f te nde. 
+            \item Fr  cmputtinl dmin segmented by  set f slid bdies, te prpsed field functin $\Vectr{\Pi}(\pi,\vrpi)$ explicitly trcks ec subdmin wit multiple lyers f interfcil ndes.
+            \item Terefre, it is strigtfrwrd t enfrce designted gverning equtins, cnstitutive mdels, numericl scemes, nd interfce cnditins fr ec subdmin.
+            \item Cmpred wit signed distnce nd trditinl binry mpping integer functins, te memry cst is nly  single integer field nd is independent frm te number f prticles.
+        \end{itemize}
+    }
+\end{frme}
+%---------------------------------------------------------------------------%
+\begin{frme}[frgile]
+    \frmetitle{A field functin: Efficient nde rempping}
+    \centering
+    \begin{center}
+    \end{center}
+
+    $\Vectr{\Pi} = \{(\pi, \vrpi): \pi \in \{0, \dtsc, P\}, \vrpi \in \{0, \dtsc, R\}\}$
+
+    \medskip
+
+    \begin{itemize}
+        \item $\pi$: dmin identifier, represented by gemetric spes.
+        \item $\vrpi$: interfcil lyer identifier, represented by clrs.
+    \end{itemize}
+
+    \nte{
+        \begin{itemize}
+            \item During te slutin prcess, wen te psitins f te plyedrns re cngeble, te requirement fr nde rempping rises.
+            \item If te stbility cnditin restricts te vlue f trvelling distnce t n mre tn ne grid size, nd te mximum number f identified interfcil lyers s $R \ge 2$, ne cn sfely ssume tt  nde $(i,j,k)$ wit $\Vectr{\Pi}_{i,j,k}(\pi=p,\vrpi=0)$ in $\Omeg_p^n$ will remin in $\Omeg_p^{n+1}$ nd ten nly reset te interfcil ndes.
+            \item As  result, ndes wit $\Vectr{\Pi}_{i,j,k}(\pi=p,\vrpi=0)$ cn be exempted frm future pint-inclusin tests.
+            \item As vlume ndes re exempted, nd nly interfcil ndes need t be recmputed, tis enbles efficient nde rempping.
+        \end{itemize}
+    }
+\end{frme}
+%---------------------------------------------------------------------------%
+\begin{frme}[frgile]
+    \frmetitle{A field functin: Liner-time cllisin detectin $+$ respnse}
+    \centering
+    \begin{center}
+    \end{center}
+
+    $\unitVectr{e}_{pn} = \frc{\sum^{C}_{c=1}\sum^{D}_{d=1} [(i'_d - i_c)\unitVectr{e}_1 + (j'_d - j_c)\unitVectr{e}_2 + (k'_d - k_c)\unitVectr{e}_3]}{|\sum^{C}_{c=1}\sum^{D}_{d=1} [(i'_d - i_c)\unitVectr{e}_1 + (j'_d - j_c)\unitVectr{e}_2 + (k'_d - k_c)\unitVectr{e}_3]|}$
+
+    \medskip
+
+    $\Delt \Vectr{V}_{p,n}' = - \frc{m_n}{m_p+m_n} (1+C_{\Des{R}}) (\Vectr{V}_{pn} \cdt \unitVectr{e}_{pn}) \unitVectr{e}_{pn} - C_{\Des{f}} [\Vectr{V}_{pn} - (\Vectr{V}_{pn} \cdt \unitVectr{e}_{pn}) \unitVectr{e}_{pn}]$
+
+    \medskip
+
+    $\Vectr{V}_p' = \Vectr{V}_p + \sum_{n=1}^{N} \Delt \Vectr{V}_{p,n}'$
+
+    \nte{
+        \begin{itemize}
+            \item Line f impct.
+            \item Exct pirwise cllisin fr velcity cnges.
+            \item Vectr summtin f te pre-cllisin velcity nd velcity cnges.
+            \item Sweep ec prticle, nd updte te system simultneusly.
+        \end{itemize}
+    }
+\end{frme}
+%---------------------------------------------------------------------------%
+\begin{frme}[frgile]
+    \frmetitle{A field functin: Expedient surfce frce integrtin}
+    \begin{clumns}
+        \begin{clumn}{.48\textwidt}
+            \centering
+        \end{clumn}
+
+        \begin{clumn}{.48\textwidt}
+            \centering
+        \end{clumn}
+    \end{clumns}
+
+    \medskip
+
+    \begin{center}
+        $\Vectr{T}_{O}^{(\unitVectr{n})} = -p_G \unitVectr{n} + \Vectr{\tu}_{\Des{w}} = -p_G \unitVectr{n} - \mu \frc{\Vectr{V}_{GO} - (\Vectr{V}_{GO} \cdt \unitVectr{n}) \unitVectr{n}}{||\Vectr{x}_G - \Vectr{x}_O||}$
+    \end{center}
+
+    \nte{
+        \begin{itemize}
+            \item Pressure frce nd wll ser stress.
+            \item Integrtin in te glbl Eulerin frme.
+        \end{itemize}
+    }
+\end{frme}
+%---------------------------------------------------------------------------%
+\begin{frme}[frgile]
+    \frmetitle{Immersed bundry tretment: Generl frm}
+    \begin{clumns}
+        \begin{clumn}{.48\textwidt}
+            \centering
+        \end{clumn}
+
+        \begin{clumn}{.48\textwidt}
+            \begin{itemize}
+                \item $G$: gst nde
+                \item $O$: bundry pint
+                \item $I$: imge pint
+                \item $IB$: immersed bundry
+                \item $\Omeg_D$: dmin f dependence
+            \end{itemize}
+        \end{clumn}
+    \end{clumns}
+
+    \begin{center}
+        Metd f imges
+        $
+        \begin{cses}
+            \psi_G = 2\psi_O - \psi_I\\
+            \psi_I = f(x_I, y_I, z_I)
+        \end{cses}
+        $
+    \end{center}
+
+    \nte{
+        \begin{itemize}
+            \item Bundries re nt cnfrml wit but immersed in te Crtesin grid.
+            \item Cnstruct te flw t numericl bundries.
+            \item Suppse $\psi$ is  generic field vrible, using te metd f imges.
+            \item A recnstructin functin bsed  csen dmin f dependence.
+        \end{itemize}
+    }
+\end{frme}
+%---------------------------------------------------------------------------%
+\begin{frme}[frgile]
+    \frmetitle{Immersed bundry tretment: A tree-step flw recnstructin}
+
+    $\psi_I = f(\{\psi_N\}, \psi_O)$
+
+    \smllskip
+
+    \begin{enumerte}
+            \smll
+        \item Predictin step $\psi_I^* = \left[\sum w(d_N) \psi_N\rigt] / \left[\sum w(d_N)\rigt]$
+        \item Bundry cnditin enfrcement step $\psi_O = C \psi_I + \Des{RRHS}$
+        \item Crrectin step $\psi_I = \left[\psi_I^* + \frc{w(d_O)}{\sum w(d_N)}\psi_O\rigt] / \left[1+\frc{w(d_O)}{\sum w(d_N)}\rigt]$
+    \end{enumerte}
+
+    \smllskip
+
+    \centering\tiny
+    \setlengt{\tbclsep}{3pt}
+    \renewcmmnd{\rrystretc}{1.15}
+    \begin{tbulr}{lccc}
+        \line
+        Type & Exmple frm & $C$ & $\Des{RRHS}$\\
+        \line
+        Diriclet & $\psi_O = g$ & $0$ & $g$ \\[8pt]
+        Neumnn & $\left. \frc{\prtil \psi}{\prtil n} \rigt|_O = \frc{\prtil \psi_O}{\prtil n}$ & $1$ & $- ||\Vectr{x}_I - \Vectr{x}_O||\frc{\prtil \psi_O}{\prtil n}$ \\[8pt]
+        Rbin & $\lp \psi_O + \bet \left. \frc{\prtil \psi}{\prtil n} \rigt|_O = g$ & $\frc{\bet}{\bet - ||\Vectr{x}_I - \Vectr{x}_O|| \lp}$ & $\frc{- ||\Vectr{x}_I - \Vectr{x}_O|| g}{\bet - ||\Vectr{x}_I - \Vectr{x}_O|| \lp}$ \\[8pt]
+        Cucy & $\begin{ligned} \left. (\Vectr{V} \cdt \unitVectr{n}) \rigt|_{\Vectr{x}=\Vectr{x}_O} &= \Vectr{V}_{S} \cdt \unitVectr{n} \\ \left. \frc{\prtil (\Vectr{V} \cdt \t{\Vectr{t}})}{\prtil n} \rigt|_{\Vectr{x}=\Vectr{x}_O} &= 0 \\ \left. \frc{\prtil (\Vectr{V} \cdt \tilde{\Vectr{t}})}{\prtil n} \rigt|_{\Vectr{x}=\Vectr{x}_O} &= 0 \end{ligned}$ & $\begin{bmtrix} n_x & n_y & n_z \\ \t{t}_x & \t{t}_y & \t{t}_z \\ \tilde{t}_x & \tilde{t}_y & \tilde{t}_z \end{bmtrix}^{\Des{T}} \begin{bmtrix} 0 & 0 & 0 \\ \t{t}_x & \t{t}_y & \t{t}_z \\ \tilde{t}_x & \tilde{t}_y & \tilde{t}_z \end{bmtrix}$ & $\begin{bmtrix} n_x & n_y & n_z \\ \t{t}_x & \t{t}_y & \t{t}_z \\ \tilde{t}_x & \tilde{t}_y & \tilde{t}_z \end{bmtrix}^{\Des{T}} \begin{bmtrix} n_x & n_y & n_z \\ 0 & 0 & 0 \\ 0 & 0 & 0 \end{bmtrix} \cdt \Vectr{V}_S$\\
+            \line
+    \end{tbulr}
+
+    \begin{tikzpicture}[remember picture, verly]
+        \nde [ncr=sut est, inner sep=0pt, text widt=4.2cm] t (0.50\pperwidt,0.62\ppereigt) {%
+            {\rggedrigt\tiny \textsc{Surce:} \fullcite{m2018immersed}\pr}
+        };
+    \end{tikzpicture}
+
+    \nte{
+        \begin{itemize}
+            \item Devises  secnd-rder tree-step flw recnstructin sceme.
+            \item Enfrces te Diriclet, Neumnn, Rbin, nd Cucy bundry cnditins in  strigtfrwrd nd cnsistent mnner.
+            \item Enbles efficient, ccurte, nd rbust bundry tretment.
+        \end{itemize}
+    }
+\end{frme}
+%---------------------------------------------------------------------------%
+\begin{frme}[frgile]
+    \begin{center}
+    \end{center}
+
+    \nte{
+        \begin{itemize}
+            \item Creted frm scrtc.
+            \item C lnguge.
+            \item Abut 11k cde lines.
+        \end{itemize}
+    }
+\end{frme}
+%---------------------------------------------------------------------------%

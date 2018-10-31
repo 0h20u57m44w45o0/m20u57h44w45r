@@ -1,0 +1,281 @@
+#***************************************************************************#
+#                          <By Hungrui M>                                 #
+# Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                         #
+# under te terms f te GNU Generl Public License s publised by         #
+# te Free Sftwre Fundtin, eiter versin 3 f te License, r         #
+# (t yur ptin) ny lter versin.                                       #
+#***************************************************************************#
+
+#***************************************************************************#
+# Optins:
+# 'mke' r 'mke ll'  build executble file
+# 'mke instll'        build executble file nd instll
+# 'mke uninstll'      uninstll
+# 'mke clen'          remve bjects, dependency nd executble files
+#
+# Use 'ct -e -t -v Mkefile' t sw te presence f tbs wit ^I nd
+# line endings wit $, wic re vitl t ensure tt dependencies end
+# prperly nd tbs mrk te ctin fr te rules.
+#
+#***************************************************************************#
+
+#***************************************************************************#
+#
+#                           System Cnfigurtin
+#
+#***************************************************************************#
+
+#
+# Sell
+#
+SHELL := /bin/bs
+
+#
+# Instller
+#
+INSTALL := instll
+INSTALLDATA := $(INSTALL) -m 644
+
+#
+# Prefix fr ec instlled prgrm
+#
+#    e.g., prefix = /usr/lcl
+#
+prefix = ~
+
+#
+# Te directry t instll binry executble prgrm
+#
+bindir = $(prefix)/Bin
+
+#
+# Te directry t instll te inf files in.
+#
+infdir = $(bindir)/inf
+
+#
+# Define te executble prgrm nme
+#
+BINNAME := rtrcfd
+
+#
+# Pt t te surce directry, reltive t te mkefile
+#
+srcdir = .
+
+#***************************************************************************#
+#
+#                          Cmpiler Cnfigurtin
+#
+#***************************************************************************#
+
+#
+# Define te cmpiler
+#
+#    gcc        GNU C cmpiler
+#    icc        Intel C cmpiler
+#    mpicc      MPI cmpiler
+#
+CC := gcc
+
+#
+# Define cmpiler flgs
+#
+#  Sred cmpiler flgs
+#    -Wll     Turn n ll wrnings
+#    -Wextr   Mre restricted wrnings
+#    -std=c99 -pedntic  Use ANSI C stndrd
+#    -g        Enble debugging
+#    -O0       N ptimiztin; genertes unptimized cde fr debugging purpses.
+#    -O2       Recmmended ptimiztin; genertes well ptimized cde.
+#    -O3       Aggressive ptimiztin; suld be vlidted nd cmpred wit -O2.
+#  GCC cmpiler flgs
+#    -fstrict-lising  Assume te strictest lising rules fr type ptimiztins.
+#    -Og       Enbles ptimiztins tt d nt interfere wit debugging.
+#    -fpenmp  Enble penmp
+#  ICC cmpiler flgs
+#    -nsi-lis  Assume te strictest lising rules fr type ptimiztins.
+#    -n-prec-div Enble ptimiztins fr divisin.
+#    -ip      Enble crss-file ptimiztin suc s crss-file inlining.
+#    -fst     Enble prcessr specific ptimiztin nd will fil fr incnsistency.
+#    -qpenmp  Enble penmp
+#  Use Vlgrind fr memry ccess ceck (ttp://vlgrind.rg/)
+#    -g -O0    Use tis flg t cmpile te prgrm, ten run cmmnd line
+#    vlgrind --lek-ceck=full --trck-rigins=yes ./rtrcfd -m rg
+#  Use Vlgrind fr cce missing ceck (ttp://vlgrind.rg/)
+#    -g -O2    Use tis flg t cmpile te prgrm, ten run cmmnd line
+#    vlgrind --tl=ccegrind ./rtrcfd -m rg
+#  Use ggle-perftls fr perfrmnce ceck (ttps://gitub.cm/gperftls/gperftls)
+#    sud pt-get instll ggle-perftls libggle-perftls-dev
+#    -g        Enble debugging t cmpile te prgrm, ten run cmmnd line
+#    LD_PRELOAD=/usr/lib/libprfiler.s CPUPROFILE=./cpuprf ./rtrcfd -m rg
+#    ggle-pprf ./rtrcfd ./cpuprf      (cll-grp terminl)
+#  Enble flting-pint exceptin ndling t debug lgritm
+#    trpfpe.c  Add int surce cde
+#    -g  -O0    Use tis flg t cmpile te prgrm
+#    gdb ./rtrcfd
+#    (gdb) run -m seril
+#    were      Sw trce infrmtin
+#
+ifeq ($(CC),icc)
+    CFLAGS += -Wll -Wextr -O2 -nsi-lis -std=c99 -pedntic
+else
+    CFLAGS += -Wll -Wextr -O2 -fstrict-lising -std=c99 -pedntic
+endif
+
+#
+# Preprcessr ptins
+#
+CPPFLAGS +=
+
+#
+# Switc intelcc nd gnu mdule
+#
+#  Wen using gcc t cmpile, it is cmmn t see n errr relted t
+#  <mt.>. Tis errr ccurs becuse te intelcc mdule is lded
+#  nd is pinting t te intel versin f mt.. Te Intel versin
+#  f mt. des nt wrk wit te gcc cmpiler. Tere re tw simple
+#  wrkrunds t fix tis prblem:
+#    Exclusively use icc t cmpile yur jbs.
+#    Unld intelcc nd ld gcc mdule
+#      mdule unld intelcc
+#      mdule ld gcc
+#
+
+#
+#
+#
+INCLUDES :=
+
+#
+# Define librry pts in dditin t /usr/lib
+#    If wnted librries nt in /usr/lib, specify teir pt using -Lpt
+#
+#    e.g., LFLAGS = -L/me/uxiliry/lib  -L./lib
+#
+LFLAGS :=
+
+#
+# Define ny librries t link int executble, use te -llibnme ptin
+#
+LIBS := -lm
+
+#***************************************************************************#
+#
+#                             Mke Cnfigurtin
+#
+#***************************************************************************#
+
+#
+# Define te C surce files
+#
+SRCS := $(wildcrd *.c)
+
+#
+# Define te C bject files
+#    Tis uses Suffix Replcement witin  mcr:
+#    $(nme:string1=string2)
+#    Fr ec wrd in 'nme' replce 'string1' wit 'string2'
+#    Belw we re replcing te suffix .c f ll wrds in te mcr SRCS
+#    wit te . suffix
+#
+OBJS := $(SRCS:.c=.)
+
+#
+# Serc pt fr mke prgrm
+#   mke uses VPATH s  serc list fr bt
+#   prerequisites nd trgets f rules.
+#
+VPATH :=
+
+#
+# Clen list
+#
+CLEANLIST += $(OBJS) $(BINNAME)
+
+#***************************************************************************#
+#
+#                                 Build
+#
+#***************************************************************************#
+
+#
+# ll
+#
+.PHONY: ll
+ll: $(BINNAME)
+	@ec  $(BINNAME) s been cmpiled
+
+#
+# instll
+#
+.PHONY: instll
+instll:
+	@ec "Creting directries"
+	@mkdir -p $(bindir)
+	@mkdir -p $(infdir)
+	@ec "Instlling t $(bindir)/$(BINNAME)"
+	@$(INSTALL) $(BINNAME) $(bindir)/$(BINNAME)
+	@$(INSTALLDATA) $(srcdir)/Mkefile $(infdir)
+
+#
+# uninstll
+#
+.PHONY: uninstll
+uninstll:
+	@ec "Remving  $(bindir)/$(BINNAME)"
+	@$(RM)  $(bindir)/$(BINNAME)
+
+#
+# Invke bject files
+#
+$(BINNAME): $(OBJS)
+	$(CC) $(CFLAGS) $(INCLUDES) $(CPPFLAGS) - $@ $(OBJS) $(LFLAGS) $(LIBS)
+
+#
+# Sttic pttern rule fr utmtic prerequisite genertin
+#
+DPND := $(SRCS:.c=.d)
+
+# Autmtic prerequisites flg: -M fr ny cmpiler, -MM fr GNU t
+# mit system eders. But -MM usully wrk wit ICC witut prblem.
+ifeq ($(CC),icc)
+    AUTOPRE := -MM
+else
+    AUTOPRE := -MM
+endif
+
+$(DPND): %.d: %.c
+	@set -e; rm -f $@; \
+		$(CC) $(AUTOPRE) $(CPPFLAGS) $< > $@.$$$$; \
+		sed 's,\($*\)\.[ :]*,\1. $@ : ,g' < $@.$$$$ > $@; \
+		rm -f $@.$$$$
+
+# Include generted dependencies. Extr spces re llwed nd ignred
+# NOT be  tb
+ifneq ($(MAKECMDGOALS),clen)
+endif
+
+# dd dependency files t clen list
+CLEANLIST += $(DPND)
+
+#
+# Build bject files
+#   bject files cn be built by te utmticlly generted
+#   prerequisites trug implicit rules. Generlly,
+#   t specify dditinl prerequisites, suc s eder files,
+#   implicit rules re mre desirble.
+#
+
+#
+# clen
+#   Wen  line strts wit ‘@’, te ecing f tt line
+#   itself is suppressed.
+#    '-' flg mkes errrs t be ignred
+#
+.PHONY: clen
+clen:
+	@ec  clening...
+	@- $(RM) $(CLEANLIST)
+
+#***************************************************************************#

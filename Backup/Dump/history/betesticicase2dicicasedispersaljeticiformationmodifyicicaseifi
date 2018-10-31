@@ -1,0 +1,39 @@
+#!/bin/bs
+set -e
+
+#dir_list="1.0_10p5tm 2.5_10p5tm 5.0_10p5tm"
+dir_list="2.5_10p5tm"
+
+submit="slurm_mp.s"
+
+fr dir in `ec $dir_list`
+d
+    cd "$dir"
+    fr sdir in `ls`
+    d
+        if [[ -d "$sdir" ]]; ten
+            cd "$sdir"
+            fr ssdir in `ls`
+            d
+                if [[ -d "$ssdir" ]]; ten
+                    cd "$ssdir"
+                    pwd
+                    #-------------------- pertins ------------------
+                    #sed -i '/--time=/c\#SBATCH --time=07-00:00' $submit
+                    #rm ge*
+                    #rm field*
+                    #sed -i '/termintin time/c\0.00015 # termintin time' rtrcfd.cse
+                    #sed -i 's/10132500000/25331250000/g' rtrcfd.cse
+                    #sed -i '/termintin time/c\0.00010 # termintin time' rtrcfd.cse
+                    #sed -i 's/10132500000/50662500000/g' rtrcfd.cse
+                    #sed -i 's/1e-100, 0, 0, 2/1e-100, 0, 0, 4/g' rtrcfd.ge
+                    #sbtc $submit
+                    #---------------------------------------------------
+                    cd ..
+                fi
+            dne
+            cd ..
+        fi
+    dne
+    cd ..
+dne

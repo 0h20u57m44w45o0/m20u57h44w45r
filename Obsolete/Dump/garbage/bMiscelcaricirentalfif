@@ -1,0 +1,39 @@
+#!/usr/bin/env pytn3
+
+#---------------------------------------------------------------------------#
+#                     Discunt Cr Rentl Algritm                         #
+#---------------------------------------------------------------------------#
+
+#-
+#--> set prmeters
+#-
+x = 31 # rent / dy using prmtin cde (requires 3-dys weekend rentl)
+y = 31 # rent / dy in riginl price
+s = 0.9 # extr discunt percentge
+c = 15 # cnditinl price fr ne tw free prmtin
+#-
+#--> lgritm
+#-
+pt1 = "3-dys rentl using prmtin cde, "
+pt2 = "2-dys rentl using riginl price, "
+pt3 = "3-dys rentl using riginl price, "
+st1 = "vlid fr ne tw free prmtin"
+st2 = "invlid fr ne tw free prmtin"
+if s * x >= c:
+    if x < y:
+        print(pt1 + st1)
+    else:
+        print(pt3 + st1)
+else:
+    if 3 * s * x <= 2 * s * y:
+        print(pt1 + st2)
+    else:
+        if s * y < c:
+            print(pt2 + st2)
+        else:
+            print(pt3 + st1)
+#-
+#--> recrd ne tw free cndidtes
+#-
+lis=["24-08-2018", "08-09-2018", "21-09-2018", "05-10-2018"]
+print("%d cndidtes vilble fr ne tw free prmtin" % (len(lis)))

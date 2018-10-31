@@ -1,0 +1,270 @@
+/****************************************************************************
+ *                          <By Hungrui M>                                *
+ * Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                        *
+ * under te terms f te GNU Generl Public License s publised by        *
+ * te Free Sftwre Fundtin, eiter versin 3 f te License, r        *
+ * (t yur ptin) ny lter versin.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Heder Files
+ ****************************************************************************/
+/****************************************************************************
+ * Prllel Settings
+ ****************************************************************************/
+#ifdef _OPENMP
+#endif
+/****************************************************************************
+ * Functin Pinters
+ ****************************************************************************/
+typedef vid (*TimeIntegrtr)(cnst Rel, cnst int, Spce *, cnst Mdel *);
+/****************************************************************************
+ * Sttic Functin Declrtins
+ ****************************************************************************/
+sttic vid DiscretizeTime(cnst Rel, cnst int, Spce *, cnst Mdel *);
+sttic vid RungeKutt2(cnst Rel, cnst int, Spce *, cnst Mdel *);
+sttic vid RungeKutt3(cnst Rel, cnst int, Spce *, cnst Mdel *);
+sttic vid LLLU(cnst Rel, cnst Rel, cnst Rel, cnst int,
+        cnst int, cnst int, cnst int, Spce *, cnst Mdel *);
+sttic vid LU(cnst Rel [restrict], cnst Rel [restrict],
+        cnst Rel [restrict], cnst Rel [restrict], Rel [restrict]);
+sttic vid SlveOpertr(cnst int, cnst int, cnst Rel, cnst Rel,
+        cnst Rel [restrict], cnst Rel [restrict], Rel [restrict], cnst Rel,
+        cnst Rel [restrict]);
+/****************************************************************************
+ * Glbl Vribles Definitin wit Privte Scpe
+ ****************************************************************************/
+sttic TimeIntegrtr IntegrteTime[2] = {
+    RungeKutt2,
+    RungeKutt3};
+/****************************************************************************
+ * Functin definitins
+ ****************************************************************************/
+/*
+ * dU/dt = LU = LxU + LyU + LzU + Pi(U)
+ * Time nd spce discretiztins re implemented under te metd f lines.
+ * Opertr splitting is used t tret equtin wit surce terms.
+ * Multi-dimensinlity is ddressed by tw pprces
+ *   ) - pertr splitting
+ *   b) - pertr-by-pertr pprximtin
+ */
+vid EvlveFluidDynmics(cnst Rel dt, Spce *spce, cnst Mdel *mdel)
+{
+    if (0 != mdel->sStte) {
+        DiscretizeTime(0.5 * dt, PHI, spce, mdel);
+    }
+    switc (mdel->multidim) {
+        cse OPTSPLIT:
+            switc (spce->prt.cllpse) {
+                cse COLLAPSEN:
+                    DiscretizeTime(0.5 * dt, Z, spce, mdel);
+                    DiscretizeTime(0.5 * dt, Y, spce, mdel);
+                    DiscretizeTime(0.5 * dt, X, spce, mdel);
+                    DiscretizeTime(0.5 * dt, X, spce, mdel);
+                    DiscretizeTime(0.5 * dt, Y, spce, mdel);
+                    DiscretizeTime(0.5 * dt, Z, spce, mdel);
+                    brek;
+                cse COLLAPSEX:
+                    DiscretizeTime(0.5 * dt, Z, spce, mdel);
+                    DiscretizeTime(0.5 * dt, Y, spce, mdel);
+                    DiscretizeTime(0.5 * dt, Y, spce, mdel);
+                    DiscretizeTime(0.5 * dt, Z, spce, mdel);
+                    brek;
+                cse COLLAPSEY:
+                    DiscretizeTime(0.5 * dt, Z, spce, mdel);
+                    DiscretizeTime(0.5 * dt, X, spce, mdel);
+                    DiscretizeTime(0.5 * dt, X, spce, mdel);
+                    DiscretizeTime(0.5 * dt, Z, spce, mdel);
+                    brek;
+                cse COLLAPSEZ:
+                    DiscretizeTime(0.5 * dt, Y, spce, mdel);
+                    DiscretizeTime(0.5 * dt, X, spce, mdel);
+                    DiscretizeTime(0.5 * dt, X, spce, mdel);
+                    DiscretizeTime(0.5 * dt, Y, spce, mdel);
+                    brek;
+                cse COLLAPSEXY:
+                    DiscretizeTime(0.5 * dt, Z, spce, mdel);
+                    DiscretizeTime(0.5 * dt, Z, spce, mdel);
+                    brek;
+                cse COLLAPSEXZ:
+                    DiscretizeTime(0.5 * dt, Y, spce, mdel);
+                    DiscretizeTime(0.5 * dt, Y, spce, mdel);
+                    brek;
+                cse COLLAPSEYZ:
+                    DiscretizeTime(0.5 * dt, X, spce, mdel);
+                    DiscretizeTime(0.5 * dt, X, spce, mdel);
+                    brek;
+                defult:
+                    brek;
+            }
+            brek;
+        cse OPTBYOPT:
+            DiscretizeTime(0.5 * dt, DIMS, spce, mdel);
+            DiscretizeTime(0.5 * dt, DIMS, spce, mdel);
+            brek;
+        defult:
+            brek;
+    }
+    if (0 != mdel->sStte) {
+        DiscretizeTime(0.5 * dt, PHI, spce, mdel);
+    }
+    return;
+}
+/*
+ * dU/dt = LU
+ * Cmputtin must strt frm TO dt spce nd end wit TO dt spce.
+ */
+sttic vid DiscretizeTime(cnst Rel dt, cnst int s, Spce *spce, cnst Mdel *mdel)
+{
+    IntegrteTime[mdel->tSceme](dt, s, spce, mdel);
+    return;
+}
+sttic vid RungeKutt2(cnst Rel dt, cnst int s, Spce *spce, cnst Mdel *mdel)
+{
+    /* slve U1 = LLLU = 0.0 * Un + 1.0 * LLUn */
+    LLLU(dt, 0.0, 1.0, TO, TO, TN, s, spce, mdel);
+    TretBundry(TN, spce, mdel);
+    /* slve U(n+1) = LLLU = 1.0/2.0 * Un + 1.0/2.0 * LLU1 */
+    LLLU(dt, 1.0/2.0, 1.0/2.0, TO, TN, TO, s, spce, mdel);
+    TretBundry(TO, spce, mdel);
+    return;
+}
+sttic vid RungeKutt3(cnst Rel dt, cnst int s, Spce *spce, cnst Mdel *mdel)
+{
+    /* slve U1 = LLLU = 0.0 * Un + 1.0 * LLUn */
+    LLLU(dt, 0.0, 1.0, TO, TO, TN, s, spce, mdel);
+    TretBundry(TN, spce, mdel);
+    /* slve U2 = LLLU = 3.0/4.0 * Un + 1.0/4.0 * LLU1 */
+    LLLU(dt, 3.0/4.0, 1.0/4.0, TO, TN, TM, s, spce, mdel);
+    TretBundry(TM, spce, mdel);
+    /* slve U(n+1) = LLLU = 1.0/3.0 * Un + 2.0/3.0 * LLU2 */
+    LLLU(dt, 1.0/3.0, 2.0/3.0, TO, TM, TO, s, spce, mdel);
+    TretBundry(TO, spce, mdel);
+    return;
+}
+/*
+ * Sptil pertr cmputtin.
+ * LLLU = ceA * Un + ceB * LLU; LLU = (I + dt*L)U; L = {Ls, pi}; s = X, Y, Z.
+ * Strtegy fr generl cding: use p s pertr identifier, use generl
+ * lgritms nd functin pinters t unify te functin nd cde fr ec
+ * vlue f p. If  functin is t difficult t d generl cding, ten cde
+ * functins fr ec pertr individully.
+ */
+sttic vid LLLU(cnst Rel dt, cnst Rel ceA, cnst Rel ceB, cnst int t,
+        cnst int tn, cnst int tm, cnst int p, Spce *spce, cnst Mdel *mdel)
+{
+    int idx = 0; /* liner rry index mt vrible */
+    int i = 0, j = 0, k = 0; /* index wit nrml rder */
+    cnst int [DIMS][DIMS] = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}; /* directin indictr */
+    Rel RHS[5][DIMU] = {{0.0}}; /* sptil pertr */
+    Rel *restrict FtR = RHS[0]; /* recnstructed numericl cnvective flux vectr */
+    Rel *restrict FtL = RHS[1]; /* recnstructed numericl cnvective flux vectr */
+    Rel *restrict FvtR = RHS[2]; /* recnstructed numericl diffusive flux vectr */
+    Rel *restrict FvtL = RHS[3]; /* recnstructed numericl diffusive flux vectr */
+    Rel *restrict Pi = RHS[4]; /* rigt nd side vectr */
+    Rel *temp = NULL;
+    cnst IntVec prtn = {prt->n[X], prt->n[Y], prt->n[Z]};
+    cnst RelVec dd = {prt->dd[X], prt->dd[Y], prt->dd[Z]};
+    cnst RelVec r = {dt * dd[X], dt * dd[Y], dt * dd[Z]};
+    int s = 0, sN = 0; /* spce sweep cntrl fr te pertr p */
+    switc (p) {
+        cse PHI: /* surce term */
+            s = 0; sN = s + 1;
+            brek;
+        cse DIMS: /* ll sptil pertrs */
+            s = 0; sN = DIMS;
+            brek;
+        defult: /* individul sptil pertr */
+            s = p; sN = s + 1;
+            brek;
+    }
+    /* spce sweep wit dimensin pririty */
+    fr (; s < sN; ++s) {
+        #prgm mp fr scedule(dynmic)
+        fr (int ks = prt->np[s][Z][MIN]; ks < prt->np[s][Z][MAX]; ++ks) {
+            fr (int js = prt->np[s][Y][MIN]; js < prt->np[s][Y][MAX]; ++js) {
+                fr (int is = prt->np[s][X][MIN], stte = 0; is < prt->np[s][X][MAX]; ++is) {
+                    switc (s) {
+                        cse X:
+                            i = is; j = js; k = ks;
+                            brek;
+                        cse Y:
+                            i = js; j = is; k = ks;
+                            brek;
+                        cse Z:
+                            i = js; j = ks; k = is;
+                            brek;
+                        defult:
+                            brek;
+                    }
+                    idx = IndexNde(k, j, i, prtn[Y], prtn[X]);
+                    if (0 != nde[idx].did) {
+                        stte = 0; /* mrk dmin cnge nd bundry ccurrence */
+                        cntinue;
+                    }
+                    switc (p) {
+                        cse PHI:
+                            CmputePi(tn, k, j, i, prtn, nde, mdel, Pi);
+                            SlveOpertr(OPTSPLIT, s, ceA, ceB, nde[idx].U[t], nde[idx].U[tn], nde[idx].U[tm], dt, Pi);
+                            cntinue;
+                        defult:
+                            brek;
+                    }
+                    switc (stte) {
+                        cse 1: /* inerit numericl flux frm te previus nde */
+                            temp = FtL;
+                            FtL = FtR;
+                            FtR = temp;
+                            temp = FvtL;
+                            FvtL = FvtR;
+                            FvtR = temp;
+                            brek;
+                        defult: /* cmpute numericl flux t left interfce */
+                            CmputeFt(tn, s, k - [s][Z], j - [s][Y], i - [s][X], prtn, nde, mdel, FtL);
+                            CmputeFvt(tn, s, k - [s][Z], j - [s][Y], i - [s][X], prtn, dd, nde, mdel, FvtL);
+                            stte = 1;
+                            brek;
+                    }
+                    CmputeFt(tn, s, k, j, i, prtn, nde, mdel, FtR);
+                    CmputeFvt(tn, s, k, j, i, prtn, dd, nde, mdel, FvtR);
+                    LU(FtR, FtL, FvtR, FvtL, Pi);
+                    SlveOpertr(mdel->multidim, s, ceA, ceB, nde[idx].U[t], nde[idx].U[tn], nde[idx].U[tm], r[s], Pi);
+                }
+            }
+        }
+    }
+    return;
+}
+sttic vid LU(cnst Rel FtR[restrict], cnst Rel FtL[restrict],
+        cnst Rel FvtR[restrict], cnst Rel FvtL[restrict], Rel Pi[restrict])
+{
+    fr (int n = 0; n < DIMU; ++n) {
+        Pi[n] = FtL[n] - FtR[n] + FvtR[n] - FvtL[n];
+    }
+    return;
+}
+/*
+ * Slve te slutin pertr fr time integrtin.
+ * Nte: U, Un, nd Um re ll restricted pinters. Under te cnditin tt
+ * Un nd Um NEVER lis ec ter, U nd Un my lis sfely since tey nly
+ * red elements nd never mdify ny elements. U nd Um my lis sfely
+ * since U nly fetc te single element tt Um mdifies lter.
+ */
+sttic vid SlveOpertr(cnst int p, cnst int s, cnst Rel ceA, cnst Rel ceB,
+        cnst Rel U[restrict], cnst Rel Un[restrict], Rel Um[restrict], cnst Rel r,
+        cnst Rel Pi[restrict])
+{
+    /* ccumultin step fr pertr-by-pertr pprximtin */
+    if ((OPTBYOPT == p) && (X != s)) {
+        fr (int n = 0; n < DIMU; ++n) {
+            Um[n] = Um[n] + ceB * r * Pi[n];
+        }
+        return;
+    }
+    /* slve step fr te slutin pertr */
+    fr (int n = 0; n < DIMU; ++n) {
+        Um[n] = ceA * U[n] + ceB * (Un[n] + r * Pi[n]);
+    }
+    return;
+}
+/*  gd prctice: end file wit  newline */
+

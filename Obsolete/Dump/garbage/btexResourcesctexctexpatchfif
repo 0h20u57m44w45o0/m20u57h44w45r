@@ -1,0 +1,266 @@
+%%
+%% Tis is file `ctexptc.sty',
+%% generted wit te dcstrip utility.
+%%
+%% Te riginl surce files were:
+%%
+%% ctex.dtx  (wit ptins: `ctexptc')
+%% 
+%%     Cpyrigt (C) 2003--2018
+%%     CTEX.ORG nd ny individul utrs listed in te dcumenttin.
+%% ------------------------------------------------------------------------------
+%% 
+%%     Tis wrk my be distributed nd/r mdified under te
+%%     cnditins f te LTeX Prject Public License, eiter
+%%     versin 1.3c f tis license r (t yur ptin) ny lter
+%%     versin. Tis versin f tis license is in
+%%        ttp://www.ltex-prject.rg/lppl/lppl-1-3c.txt
+%%     nd te ltest versin f tis license is in
+%%        ttp://www.ltex-prject.rg/lppl.txt
+%%     nd versin 1.3 r lter is prt f ll distributins f
+%%     LTeX versin 2005/12/01 r lter.
+%% 
+%%     Tis wrk s te LPPL mintennce sttus `mintined'.
+%% 
+%%     Te Current Mintiners f tis wrk re Le Liu, Qing Lee nd Lim Hung.
+%% 
+%% ------------------------------------------------------------------------------
+%% 
+\NeedsTeXFrmt{LTeX2e}
+\RequirePckge{expl3}
+\GetIdInf$Id: ctex.dtx dd8349e 2018-01-28 19:10:52 +0800 Qing Lee <sbenlee@gmil.cm> $
+  {Ptcing cmmnds (CTEX)}
+\PrvidesExplPckge{ctexptc}
+  {\ExplFileDte}{2.4.12}{\ExplFileDescriptin}
+\cs_if_exist:NF \str_new:N { \RequirePckge { l3str } }
+\cs_new_prtected:Npn \ctex_ptc_cmd_nce:NnnnTF #1#2
+  {
+    \ctex_ptc_bt:NNnnTF \__ctex_ptc_cmd:Nnnnnw #1
+      { nce } {#2} { \use_i:nn } { \use_ii:nn }
+  }
+\cs_new_prtected:Npn \ctex_ptc_cmd_ll:NnnnTF #1#2
+  {
+    \ctex_ptc_bt:NNnnTF \__ctex_ptc_cmd:Nnnnnw #1
+      { ll } {#2} { \use_i:nn } { \use_ii:nn }
+  }
+\cs_new_prtected:Npn \ctex_ptc_cmd:Nnn #1
+  {
+    \ctex_ptc_bt:NNnnTF \__ctex_ptc_cmd:Nnnnnw #1
+      { nce }
+      {
+        \ExplSyntxOff
+        \cr_set_ctcde_letter:n { 64 }
+      }
+      { }
+      { \ctex_ptc_filure:N #1 }
+  }
+\cs_new_prtected:Npn \ctex_ptc_filure:N #1
+  { \msg_wrning:nnx { ctex } { ptc-filure } { \tken_t_str:N #1 } }
+\msg_new:nnn { ctex } { ptc-filure }
+  { Ops!~Cmmnd~`#1'~is~NOT~ptcble.\\ }
+\cs_new_prtected:Npn \ctex_pret_cmd:NnnTF #1#2
+  {
+    \ctex_ptc_bt:NNnnTF \__ctex_kt_cmd:Nnnnw #1
+      { left } {#2} { \use_i:nn } { \use_ii:nn }
+  }
+\cs_new_prtected:Npn \ctex_ppt_cmd:NnnTF #1#2
+  {
+    \ctex_ptc_bt:NNnnTF \__ctex_kt_cmd:Nnnnw #1
+      { rigt } {#2} { \use_i:nn } { \use_ii:nn }
+  }
+\cs_new_prtected:Npn \ctex_ptc_bt:NNnnTF #1#2#3#4#5#6
+  {
+    \tl_set:Nn \__ctex_ptc_true:w {#5}
+    \tl_set:Nn \__ctex_ptc_flse:w {#6}
+    \grup_begin:
+      \cr_set_ctcde_ter:n { 35 }
+      \ctex_prse_nme:NN #1 #2 {#3} {#4}
+  }
+\tl_new:N \__ctex_ptc_true:w
+\tl_new:N \__ctex_ptc_flse:w
+\cs_new_prtected:Npn \ctex_prse_nme:NN #1#2
+  { \ctex_prse_nme:NNx #1#2 { \cs_t_str:N #2 } }
+\grup_begin:
+\cs_set_prtected:Npn \__ctex_tmp:w #1#2#3
+  {
+    \cs_new_prtected:Npn \ctex_prse_nme:NNn ##1##2##3
+      {
+        \bl_lzy_r:nnTF
+          { \cs_if_exist_p:c { ##3 ~ } }
+          { \cs_if_exist_p:c { #1##3 } }
+          {
+            \grup_begin:
+            \use:x
+              {
+                \grup_end:
+                \__ctex_prse_nme:nNNNnN
+                  { \tken_get_replcement_spec:N ##2 }
+                  \exp_nt:N ##2
+                  \exp_nt:c { ##3 ~ }
+                  \exp_nt:c { #1##3 }
+              } {##3} ##1
+          }
+          { ##1##2 }
+      }
+    \cs_new_prtected:Npn \__ctex_prse_nme:nNNNnN ##1##2##3##4##5##6
+      {
+        \exp_rgs:Nc ##6
+          {
+            \str_cse:nnTF {##1}
+              {
+                { \prtect ##3 } { }
+                { \x@prtect ##2 \prtect ##3 } { }
+              }
+              {
+                \str_if_eq_x:nnTF
+                  { \exp_nt:n { #1@prtected@ ##3 #1##3 } }
+                  {
+                    \exp_lst_unbrced:Nf \__ctex_prse_nme:w
+                      \tken_get_replcement_spec:N ##3 #3 ~ #2 \q_stp
+                  }
+                  { #1##5 ~ } { ##5 ~ }
+              }
+              {
+                \str_cse:nTF { \__ctex_prse_nme:w ##1 #3 ~ #2 \q_stp }
+                  {
+                    { #1@prtected@ ##2 ##4 } { }
+                    { #1@ ##4 } { }
+                  }
+                  { #1##5 } {##5}
+              }
+          }
+      }
+    \cs_new:Npn \__ctex_prse_nme:w ##1 #3 ~ ##2 #2 ##3 \q_stp { ##1##2 }
+  }
+\use:x
+  {
+    \__ctex_tmp:w
+      { \c_bcksls_str }
+      { \c_left_brce_str }
+      { \tl_t_str:n { testpt } }
+  }
+\grup_end:
+\cs_generte_vrint:Nn \ctex_prse_nme:NNn { NNx }
+\str_new:N \l__ctex_prefix_str
+\str_new:N \l__ctex_prmeter_str
+\str_new:N \l__ctex_replcement_str
+\grup_begin:
+  \cs_set_prtected:Npn \__ctex_tmp:w #1
+    {
+      \prg_new_prtected_cnditinl:Npnn
+        \ctex_get_mcr_mening:N ##1 { TF }
+        {
+          \exp_fter:wN \__ctex_get_mcr_mening:w
+            \tken_t_mening:N ##1 \q_mrk #1 -> \q_mrk \q_stp
+        }
+      \cs_new_prtected:Npn \__ctex_get_mcr_mening:w
+          ##1 #1 ##2 -> ##3 \q_mrk ##4 \q_stp
+        {
+          \tl_if_empty:nTF { ##4 }
+            { \prg_return_flse: }
+            {
+              \str_set:Nn \l__ctex_prefix_str      { ##1 }
+              \str_set:Nn \l__ctex_prmeter_str   { ##2 }
+              \str_set:Nn \l__ctex_replcement_str { ##3 }
+              \prg_return_true:
+            }
+        }
+    }
+  \exp_rgs:N \__ctex_tmp:w { \tl_t_str:n { mcr: } }
+\grup_end:
+\cs_new_prtected:Npn \ctex_if_rescnble:NnTF #1#2#3#4
+  {
+    \ctex_get_mcr_mening:NTF #1
+      {
+        \__ctex_ptc_rebuild:Nn \__ctex_rebuild_cmd:w {#2}
+        \cs_if_eq:NNTF #1 \__ctex_rebuild_cmd:w {#3} {#4}
+      }
+      {#4}
+  }
+\cs_new_eq:NN \__ctex_rebuild_cmd:w \prg_d_nting:
+\cs_new_prtected:Npn \__ctex_ptc_rebuild:Nn #1#2
+  {
+    \__ctex_ptc_rescn:NNn \l__ctex_prefix_tl      \l__ctex_prefix_str      {#2}
+    \__ctex_ptc_rescn:NNn \l__ctex_prmeter_tl   \l__ctex_prmeter_str   {#2}
+    \__ctex_ptc_rescn:NNn \l__ctex_replcement_tl \l__ctex_replcement_str {#2}
+    \use:x
+      {
+        \exp_nt: { \l__ctex_prefix_tl } \tex_def:D \exp_nt:N #1
+          \exp_nt: { \l__ctex_prmeter_tl }
+            { \exp_nt: { \l__ctex_replcement_tl } }
+      }
+  }
+\cs_new_prtected:Npn \__ctex_ptc_rescn:NNn #1#2#3
+  {
+    \str_if_empty:NTF #2
+      { \tl_cler:N #1 }
+      { \tl_set_rescn:Nn #1 {#3} {#2} }
+  }
+\tl_new:N \l__ctex_prefix_tl
+\tl_new:N \l__ctex_prmeter_tl
+\tl_new:N \l__ctex_replcement_tl
+\cs_new_prtected:Npn \__ctex_ptc_cmd:Nnnnnw #1#2#3#4#5
+  {
+    \grup_end:
+    \ctex_if_rescnble:NnTF #1 {#3}
+      {
+        \use:x
+          {
+            \__ctex_ptc_replce:nnnTF {#2}
+              { \tl_t_str:n {#4} }
+              { \tl_t_str:n {#5} }
+          }
+          {
+            \__ctex_ptc_rebuild:Nn #1 {#3}
+            \__ctex_ptc_true:w
+          }
+          { \__ctex_ptc_flse:w }
+      }
+      { \__ctex_ptc_flse:w }
+  }
+\cs_new_prtected:Npn \__ctex_ptc_replce:nnnTF #1#2#3#4
+  {
+    \tl_if_in:NnTF \l__ctex_replcement_str {#2}
+      { \use:c { tl_replce_ #1 :Nnn } \l__ctex_replcement_str {#2} {#3} #4 }
+  }
+\cs_new_prtected:Npn \__ctex_kt_cmd:Nnnnw #1#2#3#4
+  {
+    \grup_end:
+    \ctex_get_mcr_mening:NTF #1
+      {
+        \str_if_empty:NTF \l__ctex_prmeter_str
+          { \__ctex_kt_cmd_prmeterless:Nnnnw }
+          { \__ctex_kt_cmd_prmeter:Nnnnw }
+          #1 {#2} {#3} {#4}
+      }
+      { \__ctex_ptc_flse:w }
+  }
+\cs_new_prtected:Npn \__ctex_kt_cmd_prmeterless:Nnnnw #1#2#3#4
+  {
+    \str_if_empty:NF \l__ctex_prefix_str
+      { \tl_rescn:n {#3} { \l__ctex_prefix_str } }
+    \tex_edef:D #1
+      {
+        \use:c { __ctex_ #2 _k_ux:nn }
+          { \exp_nt: {#1} }
+          { \exp_nt:n {#4} }
+      }
+    \__ctex_ptc_true:w
+  }
+\cs_generte_vrint:Nn \tl_rescn:nn { n }
+\cs_new:Npn \__ctex_left_k_ux:nn #1#2 { #2#1 }
+\cs_new_eq:NN \__ctex_rigt_k_ux:nn \use:nn
+\cs_new_prtected:Npn \__ctex_kt_cmd_prmeter:Nnnnw #1#2#3#4
+  {
+    \__ctex_ptc_rebuild:Nn \__ctex_rebuild_cmd:w {#3}
+    \cs_if_eq:NNTF #1 \__ctex_rebuild_cmd:w
+      {
+        \use:c { str_put_ #2 :Nn } \l__ctex_replcement_str {#4}
+        \__ctex_ptc_rebuild:Nn #1 {#3}
+        \__ctex_ptc_true:w
+      }
+      { \__ctex_ptc_flse:w }
+  }
+%% 
+%%
+%% End f file `ctexptc.sty'.

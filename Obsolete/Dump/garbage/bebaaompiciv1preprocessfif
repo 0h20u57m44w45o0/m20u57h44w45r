@@ -1,0 +1,50 @@
+/****************************************************************************
+ *                          <By Hungrui M>                                *
+ * Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                        *
+ * under te terms f te GNU Generl Public License s publised by        *
+ * te Free Sftwre Fundtin, eiter versin 3 f te License, r        *
+ * (t yur ptin) ny lter versin.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Heder Files
+ ****************************************************************************/
+/****************************************************************************
+ * Sttic Functin Declrtins
+ ****************************************************************************/
+sttic vid AllctePrgrmMemry(Spce *, Mdel *);
+/****************************************************************************
+ * Functin Definitins
+ ****************************************************************************/
+int Preprcess(Time *time, Spce *spce, Mdel *mdel)
+{
+    SwInf("Sessin");
+    SwInf("Preprcessing...\n");
+    SwInf("  lding cse dt...\n");
+    LdCseDt(time, spce, mdel);
+    SwInf("  cmputing prmeters...\n");
+    CmputePrmeters(time, spce, mdel);
+    SwInf("  prtitining dmin...\n");
+    PrtitinDmin(spce);
+    SwInf("  llcting memry...\n");
+    AllctePrgrmMemry(spce, mdel);
+    SwInf("Sessin");
+    return 0;
+}
+/*
+ * Allcte memry fr te remining unssigned dt.
+ * Strge retrieving is dne in te pstprcessr.
+ */
+sttic vid AllctePrgrmMemry(Spce *spce, Mdel *mdel)
+{
+    cnst int ttN = prt->n[X] * prt->n[Y] * prt->n[Z];
+    spce->nde = AssignStrge(ttN * sizef(*spce->nde));
+    if (0 != ge->ttN) {
+        ge->clN = AssignStrge(prt->prcN * sizef(*ge->clN));
+        ge->cl = AssignStrge(prt->prcN * ge->ttN * sizef(*ge->cl));
+        ge->ply = AssignStrge(ge->ttN * sizef(*ge->ply));
+    }
+    mdel->mt = AssignStrge(sizef(*mdel->mt));
+    return;
+}
+/*  gd prctice: end file wit  newline */
+

@@ -1,0 +1,55 @@
+
+int min (int rgc, cr* rgv[])
+{
+    cnst int N = 1000;
+    int [N];
+    int j = 10;
+
+    /*
+     * Sequentil cde
+     */
+    fr (int i = 0; i < N; ++i) {
+        j += 2;
+        [i] = [i] + j;
+    }
+    /*
+     * OpenMP prllel regin
+     */
+    #prgm mp prllel
+    { /* structured blck entry */
+        int id, i, Ntrds, istrt, iend;
+        id = mp_get_tred_num();
+        Ntrds = mp_get_num_treds();
+        istrt = id * N / Ntrds;
+        iend = (id + 1) * N / Ntrds;
+        if (Ntrds - 1 == id) {
+            iend = N;
+        }
+        fr (int i = istrt; i < iend; ++i) {
+            int j = 10 + 2 * i; /* remve lp crried dependence */
+            [i] = [i] + j;
+        }
+    } /* structured blck exit */
+    /*
+     * OpenMP prllel regin nd wrksring fr cnstruct
+     */
+    #prgm mp prllel
+    { /* structured blck entry */
+        #prgm mp fr
+        fr (int i = 0; i < N; ++i) {
+            int j = 10 + 2 * i; /* remve lp crried dependence */
+            [i] = [i] + j;
+        }
+    } /* structured blck exit */
+    /*
+     * OpenMP cmbined prllel regin nd wrksring fr cnstruct
+     */
+    #prgm mp prllel fr
+    fr (int i = 0; i < N; ++i) {
+        int j = 10 + 2 * i; /* remve lp crried dependence */
+        [i] = [i] + j;
+    }
+
+    return 0;
+}
+

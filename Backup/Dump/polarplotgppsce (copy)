@@ -1,0 +1,305 @@
+//****************************** Scilab Plot ***********************************
+
+//* initialize program
+clear;
+
+//* ***************************** System Configure *****************************
+
+//* data structure
+Case=tlist(["CL";"Amount";"Name";"Rows";"Cols"],[ ],[ ],[ ],[ ]);
+X=tlist(["xaxes";"pointer";"data"],[ ],list());
+Y=tlist(["yaxes";"pointer";"data"],[ ],list());
+LoadData=list();//* use to load data from files
+
+//* system configure: specify the file name for load
+Data_In="Data.in";
+
+//* *************************** Import Data Configure **************************
+
+//* specify the data of x axes
+X.pointer=[1];
+
+//* specify the data of y axes
+Y.pointer=[2];//if all Y are at the same collum, give single No.
+//Y.pointer=[2,3,4,5];//if Y are in different collums, give each No.
+
+//* ******************************** load data *********************************
+
+//* the number of Y data collums
+Number_Y_Col=length(Y.pointer);
+
+Data_In_FID=file('open',Data_In,'unknow');
+//* strip the head comments
+CommentLine=read(Data_In_FID, 1, 1,'(A)');
+CommentLine=read(Data_In_FID, 1, 1,'(A)');
+CommentLine=read(Data_In_FID, 1, 1,'(A)');
+//* get the total amount of cases
+CommentLine=read(Data_In_FID, 1, 1,'(A)');
+Case.Amount=read(Data_In_FID, 1, 1);
+for n = 1 : Case.Amount
+    CommentLine=read(Data_In_FID, 1, 1,'(A)');
+    Case.Name(n)=read(Data_In_FID, 1, 1,'(A)');
+    CommentLine=read(Data_In_FID, 1, 1,'(A)');
+    Case.Rows=read(Data_In_FID, 1, 1);
+    CommentLine=read(Data_In_FID, 1, 1,'(A)');
+    Case.Cols=read(Data_In_FID, 1, 1);
+    LoadData(1)=read(Data_In_FID, Case.Rows, Case.Cols);
+    //* extract the specified data of x and y from LoadData(1), default is coloumn
+    X.data(n)=LoadData(1)(:,X.pointer);
+    if Number_Y_Col == 1 then
+    Y.data(n)=LoadData(1)(:,Y.pointer);//if all Y are at the same collum, give single No.
+    else
+    Y.data(n)=LoadData(1)(:,Y.pointer(n));//if Y are in different collums, give each No.
+    end
+end
+CommentLine=read(Data_In_FID, 1, 1,'(A)');
+file('close',Data_In_FID);
+
+//***************************** Common Settings *******************************
+
+//* **************************** Axes Settings ********************************
+
+//* specify the target lines to plot
+Line_to_Plot=[1:1:Case.Amount];//* plot all lines in data file
+//Line_to_Plot=[1,2,3]+0;//* plot target lines in data file
+
+//* title and labels and legend annotation, character string vector, Latex support
+//Title_Info="";
+//X_Lable="$\mathbf{x}$";
+//Y_Lable="$\mathbf{y}$";
+Leg_Text=Case.Name(Line_to_Plot); //* use each case name as legend annotation
+//Leg_Text=["$\mathbf{QFF\ Experiment}$","$\mathbf{BART\ Experiment}$","$\mathbf{DDES}$"]; //* manually assign legend
+//Leg_Text=["$\mathbf{Exp.\ Probe\ a}$","$\mathbf{Exp.\ Probe\ b}$","$\mathbf{Probe\ a}$", "$\mathbf{Probe\ b}$"];
+//Leg_Text=["$\mathbf{C_D}$","$\mathbf{C_L}$"]; //* manually assign legend
+Leg_Text=["$\mathbf{A}$","$\mathbf{B}$","$\mathbf{C}$"]; //* manually assign legend
+
+//* configure axes linear(n) or logatithmic(l)
+Log_Flags="nnn";
+
+//* configure the range of field
+//Tight_Limits="on";//* if "on", data bounds will need to set 
+Tight_Limits="off";//* if "off", data bounds will has no effect
+Data_Bounds=[6000,-2;11000,2];//* [xmin,ymin;xmax,ymax]
+
+//* the subticks
+Sub_Ticks=[1,1];
+
+//* default line thickness
+Def_Line_Thickness=2;
+
+//* set font style and font size globally
+//* font style:(0,Monospaced)(2,Serif)(3,Italic Serif)(4,Bold Serif)(5,Bold Italic Serif)
+//* (6,SansSerif)(7,Italic Sans)(8,Bold Sans)(9,Bold Italic Sans),there are already loaded.
+//* load fonts, use "xlfont('AVAILABLE_FONTS')" to check available fonts.
+
+//* load a new fonts: xlfont(font-name,font-id,bold,italic), a boolean %t if true.
+//* reset to initial index list of fonts: xlfont('reset');
+//xlfont("FreeSerif",11,%t,%t);
+
+//* user configure font style and size
+Font_Size=4;//* font size for all text entities
+Font_Style=6;//* this is the dedault font style
+
+//* user define figure size, [640,480] good for slide.
+Figure_Size=[640,480];
+
+
+//* line_style: should be integer in [1 8], such as solid, dash,double dash...
+Line_Sty_List=[1,3,7,6,5,2,4,8];
+//Line_Sty_List=[1,1,1,1,1,1,1,1];
+//* check color_list to get named colors, then Id=color("color_name") to get the color index. 
+//* line color, color index: [1-8]:black,blue,green,cyan,red,magenta,yellow,white,
+//* dim red: 20, dim magenta: 23, brown: 26, grey: 33
+//Line_Color_List=[1,1,1,1,1,1,1,1];
+Line_Color_List=[1,5,2,3,6,26,4,33];
+//* line background color list
+Line_BakColor_List=[1,5,2,3,6,26,4,33];
+//* line width in pixels, positive real value
+Line_Width=Def_Line_Thickness;
+//* line_mode: "on" for line drawn, "off" not to draw line, default is "on"
+Line_Mode_List=["on","on","on","on","on","on","on","on"];
+
+//* mark style: integer in [0 14], 
+Mk_Sty_List=[11,7,0,4,2,10,14,1];
+//* mark size: integer, plot is point mode,plot2d is tabulated.
+Mark_Size=7;
+//* mark foreground: color of mark's edge, value is a color index, -1 for black
+Mark_EdgeColor_List=[-1,-1,-1,-1,-1,-1,-1,-1];
+//* mark background: color of mark's face, value is a color index, -2 for white
+Mark_FaceColor_List=[-2,-2,-2,-2,-2,-2,-2,-2];
+//* mark_mode: "on" for mark drawn, "off" not to draw mark, default is "off"
+Mark_Mode_List=["off","off","off","off","off","off","off","off"];
+
+//* ********** set default graphic property globally before plot ***************
+
+//* ********** default figure configure *******************
+
+//* get default figure handle
+Def_Fig_Hdl=get("default_figure");
+//Def_Fig_Hdl.figure_size=Figure_Size;
+Def_Fig_Hdl.axes_size=Figure_Size;
+//* whether auto resize the axes and zoom the image when resize the fig window, default is on
+//Fig_Entity.auto_resize="on";
+//* anti-aliasing level to improve graphic quality, "off","2x",...,"16x", default is "off"
+//Fig_Entity.anti_aliasing="16x";
+// * figure background, default is white, i.e., "-2"
+//Fig_Entity.background=-2;
+
+//* ************ default axes configure ******************
+
+//* get default axes handle
+Def_Axe_Hdl=get("default_axes");
+
+//* now configure axes font to set font globally
+Fraction_Font="on";//* set fractional_font "on" to allow floating point value of font_size
+//Def_Axe_Hdl.fractional_font=Fraction_Font;
+Def_Axe_Hdl.font_style=Font_Style;
+Def_Axe_Hdl.font_size=Font_Size;
+//* titles and labels need set seperately
+Def_Axe_Hdl.title.font_style=Font_Style;
+Def_Axe_Hdl.title.font_size=Font_Size;
+Def_Axe_Hdl.x_label.font_style=Font_Style;
+Def_Axe_Hdl.x_label.font_size=Font_Size;
+Def_Axe_Hdl.y_label.font_style=Font_Style;
+Def_Axe_Hdl.y_label.font_size=Font_Size;
+//* set line thichness globally for all line in image
+Def_Axe_Hdl.thickness=Def_Line_Thickness;
+
+//* ****************************** plot part ***********************************
+
+//* prepare: clear current figure window
+
+Cur_Fig=scf(1);
+clf;
+
+//* get number of lines to plot
+
+
+    Matrix_Theta(:,Pn)=X.data(Line_to_Plot(Pn));
+    Matrix_Rho(:,Pn)=Y.data(Line_to_Plot(Pn));
+end
+
+//* ploarplot, Matrix_Theta must in radius unit!
+Radius_Factor=1;//* if theta matrix is in raduis
+Radius_Factor=%pi/180;//* if theta matrix is in angle
+Matrix_Theta=Matrix_Theta .* Radius_Factor;//* scale the theta matrix, ensure it's radius
+polarplot(Matrix_Theta,Matrix_Rho);//* plot
+
+//******************************************************************************
+//* ************************** configure part **********************************
+//******************************************************************************
+
+//* get entity of each level of current figure, early entity has larger index!
+
+Axe_Entity=gca();
+Fig_Entity=Axe_Entity.parent;
+
+
+
+
+//* line_style:
+//* line color
+//* line background color
+//* line width in pixels:
+//* line_mode: "on" for line drawn, "off" not to draw line
+
+//* mark style:
+//* mark size: integer, plot is point mode,plot2d is tabulated.
+//* mark foreground: 
+//* mark background:
+//* mark_mode: "on" for mark drawn, "off" not to draw mark
+
+end
+
+//* ********************** legend property configure ***************************
+
+//* draw legend
+legend(Leg_Text);
+
+//* get legend entity
+Legend_Entity=Axe_Entity.children(1);
+
+//* location: "[in,out]_[upper,lower]_[left,right]",or,"[upper,lower]_caption",or,"by_coordinates"
+Legend_Entity.legend_location="in_upper_right";
+//Legend_Entity.legend_location="by_coordinates";
+//* position: if choose "by_coordinates", then need to specify the [x,y]
+//* [x,y] is upper-left corner of the legend, given as fractions of the "axes_bounds" sizes.
+//Legend_Entity.position=[0.5-0.1,1-0.3];
+
+//* box "on" or "off"
+Legend_Entity.line_mode="on";
+
+//* box line thickness
+Legend_Entity.thickness=0.5*Def_Line_Thickness;
+
+//* ********************** axes property configure *****************************
+
+//* configure labels of axes:
+//xtitle(Title_Info,X_Lable,Y_Lable);
+
+//* set the margins of current figure
+//* a vector [margin_left,margin_right,margin_top,margin_bottom], value [0,1]
+//* specify the margins portion for this axes, default: [0.125,0.125,0.125,0.125]
+Axe_Entity.margins=[0.05,0.05,0.05,0.05];// for figures without labels
+//Axe_Entity.margins=[0.125,0.05,0.125,0.125];// for figures with labels
+
+//* axes visiable: axes_visiable[N] corresponding to x, y, or z axis
+//Axe_Entity.axes_visible=["off","off","off"];
+
+//* axes reverse: default is axes_reverse=["off","off","off"];
+//Axe_Entity.axes_reverse=["off","on","off"];
+
+//* configure axes linear(n) or logatithmic(l)
+Axe_Entity.log_flags = Log_Flags;
+
+//* configure coordinates position:
+//Axe_Entity.x_location = "bottom"; //* "bottom","top","middle","origin"
+//Axe_Entity.y_location = "left"; //* "left","right","middle","origin"
+
+//* configure the appearance of axes
+Axe_Entity.box="off";
+//Axe_Entity.isoview = "off";
+Axe_Entity.thickness = 0.5*Def_Line_Thickness;
+
+//* the grid:-1 not show, else grid draw using the grid value as color index
+//Axe_Entity.grid=[-1,5];
+//Axe_Entity.grid_position="foreground"// default is "background"
+
+//* configure the range of field
+//* "on" to strictly adapt axes to data_bounds,"off" to enlarge boundaries for pretty ticks.
+if Tight_Limits == "on" then
+Axe_Entity.tight_limits = Tight_Limits;
+//* field of boundary of axes:[xmin,ymin;xmax,ymax];
+Axe_Entity.data_bounds = Data_Bounds;
+end
+
+//* configure the ticks apperance
+//* the main ticks: it can use variables and Latex format in the string vector "labels",e.g.
+//* mathexpr="$\cos(x)$";
+//* Axe_Entity.x_ticks = tlist(["ticks","locations","labels"],[0:2]',[mathexpr;"$\pi$";"$\sin(x)$];
+//* Axe_Entity.y_ticks = tlist(["ticks","locations","labels"],[-150:50:150]',['P'+string(-150:50:150)]');
+
+//Axe_Entity.x_ticks = tlist(["ticks","locations","labels"],[0:14]',["";['p'+string(1:13)]';""]);
+//Axe_Entity.y_ticks = tlist(["ticks","locations","labels"],[0:1]',["lablel1";"label2"]);
+
+//* the subticks
+Axe_Entity.sub_ticks = Sub_Ticks;
+
+//* ***************************** export graphics ******************************
+
+//* xs2eps(fig_handle,file_name [,orientation])
+//* xs2pdf(fig_handle,file_name [,orientation])
+//* xs2jpg(fig_handle,file_name [, compression_quality])
+//* xs2bmp(fig_handle,file_name ), e.g.
+//* xs2png(gcf(),'photo.png')
+//* xs2jpg(Fig_Entity,'photo.jpg',1)
+
+xs2pdf(Fig_Entity,'Plot.pdf');
+//xs2jpg(Fig_Entity,'Plot.jpg',1);
+
+//* ******************************* exit ***************************************
+
+//* exit Scilab, value "0" means succeed, "1-125" means failed
+//clear;
+exit(0);
+//* ***************************** end ******************************************

@@ -1,0 +1,339 @@
+
+# coding: utf-8
+
+# In[2]:
+
+import numpy as np
+#from IPython.display import Audio
+from sound4python import sound4python as S4P
+import scipy.io.wavfile
+from numpy.fft import fft, ifft, fftshift, ifftshift
+import matplotlib.pyplot as plt
+#get_ipython().magic(u'matplotlib inline')
+plt.ion()
+
+
+def PlaySound(f, freq):
+    blah2 = S4P.Sound4Python()
+    blah2.createMemfile(f, freq)
+    blah2.play()
+
+# ## Audio Filtering
+
+# In[60]:
+
+Omega, f = scipy.io.wavfile.read('train_bird.wav')
+print(Omega, len(f))
+
+
+# In[1]:
+
+Omega, f = scipy.io.wavfile.read('handel.wav')
+print(Omega, np.shape(f))
+
+blah = S4P.Sound4Python()
+blah.loadWav('handel.wav')
+
+f = blah.wav[1]
+Omega = blah.wav[0]
+
+
+# In[54]:
+
+#Audio(f, rate=Omega)
+blah.play()
+blah.playing = False
+
+# In[61]:
+
+def TimeSamples(f, Omega):
+    N = len(f)
+    L = float(N) / Omega
+    return np.linspace(0., L, N)
+
+
+# In[62]:
+
+def FreqSamples(f, Omega):
+    N = len(f)
+    L = N / float(Omega)
+    return np.arange(N)/L
+    #return np.linspace(0., N/L, N)
+
+
+# In[63]:
+
+def ShiftedFreqSamples(f, Omega):
+    N = len(f)
+    L = N / float(Omega)
+    ctr = np.floor(N/2.)
+    shifted_omega = (np.arange(N) - ctr) / L
+    return shifted_omega
+
+
+# In[64]:
+
+t = TimeSamples(f, Omega)
+plt.clf()
+plt.plot(t, f)
+plt.title('Time Domain')
+plt.xlabel('Time (s)')
+plt.ylabel('Amplitude');
+
+
+# In[65]:
+
+omega = FreqSamples(f, Omega)
+F = fft(f)
+plt.clf()
+plt.plot(omega, abs(F))
+plt.title('Frequency Domain')
+plt.xlabel('Frequency (Hz)')
+plt.ylabel('Modulus');
+
+
+# In[66]:
+
+shifted_omega = ShiftedFreqSamples(f, Omega)
+plt.clf()
+plt.plot(shifted_omega, fftshift(abs(F)))
+plt.title('Frequency Domain')
+plt.xlabel('Frequency (Hz)')
+plt.ylabel('Modulus');
+
+
+# In[68]:
+
+#Audio(f, rate=Omega)
+blah.play()
+
+# In[69]:
+
+F = fftshift(fft(f))
+shifted_omega = ShiftedFreqSamples(f, Omega)
+T = 1800
+G = F.copy()
+G[abs(shifted_omega)>T] = 0.
+
+
+# In[70]:
+
+plt.clf()
+plt.plot(shifted_omega, abs(G));
+
+
+# In[71]:
+
+g = ifft(ifftshift(G))
+#Audio(np.real(g), rate=Omega)
+
+PlaySound(np.real(g), Omega)
+
+
+# In[72]:
+
+G = F.copy()
+G[abs(shifted_omega)<T] = 0.
+g = ifft(ifftshift(G))
+#Audio(np.real(g), rate=Omega)
+PlaySound(np.real(g), Omega)
+
+
+# ## Pitch Adjustment
+
+# In[73]:
+
+Omega, f_orig = scipy.io.wavfile.read('scale.wav')
+f = f_orig[92000:-20000].copy()
+np.shape(f)
+print(Omega)
+
+
+# In[16]:
+
+#Audio(f, rate=Omega)
+PlaySound(f, Omega)
+
+
+# In[74]:
+
+tt = TimeSamples(f, Omega)
+plt.figure(1)
+plt.clf()
+plt.plot(tt, f);
+
+
+# In[75]:
+
+stops = np.linspace(0.,8, 9)
+plt.plot(stops,np.zeros(len(stops)),'ro');
+print(stops)
+
+
+# In[76]:
+
+stops_idx = np.array(stops * Omega, dtype=np.int32)
+print(stops_idx)
+stops_idx[1:]-stops_idx[:-1]
+print(7.3*Omega)
+print(len(f))
+print(float(len(tt))/Omega)
+
+
+# In[77]:
+
+plt.figure(2)
+plt.clf()
+plt.plot(f)
+plt.plot(stops_idx,np.zeros(len(stops)),'ro');
+
+
+# In[78]:
+
+f_pieces = []
+stops2_idx = [10000, 62000, 111000, 159000, 208000, 255000, 302000, 350000]
+w = 30000
+for idx in stops2_idx:
+    f_pieces.append(f[idx:(idx+w)])
+
+
+# In[79]:
+
+#Audio(f_pieces[6], rate=Omega)
+PlaySound(f_pieces[6], Omega)
+
+# In[80]:
+
+plt.figure(3)
+plt.clf()
+ttp = TimeSamples(f_pieces[0], Omega)
+k = 1
+for p in f_pieces:
+    plt.subplot(8,1,k)
+    plt.plot( p)
+    k += 1
+
+
+# In[81]:
+
+plt.figure(4)
+plt.clf()
+sop = ShiftedFreqSamples(f_pieces[0], Omega)
+ctr = int(np.floor(len(sop)/2.))
+ww = 500
+sopc = sop[(ctr-ww):(ctr+ww)]
+k = 1
+for p in f_pieces:
+    plt.subplot(8,1,k)
+    P = fftshift(fft(p))
+    plt.plot(sopc, np.log(abs(P[(ctr-ww):(ctr+ww)])+1.))
+    k += 1
+
+
+# In[82]:
+
+semitone_factor = pow(2.,1./12)
+print(semitone_factor**2)
+
+
+# In[83]:
+
+peaks = np.array([99.3, 113.4, 128, 134.4, 151, 171.2, 189.5, 200])
+#print(pow(peaks[1:]/peaks[:-1], 6))
+print(peaks[1:]/peaks[:-1])
+
+
+# To scale up by a factor of $2^{1/6}=1.13$, we pad to 113% the size in the time domain, then crop back to the original size in the frequency domain.
+
+# In[86]:
+
+from_idx = 1
+to_idx = 7   # Change this to anything from 2 to 7
+pitch_change = peaks[to_idx] / peaks[from_idx]
+from_piece = f_pieces[from_idx]
+
+
+#%% ChangePitch function
+
+# This only works to raise the pitch
+def ChangePitch(orig, semitones):
+    mult = pow(2.,1./12)**semitones
+    if semitones>0:
+        pad_amt = len(orig) * (mult - 1.)
+        pad_amt2 = int(pad_amt/2.)
+        fp = np.zeros(len(orig)+2*pad_amt2)
+        fp[:len(orig)] = orig.copy()
+        Fp = fftshift(fft(fp))
+        G = Fp[pad_amt2:-pad_amt2]
+        g = np.real(ifft(ifftshift(G)))
+        return g
+    elif semitones<0:
+        crop_amt = len(orig) * (1.-mult)
+        crop_amt2 = int(crop_amt/2.)
+        fp = orig[crop_amt2:-crop_amt2]
+        Fp = fftshift(fft(fp))
+        G = np.zeros(len(orig))
+        G[crop_amt2:-crop_amt2] = Fp
+        g = np.real(ifft(ifftshift(G)))
+        return g
+    else:
+        return orig
+
+#%%
+
+PlaySound(f_pieces[0], Omega)
+
+#%%
+
+PlaySound(ChangePitch(f_pieces[0], 4), Omega)
+
+#%% Here is how we scale the sound ====================
+
+pad_amt = len(from_piece) * (pitch_change - 1.)
+pad_amt2 = int(pad_amt/2.)
+print(pad_amt2)
+
+
+# In[88]:
+
+fp = np.zeros(len(from_piece)+2*pad_amt2)
+fp[:len(from_piece)] = from_piece.copy()
+
+
+# In[89]:
+
+Fp = fftshift(fft(fp))
+G = Fp[pad_amt2:-pad_amt2]
+g = np.real(ifft(ifftshift(G)))
+plt.figure(5)
+plt.clf()
+P1 = fftshift(fft(from_piece))
+P2 = fftshift(fft(f_pieces[to_idx]))
+plt.plot(sopc, np.log(abs(P1[ctr-ww:ctr+ww])+1), 'r')
+plt.plot(sopc, np.log(abs(P2[ctr-ww:ctr+ww])+1), 'g');
+
+
+# In[90]:
+
+plt.plot(sopc, np.log(abs(G[ctr-ww:ctr+ww])+1), 'b');
+
+
+# In[91]:
+
+PlaySound(from_piece, Omega)
+
+
+# In[92]:
+
+PlaySound(g, Omega)
+
+
+# In[93]:
+
+PlaySound(f_pieces[to_idx], Omega)
+
+
+# In[ ]:
+
+
+

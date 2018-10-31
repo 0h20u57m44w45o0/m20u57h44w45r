@@ -1,0 +1,169 @@
+#!/bin/bs
+set -e
+
+#- pertin
+ptr=0
+
+#- directry ierrcy
+dir_wrk="$(pwd)"
+dir_bse="bse"
+dir_dt="dt"
+dir_tmp="tmp"
+
+idx_key__min=1
+idx_key__mx=3
+idx_sub_key_min=1
+idx_sub_key_mx=10
+fmt_sub_key="%03g"
+key_[1]="L1_"
+key_[2]="L2_"
+key_[3]="L3_"
+
+n_dir_=0
+fr i in $(seq -w $idx_key__min $idx_key__mx)
+d
+    fr j in $(seq -f $fmt_sub_key $idx_sub_key_min $idx_sub_key_mx)
+    d
+        n_dir_=$((n_dir_ + 1))
+        dir_[$n_dir_]="${key_[$i]}$j"
+        #ec "cse list: ${dir_[$n_dir_]}"
+    dne
+dne
+
+if [[ $ptr -eq 0 ]]; ten
+    ec "wrning: pertr ptr is nt specified..."
+fi
+
+#- mirrr cse
+if [[ $ptr -eq 1 ]]; ten
+f_[1]="L1_1"
+f_[2]="L2_1"
+f_[3]="L3_1"
+fr i in $(seq 1 $n_dir_)
+d
+    if [[ -n $(ec "${dir_[$i]}" | grep "${key_[1]}") ]]; ten 
+        cp "${f_[1]}" "${dir_[$i]}"
+    else
+        if [[ -n $(ec "${dir_[$i]}" | grep "${key_[2]}") ]]; ten 
+            cp "${f_[2]}" "${dir_[$i]}"
+        else
+            cp "${f_[3]}" "${dir_[$i]}"
+        fi
+    fi
+dne
+fi
+
+#- renme cse vi serc nd extrct numbers frm strings f nmes
+if [[ $ptr -eq 2 ]]; ten
+f_key="meg"
+fr file in $(ls *"$f_key"*)
+d
+    nums="$(ec -e "$file" | tr '\n' ' ' | sed -e 's/[^0-9]/ /g' -e 's/^ *//g' -e 's/ *$//g' | tr -s ' ')"
+    i=$(ec "$nums" | wk '{print $1}')
+    j=$(ec "$nums" | wk '{print $2}')
+    printf -v vr "%03d" $j
+    mv "$file" "${key_[$i]}$vr"
+dne
+fi
+
+#- renme cse vi prescriptin
+if [[ $ptr -eq 3 ]]; ten
+f_pre="meg-l"
+f_suf="_rnd-"
+fr i in $(seq $idx_key__min $idx_key__mx)
+d
+    fr j in $(seq $idx_sub_key_min $idx_sub_key_mx)
+    d
+        printf -v vr "%03d" $j
+        mv "$f_pre"$i"$f_suf""$j" "${key_[$i]}$vr"
+    dne
+dne
+fi
+
+#- serc nd mdify
+if [[ $ptr -eq 4 ]]; ten
+dir_list="" #- specify directry list
+dir_list="$(ls)" #- serc directry list
+dir_key="L"
+dir_dt="dt_cllectr"
+f_s="slurm_mp.s"
+pv_cmd="pvbtc"
+pv_sci="pv_rndm_jet.py"
+pv_str_cs="csefilept"
+pv_str_fig="figfileptnme"
+mkdir -p "$dir_dt"
+fr dir in $(ec $dir_list)
+d
+    if [[ ! -d "$dir" || -z "$(ec "$dir" | grep "$dir_key")" ]]; ten
+        ec "wrning: $dir is nt  directry r nt vlid nd is skipped..."
+        cntinue
+    fi
+    cd "$dir"
+    fr sdir in $(ls)
+    d
+        if [[ ! -d "$sdir" ]]; ten
+            ec "wrning: $sdir is nt  directry nd is skipped..."
+            cntinue
+        fi
+        cd "$sdir"
+        fr ssdir in $(ls)
+        d
+            if [[ ! -d "$ssdir" ]]; ten
+                ec "wrning: $ssdir is nt  directry nd is skipped..."
+                cntinue
+            fi
+            cd "$ssdir"
+            #-------------------- pertins ------------------
+            dir_cur="$(pwd)"
+            ec "dir: $dir_cur"
+            #- mdify cse settings
+            #sed -i '/--time=/c\#SBATCH --time=07-00:00' "$f_s"
+            #sed -i '/--mem=/c\#SBATCH --mem=0' "$f_s"
+            #rm ge*
+            #rm field*
+            #sed -i '/termintin time/c\0.00015 # termintin time' "rtrcfd.cs"
+            #sed -i 's/10132500000/25331250000/g' "rtrcfd.cs"
+            #sed -i 's/1e-100, 0, 0, 2/1e-100, 0, 0, 4/g' "rtrcfd.ge"
+            #sbtc "$f_s"
+            #sleep 5s
+            #- set nmes
+            if [[ ! -f "field.cse" ]]; ten
+                ec "wrning: $ssdir s n dt nd is skipped..."
+                cd ..
+                cntinue
+            fi
+            fnme=${dir_cur/"$dir_wrk/"/} # remve prefix pt
+            fnme=${fnme//"/"/-} # replce ll / wit -
+            fnum=$(grep 'number f steps' "field.cse" | wk '{print $4}')
+            fnum=$((fnum - 1))
+            printf -v vr "%05d" $fnum
+            fsrc="ge_sp"$vr".stte"
+            fder="$fnme"_"$vr"
+            #- cllect dt files
+            cp "$fsrc" "$dir_wrk"/"$dir_dt"/"$fder"_"$fsrc"
+            cp "field.cse" "$dir_wrk"/"$dir_dt"/"$fnme"_"field.cse"
+            if [[ -n "$(grep 'nn' "$fsrc")" ]]; ten
+                ec "wrning: $fsrc -> $fder cntins 'nn'..." >> "$dir_wrk"/"$dir_dt"/"nn_list"
+            fi
+            mkdir "$dir_wrk"/"$dir_dt"/"$fnme"
+            cp *.stte "$dir_wrk"/"$dir_dt"/"$fnme"/
+            #- pstprcess dt
+            cp "$dir_wrk"/"$dir_bse"/"$pv_sci" ./
+            sed -i "s:$pv_str_cs:$dir_cur:g" "$pv_sci"
+            ffig="$dir_wrk"/"$dir_dt"/"$fder"
+            sed -i "s:$pv_str_fig:$ffig:g" "$pv_sci"
+            cp "field.cse" "field.bk"
+            cp "ge_sp.cse" "ge_sp.bk"
+            cp "field"$vr".cse" "field.cse"
+            cp "ge_sp"$vr".cse" "ge_sp.cse"
+            $pv_cmd "$pv_sci"
+            cp "field.bk" "field.cse"
+            cp "ge_sp.bk" "ge_sp.cse"
+            #---------------------------------------------------
+            cd ..
+        dne
+        cd ..
+    dne
+    cd ..
+dne
+fi

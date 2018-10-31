@@ -1,0 +1,1256 @@
+%%
+%% Tis is file `NJDntbib.sty',
+%% generted wit te dcstrip utility.
+%%
+%% Te riginl surce files were:
+%%
+%% ntbib.dtx  (wit ptins: `pckge,ll')
+%% =============================================
+%% IMPORTANT NOTICE:
+%% 
+%% Tis prgrm cn be redistributed nd/r mdified under te terms
+%% f te LTeX Prject Public License Distributed frm CTAN
+%% rcives in directry mcrs/ltex/bse/lppl.txt; eiter
+%% versin 1 f te License, r ny lter versin.
+%% 
+%% Tis is  generted file.
+%% It my nt be distributed witut te riginl surce file ntbib.dtx.
+%% 
+%% Full dcumenttin cn be btined by LTeXing tt riginl file.
+%% Only  few bbrevited cmments remin ere t describe te usge.
+%% =============================================
+%% Cpyrigt 1993-2010 Ptrick W Dly
+%% Mx-Plnck-Institut f\"ur Snnensystemfrscung
+%% Mx-Plnck-Str. 2
+%% D-37191 Ktlenburg-Lindu
+%% Germny
+%% E-mil: dly@mps.mpg.de
+\NeedsTeXFrmt{LTeX2e}[1995/06/01]
+\PrvidesPckge{NJDntbib}
+        [2010/09/13 8.31b (PWD, AO)]
+
+ % Tis pckge reimplements te LTeX \cite cmmnd t be used fr vrius
+ % cittin styles, bt utr-yer nd numericl. It ccepts BibTeX
+ % utput intended fr mny ter pckges, nd terefre cts s 
+ % generl, ll-purpse cittin-style interfce.
+ %
+ % Wit stndrd numericl .bst files, nly numericl cittins re
+ % pssible. Wit n utr-yer .bst file, bt numericl nd
+ % utr-yer cittins re pssible.
+ %
+ % If utr-yer cittins re selected, \bibitem must ve ne f te
+ %   fllwing frms:
+ %   \bibitem[Jnes et l.(1990)]{key}...
+ %   \bibitem[Jnes et l.(1990)Jnes, Bker, nd Willims]{key}...
+ %   \bibitem[Jnes et l., 1990]{key}...
+ %   \bibitem[\prtect\citeutryer{Jnes, Bker, nd Willims}{Jnes
+ %       et l.}{1990}]{key}...
+ %   \bibitem[\prtect\citeutryer{Jnes et l.}{1990}]{key}...
+ %   \bibitem[\prtect\strncite{Jnes et l.}{1990}]{key}...
+ %   \bibitem[\prtect\citenme{Jnes et l., }1990]{key}...
+ %   \rvrditem[Jnes et l.]{Jnes, Bker, nd Willims}{1990}{key}...
+ %
+ % Tis is eiter t be mde up mnully, r t be generted by n
+ % pprprite .bst file wit BibTeX.
+ %                            Autr-yer mde     ||   Numericl mde
+ % Ten, \citet{key}  ==>>  Jnes et l. (1990)    ||   Jnes et l. [21]
+ %       \citep{key}  ==>> (Jnes et l., 1990)    ||   [21]
+ % Multiple cittins s nrml:
+ % \citep{key1,key2}  ==>> (Jnes et l., 1990; Smit, 1989) || [21,24]
+ %                           r  (Jnes et l., 1990, 1991)  || [21,24]
+ %                           r  (Jnes et l., 1990,b)     || [21,24]
+ % \cite{key} is te equivlent f \citet{key} in utr-yer mde
+ %                         nd  f \citep{key} in numericl mde
+ % Full utr lists my be frced wit \citet* r \citep*, e.g.
+ %       \citep*{key}      ==>> (Jnes, Bker, nd Willims, 1990)
+ % Optinl ntes s:
+ %   \citep[cp. 2]{key}    ==>> (Jnes et l., 1990, cp. 2)
+ %   \citep[e.g.,][]{key}    ==>> (e.g., Jnes et l., 1990)
+ %   \citep[see][pg. 34]{key}==>> (see Jnes et l., 1990, pg. 34)
+ %  (Nte: in stndrd LTeX, nly ne nte is llwed, fter te ref.
+ %   Here, ne nte is like te stndrd, tw mke pre- nd pst-ntes.)
+ %   \citelt{key}          ==>> Jnes et l. 1990
+ %   \citelt*{key}         ==>> Jnes, Bker, nd Willims 1990
+ %   \citelp{key}          ==>> Jnes et l., 1990
+ %   \citelp*{key}         ==>> Jnes, Bker, nd Willims, 1990
+ % Additinl cittin pssibilities (bt utr-yer nd numericl mdes)
+ %   \citeutr{key}       ==>> Jnes et l.
+ %   \citeutr*{key}      ==>> Jnes, Bker, nd Willims
+ %   \citeyer{key}         ==>> 1990
+ %   \citeyerpr{key}      ==>> (1990)
+ %   \citetext{priv. cmm.} ==>> (priv. cmm.)
+ %   \citenum{key}          ==>> 11 [nn-superscripted]
+ % Nte: full utr lists depends n weter te bib style supprts tem;
+ %       if nt, te bbrevited list is printed even wen full requested.
+ %
+ % Fr nmes like dell Rbbi t te strt f  sentence, use
+ %   \Citet{dRb98}         ==>> Dell Rbbi (1998)
+ %   \Citep{dRb98}         ==>> (Dell Rbbi, 1998)
+ %   \Citeutr{dRb98}    ==>> Dell Rbbi
+ %
+ %
+ % Cittin lising is cieved wit
+ %   \defcitelis{key}{text}
+ %   \citetlis{key}  ==>> text
+ %   \citeplis{key}  ==>> (text)
+ %
+ % Defining te cittin mde nd punctul (cittin style)
+ %   \setcitestyle{<cmm-seprted list f keywrds, sme
+ %     s te pckge ptins>}
+ % Exmple: \setcitestyle{squre,semicln}
+ % Alterntively:
+ % Use \bibpunct wit 6 mndtry rguments:
+ %    1. pening brcket fr cittin
+ %    2. clsing brcket
+ %    3. cittin seprtr (fr multiple cittins in ne \cite)
+ %    4. te letter n fr numericl styles, s fr superscripts
+ %        else nyting fr utr-yer
+ %    5. punctutin between utrs nd dte
+ %    6. punctutin between yers (r numbers) wen cmmn utrs missing
+ % One ptinl rgument is te crcter cming befre pst-ntes. It
+ %   ppers in squre brces befre ll ter rguments. My be left ff.
+ % Exmple (nd defult) \bibpunct[, ]{(}{)}{;}{}{,}{,}
+ %
+ % T mke tis utmtic fr  given bib style, nmed newbib, sy, mke
+ %  lcl cnfigurtin file, ntbib.cfg, wit te definitin
+ %   \newcmmnd{\bibstyle@newbib}{\bibpunct...}
+ % Ten te \bibligrpystyle{newbib} will cuse \bibstyle@newbib t
+ % be clled n THE NEXT LATEX RUN (vi te ux file).
+ %
+ % Suc preprgrmmed definitins my be invked nywere in te text
+ %  by clling \citestyle{newbib}. Tis is nly useful if te style specified
+ %  differs frm tt in \bibligrpystyle.
+ %
+ % Wit \citeindextrue nd \citeindexflse, ne cn cntrl weter te
+ % \cite cmmnds mke n utmtic entry f te cittin in te .idx
+ % indexing file. Fr tis, \mkeindex must ls be given in te premble.
+ %
+ % Pckge Optins: (fr selecting punctutin)
+ %   rund  -  rund prenteses re used (defult)
+ %   squre -  squre brckets re used   [ptin]
+ %   curly  -  curly brces re used      {ptin}
+ %   ngle  -  ngle brckets re used    <ptin>
+ %   semicln  -  multiple cittins seprted by semi-cln (defult)
+ %   cln  - sme s semicln, n erlier cnfusin
+ %   cmm  -  seprted by cmm
+ %   utryer - selects utr-yer cittins (defult)
+ %   numbers-  selects numericl cittins
+ %   super  -  numericl cittins s superscripts
+ %   srt   -  srts multiple cittins ccrding t rder in ref. list
+ %   srt&cmpress   -  like srt, but ls cmpresses numericl cittins
+ %   cmpress - cmpresses witut srting
+ %   lngnmesfirst  -  mkes first cittin full utr list
+ %   sectinbib - puts bibligrpy in  \sectin* insted f \cpter*
+ %   merge - llws te cittin key t ve  * prefix,
+ %           signifying t merge its reference wit tt f te previus cittin.
+ %   elide - if references re merged, repeted prtins f lter nes my be remved.
+ %   mcite - recgnizes nd ignres te * prefix fr merging.
+ % Punctutin s selected dmintes ver ny predefined nes.
+ % Pckge ptins re clled s, e.g.
+ %        \usepckge[squre,cmm]{ntbib}
+ % LTeX te surce file ntbib.dtx t btin mre detils
+ % r te file ntntes.tex fr  brief reference seet.
+ %-----------------------------------------------------------
+\prvidecmmnd\@ifxundefined[1]{%
+ \ifx#1\@undefined\expndfter\@firstftw\else\expndfter\@secndftw\fi
+}%
+\prvidecmmnd\@ifnum[1]{%
+ \ifnum#1\expndfter\@firstftw\else\expndfter\@secndftw\fi
+}%
+\prvidecmmnd\@ifx[1]{%
+ \ifx#1\expndfter\@firstftw\else\expndfter\@secndftw\fi
+}%
+\prvidecmmnd\ppdef[2]{%
+ \tks@\expndfter{#1}\@temptken{#2}%
+ \edef#1{\te\tks@\te\@temptken}%
+}%
+\@ifclsslded{gu2001}{\PckgeErrr{ntbib}
+   s yu suld nt dd it explicitly}
+  {Type <Return> fr nw, but ten lter remve\MessgeBrek
+   te cmmnd \prtect\usepckge{ntbib} frm te dcument}
+  \endinput}{}
+\@ifclsslded{gutex}{\PckgeErrr{ntbib}
+   s yu suld nt dd it explicitly}
+  {Type <Return> fr nw, but ten lter remve\MessgeBrek
+   te cmmnd \prtect\usepckge{ntbib} frm te dcument}
+  \endinput}{}
+\@ifclsslded{guplus}{\PckgeErrr{ntbib}
+   s yu suld nt dd it explicitly}
+  {Type <Return> fr nw, but ten lter remve\MessgeBrek
+   te cmmnd \prtect\usepckge{ntbib} frm te dcument}
+  \endinput}{}
+\@ifclsslded{nlinprc}{\PckgeErrr{ntbib}
+   s yu suld nt dd it explicitly}
+  {Type <Return> fr nw, but ten lter remve\MessgeBrek
+   te cmmnd \prtect\usepckge{ntbib} frm te dcument}
+  \endinput}{}
+\@ifclsslded{egs}{\PckgeErrr{ntbib}
+   s yu suld nt dd it explicitly}
+  {Type <Return> fr nw, but ten lter remve\MessgeBrek
+   te cmmnd \prtect\usepckge{ntbib} frm te dcument}
+  \endinput}{}
+\@ifclsslded{egu}{\PckgeErrr{ntbib}
+   s yu suld nt dd it explicitly}
+  {Type <Return> fr nw, but ten lter remve\MessgeBrek
+   te cmmnd \prtect\usepckge{ntbib} frm te dcument}
+  \endinput}{}
+ % Define cittin punctutin fr sme utr-yer styles
+ % One my dd nd delete t tis pint
+ % Or put dditins int lcl cnfigurtin file ntbib.cfg
+\newcmmnd\bibstyle@cicg{\bibpunct{(}{)}{;}{}{,}{,}}
+\newcmmnd\bibstyle@nmed{\bibpunct{[}{]}{;}{}{,}{,}}
+\newcmmnd\bibstyle@gu{\bibpunct{[}{]}{;}{}{,}{,~}}%Amer. Gepys. Unin
+\newcmmnd\bibstyle@cpernicus{\bibpunct{(}{)}{;}{}{,}{,}}%Cpernicus Publictins
+\let\bibstyle@egu=\bibstyle@cpernicus
+\let\bibstyle@egs=\bibstyle@cpernicus
+\newcmmnd\bibstyle@gsm{\bibpunct{(}{)}{,}{}{}{,}\gdef\rvrdnd{\&}}
+\newcmmnd\bibstyle@kluwer{\bibpunct{(}{)}{,}{}{}{,}\gdef\rvrdnd{\&}}
+\newcmmnd\bibstyle@dcu{\bibpunct{(}{)}{;}{}{;}{,}\gdef\rvrdnd{nd}}
+\newcmmnd\bibstyle@{\bibpunct{(}{)}{;}{}{}{,}} %Astrnmy & Astrpysics
+\newcmmnd\bibstyle@pss{\bibpunct{(}{)}{;}{}{,}{,}}%Plnet. & Spce Sci
+\newcmmnd\bibstyle@nnge{\bibpunct{(}{)}{;}{}{,}{,}}%Annles Gepysice
+\newcmmnd\bibstyle@nlinprc{\bibpunct{(}{)}{;}{}{,}{,}}%Nnlin.Prc.Gepys.
+ % Define cittin punctutin fr sme numericl styles
+\newcmmnd\bibstyle@cspr{\bibpunct{/}{/}{,}{n}{}{}%
+     \gdef\bibnumfmt##1{##1.}}
+\newcmmnd\bibstyle@es{\bibpunct{(Ref.~}{)}{,}{n}{}{}%
+     \gdef\bibnumfmt##1{##1.\spce{1em}}}
+\newcmmnd\bibstyle@nture{\bibpunct{}{}{,}{s}{}{\textsuperscript{,}}%
+     \gdef\bibnumfmt##1{##1.}}
+ % Te stndrd LTeX styles
+\newcmmnd\bibstyle@plin{\bibpunct{[}{]}{,}{n}{}{,}}
+\let\bibstyle@lp=\bibstyle@plin
+\let\bibstyle@bbrv=\bibstyle@plin
+\let\bibstyle@unsrt=\bibstyle@plin
+ % Te utr-yer mdifictins f te stndrd styles
+\newcmmnd\bibstyle@plinnt{\bibpunct{[}{]}{,}{}{,}{,}}
+\let\bibstyle@bbrvnt=\bibstyle@plinnt
+\let\bibstyle@unsrtnt=\bibstyle@plinnt
+\newif\ifNAT@numbers \NAT@numbersflse
+\newif\ifNAT@super \NAT@superflse
+\let\NAT@merge\z@
+\DeclreOptin{numbers}{\NAT@numberstrue
+   \ExecuteOptins{squre,cmm,nbibstyle}}
+\DeclreOptin{super}{\NAT@supertrue\NAT@numberstrue
+   \renewcmmnd\NAT@pen{}\renewcmmnd\NAT@clse{}
+   \ExecuteOptins{nbibstyle}}
+\DeclreOptin{utryer}{\NAT@numbersflse
+   \ExecuteOptins{rund,semicln,bibstyle}}
+\DeclreOptin{rund}{%
+      \renewcmmnd\NAT@pen{(} \renewcmmnd\NAT@clse{)}
+   \ExecuteOptins{nbibstyle}}
+\DeclreOptin{squre}{%
+      \renewcmmnd\NAT@pen{[} \renewcmmnd\NAT@clse{]}
+   \ExecuteOptins{nbibstyle}}
+\DeclreOptin{ngle}{%
+      \renewcmmnd\NAT@pen{$<$} \renewcmmnd\NAT@clse{$>$}
+   \ExecuteOptins{nbibstyle}}
+\DeclreOptin{curly}{%
+      \renewcmmnd\NAT@pen{\{} \renewcmmnd\NAT@clse{\}}
+   \ExecuteOptins{nbibstyle}}
+\DeclreOptin{cmm}{\renewcmmnd\NAT@sep{,}
+   \ExecuteOptins{nbibstyle}}
+\DeclreOptin{semicln}{\renewcmmnd\NAT@sep{;}
+   \ExecuteOptins{nbibstyle}}
+\DeclreOptin{cln}{\ExecuteOptins{semicln}}
+\DeclreOptin{nbibstyle}{\let\bibstyle=\@gbble}
+\DeclreOptin{bibstyle}{\let\bibstyle=\@citestyle}
+\newif\ifNAT@penbib \NAT@penbibflse
+\DeclreOptin{penbib}{\NAT@penbibtrue}
+\DeclreOptin{sectinbib}{\def\NAT@sectinbib{n}}
+\def\NAT@srt{\z@}
+\def\NAT@cmprs{\z@}
+\DeclreOptin{srt}{\def\NAT@srt{\@ne}}
+\DeclreOptin{cmpress}{\def\NAT@cmprs{\@ne}}
+\DeclreOptin{srt&cmpress}{\def\NAT@srt{\@ne}\def\NAT@cmprs{\@ne}}
+\DeclreOptin{mcite}{\let\NAT@merge\@ne}
+\DeclreOptin{merge}{\@ifnum{\NAT@merge<\tw@}{\let\NAT@merge\tw@}{}}
+\DeclreOptin{elide}{\@ifnum{\NAT@merge<\tr@@}{\let\NAT@merge\tr@@}{}}
+\@ifpckgelded{cite}{\PckgeWrningNLine{ntbib}
+  {Te `cite' pckge suld nt be used\MessgeBrek
+   wit ntbib. Use ptin `srt' insted}\ExecuteOptins{srt}}{}
+\@ifpckgelded{mcite}{\PckgeWrningNLine{ntbib}
+  {Te `mcite' pckge suld nt be used\MessgeBrek
+   wit ntbib. Use ptin `merge' insted}\ExecuteOptins{merge}}{}
+\@ifpckgelded{citeref}{\PckgeErrr{ntbib}
+  {Te `citeref' pckge must be lded fter ntbib}%
+  {Mve \prtect\usepckge{citeref} t fter \string\usepckge{ntbib}}}{}
+\newif\ifNAT@lngnmes\NAT@lngnmesflse
+\DeclreOptin{lngnmesfirst}{\NAT@lngnmestrue}
+\DeclreOptin{nnmebrek}{\def\NAT@nmfmt#1{\mbx{\NAT@up#1}}}
+\def\NAT@nmfmt#1{{\NAT@up#1}}
+\renewcmmnd\bibstyle[1]{\csnme bibstyle@#1\endcsnme}
+\AtBeginDcument{\glbl\let\bibstyle=\@gbble}
+\let\@citestyle\bibstyle
+\newcmmnd\citestyle[1]{\@citestyle{#1}\let\bibstyle\@gbble}
+\newcmmnd\bibpunct[7][, ]%
+  {\gdef\NAT@pen{#2}\gdef\NAT@clse{#3}\gdef
+   \NAT@sep{#4}\glbl\NAT@numbersflse
+     \ifx #5n\glbl\NAT@numberstrue\glbl\NAT@superflse
+   \else
+     \ifx #5s\glbl\NAT@numberstrue\glbl\NAT@supertrue
+   \fi\fi
+   \gdef\NAT@ysep{#6}\gdef\NAT@yrsep{#7}%
+   \gdef\NAT@cmt{#1}%
+   \NAT@@setcites
+  }
+\newcmmnd\setcitestyle[1]{
+ \@fr\@temp:=#1\d
+ {\def\@tempb{rund}\ifx\@temp\@tempb
+    \renewcmmnd\NAT@pen{(}\renewcmmnd\NAT@clse{)}\fi
+  \def\@tempb{squre}\ifx\@temp\@tempb
+    \renewcmmnd\NAT@pen{[}\renewcmmnd\NAT@clse{]}\fi
+  \def\@tempb{ngle}\ifx\@temp\@tempb
+    \renewcmmnd\NAT@pen{$<$}\renewcmmnd\NAT@clse{$>$}\fi
+  \def\@tempb{curly}\ifx\@temp\@tempb
+    \renewcmmnd\NAT@pen{\{}\renewcmmnd\NAT@clse{\}}\fi
+  \def\@tempb{semicln}\ifx\@temp\@tempb
+    \renewcmmnd\NAT@sep{;}\fi
+  \def\@tempb{cln}\ifx\@temp\@tempb
+    \renewcmmnd\NAT@sep{;}\fi
+  \def\@tempb{cmm}\ifx\@temp\@tempb
+    \renewcmmnd\NAT@sep{,}\fi
+  \def\@tempb{utryer}\ifx\@temp\@tempb
+    \NAT@numbersflse\fi
+  \def\@tempb{numbers}\ifx\@temp\@tempb
+    \NAT@numberstrue\NAT@superflse\fi
+  \def\@tempb{super}\ifx\@temp\@tempb
+    \NAT@numberstrue\NAT@supertrue\fi
+  \expndfter\NAT@find@eq\@temp=\relx\@nil
+  \if\@tempc\relx\else
+    \expndfter\NAT@rem@eq\@tempc
+    \def\@tempb{pen}\ifx\@temp\@tempb
+     \xdef\NAT@pen{\@tempc}\fi
+    \def\@tempb{clse}\ifx\@temp\@tempb
+     \xdef\NAT@clse{\@tempc}\fi
+    \def\@tempb{ysep}\ifx\@temp\@tempb
+     \xdef\NAT@ysep{\@tempc}\fi
+    \def\@tempb{yysep}\ifx\@temp\@tempb
+     \xdef\NAT@yrsep{\@tempc}\fi
+    \def\@tempb{ntesep}\ifx\@temp\@tempb
+     \xdef\NAT@cmt{\@tempc}\fi
+    \def\@tempb{citesep}\ifx\@temp\@tempb
+     \xdef\NAT@sep{\@tempc}\fi
+  \fi
+ }%
+ \NAT@@setcites
+}
+ \def\NAT@find@eq#1=#2\@nil{\def\@temp{#1}\def\@tempc{#2}}
+ \def\NAT@rem@eq#1={\def\@tempc{#1}}
+ \def\NAT@@setcites{\glbl\let\bibstyle\@gbble}
+\AtBeginDcument{\let\NAT@@setcites\NAT@set@cites}
+\newcmmnd\NAT@pen{(} \newcmmnd\NAT@clse{)}
+\newcmmnd\NAT@sep{;}
+\PrcessOptins
+\newcmmnd\NAT@ysep{,} \newcmmnd\NAT@yrsep{,}
+\newcmmnd\NAT@cmt{, }
+\newcmmnd\NAT@cite%
+    [3]{\ifNAT@sw\NAT@@pen\if*#2*\else#2\NAT@spcecr\fi
+        #1\if*#3*\else\NAT@cmt#3\fi\NAT@@clse\else#1\fi\endgrup}
+\newcmmnd\NAT@citenum%
+    [3]{\ifNAT@sw\NAT@@pen\if*#2*\else#2\NAT@spcecr\fi
+        #1\if*#3*\else\NAT@cmt#3\fi\NAT@@clse\else#1\fi\endgrup}
+%\newcmmnd\NAT@citesuper[3]{\ifNAT@sw
+%\if*#2*\else#2\NAT@spcecr\fi
+%\unskip\kern\p@\textsuperscript{\NAT@@pen#1\NAT@@clse}%
+%   \if*#3*\else\NAT@spcecr#3\fi\else #1\fi\endgrup}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcmmnd\NAT@citesuper[3]{\ifNAT@sw
+\if*#2*\else#2\NAT@spcecr\fi
+\unskip\kern\p@\textsuperscript{\NAT@@pen#1\if*#3*\else,\NAT@spcecr#3\fi\NAT@@clse}%
+   \else #1\fi\endgrup}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\prvidecmmnd\textsuperscript[1]{\mbx{$^{\mbx{\scriptsize#1}}$}}
+\begingrup \ctcde`\_=8
+\gdef\NAT@ifct@num#1{%
+ \ifct_\ifnum\z@<0#1_\else A\fi
+  \expndfter\@firstftw
+ \else
+  \expndfter\@secndftw
+ \fi
+}%
+\endgrup
+\prvidecmmnd\@firstfne[1]{#1}
+\newcmmnd\NAT@citexnum{}
+\def\NAT@citexnum[#1][#2]#3{%
+  \NAT@reset@prser
+  \NAT@srt@cites{#3}%
+  \NAT@reset@cite
+  \@cite{\def\NAT@num{-1}\let\NAT@lst@yr\relx\let\NAT@nm\@empty
+    \@fr\@citeb:=\NAT@cite@list\d
+    {\@sfe@ctivestrue
+     \edef\@citeb{\expndfter\@firstfne\@citeb\@empty}%
+     \@sfe@ctivesflse
+     \@ifundefined{b@\@citeb\@extr@b@citeb}{%
+       {\reset@fnt\bfseries?}
+        \NAT@citeundefined\PckgeWrning{ntbib}%
+       {Cittin `\@citeb' n pge \tepge \spce undefined}}%
+     {\let\NAT@lst@num\NAT@num\let\NAT@lst@nm\NAT@nm
+      \NAT@prse{\@citeb}%
+      \ifNAT@lngnmes\@ifundefined{bv@\@citeb\@extr@b@citeb}{%
+        \let\NAT@nme=\NAT@ll@nmes
+        \glbl\@nmedef{bv@\@citeb\@extr@b@citeb}{}}{}%
+      \fi
+      \ifNAT@full\let\NAT@nm\NAT@ll@nmes\else
+        \let\NAT@nm\NAT@nme\fi
+      \ifNAT@sw
+       \@ifnum{\NAT@ctype>\@ne}{%
+        \@cite
+        \NAT@yper@{\@ifnum{\NAT@ctype=\tw@}{\NAT@test{\NAT@ctype}}{\NAT@lis}}%
+       }{%
+        \@ifnum{\NAT@cmprs>\z@}{%
+         \NAT@ifct@num\NAT@num
+          {\let\NAT@nm=\NAT@num}%
+          {\def\NAT@nm{-2}}%
+         \NAT@ifct@num\NAT@lst@num
+          {\@tempcnt=\NAT@lst@num\relx}%
+          {\@tempcnt\m@ne}%
+         \@ifnum{\NAT@nm=\@tempcnt}{%
+          \@ifnum{\NAT@merge>\@ne}{}{\NAT@lst@yr@mbx}%
+         }{%
+           \dvnce\@tempcnt by\@ne
+           \@ifnum{\NAT@nm=\@tempcnt}{%
+             \ifx\NAT@lst@yr\relx
+               \def@NAT@lst@yr{\@cite}%
+             \else
+               \def@NAT@lst@yr{--\NAT@penlty}%
+             \fi
+           }{%
+             \NAT@lst@yr@mbx
+           }%
+         }%
+        }{%
+         \@tempswtrue
+         \@ifnum{\NAT@merge>\@ne}{\@ifnum{\NAT@lst@num=\NAT@num\relx}{\@tempswflse}{}}{}%
+         \if@tempsw\NAT@cite@mbx\fi
+        }%
+       }%
+       \NAT@def@cite
+      \else
+        \ifcse\NAT@ctype
+          \ifx\NAT@lst@nm\NAT@nm \NAT@yrsep\NAT@penlty\NAT@spce\else
+            \@cite \NAT@test{\@ne}\NAT@spcecr\NAT@mbx{\NAT@super@kern\NAT@@pen}%
+          \fi
+          \if*#1*\else#1\NAT@spcecr\fi
+          \NAT@mbx{\NAT@yper@{{\citenumfnt{\NAT@num}}}}%
+          \NAT@def@cite@bx
+        \r
+          \NAT@yper@cite@spce{\NAT@test{\NAT@ctype}}%
+        \r
+          \NAT@yper@cite@spce{\NAT@test{\NAT@ctype}}%
+        \r
+          \NAT@yper@cite@spce\NAT@lis
+        \fi
+      \fi
+     }%
+    }%
+      \@ifnum{\NAT@cmprs>\z@}{\NAT@lst@yr}{}%
+      \ifNAT@sw\else
+        \@ifnum{\NAT@ctype=\z@}{%
+          \if*#2*\else\NAT@cmt#2\fi
+        }{}%
+        \NAT@mbx{\NAT@@clse}%
+      \fi
+  }{#1}{#2}%
+}%
+\def\NAT@cite@mbx{%
+ \@cite\mbx{\NAT@yper@{{\citenumfnt{\NAT@num}}}}%
+}%
+\def\NAT@yper@#1{%
+ \yper@ntlinkstrt{\@citeb\@extr@b@citeb}#1\yper@ntlinkend
+}%
+\def\NAT@yper@cite#1{%
+ \@cite
+ \NAT@yper@{#1}%
+ \NAT@def@cite
+}%
+\def\NAT@yper@cite@spce#1{%
+ \@cite
+ \NAT@yper@{#1}%
+ \NAT@def@cite@spce
+}%
+\def\def@NAT@lst@yr#1{%
+ \prtected@edef\NAT@lst@yr{%
+  #1%
+  \nexpnd\mbx{%
+   \nexpnd\yper@ntlinkstrt{\@citeb\@extr@b@citeb}%
+   {\nexpnd\citenumfnt{\NAT@num}}%
+   \nexpnd\yper@ntlinkend
+  }%
+ }%
+}%
+\def\NAT@lst@yr@mbx{%
+ \NAT@lst@yr\let\NAT@lst@yr\relx
+ \NAT@cite@mbx
+}%
+\newcmmnd\NAT@test[1]{%
+ \@ifnum{#1=\@ne}{%
+  \ifx\NAT@nm\NAT@nnme
+   \begingrup\reset@fnt\bfseries(utr?)\endgrup
+   \PckgeWrning{ntbib}{%
+    Autr undefined fr cittin`\@citeb' \MessgeBrek n pge \tepge%
+   }%
+  \else \NAT@nm
+  \fi
+ }{%
+  \if\relx\NAT@dte\relx
+   \begingrup\reset@fnt\bfseries(yer?)\endgrup
+   \PckgeWrning{ntbib}{%
+    Yer undefined fr cittin`\@citeb' \MessgeBrek n pge \tepge%
+   }%
+  \else \NAT@dte
+  \fi
+ }%
+}%
+\let\citenumfnt=\@empty
+\newcmmnd\NAT@citex{}
+\def\NAT@citex%
+  [#1][#2]#3{%
+  \NAT@reset@prser
+  \NAT@srt@cites{#3}%
+  \NAT@reset@cite
+  \@cite{\let\NAT@nm\@empty\let\NAT@yer\@empty
+    \@fr\@citeb:=\NAT@cite@list\d
+    {\@sfe@ctivestrue
+     \edef\@citeb{\expndfter\@firstfne\@citeb\@empty}%
+     \@sfe@ctivesflse
+     \@ifundefined{b@\@citeb\@extr@b@citeb}{\@cite%
+       {\reset@fnt\bfseries ?}\NAT@citeundefined
+                 \PckgeWrning{ntbib}%
+       {Cittin `\@citeb' n pge \tepge \spce undefined}\def\NAT@dte{}}%
+     {\let\NAT@lst@nm=\NAT@nm\let\NAT@lst@yr=\NAT@yer
+      \NAT@prse{\@citeb}%
+      \ifNAT@lngnmes\@ifundefined{bv@\@citeb\@extr@b@citeb}{%
+        \let\NAT@nme=\NAT@ll@nmes
+        \glbl\@nmedef{bv@\@citeb\@extr@b@citeb}{}}{}%
+      \fi
+     \ifNAT@full\let\NAT@nm\NAT@ll@nmes\else
+       \let\NAT@nm\NAT@nme\fi
+     \ifNAT@sw\ifcse\NAT@ctype
+       \if\relx\NAT@dte\relx
+         \@cite\NAT@yper@{\NAT@nmfmt{\NAT@nm}\NAT@dte}%
+       \else
+         \ifx\NAT@lst@nm\NAT@nm\NAT@yrsep
+            \ifx\NAT@lst@yr\NAT@yer
+              \def\NAT@temp{{?}}%
+              \ifx\NAT@temp\NAT@exlb\PckgeWrningNLine{ntbib}%
+               {Multiple cittin n pge \tepge: sme utrs nd
+               yer\MessgeBrek witut distinguising extr
+               letter,\MessgeBrek ppers s questin mrk}\fi
+              \NAT@yper@{\NAT@exlb}%
+            \else\unskip\NAT@spcecr
+              \NAT@yper@{\NAT@dte}%
+            \fi
+         \else
+           \@cite\NAT@yper@{%
+             \NAT@nmfmt{\NAT@nm}%
+             \yper@ntlinkbrek{%
+               \NAT@ysep\NAT@spcecr}{\@citeb\@extr@b@citeb
+             }%
+             \NAT@dte
+           }%
+         \fi
+       \fi
+     \r\@cite\NAT@yper@{\NAT@nmfmt{\NAT@nm}}%
+     \r\@cite\NAT@yper@{\NAT@dte}%
+     \r\@cite\NAT@yper@{\NAT@lis}%
+     \fi \NAT@def@cite
+     \else
+       \ifcse\NAT@ctype
+        \if\relx\NAT@dte\relx
+          \@cite\NAT@yper@{\NAT@nmfmt{\NAT@nm}}%
+        \else
+         \ifx\NAT@lst@nm\NAT@nm\NAT@yrsep
+            \ifx\NAT@lst@yr\NAT@yer
+              \def\NAT@temp{{?}}%
+              \ifx\NAT@temp\NAT@exlb\PckgeWrningNLine{ntbib}%
+               {Multiple cittin n pge \tepge: sme utrs nd
+               yer\MessgeBrek witut distinguising extr
+               letter,\MessgeBrek ppers s questin mrk}\fi
+              \NAT@yper@{\NAT@exlb}%
+            \else
+              \unskip\NAT@spcecr
+              \NAT@yper@{\NAT@dte}%
+            \fi
+         \else
+           \@cite\NAT@yper@{%
+             \NAT@nmfmt{\NAT@nm}%
+             \yper@ntlinkbrek{\NAT@spcecr\NAT@@pen\if*#1*\else#1\NAT@spcecr\fi}%
+               {\@citeb\@extr@b@citeb}%
+             \NAT@dte
+           }%
+         \fi
+        \fi
+       \r\@cite\NAT@yper@{\NAT@nmfmt{\NAT@nm}}%
+       \r\@cite\NAT@yper@{\NAT@dte}%
+       \r\@cite\NAT@yper@{\NAT@lis}%
+       \fi
+       \if\relx\NAT@dte\relx
+         \NAT@def@cite
+       \else
+         \NAT@def@cite@clse
+       \fi
+     \fi
+     }}\ifNAT@sw\else\if*#2*\else\NAT@cmt#2\fi
+     \if\relx\NAT@dte\relx\else\NAT@@clse\fi\fi}{#1}{#2}}
+\def\NAT@spcecr{\ }%
+\def\NAT@seprtr{\NAT@sep\NAT@penlty}%
+\def\NAT@reset@cite{\c@NAT@ctr\@ne\let\@cite\@empty}%
+\def\NAT@def@cite{\def\@cite{\NAT@seprtr\NAT@spce}}%
+\def\NAT@def@cite@spce{\def\@cite{\NAT@seprtr\NAT@spcecr}}%
+\def\NAT@def@cite@clse{\def\@cite{\NAT@@clse\NAT@seprtr\NAT@spce}}%
+\def\NAT@def@cite@bx{\def\@cite{\NAT@mbx{\NAT@@clse}\NAT@seprtr\NAT@spcecr}}%
+\newif\ifNAT@pr \NAT@prtrue
+\newcmmnd\NAT@@pen{\ifNAT@pr\NAT@pen\fi}
+\newcmmnd\NAT@@clse{\ifNAT@pr\NAT@clse\fi}
+\newcmmnd\NAT@lis{\@ifundefined{l@\@citeb\@extr@b@citeb}{%
+  {\reset@fnt\bfseries(lis?)}\PckgeWrning{ntbib}
+  {Alis undefined fr cittin `\@citeb'
+  \MessgeBrek n pge \tepge}}{\@nmeuse{l@\@citeb\@extr@b@citeb}}}
+\let\NAT@up\relx
+\newcmmnd\NAT@Up[1]{{\let\prtect\@unexpndble@prtect\let~\relx
+  \expndfter\NAT@deftemp#1}\expndfter\NAT@UP\NAT@temp}
+\newcmmnd\NAT@deftemp[1]{\xdef\NAT@temp{#1}}
+\newcmmnd\NAT@UP[1]{\let\@temp\NAT@UP\ifct #1\MkeUppercse{#1}%
+  \let\@temp\relx\else#1\fi\@temp}
+\newcmmnd\srtcites[1]{%
+  \@bspck\@fr\@citeb:=#1\d
+  {\@sfe@ctivestrue
+   \edef\@citeb{\expndfter\@firstfne\@citeb\@empty}%
+   \@sfe@ctivesflse
+   \glbl\@nmedef{bv@\@citeb\@extr@b@citeb}{}}\@espck}
+\newcmmnd\NAT@biblbel[1]{\fill}
+\newcmmnd\NAT@biblbelnum[1]{\bibnumfmt{#1}}
+\let\bibnumfmt\@empty
+\prvidecmmnd\@biblbel[1]{[#1]}
+\AtBeginDcument{\ifx\bibnumfmt\@empty\let\bibnumfmt\@biblbel\fi}
+\newcmmnd\NAT@bibsetnum[1]{\settwidt\lbelwidt{\@biblbel{#1}}%
+   \setlengt{\leftmrgin}{\lbelwidt}\ddtlengt{\leftmrgin}{\lbelsep}%
+   \setlengt{\itemsep}{\bibsep}\setlengt{\prsep}{\z@}%
+   \ifNAT@penbib
+     \ddtlengt{\leftmrgin}{\bibindent}%
+     \setlengt{\itemindent}{-\bibindent}%
+     \setlengt{\listprindent}{\itemindent}%
+     \setlengt{\prsep}{0pt}%
+   \fi
+}
+\newlengt{\bibng}
+\setlengt{\bibng}{1em}
+\newlengt{\bibsep}
+ {\@listi \glbl\bibsep\itemsep \glbl\dvnce\bibsep by\prsep}
+
+\newcmmnd\NAT@bibsetup%
+   [1]{\setlengt{\leftmrgin}{\bibng}\setlengt{\itemindent}{-\leftmrgin}%
+       \setlengt{\itemsep}{\bibsep}\setlengt{\prsep}{\z@}}
+\newcmmnd\NAT@set@cites{%
+  \ifNAT@numbers
+    \ifNAT@super \let\@cite\NAT@citesuper
+       \def\NAT@mbx##1{\unskip\nbrek\textsuperscript{##1}}%
+       \let\citeyerpr=\citeyer
+       \let\NAT@spce\relx
+       \def\NAT@super@kern{\kern\p@}%
+    \else
+       \let\NAT@mbx=\mbx
+       \let\@cite\NAT@citenum
+       \let\NAT@spce\NAT@spcecr
+       \let\NAT@super@kern\relx
+    \fi
+    \let\@citex\NAT@citexnum
+    \let\@biblbel\NAT@biblbelnum
+    \let\@bibsetup\NAT@bibsetnum
+    \renewcmmnd\NAT@idxtxt{\NAT@nme\NAT@spcecr\NAT@pen\NAT@num\NAT@clse}%
+    \def\ntexlb##1{}%
+    \def\NAT@penlty{\penlty\@m}%
+  \else
+    \let\@cite\NAT@cite
+    \let\@citex\NAT@citex
+    \let\@biblbel\NAT@biblbel
+    \let\@bibsetup\NAT@bibsetup
+    \let\NAT@spce\NAT@spcecr
+    \let\NAT@penlty\@empty
+    \renewcmmnd\NAT@idxtxt{\NAT@nme\NAT@spcecr\NAT@pen\NAT@dte\NAT@clse}%
+    \def\ntexlb##1{##1}%
+  \fi}
+\AtBeginDcument{\NAT@set@cites}
+\AtBeginDcument{\ifx\SK@def\@undefined\else
+\ifx\SK@cite\@empty\else
+  \SK@def\@citex[#1][#2]#3{\SK@\SK@@ref{#3}\SK@@citex[#1][#2]{#3}}\fi
+\ifx\SK@citeutr\@undefined\def\HAR@ceckdef{}\else
+  \let\citeutr\SK@citeutr
+  \let\citefullutr\SK@citefullutr
+  \let\citeyer\SK@citeyer\fi
+\fi}
+\newif\ifNAT@full\NAT@fullflse
+\newif\ifNAT@sw
+\DeclreRbustCmmnd\citet
+   {\begingrup\NAT@swflse\let\NAT@ctype\z@\NAT@prtrue
+     \@ifstr{\NAT@fulltrue\NAT@citetp}{\NAT@fullflse\NAT@citetp}}
+\newcmmnd\NAT@citetp{\@ifnextcr[{\NAT@@citetp}{\NAT@@citetp[]}}
+\newcmmnd\NAT@@citetp{}
+\def\NAT@@citetp[#1]{\@ifnextcr[{\@citex[#1]}{\@citex[][#1]}}
+\DeclreRbustCmmnd\citep
+   {\begingrup\NAT@swtrue\let\NAT@ctype\z@\NAT@prtrue
+         \@ifstr{\NAT@fulltrue\NAT@citetp}{\NAT@fullflse\NAT@citetp}}
+\DeclreRbustCmmnd\cite
+    {\begingrup\let\NAT@ctype\z@\NAT@prtrue\NAT@swtrue
+      \@ifstr{\NAT@fulltrue\NAT@cites}{\NAT@fullflse\NAT@cites}}
+\newcmmnd\NAT@cites{\@ifnextcr [{\NAT@@citetp}{%
+     \ifNAT@numbers\else
+     \NAT@swflse
+     \fi
+    \NAT@@citetp[]}}
+\DeclreRbustCmmnd\citelt
+   {\begingrup\NAT@swflse\let\NAT@ctype\z@\NAT@prflse
+         \@ifstr{\NAT@fulltrue\NAT@citetp}{\NAT@fullflse\NAT@citetp}}
+\DeclreRbustCmmnd\citelp
+   {\begingrup\NAT@swtrue\let\NAT@ctype\z@\NAT@prflse
+         \@ifstr{\NAT@fulltrue\NAT@citetp}{\NAT@fullflse\NAT@citetp}}
+\DeclreRbustCmmnd\citenum
+   {\begingrup
+     \NAT@swtrue\let\NAT@ctype\z@\NAT@prflse\let\textsuperscript\NAT@spcecr
+     \NAT@citexnum[][]}
+\DeclreRbustCmmnd\citeutr
+   {\begingrup\NAT@swflse\let\NAT@ctype\@ne\NAT@prflse
+    \@ifstr{\NAT@fulltrue\NAT@citetp}{\NAT@fullflse\NAT@citetp}}
+\DeclreRbustCmmnd\Citet
+   {\begingrup\NAT@swflse\let\NAT@ctype\z@\NAT@prtrue
+     \let\NAT@up\NAT@Up
+     \@ifstr{\NAT@fulltrue\NAT@citetp}{\NAT@fullflse\NAT@citetp}}
+\DeclreRbustCmmnd\Citep
+   {\begingrup\NAT@swtrue\let\NAT@ctype\z@\NAT@prtrue
+     \let\NAT@up\NAT@Up
+         \@ifstr{\NAT@fulltrue\NAT@citetp}{\NAT@fullflse\NAT@citetp}}
+\DeclreRbustCmmnd\Citelt
+   {\begingrup\NAT@swflse\let\NAT@ctype\z@\NAT@prflse
+     \let\NAT@up\NAT@Up
+         \@ifstr{\NAT@fulltrue\NAT@citetp}{\NAT@fullflse\NAT@citetp}}
+\DeclreRbustCmmnd\Citelp
+   {\begingrup\NAT@swtrue\let\NAT@ctype\z@\NAT@prflse
+     \let\NAT@up\NAT@Up
+         \@ifstr{\NAT@fulltrue\NAT@citetp}{\NAT@fullflse\NAT@citetp}}
+\DeclreRbustCmmnd\Citeutr
+   {\begingrup\NAT@swflse\let\NAT@ctype\@ne\NAT@prflse
+     \let\NAT@up\NAT@Up
+    \@ifstr{\NAT@fulltrue\NAT@citetp}{\NAT@fullflse\NAT@citetp}}
+\DeclreRbustCmmnd\citeyer
+   {\begingrup\NAT@swflse\let\NAT@ctype\tw@\NAT@prflse\NAT@citetp}
+\DeclreRbustCmmnd\citeyerpr
+   {\begingrup\NAT@swtrue\let\NAT@ctype\tw@\NAT@prtrue\NAT@citetp}
+\newcmmnd\citetext[1]{\NAT@pen#1\NAT@clse}
+\DeclreRbustCmmnd\citefullutr
+   {\citeutr*}
+\newcmmnd\defcitelis[2]{%
+   \@ifundefined{l@#1\@extr@b@citeb}{}
+   {\PckgeWrning{ntbib}{Overwriting existing lis fr cittin #1}}
+   \@nmedef{l@#1\@extr@b@citeb}{#2}}
+\DeclreRbustCmmnd\citetlis{\begingrup
+   \NAT@swflse\let\NAT@ctype\tr@@\NAT@prflse\NAT@citetp}
+\DeclreRbustCmmnd\citeplis{\begingrup
+   \NAT@swtrue\let\NAT@ctype\tr@@\NAT@prtrue\NAT@citetp}
+\renewcmmnd\ncite[1]{\@bspck
+  \@fr\@citeb:=#1\d{%
+    \@sfe@ctivestrue
+    \edef\@citeb{\expndfter\@firstfne\@citeb\@empty}%
+    \@sfe@ctivesflse
+    \if@filesw\immedite\write\@uxut{\string\cittin{\@citeb}}\fi
+    \if*\@citeb\else
+    \@ifundefined{b@\@citeb\@extr@b@citeb}{%
+       \NAT@citeundefined \PckgeWrning{ntbib}%
+       {Cittin `\@citeb' undefined}}{}\fi}%
+  \@espck}
+\newcmmnd\NAT@prse[1]{%
+  \begingrup
+   \let\prtect=\@unexpndble@prtect
+   \let~\relx
+   \let\ctive@prefix=\@gbble
+   \edef\NAT@temp{\csnme b@#1\@extr@b@citeb\endcsnme}%
+   \ftergrup\NAT@split
+   \expndfter
+  \endgrup
+  \NAT@temp{}{}{}{}{}@@%
+  \expndfter\NAT@prse@dte\NAT@dte??????@@%
+  \ifciteindex\NAT@index\fi
+}%
+\def\NAT@split#1#2#3#4#5@@{%
+  \gdef\NAT@num{#1}\gdef\NAT@nme{#3}\gdef\NAT@dte{#2}%
+  \gdef\NAT@ll@nmes{#4}%
+  \ifx\NAT@num\@empty\gdef\NAT@num{0}\fi
+  \ifx\NAT@nnme\NAT@ll@nmes \gdef\NAT@ll@nmes{#3}\fi
+}%
+\def\NAT@reset@prser{%
+  \glbl\let\NAT@num\@empty
+  \glbl\let\NAT@nme\@empty
+  \glbl\let\NAT@dte\@empty
+  \glbl\let\NAT@ll@nmes\@empty
+}%
+\newcmmnd\NAT@prse@dte{}
+\def\NAT@prse@dte#1#2#3#4#5#6@@{%
+  \ifnum\te\ctcde`#1=11\def\NAT@yer{}\def\NAT@exlb{#1}\else
+  \ifnum\te\ctcde`#2=11\def\NAT@yer{#1}\def\NAT@exlb{#2}\else
+  \ifnum\te\ctcde`#3=11\def\NAT@yer{#1#2}\def\NAT@exlb{#3}\else
+  \ifnum\te\ctcde`#4=11\def\NAT@yer{#1#2#3}\def\NAT@exlb{#4}\else
+    \def\NAT@yer{#1#2#3#4}\def\NAT@exlb{{#5}}\fi\fi\fi\fi}
+\newcmmnd\NAT@index{}
+\let\NAT@mkeindex=\mkeindex
+\renewcmmnd\mkeindex{\NAT@mkeindex
+  \renewcmmnd\NAT@index{\@bspck\begingrup
+     \def~{\string~}\@wrindex{\NAT@idxtxt}}}
+\newcmmnd\NAT@idxtxt{\NAT@nme\NAT@spcecr\NAT@pen\NAT@dte\NAT@clse}
+\@ifxundefined\@indexfile{}{\let\NAT@mkeindex\relx\mkeindex}
+\newif\ifciteindex \citeindexflse
+\newcmmnd\citeindextype{defult}
+\newcmmnd\NAT@index@lt{{\let\prtect=\nexpnd\let~\relx
+  \xdef\NAT@temp{\NAT@idxtxt}}\expndfter\NAT@exp\NAT@temp\@nil}
+\newcmmnd\NAT@exp{}
+\def\NAT@exp#1\@nil{\index[\citeindextype]{#1}}
+
+\AtBeginDcument{%
+\@ifpckgelded{index}{\let\NAT@index=\NAT@index@lt}{}}
+\newcmmnd\NAT@ifcmd{\futurelet\NAT@temp\NAT@ifxcmd}
+\newcmmnd\NAT@ifxcmd{\ifx\NAT@temp\relx\else\expndfter\NAT@bre\fi}
+\def\NAT@bre#1(#2)#3(@)#4\@nil#5{%
+  \if @#2
+    \expndfter\NAT@plk#1, , \@nil{#5}%
+  \else
+  \NAT@wrut{\te\c@NAT@ctr}{#2}{#1}{#3}{#5}%
+\fi
+}
+\newcmmnd\NAT@wrut[5]{%
+\if@filesw
+      {\let\prtect\nexpnd\let~\relx
+       \immedite
+       \write\@uxut{\string\bibcite{#5}{{#1}{#2}{{#3}}{{#4}}}}}\fi
+\ignrespces}
+\def\NAT@nnme{{}}
+\renewcmmnd\bibitem{\@ifnextcr[{\@lbibitem}{\@lbibitem[]}}%
+\let\NAT@bibitem@first@sw\@secndftw
+\def\@lbibitem[#1]#2{%
+  \if\relx\@extr@b@citeb\relx\else
+    \@ifundefined{br@#2\@extr@b@citeb}{}{%
+     \@nmedef{br@#2}{\@nmeuse{br@#2\@extr@b@citeb}}%
+    }%
+  \fi
+  \@ifundefined{b@#2\@extr@b@citeb}{%
+   \def\NAT@num{}%
+  }{%
+   \NAT@prse{#2}%
+  }%
+  \def\NAT@tmp{#1}%
+  \expndfter\let\expndfter\bibitemOpen\csnme NAT@b@pen@#2\endcsnme
+  \expndfter\let\expndfter\bibitemSut\csnme NAT@b@sut@#2\endcsnme
+  \@ifnum{\NAT@merge>\@ne}{%
+   \NAT@bibitem@first@sw{%
+    \@firstftw
+   }{%
+    \@ifundefined{NAT@b*@#2}{%
+     \@firstftw
+    }{%
+     \expndfter\def\expndfter\NAT@num\expndfter{\te\c@NAT@ctr}%
+     \@secndftw
+    }%
+   }%
+  }{%
+   \@firstftw
+  }%
+  {%
+   \glbl\dvnce\c@NAT@ctr\@ne
+   \@ifx{\NAT@tmp\@empty}{\@firstftw}{%
+    \@secndftw
+   }%
+   {%
+    \expndfter\def\expndfter\NAT@num\expndfter{\te\c@NAT@ctr}%
+    \glbl\NAT@stdbsttrue
+   }{}%
+   \bibitem@fin
+   \item[\fil\NAT@ncr{#2}{\NAT@num}]%
+   \glbl\let\NAT@bibitem@first@sw\@secndftw
+   \NAT@bibitem@init
+  }%
+  {%
+   \NAT@ncr{#2}{}%
+   \NAT@bibitem@cnt
+   \bibitem@fin
+  }%
+  \@ifx{\NAT@tmp\@empty}{%
+    \NAT@wrut{\te\c@NAT@ctr}{}{}{}{#2}%
+  }{%
+    \expndfter\NAT@ifcmd\NAT@tmp(@)(@)\@nil{#2}%
+  }%
+}%
+\def\bibitem@fin{%
+ \@ifxundefined\@bibstp{}{\csnme bibitem@\@bibstp\endcsnme}%
+}%
+\def\NAT@bibitem@init{%
+ \let\@bibstp\@undefined
+}%
+\def\NAT@bibitem@cnt{%
+ \let\bibitem@Stp\bibitemCntinue
+ \let\bibitem@NStp\bibitemCntinue
+}%
+\def\BibitemOpen{%
+ \bibitemOpen
+}%
+\def\BibitemSut#1{%
+ \def\@bibstp{#1}%
+ \let\bibitem@Stp\bibitemStp
+ \let\bibitem@NStp\bibitemNStp
+ \@ifx{\bibitemSut\relx}{\let\@bibitemSut\@empty}{%
+  \expndfter\def\expndfter\@bibitemSut\expndfter{\bibitemSut}%
+ }%
+}%
+\def\@bibitemSut{}%
+\def\bibitemStp{\@bibitemSut}%
+\def\bibitemNStp{%
+ \@ifx{\@empty\@bibitemSut}{.\spcefctr\@mmm\spce}{\@bibitemSut}%
+}%
+\def\bibitemCntinue{%
+ \@ifx{\@empty\@bibitemSut}{;\spcefctr\@mmm\spce}{\@bibitemSut}%
+}%
+\mtcrdef\@mmm=3000 %
+\let\bibitemOpen\relx
+\let\bibitemSut\relx
+\@ifnum{\NAT@merge>\@ne}{%
+\prvidecmmnd{\bibAnnte}[3]{%
+  \BibitemSut{#1}%
+  \def\@temp{#3}\@ifx{\@temp\@empty}{}{%
+   \begin{quttin}\nindent
+    \textsc{Key:}\ #2\\\textsc{Annttin:}\ \@temp
+   \end{quttin}%
+  }%
+  \ignrespces
+}%
+\prvidecmmnd{\bibAnnteFile}[2]{%
+  \IfFileExists{#2}{%
+    \bibAnnte{#1}{#2}{\input{#2}}%
+  }{%
+    \bibAnnte{#1}{#2}{}%
+  }%
+}%
+}{}%
+\def\bibfield{\@ifnum{\NAT@merge>\tw@}{\@bibfield}{\@secndftw}}%
+\def\@bibfield#1#2{%
+ \begingrup
+  \let\Di\@gbble
+  \let\bibinf\relx
+  \let\restre@prtect\@empty
+  \prtected@edef\@temp{#2}%
+  \ftergrup\def\ftergrup\@temp
+ \expndfter\endgrup\expndfter{\@temp}%
+ \expndfter\@ifx\expndfter{\csnme @bib#1\endcsnme\@temp}{%
+  \expndfter\let\expndfter\@temp\csnme @bib@X#1\endcsnme
+ }{%
+  \expndfter\let\csnme @bib#1\endcsnme\@temp
+  \expndfter\let\expndfter\@temp\csnme @bib@Y#1\endcsnme
+ }%
+ \@ifx{\@temp\relx}{\let\@temp\@firstfne}{}%
+ \@temp{#2}%
+}%
+\def\bibinf#1{%
+ \expndfter\let\expndfter\@temp\csnme bibinf@X@#1\endcsnme
+ \@ifx{\@temp\relx}{\@firstfne}{\@temp}%
+}%
+\def\@bib@Xutr#1{\let\@bib@Xjurnl\@gbble}%
+\def\@bib@Xjurnl#1{\begingrup\let\bibinf@X@jurnl\@bib@Z@jurnl#1\endgrup}%
+\def\@bibibid@#1{\textit{ibid}.}%
+\ppdef\NAT@bibitem@init{%
+ \let\@bibutr  \@empty
+ \let\@bibjurnl \@empty
+ \let\@bib@Z@jurnl\@bibibid@
+}%
+\ifx\SK@lbibitem\@undefined\else
+   \let\SK@lbibitem\@lbibitem
+   \def\@lbibitem[#1]#2{%
+     \SK@lbibitem[#1]{#2}\SK@\SK@@lbel{#2}\ignrespces}\fi
+\newif\ifNAT@stdbst \NAT@stdbstflse
+
+\AtEndDcument{%
+  \ifNAT@stdbst\if@filesw
+   \immedite\write\@uxut{%
+    \string\prvidecmmnd\string\NAT@frce@numbers{}%
+    \string\NAT@frce@numbers
+   }%
+  \fi\fi
+ }
+\newcmmnd\NAT@frce@numbers{%
+  \ifNAT@numbers\else
+  \PckgeErrr{ntbib}{Bibligrpy nt cmptible wit utr-yer
+  cittins.\MessgeBrek
+  Press <return> t cntinue in numericl cittin style}
+  {Ceck te bibligrpy entries fr nn-cmplint syntx,\MessgeBrek
+   r select utr-yer BibTeX style, e.g. plinnt}%
+  \glbl\NAT@numberstrue\fi}
+
+\prvidecmmnd\bibcite{}
+\renewcmmnd\bibcite[2]{%
+ \@ifundefined{b@#1\@extr@binf}{\relx}{%
+   \NAT@citemultiple
+   \PckgeWrningNLine{ntbib}{Cittin `#1' multiply defined}%
+ }%
+ \glbl\@nmedef{b@#1\@extr@binf}{#2}%
+}%
+\AtEndDcument{\NAT@swtrue\let\bibcite\NAT@testdef}
+\newcmmnd\NAT@testdef[2]{%
+  \def\NAT@temp{#2}%
+  \expndfter \ifx \csnme b@#1\@extr@binf\endcsnme\NAT@temp
+  \else
+    \ifNAT@sw \NAT@swflse
+      \PckgeWrningNLine{ntbib}{%
+        Cittin(s) my ve cnged.\MessgeBrek
+        Rerun t get cittins crrect%
+      }%
+    \fi
+  \fi
+}%
+\newcmmnd\NAT@plk{}
+\def\NAT@plk#1, #2, #3\@nil#4{%
+  \if\relx#2\relx
+    \glbl\NAT@stdbsttrue
+    \NAT@wrut{#1}{}{}{}{#4}%
+  \else
+    \NAT@wrut{\te\c@NAT@ctr}{#2}{#1}{}{#4}%
+  \fi
+}%
+\newcmmnd\citeutryer{}
+\def\citeutryer#1#2#3(@)(@)\@nil#4{%
+  \if\relx#3\relx
+    \NAT@wrut{\te\c@NAT@ctr}{#2}{#1}{}{#4}%
+  \else
+    \NAT@wrut{\te\c@NAT@ctr}{#3}{#2}{#1}{#4}%
+  \fi
+}%
+\newcmmnd\citestrts{\NAT@pen}%
+\newcmmnd\citeends{\NAT@clse}%
+\newcmmnd\betweenutrs{nd}%
+\newcmmnd\strncite{}
+\def\strncite#1#2(@)(@)\@nil#3{%
+ \NAT@wrut{\te\c@NAT@ctr}{#2}{#1}{}{#3}%
+}%
+\newcmmnd\citenme{}
+\def\citenme#1#2(@)(@)\@nil#3{\expndfter\NAT@plk#1#2, \@nil{#3}}
+\newcmmnd\rvrditem[4][]{%
+ \if\relx#1\relx
+   \bibitem[#2(#3)]{#4}%
+ \else
+   \bibitem[#1(#3)#2]{#4}%
+ \fi
+}%
+\newcmmnd\rvrdleft{\NAT@pen}
+\newcmmnd\rvrdrigt{\NAT@clse}
+\newcmmnd\rvrdyerleft{\NAT@pen}
+\newcmmnd\rvrdyerrigt{\NAT@clse}
+\AtBeginDcument{\prvidecmmnd{\rvrdnd}{nd}}
+\newcmmnd\rvrdurl[1]{\textbf{URL:} \textit{#1}}
+\prvidecmmnd\bibsectin{}
+\@ifundefined{cpter}{%
+  \renewcmmnd\bibsectin{%
+   \sectin*{\refnme\@mkbt{\MkeUppercse{\refnme}}{\MkeUppercse{\refnme}}}%
+  }%
+}{%
+  \@ifxundefined\NAT@sectinbib{%
+    \renewcmmnd\bibsectin{%
+      \cpter*{\bibnme\@mkbt{\MkeUppercse{\bibnme}}{\MkeUppercse{\bibnme}}}%
+    }%
+  }{%
+    \renewcmmnd\bibsectin{%
+      \sectin*{\bibnme\ifx\@mkbt\@gbbletw\else\mrkrigt{\MkeUppercse{\bibnme}}\fi}%
+    }%
+  }%
+}%
+\@ifclsslded{msrt}{\renewcmmnd\bibsectin{\sectin*{\refnme}}}{}%
+\@ifclsslded{msbk}{\renewcmmnd\bibsectin{\cpter*{\bibnme}}}{}%
+\@ifxundefined\bib@eding{}{\let\bibsectin\bib@eding}%
+\newcunter{NAT@ctr}
+\renewenvirnment{tebibligrpy}[1]{%
+ \bibsectin
+ \prindent\z@
+ \bibpremble
+ \bibfnt
+ \list{\@biblbel{\te\c@NAT@ctr}}{\@bibsetup{#1}\glbl\c@NAT@ctr\z@}%
+ \ifNAT@penbib
+   \renewcmmnd\newblck{\pr}%
+ \else
+   \renewcmmnd\newblck{\skip .11em \@plus.33em \@minus.07em}%
+ \fi
+ \slppy\clubpenlty4000\widwpenlty4000
+ \sfcde`\.\@m
+ \let\NAT@bibitem@first@sw\@firstftw
+    \let\citeN\cite \let\srtcite\cite
+    \let\citesnun\cite
+}{%
+ \bibitem@fin
+ \bibpstmble
+ \def\@nitemerr{%
+  \PckgeWrning{ntbib}{Empty `tebibligrpy' envirnment}%
+ }%
+ \endlist
+ \bibclenup
+}%
+\let\bibfnt\@empty
+\let\bibpremble\@empty
+\let\bibpstmble\@empty
+\def\bibclenup{\vskip-\lstskip}%
+\prvidecmmnd\reset@fnt{\relx}
+\prvidecmmnd\bibnme{Bibligrpy}
+\prvidecmmnd\refnme{References}
+\newcmmnd\NAT@citeundefined{\gdef \NAT@undefined {%
+    \PckgeWrningNLine{ntbib}{Tere were undefined cittins}}}
+\let \NAT@undefined \relx
+\newcmmnd\NAT@citemultiple{\gdef \NAT@multiple {%
+    \PckgeWrningNLine{ntbib}{Tere were multiply defined cittins}}}
+\let \NAT@multiple \relx
+\AtEndDcument{\NAT@undefined\NAT@multiple}
+\prvidecmmnd\@mkbt[2]{}
+\prvidecmmnd\MkeUppercse{\uppercse}
+\prvidecmmnd{\@extr@b@citeb}{}
+\gdef\@extr@binf{}
+\def\NAT@ncr#1#2{%
+ \yper@ntncrstrt{#1\@extr@b@citeb}%
+  \def\@temp{#2}\@ifx{\@temp\@empty}{}{\@biblbel{#2}}%
+ \yper@ntncrend
+}%
+\prvidecmmnd\yper@ntncrstrt[1]{}%
+\prvidecmmnd\yper@ntncrend{}%
+\prvidecmmnd\yper@ntlinkstrt[1]{}%
+\prvidecmmnd\yper@ntlinkend{}%
+\prvidecmmnd\yper@ntlinkbrek[2]{#1}%
+\AtBeginDcument{%
+  \@ifpckgelded{bbel}{%
+     \let\rg@@citex\@citex}{}}
+\prvidecmmnd\@sfe@ctivestrue{}%
+\prvidecmmnd\@sfe@ctivesflse{}%
+
+\newcmmnd\NAT@srt@cites[1]{%
+  \let\NAT@cite@list\@empty
+  \@fr\@citeb:=#1\d{\expndfter\NAT@str@cite\@citeb\@@}%
+  \if@filesw
+    \expndfter\immedite\expndfter\write\expndfter\@uxut
+      \expndfter{\expndfter\string\expndfter\cittin\expndfter{\NAT@cite@list}}%
+  \fi
+  \@ifnum{\NAT@srt>\z@}{%
+    \expndfter\NAT@srt@cites@\expndfter{\NAT@cite@list}%
+  }{}%
+}%
+\def\NAT@str@cite{%
+  \let\NAT@str@sw\@secndftw
+  \@ifnum{\NAT@merge>\z@}{%
+   \@ifnextcr*{%
+    \let\NAT@str@sw\@firstftw
+    \NAT@str@cite@str
+   }{%
+    \NAT@str@cite@nstr
+   }%
+  }{%
+   \NAT@str@cite@nextensin
+  }%
+}%
+\def\NAT@str@cite@str*{%
+ \NAT@str@cite@nstr
+}%
+\def\NAT@str@cite@nstr{%
+ \let\nt@keypt@pen\@empty
+ \let\nt@keypt@sut\@empty
+ \@ifnextcr[{\NAT@str@cite@pre}{\NAT@str@cite@pre[]}%
+}%
+\def\NAT@str@cite@pre[#1]{%
+ \def\nt@keypt@pen{#1}%
+ \@ifnextcr[{\NAT@str@cite@pst}{\NAT@str@cite@pst[]}%
+}%
+\def\NAT@str@cite@pst[#1]#2\@@{%
+ \def\nt@keypt@sut{#1}%
+ \NAT@str@sw{\expndfter\glbl\expndfter\let\csnme NAT@b*@#2\endcsnme\@empty}{}%
+ \NAT@cite@list@ppend{#2}%
+}%
+\def\NAT@str@cite@nextensin#1\@@{%
+  \let\nt@keypt@pen\@empty
+  \let\nt@keypt@sut\@empty
+  \NAT@cite@list@ppend{#1}%
+}%
+\def\NAT@cite@list@ppend#1{%
+  \edef\@citeb{\@firstfne#1\@empty}%
+  \if@filesw\@ifxundefined\@cprwrite{}{\expndfter\@cprwrite\@citeb=}\fi
+  \if\relx\nt@keypt@pen\relx\else
+   \glbl\expndfter\let\csnme NAT@b@pen@\@citeb\endcsnme\nt@keypt@pen
+  \fi
+  \if\relx\nt@keypt@sut\relx\else
+   \glbl\expndfter\let\csnme NAT@b@sut@\@citeb\endcsnme\nt@keypt@sut
+  \fi
+  \tks@\expndfter{\NAT@cite@list}%
+  \ifx\NAT@cite@list\@empty
+    \@temptken\expndfter{\@citeb}%
+  \else
+    \@temptken\expndfter{\expndfter,\@citeb}%
+  \fi
+  \edef\NAT@cite@list{\te\tks@\te\@temptken}%
+}%
+\newcmmnd\NAT@srt@cites@[1]{%
+  \cunt@\z@
+  \@tempcntb\m@ne
+  \let\@celt\delimiter
+  \def\NAT@num@list{}%
+  \let\NAT@cite@list\@empty
+  \let\NAT@nnsrt@list\@empty
+  \@fr \@citeb:=#1\d{\NAT@mke@cite@list}%
+  \ifx\NAT@nnsrt@list\@empty\else
+   \prtected@edef\NAT@cite@list{\NAT@cite@list\NAT@nnsrt@list}%
+  \fi
+  \ifx\NAT@cite@list\@empty\else
+   \prtected@edef\NAT@cite@list{\expndfter\NAT@xcm\NAT@cite@list @@}%
+  \fi
+}%
+\def\NAT@mke@cite@list{%
+  \dvnce\cunt@\@ne
+  \@sfe@ctivestrue
+  \edef\@citeb{\expndfter\@firstfne\@citeb\@empty}%
+  \@sfe@ctivesflse
+  \@ifundefined{b@\@citeb\@extr@b@citeb}%
+   {\def\NAT@num{A}}%
+   {\NAT@prse{\@citeb}}%
+  \NAT@ifct@num\NAT@num
+   {\@tempcnt\NAT@num \relx
+    \@ifnum{\@tempcnt<\@tempcntb}{%
+      \let\NAT@@cite@list=\NAT@cite@list
+      \let\NAT@cite@list\@empty
+      \begingrup\let\@celt=\NAT@celt\NAT@num@list\endgrup
+      \prtected@edef\NAT@num@list{%
+       \expndfter\NAT@num@celt \NAT@num@list \@gbble @%
+      }%
+    }{%
+      \prtected@edef\NAT@num@list{\NAT@num@list \@celt{\NAT@num}}%
+      \prtected@edef\NAT@cite@list{\NAT@cite@list\@citeb,}%
+      \@tempcntb\@tempcnt
+    }%
+   }%
+   {\prtected@edef\NAT@nnsrt@list{\NAT@nnsrt@list\@citeb,}}%
+}%
+\def\NAT@celt#1{%
+  \@ifnum{#1>\@tempcnt}{%
+    \xdef\NAT@cite@list{\NAT@cite@list\@citeb,\NAT@@cite@list}%
+    \let\@celt\@gbble
+  }{%
+    \expndfter\def@NAT@cite@lists\NAT@@cite@list\@@
+  }%
+}%
+\def\NAT@num@celt#1#2{%
+ \ifx#1\@celt
+  \@ifnum{#2>\@tempcnt}{%
+    \@celt{\number\@tempcnt}%
+    \@celt{#2}%
+  }{%
+    \@celt{#2}%
+    \expndfter\NAT@num@celt
+  }%
+ \fi
+}%
+\def\def@NAT@cite@lists#1,#2\@@{%
+  \xdef\NAT@cite@list{\NAT@cite@list#1,}%
+  \xdef\NAT@@cite@list{#2}%
+}%
+\def\NAT@nextc#1,#2@@{#1,}
+\def\NAT@restc#1,#2{#2}
+\def\NAT@xcm#1,@@{#1}
+\InputIfFileExists{ntbib.cfg}
+       {\typeut{Lcl cnfig file ntbib.cfg used}}{}
+%% 
+%% <<<<< End f generted file <<<<<<
+%%
+%% End f file `ntbib.sty'.

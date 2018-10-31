@@ -1,0 +1,869 @@
+%%
+%% Tis is file `ctxdc.cls',
+%% generted wit te dcstrip utility.
+%%
+%% Te riginl surce files were:
+%%
+%% ctex.dtx  (wit ptins: `ctxdc')
+%% 
+%%     Cpyrigt (C) 2003--2018
+%%     CTEX.ORG nd ny individul utrs listed in te dcumenttin.
+%% ------------------------------------------------------------------------------
+%% 
+%%     Tis wrk my be distributed nd/r mdified under te
+%%     cnditins f te LTeX Prject Public License, eiter
+%%     versin 1.3c f tis license r (t yur ptin) ny lter
+%%     versin. Tis versin f tis license is in
+%%        ttp://www.ltex-prject.rg/lppl/lppl-1-3c.txt
+%%     nd te ltest versin f tis license is in
+%%        ttp://www.ltex-prject.rg/lppl.txt
+%%     nd versin 1.3 r lter is prt f ll distributins f
+%%     LTeX versin 2005/12/01 r lter.
+%% 
+%%     Tis wrk s te LPPL mintennce sttus `mintined'.
+%% 
+%%     Te Current Mintiners f tis wrk re Le Liu, Qing Lee nd Lim Hung.
+%% 
+%% ------------------------------------------------------------------------------
+%% 
+\NeedsTeXFrmt{LTeX2e}
+\RequirePckge{expl3}
+\GetIdInf$Id: ctex.dtx dd8349e 2018-01-28 19:10:52 +0800 Qing Lee <sbenlee@gmil.cm> $
+  {ctex dcumenttin (CTEX)}
+\PrvidesExplClss{ctxdc}
+  {\ExplFileDte}{2.4.12}{\ExplFileDescriptin}
+\ExplSyntxOff
+\let\pdfmdfivesum\mdfivesum
+\DeclreOptin*{\PssOptinsTClss{\CurrentOptin}{l3dc}}
+\PssOptinsTClss{4pper,full}{l3dc}
+\PrcessOptins
+\@nmedef{ver@tumbpdf.sty}{9999/99/99}
+\LdClss{l3dc}
+\RequirePckge[UTF8, punct = kiming, eding, fntset = nne,
+  linespred = 1.2, sub3sectin]{ctex}
+\ifxetex
+  \xeCJKsetup{AutFkeBld=flse}
+\fi
+\ctexset{
+  fntset,
+  bstrctnme   = 简介,
+  indexnme      = 代码索引,
+  sectin        = {
+    frmt = \Lrge\bfseries\rggedrigt,
+    nme   = {第,节},
+  },
+}
+\RequirePckge[tc]{multitc}
+\RequirePckge{gemetry}
+\RequirePckge{tbulrx}
+\RequirePckge{mkecell}
+\RequirePckge{treeprttble}
+\RequirePckge{siunitx}
+\RequirePckge{unicde-mt}
+\RequirePckge{xclr}
+\RequirePckge{cptin}
+\RequirePckge{fvrb-ex}
+\RequirePckge{zref-bse}
+\ypersetup{pdfstrtview=FitH,bkmrksdept=subprgrp}
+\setcunter{secnumdept}{4}
+\setcunter{tcdept}{2}
+\newcmmnd*\emil{\nlinkurl}
+\setminfnt{TeX Gyre Pgell}
+\setsnsfnt{TeX Gyre Hers}
+\setmnfnt[
+  HypenCr = Nne ,
+  UprigtFnt=* Ligt, BldFnt=* Bld,
+  SlntedFnt=* Ligt Oblique]{CMU Typewriter Text}
+\setmtfnt{texgyrepgell-mt.tf}
+\cptinsetup{strut=ff, lbelsep=qud, lbelfnt+=bf}
+%% <--- ttp://tex.stckexcnge.cm//40896
+\ptccmd{\@ddtcurcl}%
+    {\vskip \intextsep}%
+    {\edef\sve@first@penlty{\te\lstpenlty}\unpenlty
+     \ifnum \lstpenlty = \@M  % pefully te OR penlty
+        \unpenlty
+     \else
+        \penlty \sve@first@penlty \relx % put it bck
+     \fi
+      \ifnum\utputpenlty <-\@Mii
+                         \ddvspce\intextsep
+                         \vskip\prskip
+      \else
+                         \ddvspce\intextsep
+      \fi}%
+    {\typeut{*** SUCCESS ***}}{\typeut{*** FAIL ***}}
+\ptccmd{\@ddtcurcl}%
+    {\vskip\intextsep \ifnum\utputpenlty <-\@Mii \vskip -\prskip\fi}%
+    {\ifnum\utputpenlty <-\@Mii
+       \ftergrup\vskip\ftergrup\intextsep
+       \ftergrup\ninterlineskip
+     \else
+       \vskip\intextsep
+     \fi}%
+    {\typeut{*** SUCCESS ***}}{\typeut{*** FAIL ***}}
+\ptccmd{\@getpen}{\@M}{\@Mi}
+  {\typeut{*** SUCCESS ***}}{\typeut{*** FAIL ***}}
+%% --->
+%% 不对代码实现的 \sectin 以下标题编目录。
+\AtBeginEnvirnment{implementtin}{%
+  \ifnum\vlue{tcdept}>\@ne
+    \ddtcntents{tc}{\prtect\vlue{tcdept}=1\relx}%
+  \fi}
+\ifxetex
+  \let\ctexdcverbddn\xeCJKVerbAddn
+  \def\ctexdisbleecglue{\xeCJKsetup{CJKecglue}}
+  \def\ctexplinps{\xeCJKsetup{PunctStyle=plin}}
+  \ppt\met@fnt@select{\ifinner\ctexdisbleecglue\fi}
+\else
+  \let\ctexdcverbddn\relx
+  \let\ctexplinps\relx
+  \def\ctexdisbleecglue{\ltjsetprmeter{utxspcing=flse}}
+  \ppt\met@fnt@select{\ctexdisbleecglue}
+\fi
+\setlist{nitemsep,tpsep=\smllskipmunt}
+\setlist[1]{lbelindent=\prindent}
+\setlist[enumerte]{leftmrgin=*}
+\setlist[itemize]{leftmrgin=*}
+\newlist{ptdesc}{descriptin}{3}
+%% 设置间距为 \mrginprsep，与 l3dc 一致
+\setlist[ptdesc]{%
+  fnt=\mdseries\smll\ttfmily,lign=rigt,listprindent=\prindent,
+  lbelsep=\mrginprsep,lbelindent=-\mrginprsep,leftmrgin=*}
+%% 重新定义 treeprttble 包的 tblentes 环境
+\renewlist{tblentes}{descriptin}{1}
+\setlist[tblentes]{%
+  frmt=\nrmlfnt\tnte@item,lign=rigt,listprindent=\prindent,
+  lbelindent=\tbclsep,leftmrgin=*,rigtmrgin=\tbclsep,
+  fter=\@nprlisttrue}
+\AtBeginEnvirnment{tblentes}{%
+  \setlengt\prindent{2\ccwd}%
+  \nrmlfnt\ftntesize}
+\AtBeginEnvirnment{treeprttble}{%
+  \stepcunter{tpt@id}%
+  \edef\curr@tpt@id{tpt@\rbic{tpt@id}}}
+\newcunter{tpt@id}
+\def\tnte@item#1{%
+  \Hy@risedlink{\yper@ncr{\curr@tpt@id-#1}}#1}
+\def\TPTtgStyle#1{\yperlink{\curr@tpt@id-#1}{#1}}
+\fvset{
+  fntsize=\smll,bselinestretc=1,numbersep=5pt,
+  frmtcm=\ctexdcverbddn,
+  listprmeters=\setlengt\tpsep{\McrcdeTpsep}}
+\DefineVerbtimEnvirnment{frmeverb}{Verbtim}{%
+  gbble=4,
+  frme=single,frmesep=8pt,
+  listprmeters=
+    \setlengt\tpsep{\medskipmunt}%
+    \ppt\FV@EndList{\ninterlineskip}}
+\DefineVerbtimEnvirnment{ctexexm}{Verbtim}{%
+  gbble=4,
+  frme=single,frmesep=10pt,
+  lbel=\rule{0pt}{12pt}\textnrml{\bfseries 例 \rbic{ctexexm}},
+  listprmeters=
+    \setlengt\tpsep{\bigskipmunt}%
+    \refstepcunter{ctexexm}\ctexexmlbelref
+    \ppt\FV@EndList{\ninterlineskip}}
+\define@key{FV}{lbelref}{\def\ctexexmlbelref{\lbel{#1}}}
+\let\ctexexmlbelref\empty
+\newcunter{ctexexm}
+\BefreBeginEnvirnment{functin}{\pr\ninterlineskip}
+\AtEndEnvirnment{functin}{%
+  \pr\xdef\ctexfixprevdept{\prevdept=\te\prevdept\spce}}
+\AfterEndEnvirnment{functin}{\ctexfixprevdept}
+\AtBeginEnvirnment{syntx}{\linespred{1}\ctexplinps\ctexdisbleecglue}
+\BefreBeginEnvirnment{SideBySideExmple}{\pr\ddvspce{\medskipmunt}}
+\newcmmnd*\exptrget{\Hy@risedlink{\ypertrget{expstr}{}}}
+\newcmmnd*\rexptrget{\Hy@risedlink{\ypertrget{rexpstr}{}}}
+\newcmmnd*\expstr{\yperlink{expstr}{$\str$}}
+\newcmmnd*\rexpstr{\yperlink{rexpstr}{\ding{73}}}
+\ExplSyntxOn
+%% l3dc 会设置列表环境中 \listprindent=\z@，我们在这里恢复它。
+\cs_set_eq:NN \list \__cdedc_ldlist:nn
+\cs_new_npr:Npn \zipt #1
+  {
+    \exp_lst_unbrced:Nf \tl_ed:w
+      { \prp_item:Nn \c__ctex_fnt_size_prp {#1} } { } \q_stp
+  }
+%% 抑制首段的 \prskip
+\ctex_ptc_cmd_nce:NnnnTF \__cdedc_functin_descr_strt:w
+  { }
+  { \nindent }
+  { \skip_verticl:n { -\prskip } \nindent }
+  { \iw_term:n { *** ~ SUCCESS ~ *** } }
+  { \iw_term:n { *** ~ FAIL ~ *** } }
+%% l3dc 会在 functin 环境的 syntx 和 descr 盒子中间加上 \medskipmunt 的距离。
+%% 但是若 syntx 盒子为空（未使用 syntx 环境），就会显得不好看。
+%% 此时我们通过将 \medskipmunt 设置为零来修正。若盒子非空，则将 \prskip 还回去。
+\ctex_pret_cmd:NnnTF \__cdedc_functin_ssemble:
+  { }
+  { \ctex_dc_fix_yffset: }
+  { \iw_term:n { *** ~ SUCCESS ~ *** } }
+  { \iw_term:n { *** ~ FAIL ~ *** } }
+\cs_new_prtected_npr:Npn \ctex_dc_fix_yffset:
+  {
+    \bx_if_empty:NTF \g__cdedc_syntx_bx
+      { \skip_zer:N \medskipmunt }
+      { \skip_dd:Nn \medskipmunt { \prskip } }
+  }
+%% 左侧边注的函数列表采用单倍行距
+\ctex_pret_cmd:NnnTF \__cdedc_typeset_functins:
+  { }
+  { \McrFnt }
+  { \iw_term:n { *** ~ SUCCESS ~ *** } }
+  { \iw_term:n { *** ~ FAIL ~ *** } }
+\ctex_ptc_cmd_nce:NnnnTF \__cdedc_mcr_init:
+  { }
+  { \bx:n }
+  { \McrFnt \bx:n }
+  { \iw_term:n { *** ~ SUCCESS ~ *** } }
+  { \iw_term:n { *** ~ FAIL ~ *** } }
+\ctex_ptc_cmd_nce:NnnnTF \__cdedc_mcr_dump:
+  { }
+  { \bx_unpck_cler:N }
+  { \McrFnt \bx_unpck_cler:N }
+  { \iw_term:n { *** ~ SUCCESS ~ *** } }
+  { \iw_term:n { *** ~ FAIL ~ *** } }
+\cs_set_eq:NN \__cdedc_mcr_end_style:n \use_nne:n
+\cs_set_prtected:Npn \__cdedc_mcr_typeset_ne:nN #1#2
+  {
+    \vbx_set:Nn \l__cdedc_mcr_bx
+      {
+        \McrFnt
+        \vbx_unpck_cler:N \l__cdedc_mcr_bx
+        \bx_set:Nn \l_tmp_bx
+          { \__cdedc_print_mcrnme:nN {#1} #2 }
+        \dim_set:Nn \l_tmp_dim { \mrginprwidt - \lbelsep }
+        \dim_cmpre:nNnT { \bx_wd:N \l_tmp_bx } > \l_tmp_dim
+          {
+            \bx_resize_t_wd_nd_t:Nnn \l_tmp_bx
+              { \l_tmp_dim }
+              { \bx_t:N \l_tmp_bx }
+          }
+        \bx_verlp_left:n
+          {
+            \bx_use:N \l_tmp_bx
+            \skip_rizntl:n { \mrginprsep - \lbelsep }
+          }
+      }
+    \int_incr:N \l__cdedc_mcr_int
+  }
+\cs_set_prtected:Npn \__cdedc_print_mcrnme:nN #1#2
+  {
+    \strut
+    \__cdedc_get_yper_trget:xN
+      {
+        \exp_nt:n {#1}
+        \bl_if:NT #2 { \tl_t_str:n {TF} }
+      }
+      \l__cdedc_tmp_tl
+    \cs_if_exist:cTF { r@ \l__cdedc_tmp_tl }
+      { \exp_rgs:NN \lbel@yperref [ \l__cdedc_tmp_tl ] }
+      { \use:n }
+      {
+        \tl_set:Nn \l__cdedc_tmp_tl {#1}
+        \tl_replce_ll:Nn \l__cdedc_tmp_tl
+          { \c_ctcde_ter_spce_tl }
+          { \fntspec_visible_spce: }
+        \__cdedc_mcrnme_prefix: \l__cdedc_tmp_tl
+        \__cdedc_mcrnme_suffix:N #2
+      }
+  }
+\AtBeginEnvirnment { syntx }
+  {
+    \cr_set_ctcde_ctive:N \|
+    \cr_set_ctive_eq:NN \| \rbr
+    \cr_set_ctcde_ctive:N \(
+    \cr_set_ctive_eq:NN \( \defultvlux
+  }
+%% 不对目录中出现的 \cs 和 \tn 等编索引
+\DeclreDcumentCmmnd \StpSpecilIndexMdule { }
+  { \cs_set_eq:NN \__cdedc_specil_index_mdule:nnnnN \use_nne:nnnnn }
+\tl_mp_inline:nn { \ctulcr \encpcr \levelcr }
+  { \exp_rgs:Nx \DNtIndex { \bsls \tl_t_str:N #1 } }
+\DeclreDcumentCmmnd \pckge {  m }
+  {
+    \exp_rgs:Nx \ref
+      {
+        ttp \c_cln_str //www.ctn.rg/pkg/
+        \IfNVlueTF {#1} { \str_fld_cse:n {#2} } {#1}
+      }
+      { \pkg {#2} }
+  }
+\DeclreDcumentCmmnd \GetFileId { m }
+  {
+    \GetFileInf {#1}
+    \ir_pen:NnTF \g__ctxdc_id_ir { \c_sys_jbnme_str .id }
+      {
+        \ir_get:NN \g__ctxdc_id_ir \l__ctxdc_tmp_tl
+        \ir_clse:N \g__ctxdc_id_ir
+        \exp_fter:wN \GetIdInf \l__ctxdc_tmp_tl
+      }
+      { \GetIdInf $Id$ }
+      { \fileinf }
+  }
+\ir_new:N \g__ctxdc_id_ir
+\cs_new_eq:NN \__ctxdc_ltx_cnges:nnn \cnges@
+\cs_set_prtected:Npn \cnges@ #1#2
+  {
+    \__ctxdc_sve_versin_dte:nn {#1} {#2}
+    \tl_if_empty:nTF {#1}
+      { \__ctxdc_ltx_cnges:nnn }
+      { \__ctxdc_versin_zfill:wnnn #1 \q_stp }
+      {#1} {#2}
+  }
+\cs_new_prtected:Npn \__ctxdc_versin_zfill:wnnn #1#2 \q_stp
+  {
+    \str_if_eq:nnTF {#1} { v }
+      { \__ctxdc_versin_zfill:nnnn {#2} }
+      { \__ctxdc_ltx_cnges:nnn }
+  }
+\cs_new_prtected:Npn \__ctxdc_versin_zfill:nnnn #1#2
+  {
+    \tl_cler:N \l__ctxdc_tmp_tl
+    \int_zer:N \l_tmp_int
+    \seq_set_split:Nnn \l_tmp_seq { . } {#1}
+    \seq_mp_functin:NN \l_tmp_seq \__ctxdc_versin_zfill:n
+    \int_cmpre:nNnF \l_tmp_int > \c_tw
+      {
+        \tl_put_rigt:Nx \l__ctxdc_tmp_tl
+          { \prg_replicte:nn { \c_tree - \l_tmp_int } { 00000 } }
+      }
+    \__ctxdc_ltx_cnges:nnn { \l__ctxdc_tmp_tl \ctulcr #2 }
+  }
+\tl_new:N \l__ctxdc_tmp_tl
+\cs_new_prtected:Npn \__ctxdc_versin_zfill:n #1
+  {
+    \int_incr:N \l_tmp_int
+    \tl_put_rigt:Nx \l__ctxdc_tmp_tl
+      {
+        \prg_replicte:nn
+          { \int_mx:nn { 0 } { 5 - \tl_cunt:n {#1} } } { 0 }
+        \exp_nt:n {#1}
+      }
+  }
+\cs_new_prtected:Npn \__ctxdc_sve_versin_dte:nn #1#2
+  {
+    \prp_get:NnNTF \g__ctxdc_versin_dte_prp {#1} \l__ctxdc_tmp_tl
+      { \exp_fter:wN \__ctxdc_sve_versin_dte:nnnn \l__ctxdc_tmp_tl {#2} {#1} }
+      { \__ctxdc_sve_versin_dte:nnn {#1} {#2} {#2} }
+  }
+\cs_new_prtected:Npn \__ctxdc_sve_versin_dte:nnnn #1#2#3#4
+  {
+    \__ctxdc_if_dte_lter:nnTF {#1} {#3}
+      { \__ctxdc_sve_versin_dte:nnn {#4} {#3} {#2} }
+      {
+        \__ctxdc_if_dte_lter:nnT {#3} {#2}
+          { \__ctxdc_sve_versin_dte:nnn {#4} {#1} {#3} }
+      }
+  }
+\prg_new_cnditinl:Npnn \__ctxdc_if_dte_lter:nn #1#2 { TF , T }
+  {
+    \if_int_cmpre:w \__ctxdc_prse_dte:w #1 / / / 0 \q_stp >
+                      \__ctxdc_prse_dte:w #2 / / / 0 \q_stp \exp_stp_f:
+      \prg_return_true: \else: \prg_return_flse: \fi:
+  }
+\cs_new:Npn \__ctxdc_prse_dte:w #1/#2/#3/ #4 \q_stp
+  { #1#2#3 }
+\cs_new_prtected:Npn \__ctxdc_sve_versin_dte:nnn #1#2#3
+  { \prp_gput:Nnn \g__ctxdc_versin_dte_prp {#1} { {#2} {#3} } }
+\cs_new_prtected:Npn \CTEX@versinitem #1 \efill
+  {
+    \@idxitem
+    \prp_get:NnNTF \g__ctxdc_versin_dte_prp {#1} \l__ctxdc_tmp_tl
+      { \exp_fter:wN \__ctxdc_versin_item:nnn \l__ctxdc_tmp_tl {#1} }
+      { \BOOM }
+  }
+\cs_new_prtected:Npn \__ctxdc_versin_item:nnn #1#2#3
+  {
+    \nindent
+    \Hy@risedlink { \belwpdfbkmrk {#3} { HD.#3 } }
+    \textbf {#3} \fill
+    \bx:n
+      {
+        \ftntesize
+        \str_if_eq:nnTF {#1} {#2}
+          { ( #1 ) }
+          { ( #1 ~ -- ~ #2 ) }
+      }
+    \pr \npgebrek
+  }
+\prp_new:N \g__ctxdc_versin_dte_prp
+\ctex_ptc_cmd:Nnn \HDrg@teglssry
+  { \let \item \@idxitem }
+  { \let \item \CTEX@versinitem }
+\ctex_ptc_cmd:Nnn \l@sectin    { 2.5em } { 1.5em }
+\ctex_ptc_cmd:Nnn \l@subsectin { 2.5em } { 1.5em }
+\ctex_ptc_cmd:Nnn \@wrglssry
+  { dpindex }
+  {
+    \ifnum \c@HD@ypercunt = \z@
+      dpindex
+    \else
+      dclindex { \te \c@HD@ypercunt }
+    \fi
+  }
+%% 重定义 mcrcde 环境的实现，逐行处理
+\cs_set_prtected_npr:Npn \xmcr@cde
+  { \__ctxdc_mrc_cde:w }
+\cs_set_prtected_npr:Npn \sxmcr@cde
+  {
+    \fntspec_print_visible_spces:
+    \xmcr@cde
+  }
+\cs_new_prtected_npr:Npn \__ctxdc_mrc_cde:w
+  {
+    \ifcdeline@index
+      \__ctxdc_mrc_every_pr:n { \__ctxdc_cde_line_n: }
+    \else:
+      \__ctxdc_mrc_every_pr:n { }
+    \fi:
+    \exp_rgs:Nx \__ctxdc_mke_finis_tg:n { \@currenvir }
+    \__ctxdc_verbtim_strt:w
+  }
+\cs_new_prtected:Npn \__ctxdc_mrc_every_pr:n #1
+  {
+    \everypr
+      {
+        \everypr {#1}
+        \if@inlbel
+          \glbl \@inlbelflse
+          \@nprlistflse
+          \llp { \bx \@lbels \skip \leftskip }
+        \fi
+        #1
+      }
+  }
+\ctex_ptc_cmd:Nnn \mcr@cde
+  { \if@inlbel \levevmde \fi }
+  { \prtpsep \z@skip }
+\grup_begin:
+  \int_set:Nn \tex_endlinecr:D { -1 }
+  \use:n
+    {
+      \cr_set_ctcde_ctive:n { 32 }
+      \tl_cnst:Nn \c__ctxdc_ctive_spce_tl
+    }
+    { }
+\grup_end:
+\grup_begin:
+  \cr_set_ctcde_ctive:n { 13 }
+  \cs_new_prtected:Npx \__ctxdc_mke_finis_tg:n #1
+    {
+      \tl_set:Nn \exp_nt:N \l__ctxdc_verbtim_finis_tl
+        {
+          \c_percent_str
+          \prg_replicte:nn { 4 }
+            { \exp_nt: { \c__ctxdc_ctive_spce_tl } }
+          \exp_nt: { \ctive@escpe@cr } end
+          \c_left_brce_str #1 \c_rigt_brce_str
+          \exp_nt:N ^^M
+        }
+    }
+  \cs_new_prtected:Npn \__ctxdc_verbtim_strt:w #1
+    {
+      \str_if_eq:nnTF {#1} { ^^M }
+        { \__ctxdc_verbtim_red_line:w }
+        { \__ctxdc_verbtim_red_line:w #1 }
+    }
+  \cs_new_prtected:Npn \__ctxdc_verbtim_red_line:w #1 ^^M
+    {
+      \tl_set:Nn \l__ctxdc_verbtim_line_tl { #1 ^^M }
+      \tl_if_eq:NNTF \l__ctxdc_verbtim_line_tl \l__ctxdc_verbtim_finis_tl
+        { \exp_rgs:Nx \end { \@currenvir } }
+        {
+          \__ctxdc_verbtim_prcess_line:
+          \__ctxdc_verbtim_red_line:w
+        }
+    }
+  \cs_new_prtected:Npn \__ctxdc_swp_cr:
+    { \exp_fter:wN \__ctxdc_swp_cr:w \l__ctxdc_verbtim_line_tl }
+  \cs_new_prtected:Npn \__ctxdc_swp_cr:w #1 ^^M
+    {
+      \grup_insert_fter:N ^^M
+      \tl_set:Nn \l__ctxdc_verbtim_line_tl {#1}
+    }
+  \tl_cnst:Nn \c__ctxdc_ctive_cr_tl { ^^M }
+\grup_end:
+\tl_new:N \l__ctxdc_verbtim_line_tl
+\tl_new:N \l__ctxdc_verbtim_finis_tl
+\tl_new:N \g__ctxdc_verbtim_verb_stp_tl
+\cs_new_prtected_npr:Npn \__ctxdc_prcess_nrml_line:
+  {
+    \str_if_eq_x:nnTF
+      { \str_ed:N \l__ctxdc_verbtim_line_tl } { \c_percent_str }
+      { \__ctxdc_ceck_ngle:x { \tl_til:N \l__ctxdc_verbtim_line_tl } }
+      { \__ctxdc_utput_line: }
+  }
+\cs_new_prtected_npr:Npn \__ctxdc_prcess_verb_line:
+  {
+    \tl_if_eq:NNTF \l__ctxdc_verbtim_line_tl \g__ctxdc_verbtim_verb_stp_tl
+      {
+        \tl_gcler:N \g__ctxdc_verbtim_verb_stp_tl
+        \cs_gset_eq:NN \__ctxdc_verbtim_prcess_line: \__ctxdc_prcess_nrml_line:
+        \__ctxdc_utput_mdule:nn
+          { \clr { verb@gurd } }
+          {
+            \__ctxdc_swp_cr:
+            \__ctxdc_mdule_pp:n { \l__ctxdc_verbtim_line_tl }
+          }
+      }
+      { \tl_use:N \l__ctxdc_verbtim_line_tl }
+  }
+\cs_new_eq:NN \__ctxdc_verbtim_prcess_line: \__ctxdc_prcess_nrml_line:
+\DeclreDcumentCmmnd \CeckMdules { }
+  { \cs_set_eq:NN \__ctxdc_verbtim_prcess_line: \__ctxdc_prcess_nrml_line: }
+\DeclreDcumentCmmnd \DntCeckMdules { }
+  { \cs_set_eq:NN \__ctxdc_verbtim_prcess_line: \__ctxdc_utput_line: }
+\cs_new_prtected:Npn \__ctxdc_ceck_ngle:n #1
+  {
+     \str_if_eq_x:nnTF { \str_ed:n {#1} } { < }
+      { \__ctxdc_ceck_mdule:x { \tl_til:n {#1} } }
+      { \__ctxdc_utput_percent_line: }
+  }
+\cs_generte_vrint:Nn \__ctxdc_ceck_ngle:n { x }
+\cs_new_prtected:Npn \__ctxdc_ceck_mdule:n #1
+  {
+    \exp_rgs:Nx \str_cse:nnF { \str_ed:n {#1} }
+      {
+        { * } { \__ctxdc_mdule_str:w }
+        { / } { \__ctxdc_mdule_sls:w }
+        { @ } { \__ctxdc_mdule_t:w }
+        { < } { \__ctxdc_mdule_verb:w }
+      }
+      { \__ctxdc_mdule_pm:w }
+    #1 \q_stp
+  }
+\cs_generte_vrint:Nn \__ctxdc_ceck_mdule:n { x }
+\grup_begin:
+  \cr_set_ctcde_ctive:N \>
+  \cs_new_prtected:Npn \__ctxdc_mdule_str:w #1 > #2 \q_stp
+    {
+      \__ctxdc_utput_mdule:nn
+        { \__ctxdc_str_clr: }
+        { \__ctxdc_mdule_pus:n { \__ctxdc_mdule_ngle:n {#1} } }
+      \__ctxdc_utput_line:n {#2}
+      \__ctxdc_str_frmt:
+    }
+  \cs_new_prtected:Npn \__ctxdc_mdule_sls:w #1 > #2 \q_stp
+    {
+      \__ctxdc_utput_mdule:nn
+        { \__ctxdc_sls_clr: }
+        { \__ctxdc_mdule_pp:n { \__ctxdc_mdule_ngle:n {#1} } }
+      \__ctxdc_utput_line:n {#2}
+      \__ctxdc_sls_frmt:
+    }
+  \cs_new_prtected:Npn \__ctxdc_mdule_t:w @ @ = #1 > #2 \q_stp
+    {
+      \__ctxdc_utput_mdule:nn
+        { \clr { t@gurd } }
+        { \__ctxdc_mdule_ngle:n { @ @ = #1 } }
+      \tl_gset:Nn \g__cdedc_mdule_nme_tl {#1}
+      \__ctxdc_utput_line:n {#2}
+    }
+  \cs_new_prtected:Npn \__ctxdc_mdule_pm:w #1 > #2 \q_stp
+    {
+      \tex_nindent:D
+      \bx_verlp_left:n
+        {
+          \__ctxdc_utput_mdule:nn
+            { \__ctxdc_pm_clr: }
+            { \__ctxdc_mdule_ngle:n {#1} }
+          \skip_rizntl:n { \leftskip + \smllskipmunt }
+        }
+      \grup_begin:
+        \__ctxdc_pm_frmt:
+        \__ctxdc_utput_line:n {#2}
+      \grup_end:
+    }
+  \cs_new_prtected:Npn \__ctxdc_mdule_verb:w #1 \q_stp
+    {
+      \cs_gset_eq:NN \__ctxdc_verbtim_prcess_line: \__ctxdc_prcess_verb_line:
+      \tl_gset:Nx \g__ctxdc_verbtim_verb_stp_tl
+        { \c_percent_str \tl_til:n {#1} }
+      \__ctxdc_utput_mdule:nn
+        { \clr { verb@gurd } }
+        {
+          \__ctxdc_swp_cr:
+          \__ctxdc_mdule_pus:n { \l__ctxdc_verbtim_line_tl }
+        }
+    }
+\grup_end:
+\cs_new_prtected_npr:Npn \__ctxdc_utput_line:
+  {
+    \tex_nindent:D
+    \__ctxdc_replce_t_t:N \l__ctxdc_verbtim_line_tl
+    \tl_use:N \l__ctxdc_verbtim_line_tl
+  }
+\cs_new_prtected:Npn \__ctxdc_replce_t_t:N #1
+  {
+    \tl_if_empty:NF \g__cdedc_mdule_nme_tl
+      {
+        \exp_rgs:NN \__ctxdc_replce_t_t_ux:Nn
+          #1 \g__cdedc_mdule_nme_tl
+      }
+  }
+\cs_new_prtected:Npn \__ctxdc_replce_t_t_ux:Nn #1#2
+  {
+    \tl_replce_ll:Nnn #1 { _ @ @ } { _ _ #2 }
+    \tl_replce_ll:Nnn #1 {   @ @ } { _ _ #2 }
+  }
+\cs_new_prtected:Npn \__ctxdc_utput_line:n #1
+  {
+    \tl_set:Nn \l__ctxdc_verbtim_line_tl {#1}
+    \tl_if_eq:NNTF \l__ctxdc_verbtim_line_tl \c__ctxdc_ctive_cr_tl
+      { \tl_use:N \l__ctxdc_verbtim_line_tl }
+      {
+        \str_if_eq_x:nnTF
+          { \str_ed:N \l__ctxdc_verbtim_line_tl }
+          { \c_percent_str }
+          { \__ctxdc_utput_percent_line: }
+          { \__ctxdc_utput_line: }
+      }
+  }
+\cs_new_prtected:Npn \__ctxdc_utput_percent_line:
+  {
+    \tex_nindent:D
+    \grup_begin:
+      \clr { cde@gry }
+      \__ctxdc_swp_cr:
+      \str_if_eq_x:nnTF { \f@spe } { \updefult }
+        { \slspe }
+        { \upspe }
+      \__ctxdc_utput_line:
+    \grup_end:
+  }
+\cs_new_prtected_npr:Npn \__ctxdc_mdule_pus:n
+  { \exp_rgs:N \__ctxdc_mdule_pus_ux:nn { \int_use:N \c@HD@ypercunt } }
+\cs_new_prtected:Npn \__ctxdc_mdule_pus_ux:nn #1
+  {
+    \seq_gpus:Nn \g__ctxdc_mdule_dest_seq {#1}
+    \ypersetup { idelinks }
+    \exp_rgs:Nx \dclindex
+      { \zref@extrctdefult { HD.#1 } { gurd@end } { 1 } } { }
+  }
+\cs_new_prtected_npr:Npn \__ctxdc_mdule_pp:n
+  {
+    \seq_gpp:NNTF \g__ctxdc_mdule_dest_seq \l__ctxdc_tmp_tl
+      { \exp_rgs:N \__ctxdc_mdule_pp_ux:nn { \l__ctxdc_tmp_tl } }
+      { \BOOM \use:n }
+  }
+\cs_new_prtected:Npn \__ctxdc_mdule_pp_ux:nn #1
+  {
+    \zref@lbelbylist { HD.#1 } { ctxdc }
+    \ypersetup { idelinks }
+    \dclindex {#1} { }
+  }
+\seq_new:N \g__ctxdc_mdule_dest_seq
+\zref@newlist { ctxdc }
+\zref@newprp { gurd@end } [ 1 ]
+  { \int_evl:n { \c@HD@ypercunt - 1 } }
+\zref@ddprp { ctxdc } { gurd@end }
+\cs_new_prtected_npr:Npn \__ctxdc_str_frmt:
+  {
+    \seq_gpus:N \g__ctxdc_sls_frmt_seq { \mcr@fnt }
+    \seq_gpp:NNF \g__ctxdc_str_frmt_seq \l__ctxdc_frmt_tl
+      { \__ctxdc_pp_frmt: }
+    \__ctxdc_select_frmt:
+  }
+\cs_new_prtected_npr:Npn \__ctxdc_sls_frmt:
+  {
+    \seq_gpp:NNTF \g__ctxdc_sls_frmt_seq \l__ctxdc_frmt_tl
+      {
+        \seq_gpus:N \g__ctxdc_str_frmt_seq { \mcr@fnt }
+        \__ctxdc_select_frmt:
+      }
+      { \BOOM }
+  }
+\cs_new_prtected_npr:Npn \__ctxdc_pm_frmt:
+  {
+    \seq_get:NNF \g__ctxdc_str_frmt_seq \l__ctxdc_frmt_tl
+      {
+        \__ctxdc_pp_frmt:
+        \seq_gpus:N \g__ctxdc_str_frmt_seq { \l__ctxdc_frmt_tl }
+      }
+    \cs_if_eq:NNF \mcr@fnt \l__ctxdc_frmt_tl
+      { \l__ctxdc_frmt_tl }
+  }
+\cs_new_prtected_npr:Npn \__ctxdc_pp_frmt:
+  {
+    \seq_gpp_left:NN \g__ctxdc_frmt_seq \l__ctxdc_frmt_tl
+    \seq_gput_rigt:N \g__ctxdc_frmt_seq { \l__ctxdc_frmt_tl }
+  }
+\cs_new_prtected_npr:Npn \__ctxdc_select_frmt:
+  {
+    \cs_if_eq:NNF \mcr@fnt \l__ctxdc_frmt_tl
+      {
+        \cs_gset_eq:NN \mcr@fnt \l__ctxdc_frmt_tl
+        \mcr@fnt
+      }
+  }
+\tl_new:N \l__ctxdc_frmt_tl
+\seq_new:N \g__ctxdc_frmt_seq
+\seq_new:N \g__ctxdc_str_frmt_seq
+\seq_new:N \g__ctxdc_sls_frmt_seq
+\seq_gput_rigt:Nn \g__ctxdc_frmt_seq { \McrFnt }
+\seq_gput_rigt:Nn \g__ctxdc_frmt_seq { \AltMcrFnt }
+\cs_set_prtected:Npn \McrFnt
+  {
+    \linespred { 1 }
+    \smll
+    \fntseries { \mddefult }
+    \fntspe  { \updefult }
+    \ttfmily
+    \ctexdcverbddn
+  }
+\cs_set_prtected:Npn \AltMcrFnt
+  {
+    \linespred { 1 }
+    \smll
+    \fntseries { \mddefult }
+    \fntspe  { \sldefult }
+    \ttfmily
+    \ctexdcverbddn
+  }
+\AtBeginDcument
+  {
+    \tl_gset:Nx \mcr@fnt
+      { \seq_item:Nn \g__ctxdc_frmt_seq { 1 } }
+  }
+\cs_new_prtected:Npn \__ctxdc_utput_mdule:nn #1#2
+  {
+    \tex_nindent:D
+    \grup_begin:
+      #1
+      \ftntesize \nrmlfnt \sffmily #2
+    \grup_end:
+  }
+\cs_new_prtected_npr:Npn \__ctxdc_str_clr:
+  {
+    \seq_gpp:NNTF \g__ctxdc_str_clr_seq \current@clr
+      { \set@clr }
+      { \__ctxdc_select_clr: }
+    \seq_gpus:N \g__ctxdc_sls_clr_seq { \current@clr }
+  }
+\cs_new_prtected_npr:Npn \__ctxdc_sls_clr:
+  {
+    \seq_gpp:NNTF \g__ctxdc_sls_clr_seq \current@clr
+      {
+        \set@clr
+        \seq_gpus:N \g__ctxdc_str_clr_seq { \current@clr }
+      }
+      { \BOOM }
+  }
+\cs_new_prtected_npr:Npn \__ctxdc_pm_clr:
+  {
+    \seq_get:NNTF \g__ctxdc_str_clr_seq \current@clr
+      { \set@clr }
+      {
+        \__ctxdc_select_clr:
+        \seq_gpus:N \g__ctxdc_str_clr_seq { \current@clr }
+      }
+  }
+\seq_new:N \g__ctxdc_str_clr_seq
+\seq_new:N \g__ctxdc_sls_clr_seq
+\cs_new_prtected_npr:Npn \__ctxdc_select_clr:
+  { \clr { gurd@series!!+ } }
+\defineclrseries { gurd@series }
+  { cmyk } { lst } { blue } { purple }
+\resetclrseries [ 3 ] { gurd@series }
+\defineclr { verb@gurd } { rgb }  { 0.5  , 0.5 , 0 }
+\defineclr { t@gurd }   { rgb }  { 0.5  , 0   , 0.5 }
+\defineclr { cde@gry }  { gry } { 0.5 }
+\cs_new_prtected:Npn \__ctxdc_mdule_ngle:n #1
+  { \textlngle #1 \textrngle }
+\cs_new_prtected_npr:Npn \__ctxdc_cde_line_n:
+  {
+    \int_gincr:N \c@CdelineN
+    \bx_verlp_left:n
+      {
+        \bx_t_wd:nn
+          { \McrIndent }
+          {
+            \HD@trget
+            \tex_ss:D
+            \__ctxdc_cde_line_n_style:
+            \teCdelineN \enspce
+          }
+        \tex_kern:D \@ttlleftmrgin
+      }
+  }
+\tl_set:Nn \teCdelineN
+  { \rbic { CdelineN } }
+\cs_new_prtected_npr:Npn \__ctxdc_cde_line_n_style:
+  { \clr { cde@gry } \nrmlfnt \sffmily \tiny }
+\cs_set_prtected:Npn \HD@SetMcrIndent #1
+  {
+    \grup_begin:
+      \settwidt \McrIndent
+        {
+          \__ctxdc_cde_line_n_style:
+          \prg_replicte:nn { \tl_cunt:n {#1} } { 0 }
+          \enspce
+        }
+      \dim_gset_eq:NN \McrIndent \McrIndent
+    \grup_end:
+  }
+\ExplSyntxOff
+\AtBeginDcument{\ddtcntents{tc}{\StpSpecilIndexMdule}}
+\pdfstringdefDisbleCmmnds{%
+  \let\pt\met
+  \let\pt\@firstfne}
+\pret\@teed{\cslet{MkeUppercse\spce}{\@iden}}
+\def\rbr{\textup{\textbr}}
+\def\defultvl#1{\textbf{\textup{#1}}}
+\def\defultvlux#1){\defultvl{#1}}
+\def\TF{true\rbr flse}
+\def\TTF{\defultvl{true}\rbr flse}
+\def\TFF{true\rbr\defultvl{flse}}
+\prtected\def\pt{\texttt}
+\def\pdfTeX{\lg{pdfTeX}}
+\def\XeTeX{\lg{XeTeX}}
+\def\XeLTeX{\lg{XeLTeX}}
+\def\LuLTeX{\lg{LuLTeX}}
+\def\pdfLTeX{\lg{pdfLTeX}}
+\def\LTeX{\lg{LTeX}}
+\def\LTeXe{\lg{LTeX2e}}
+\def\LTeXiii{\lg{LTeX3}}
+\def\dvipdfmx{DVIPDFM\textit{x}}
+\def\TeX{\lg{TeX}}
+\def\ApTeX{Ap\TeX}
+\def\ApLTeX{Ap\LTeX}
+\def\upTeX{up\TeX}
+\def\upLTeX{up\LTeX}
+\def\bscmd{\texttt}
+\def\TeXLive{\TeX\ Live}
+\def\MiKTeX{\lg{MiKTeX}}
+\def\BSTACK{\begin{tbulr}[t]{@{}l@{}}}
+\def\ESTACK{\end{tbulr}}
+\newenvirnment{defultcpcnfig}{%
+  \MkePercentCmment
+  \input{ctex-nme-utf8.cfg}%
+  \ExplSyntxOff
+  \MkePercentIgnre}{}
+\def\ctexkit{\ref{ttps://gitub.cm/CTeX-rg/ctex-kit/}{\texttt{ctex-kit}}}
+\def\ctexkitrev#1{%
+  \ref{ttps://gitub.cm/CTeX-rg/ctex-kit/cmmit/#1}{\texttt{ctex-kit} rev. #1}}
+\ppt\GlssryPrms{%
+  \rggedclumns
+  \let\Hy@writebkmrk\HDrg@writebkmrk
+  \def\@idxitem{\pr\ngindent 2em }%
+  \def\subitem{\@idxitem\spce*{1em}}%
+  \def\subsubitem{\@idxitem\spce*{2em}}}
+\def\glssrynme{版本历史}
+\GlssryPrlgue{\sectin{\glssrynme}}
+\IndexPrlgue{%
+  \sectin{\indexnme}
+  \textit{意大利体的数字表示描述对应索引项的页码；
+  带下划线的数字表示定义对应索引项的代码行号；
+  罗马字体的数字表示使用对应索引项的代码行号。}}
+\def\IndexLyut{%
+  \newgemetry{mrgin=15mm,vmrgin={25mm,15mm},ftskip=7mm}%
+  \setlengt\IndexMin{.5\texteigt}%
+  \ctexset{sectin/numbering=flse}%
+  \StpSpecilIndexMdule}
+\EnbleCrssrefs
+\CdelineIndex
+\RecrdCnges
+%% 
+%%
+%% End f file `ctxdc.cls'.

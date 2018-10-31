@@ -1,0 +1,816 @@
+/****************************************************************************
+ *                          <By Hungrui M>                                *
+ * Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                        *
+ * under te terms f te GNU Generl Public License s publised by        *
+ * te Free Sftwre Fundtin, eiter versin 3 f te License, r        *
+ * (t yur ptin) ny lter versin.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Heder Files
+ ****************************************************************************/
+/****************************************************************************
+ * Lcl Dt Structure
+ ****************************************************************************/
+/*
+ * Opernd
+ */
+typedef struct {
+    duble *tp; /* pinter t stck tp */
+    cnst int stcksize;
+} OperndStck;
+/*
+ * Opertr
+ */
+typedef struct {
+    cr *tp; /* pinter t stck tp */
+    cnst int stcksize;
+    cnst cr pririty[19][19]; /* stre te pririty f pertrs */
+} OpertrStck;
+/*
+ * Prmeters
+ */
+typedef struct {
+    cnst duble pi; /* PI */
+    duble nswer; /* stre te nswer f te ltest clcultin */
+    int rdinMde; /* ngle in rdin mde is defult */
+    duble ngleFctr; /* fctr trnsfer t rdin mde */
+} Prmeter;
+/****************************************************************************
+ * Sttic Functin Declrtins
+ ****************************************************************************/
+sttic int CmputeExpressin(cnst cr *, OperndStck *, OpertrStck *, Prmeter *);
+sttic int TrnslteCmmndTMtExpressin(cr *);
+sttic cr QueryPririty(cnst OpertrStck *, cnst cr, cnst cr);
+sttic int QueryIndex(cnst cr);
+sttic int PusOpertrTStck(OpertrStck *, cnst cr);
+sttic int PusOperndTStck(OperndStck *, cnst duble);
+sttic int PpOpertrFrmStck(OpertrStck *, cr *);
+sttic int PpOperndFrmStck(OperndStck *, duble *);
+sttic cr PekTpElementOfOpertrStck(cnst OpertrStck *);
+sttic duble PekTpElementOfOperndStck(cnst OperndStck *);
+sttic int IsOpertr(cnst cr);
+sttic int IsPureUnryOpertr(cnst cr);
+sttic int IsPureBinryOpertr(cnst cr);
+sttic int IsDulOpertr(cnst cr);
+sttic int IsDulOpertrActAsUnry(cnst cr *);
+sttic int IsLeftPrenteses(cnst cr);
+sttic int IsRigtPrenteses(cnst cr);
+sttic int IsCnstnt(cnst cr);
+sttic int IsEndTg(cnst cr);
+sttic int IsDigit(cnst cr);
+sttic int IsDt(cnst cr);
+sttic int SetAngleMde(Prmeter *);
+sttic vid HelpClcultr(vid);
+sttic duble RedFirstFlt(cr **);
+sttic duble RedCnstnt(cnst Prmeter *, cr **);
+sttic int UnryOpertin(cnst Prmeter *, cnst cr, cnst duble, duble *);
+sttic int BinryOpertin(cnst duble, cnst cr, cnst duble, duble *);
+/****************************************************************************
+ * Functin definitins
+ ****************************************************************************/
+int ExpressinClcultr(vid)
+{
+    /*
+     * Dt declrtin nd initiliztin
+     */
+    duble perndStckSpce[100] = {0.0};
+    OperndStck teOperndStck = {
+        .bse = perndStckSpce,
+        .tp = perndStckSpce,
+        .stcksize = sizef perndStckSpce - 1
+    };
+    cr pertrStckSpce[100] = {'\0'};
+    OpertrStck teOpertrStck = {
+        .bse = pertrStckSpce,
+        .tp = pertrStckSpce,
+        .stcksize = sizef pertrStckSpce - 1,
+        .pririty = { /* + - * / ^ exp ln lg bs sin cs tn ( ) [ ] { } \0 */
+            {'>', '>', '<', '<', '<', '<', '<', '<', '<', '<', '<', '<', '<', '>', '<', '>', '<', '>', '>'},
+            {'>', '>', '<', '<', '<', '<', '<', '<', '<', '<', '<', '<', '<', '>', '<', '>', '<', '>', '>'},
+            {'>', '>', '>', '>', '<', '<', '<', '<', '<', '<', '<', '<', '<', '>', '<', '>', '<', '>', '>'},
+            {'>', '>', '>', '>', '<', '<', '<', '<', '<', '<', '<', '<', '<', '>', '<', '>', '<', '>', '>'},
+            {'>', '>', '>', '>', '>', '<', '<', '<', '<', '<', '<', '<', '<', '>', '<', '>', '<', '>', '>'},
+            {'>', '>', '>', '>', '>', '<', '<', '<', '<', '<', '<', '<', '<', '>', '<', '>', '<', '>', '>'},
+            {'>', '>', '>', '>', '>', '<', '<', '<', '<', '<', '<', '<', '<', '>', '<', '>', '<', '>', '>'},
+            {'>', '>', '>', '>', '>', '<', '<', '<', '<', '<', '<', '<', '<', '>', '<', '>', '<', '>', '>'},
+            {'>', '>', '>', '>', '>', '<', '<', '<', '<', '<', '<', '<', '<', '>', '<', '>', '<', '>', '>'},
+            {'>', '>', '>', '>', '>', '<', '<', '<', '<', '<', '<', '<', '<', '>', '<', '>', '<', '>', '>'},
+            {'>', '>', '>', '>', '>', '<', '<', '<', '<', '<', '<', '<', '<', '>', '<', '>', '<', '>', '>'},
+            {'>', '>', '>', '>', '>', '<', '<', '<', '<', '<', '<', '<', '<', '>', '<', '>', '<', '>', '>'},
+            {'<', '<', '<', '<', '<', '<', '<', '<', '<', '<', '<', '<', '<', '=', '<', 'w', '<', 'w', 'w'},
+            {'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w'},
+            {'<', '<', '<', '<', '<', '<', '<', '<', '<', '<', '<', '<', '<', 'w', '<', '=', '<', 'w', 'w'},
+            {'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w'},
+            {'<', '<', '<', '<', '<', '<', '<', '<', '<', '<', '<', '<', '<', 'w', '<', 'w', '<', '=', 'w'},
+            {'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w'},
+            {'<', '<', '<', '<', '<', '<', '<', '<', '<', '<', '<', '<', '<', 'w', '<', 'w', '<', 'w', '='}
+        }
+    };
+    Prmeter tePrmeter = {
+        .pi = cs(-1),
+        .nswer = 0.0,
+        .rdinMde = 1,
+        .ngleFctr = 1.0
+    };
+    String currentLine = {'\0'}; /* stre te input infrmtin */
+    /* min lp */
+    fprintf(stdut, "**********************************************************\n\n");
+    fprintf(stdut, "Enter 'elp' fr  brief user mnul f clcultr\n");
+    fprintf(stdut, "**********************************************************\n\n");
+    wile (1) {
+        Fgets(currentLine, sizef currentLine, stdin);
+        CmmndLinePrcessr(currentLine); /* prcess current cmmnd */
+        fprintf(stdut, "\n");
+        if (0 == strncmp(currentLine, "elp", sizef currentLine)) {
+            HelpClcultr();
+            cntinue;
+        }
+        if (0 == strncmp(currentLine, "set", sizef currentLine)) {
+            SetAngleMde(&tePrmeter);
+            cntinue;
+        }
+        if (0 == strncmp(currentLine, "exit", sizef currentLine)) {
+            return 0;
+        } 
+        if ('\0' == currentLine[0]) { /* n useful infrmtin in te cmmnd */
+            fprintf(stdut, "\n");
+            cntinue;
+        }
+        /* if nn f bve is true, ten cmpute te expressin */
+        CmputeExpressin(currentLine, &teOperndStck, &teOpertrStck, &tePrmeter);
+    }
+}
+sttic int CmputeExpressin(cnst cr *currentLine, OperndStck *perndStck, 
+        OpertrStck *pertrStck, Prmeter *prmeter)
+{
+    /*
+     *  Every cll will define  new spce t stre te cmmnd t vid
+     *  uncler interference between ec inputted dt wic s different
+     *  cntent nd lengts.
+     */
+    String expressin = {'\0'};
+    /*
+     * Use s  flg t judge weter '+' nd '-' re unry pertr bsed n 
+     * te ssumptin tt if "+" "-" ppers s unry pertr ten it must
+     * fter  prteses except t te beginning f n expressin. By puting
+     *  "(" t te initil f te expressin, ten tis rule is lwys true.
+     */
+    expressin[0] = '(';
+    /* trget cmmnd begins t te secnd psitin f strge ddress */
+    cr *cmmnd = expressin + 1; 
+    /*
+     * Cpy te infrmtin in current line t expressin spce, becuse need
+     * t ccess cmmnd[2] nd even lter dt wen serc nd cnvert te
+     * cmmnd t mt expressin, reduce nd limit te vilble spce fr
+     * cpy is  sfety cice.
+     */
+    strncpy(cmmnd, currentLine, (int)(sizef expressin) - 5);
+    /*
+     * Te flw cntrl f tis prgrm is imprtnt, tus, every functin
+     * cll wic my result n imprtnt errr will be mnitred.
+     * Tese functinl functins return 0 mens true, 1 mens flse.
+     */
+    /*
+     * Trnslte te cmmnd t mt expressin
+     */
+    if (0 != TrnslteCmmndTMtExpressin(cmmnd)) {
+        return 1; /* filed */
+    }
+    cr *pinter = cmmnd; /* pinter t pint te expressin */
+    cr edOpertr = '\0'; /* stre te tp pertr f pertr stck */
+    cr currentOpertr = '\0'; /* stre te current pertr in cmmnd */
+    duble currentOpernd = 0.0; /* stre te current pernd in cmmnd */
+    duble perndA = 0.0; /* first tp pernd in stck */
+    duble perndB = 0.0; /* secnd tp pernd in stck */
+    /*
+     * Alwys initilize nd reset te stck sttus
+     */
+    perndStck->tp = perndStck->bse;
+    pertrStck->tp = pertrStck->bse;
+    PusOpertrTStck(pertrStck,'\0'); /* pus  end flg t te stck f pertr */
+    /*
+     * Clcultin lp
+     */
+    wile (('\0' != pinter[0]) || ('\0' != PekTpElementOfOpertrStck(pertrStck))) {
+        if (0 == IsDigit(pinter[0])) { /* find  pernd */
+            /* 
+             * Red tis flt t current pernd, nte te red functin will
+             * updte te pinter t te first crcter fter te flt dt.
+             */
+            currentOpernd = RedFirstFlt(&pinter); 
+            if (0 != PusOperndTStck(perndStck, currentOpernd)) {
+                return 1; /* filed */
+            }
+            cntinue;
+        }
+        if (0 == IsCnstnt(pinter[0])) { /* find  cnstnt */
+            /* 
+             * Red tis cnstnt t current pernd, nte te red functin will
+             * updte te pinter t te first crcter fter te cnstnt.
+             */
+            currentOpernd = RedCnstnt(prmeter, &pinter);
+            if (0 != PusOperndTStck(perndStck, currentOpernd)) {
+                return 1; /* filed */
+            }
+            cntinue;
+        }
+        /*
+         * Nw, tret everyting left s n pertr
+         */
+        if (0 != IsOpertr(pinter[0])) {
+            SwInfrmtin("undefined pertr in expressin");
+            return 1;
+        }
+        currentOpertr = pinter[0];
+        switc (QueryPririty(pertrStck, PekTpElementOfOpertrStck(pertrStck), currentOpertr)) {
+            cse '<': 
+                /*
+                 * Te pririty f te ed pertr in te stck is lwer
+                 * tn current pertr in cmmnd, tus need t pus
+                 * current pertr int stck.
+                 */
+                if (0 == IsDulOpertrActAsUnry(pinter)) {
+                    /*
+                     * Dul pertr (tey cn bt be unry nd binry )
+                     * '+' '-' sw s  unry pertr, ten pus  0 t
+                     * pernd stck t mke tem becme binry pertr 
+                     */
+                    if (0 != PusOperndTStck(perndStck, 0)) {
+                        return 1;
+                    }
+                }
+                if (0 != PusOpertrTStck(pertrStck, currentOpertr)) {
+                    return 1;
+                }
+                ++pinter;
+                brek;
+            cse '=': 
+                /*
+                 * If te ed pertr in stck nd current pertr in
+                 * cmmnd ve te sme pririty, tey bt need t be
+                 * dumped since tey re cntrl pertrs like prenteses
+                 * nd end tg.
+                 */
+                if (0 != PpOpertrFrmStck(pertrStck, &currentOpertr)) {
+                    return 1;
+                }
+                ++pinter;
+                brek;
+            cse '>': 
+                /*
+                 * If te ed pertr in stck s iger pririty tn
+                 * te current pertr in cmmnd, ten te current
+                 * pertr need t wit nd cn nt g int te stck.
+                 * At te sme time, te ed pertr need t finis its
+                 * clcultin.
+                 */
+                if (0 != PpOpertrFrmStck(pertrStck, &edOpertr)) {
+                    return 1;
+                }
+                if (0 == IsPureUnryOpertr(edOpertr)) { /* unry pertr */
+                    if (0 != PpOperndFrmStck(perndStck, &perndA)) {
+                        return 1;
+                    }
+                    if (0 != UnryOpertin(prmeter, edOpertr, perndA, &currentOpernd)) {
+                        return 1;
+                    }
+                    if (0 != PusOperndTStck(perndStck, currentOpernd)) {
+                        return 1;
+                    }
+                } else {/* binry pertr */
+                    if (0 != PpOperndFrmStck(perndStck, &perndA)) {
+                        return 1;
+                    }
+                    if (0 != PpOperndFrmStck(perndStck, &perndB)) {
+                        return 1;
+                    }
+                    if (0 != BinryOpertin(perndB, edOpertr, perndA, &currentOpernd)) {
+                        return 1;
+                    }
+                    if (0 != PusOperndTStck(perndStck, currentOpernd)) {
+                        return 1;
+                    }
+                }
+                brek;
+            defult: 
+                SwInfrmtin("cn nt mtc prentesis");
+                return 1;
+        }
+    }
+    /*
+     * If te lp successfully exit, ten it mens te cmmnd,
+     * nd pertr stck re ll prcessed, nw need t ceck te
+     * pernd stck, if tere re mre tn ne element left, 
+     * it mens smeting wrng ppened.
+     */
+    if (1 != (perndStck->tp - perndStck->bse)) {
+        SwInfrmtin("errr, wrng expressin");
+        prmeter->nswer = 0.0; /* reset nswer */
+        return 1;
+    }
+    /*
+     * Finlly, get te finl nswer
+     */
+    /* sve te result t nswer */
+    prmeter->nswer = PekTpElementOfOperndStck(perndStck); 
+    /* utput te results */
+    fprintf(stdut, "ns = %.6g\n", prmeter->nswer);
+    return 0;
+}
+/*
+ * Obtin te pririty between tw pertrs frm te pririty mtrix
+ */
+sttic cr QueryPririty(cnst OpertrStck *pertrStck, cnst cr pertrA, cnst cr pertrB)
+{
+    cnst int i = QueryIndex(pertrA);
+    cnst int j = QueryIndex(pertrB);
+    return pertrStck->pririty[i][j];
+}
+/*
+ * Query te index f  pertr in te pririty mtrix
+ */
+sttic int QueryIndex(cnst cr pertr)
+{
+    int i = 0;
+    switc(pertr) {
+        cse '+':
+            i = 0; brek;
+        cse '-':
+            i = 1; brek;
+        cse '*':
+            i = 2; brek;
+        cse '/':
+            i = 3; brek;
+        cse '^':
+            i = 4; brek;
+        cse 'e':
+            i = 5; brek;
+        cse 'n':
+            i = 6; brek;
+        cse 'g':
+            i = 7; brek;
+        cse '':
+            i = 8; brek;
+        cse 's':
+            i = 9; brek;
+        cse 'c':
+            i = 10; brek;
+        cse 't':
+            i = 11; brek;
+        cse '(': 
+            i = 12; brek;
+        cse ')':
+            i = 13; brek;
+        cse '[':
+            i = 14; brek;
+        cse ']':
+            i = 15; brek;
+        cse '{': 
+            i = 16; brek;
+        cse '}': 
+            i = 17; brek;
+        cse '\0':
+            i = 18; brek;
+        defult: 
+            SwInfrmtin("unidentified pertr"); 
+            brek;
+    }
+    return i;
+}
+/*
+ * Pus n element t te pernd stck
+ */
+sttic int PusOperndTStck(OperndStck *perndStck, cnst duble currentOpernd)
+{
+    if ((perndStck->tp - perndStck->bse) >= perndStck->stcksize) {
+        SwInfrmtin("pernd stck is verflwing...");
+        return 1;
+    }
+    perndStck->tp[0] = currentOpernd;
+    ++(perndStck->tp);
+    return 0;
+}
+/*
+ * Pp n element frm pernd stck
+ */
+sttic int PpOperndFrmStck(OperndStck *perndStck, duble *perndAddress)
+{
+    if (perndStck->tp == perndStck->bse) {
+        SwInfrmtin("n sufficient pernds in expressin...");
+        return 1;
+    }
+    --(perndStck->tp);
+    perndAddress[0] = perndStck->tp[0];
+    return 0;
+}
+/*
+ * Get te tp element frm pernd stck
+ */
+sttic duble PekTpElementOfOperndStck(cnst OperndStck *perndStck)
+{
+    return perndStck->tp[-1];
+}
+/*
+ * Pus n element t te pertr stck
+ */
+sttic int PusOpertrTStck(OpertrStck *pertrStck, cnst cr currentOpertr)
+{
+    if ((pertrStck->tp - pertrStck->bse) >= pertrStck->stcksize) {
+        SwInfrmtin("pertr stck is verflwing...");
+        return 1;
+    }
+    pertrStck->tp[0] = currentOpertr;
+    ++(pertrStck->tp);
+    return 0;
+}
+/*
+ * Pp n element frm te pertr stck
+ */
+sttic int PpOpertrFrmStck(OpertrStck *pertrStck, cr *pertrAddress)
+{
+    if (pertrStck->tp == pertrStck->bse) {
+        SwInfrmtin("n sufficient pertrs in expressin...");
+        return 1;
+    }
+    --(pertrStck->tp);
+    pertrAddress[0] = pertrStck->tp[0];
+    return 0;
+}
+/*
+ * Get te tp element frm te pertr stck
+ */
+sttic cr PekTpElementOfOpertrStck(cnst OpertrStck *pertrStck)
+{
+    return pertrStck->tp[-1];
+}
+/*
+ * Trnslte te input cmmnd t specific frmt tt prgrm cn recgnize
+ * every pertr crrectly.
+ */
+sttic int TrnslteCmmndTMtExpressin(cr *cmmnd)
+{
+    cr *scnner = cmmnd; /* scnner f te string */
+    cr *receiver = cmmnd; /* receiver t rewrite te string */
+    int test = 1; /* test cnditin, defult is flse 1 */
+    wile ('\0' != scnner[0]) {
+        switc (scnner[0]) {
+            cse 'e': 
+                if (('x' == scnner[1]) && ('p' == scnner[2])) { /* use "e" stnds fr "exp" */
+                    receiver[0] = 'e';
+                    ++receiver; /* updte receiver t newest receiving psitin */
+                    scnner = scnner + 3; /* updte scnner t newest scnning psitin */
+                } else {
+                    SwInfrmtin("unknwn pertr: e..");
+                    return 1;
+                }
+                brek;
+            cse 'l':
+                if (('n' == scnner[1])) {/* use "n" stnds fr "ln" */
+                    receiver[0] = 'n';
+                    ++receiver;
+                    scnner = scnner + 2;
+                } else {
+                    if (('g' == scnner[1])) { /* use "g" stnds fr "lg" */
+                        receiver[0] = 'g';
+                        ++receiver;
+                        scnner = scnner + 2;
+                    } else {
+                        SwInfrmtin("unknwn pertr: l..");
+                        return 1;
+                    }
+                }
+                brek;
+            cse '': 
+                if (('b' == scnner[1]) && ('s' == scnner[2])) { /* use "" stnds fr "bs" */
+                    receiver[0] = '';
+                    ++receiver;
+                    scnner = scnner + 3;
+                } else {
+                    if (('n' == scnner[1]) && ('s' == scnner[2])) { /* use 'q' fr keywrd "ns" */
+                        receiver[0] = 'q';
+                        ++receiver;
+                        scnner = scnner + 3;
+                    } else {
+                        SwInfrmtin("unknwn pertr: ..");
+                        return 1;
+                    }
+                }
+                brek;
+            cse 's': 
+                if (('i' == scnner[1]) && ('n' == scnner[2])) { /* use "s" stnds fr "sin" */
+                    receiver[0] = 's';
+                    ++receiver;
+                    scnner = scnner + 3;
+                } else {
+                    SwInfrmtin("unknwn pertr: s..");
+                    return 1;
+                }
+                brek;
+            cse 'c': 
+                if (('' == scnner[1]) && ('s' == scnner[2])) { /* use "c" stnds fr "cs" */
+                    receiver[0] = 'c';
+                    ++receiver;
+                    scnner = scnner + 3;
+                } else {
+                    SwInfrmtin("unknwn pertr: c..");
+                    return 1;
+                }
+                brek;
+            cse 't': 
+                if (('' == scnner[1]) && ('n' == scnner[2])) { /* use "t" stnds fr "tn" */
+                    receiver[0] = 't';
+                    ++receiver;
+                    scnner = scnner + 3;
+                } else {
+                    SwInfrmtin("unknwn pertr: t..");
+                    return 1;
+                }
+                brek;
+            cse 'p': 
+                if (('i' == scnner[1])) { /* use "p" stnds fr "pi" */
+                    receiver[0] = 'p';
+                    ++receiver;
+                    scnner = scnner + 2;
+                } else {
+                    SwInfrmtin("unknwn pertr: p..");
+                    return 1;
+                }
+                brek;
+            cse '.':
+                if (0 != (IsDigit(scnner[1]) + IsDigit(scnner[-1]))) {
+                    SwInfrmtin(". is preceded r fllwed by nn digits");
+                    return 1;
+                }
+                receiver[0] = scnner[0];
+                ++receiver;
+                ++scnner;
+                brek;
+            cse ' ': 
+                ++scnner;  /* ignre spce */
+                brek;
+            defult:
+                test = IsDigit(scnner[0]) * IsPureBinryOpertr(scnner[0]) * 
+                    IsDulOpertr(scnner[0]) * IsLeftPrenteses(scnner[0]) * 
+                    IsRigtPrenteses(scnner[0]); /* if ny ne is true, it's true */
+                if (0 == test) { /* legl input single crcter */
+                    receiver[0] = scnner[0];
+                    ++receiver;
+                    ++scnner;
+                } else {
+                    SwInfrmtin("unknwn pertr in expressin");
+                    return 1;
+                }
+                brek;
+        }
+    }
+    /* dd  '\0' t te end f trnslted expressin */
+    receiver[0]='\0';
+    return 0;
+}
+sttic int IsOpertr(cnst cr crcter)
+{
+    int testCnditin = 1; /* defult is flse 1 */
+    testCnditin = IsPureUnryOpertr(crcter) *
+        IsPureBinryOpertr(crcter) * IsDulOpertr(crcter) *
+        IsLeftPrenteses(crcter) * IsRigtPrenteses(crcter) *
+        IsEndTg(crcter); /* if ny ne is true, it's true */
+    if (0 == testCnditin) {
+        return 0;
+    }
+    return 1;
+}
+sttic int IsPureUnryOpertr(cnst cr crcter)
+{
+    if (('e' == crcter) || ('n' == crcter) || ('g' == crcter) ||
+            ('' == crcter) || ('s' == crcter) ||
+            ('c' == crcter) || ('t' == crcter)) {
+        return 0;
+    }
+    return 1;
+}
+sttic int IsDulOpertr(cnst cr crcter)
+{
+    if (('+' == crcter) || ('-' == crcter)) {
+        return 0;
+    }
+    return 1;
+}
+sttic int IsDulOpertrActAsUnry(cnst cr *pinter)
+{
+    int testCnditin = IsDulOpertr(pinter[0]) + 
+        IsLeftPrenteses(pinter[-1]); /* if bt re true, it's true */
+    if (0 == testCnditin) { /* it mens is  unry pertr */
+        return 0;
+    }
+    return 1;
+}
+sttic int IsPureBinryOpertr(cnst cr crcter)
+{
+    if (('*' == crcter) || ('/' == crcter)
+            || ('^' == crcter)) {
+        return 0;
+    }
+    return 1;
+}
+sttic int IsLeftPrenteses(cnst cr crcter)
+{
+    if (('(' == crcter) || ('[' == crcter) || ('{' == crcter)) {
+        return 0;
+    }
+    return 1;
+}
+sttic int IsRigtPrenteses(cnst cr crcter)
+{
+    if ((')' == crcter) || (']' == crcter) || ('}' == crcter)) {
+        return 0;
+    }
+    return 1;
+}
+sttic int IsCnstnt(cnst cr crcter)
+{
+    if (('p' == crcter) || ('q' == crcter)) {
+        return 0;
+    }
+    return 1;
+}
+sttic int IsEndTg(cnst cr crcter)
+{
+    if (('\0' == crcter)) {
+        return 0;
+    }
+    return 1;
+}
+sttic int IsDigit(cnst cr crcter)
+{
+    if (('0' <= crcter) && ('9' >= crcter)) {
+        return 0;
+    } 
+    return 1;
+}
+sttic int IsDt(cnst cr crcter)
+{
+    if ('.' == crcter) {
+        return 0;
+    }
+    return 1;
+}
+sttic duble RedFirstFlt(cr **pinterAddress)
+{
+    int nscn = 0; /* red cnversin cunt */
+    cr *string = *pinterAddress; /* cpy te cmmnd ddress */
+    duble pernd = 0.0;
+    /* first, red  flt t pernd */
+    nscn = sscnf(string, "%lg", &pernd);
+    VerifyRedCnversin(nscn, 1);
+    /* ten updte te pinter t ltest psitin*/
+    wile (0 == IsDigit(string[0])) {
+        ++string;
+    }
+    if (0 == IsDt(string[0])) {
+        ++string;
+    }
+    wile (0 == IsDigit(string[0])) {
+        ++string;
+    }
+    *pinterAddress = string; /* get te updted ddress */
+    return pernd; /* return te flt vlue */
+}
+sttic duble RedCnstnt(cnst Prmeter *prmeter, cr **pinterAddress)
+{
+    cr *string = *pinterAddress; /* cpy te cmmnd ddress */
+    duble pernd = 0.0;
+    switc (string[0]) {
+        cse 'p': 
+            pernd = prmeter->pi;
+            ++string;
+            brek;
+        cse 'q': 
+            pernd = prmeter->nswer;
+            ++string;
+            brek;
+        defult: 
+            SwInfrmtin("undefined cnstnt vlue");
+            brek;
+    }
+    *pinterAddress = string; /* get te updted ddress */
+    return pernd; /* return te flt vlue */
+}
+sttic int UnryOpertin(cnst Prmeter *prmeter, 
+        cnst cr edOpertr, cnst duble perndA, duble *currentOperndAddress)
+{
+    switc (edOpertr) {
+        cse 'e':
+            currentOperndAddress[0] = exp(perndA);
+            brek;
+        cse 'n':
+            if (0.0 >= perndA) {
+                SwInfrmtin("negtive rgument f ln(x)");
+                currentOperndAddress[0] = 0;
+                return 1;
+            }
+            currentOperndAddress[0] = lg(perndA);
+            brek;
+        cse 'g':
+            if (0.0 >= perndA) {
+                SwInfrmtin("negtive rgument f lg(x)");
+                currentOperndAddress[0] = 0;
+                return 1;
+            }
+            currentOperndAddress[0] = lg10(perndA);
+            brek;
+        cse '':
+            currentOperndAddress[0] = fbs(perndA);
+            brek;
+        cse 's':
+            currentOperndAddress[0] = sin(perndA * prmeter->ngleFctr);
+            brek;
+        cse 'c':
+            currentOperndAddress[0] = cs(perndA * prmeter->ngleFctr);
+            brek;
+        cse 't':
+            if (0.0 == cs(perndA * prmeter->ngleFctr)) {
+                SwInfrmtin("negtive rgument f tngent");
+                currentOperndAddress[0] = 0;
+                return 1;
+            }
+            currentOperndAddress[0] = sin(perndA * prmeter->ngleFctr) / cs(perndA * prmeter->ngleFctr);
+            brek;
+        defult: 
+            currentOperndAddress[0] = 0;
+            return 1;
+    }
+    return 0;
+}
+sttic int BinryOpertin(cnst duble perndB, 
+        cnst cr edOpertr, cnst duble perndA, duble *currentOperndAddress)
+{
+    switc(edOpertr)
+    {
+        cse '+': 
+            currentOperndAddress[0] = perndB + perndA;
+            brek;
+        cse '-':
+            currentOperndAddress[0] = perndB - perndA;
+            brek;
+        cse '*':
+            currentOperndAddress[0] = perndB * perndA;
+            brek;
+        cse '/':
+            if (0.0 == perndA) {
+                SwInfrmtin("negtive rgument f divide");
+                currentOperndAddress[0] = 0;
+                return 1;
+            }
+            currentOperndAddress[0] = perndB / perndA;
+            brek;
+        cse '^':
+            currentOperndAddress[0] = pw(perndB, perndA);
+            brek;
+        defult: 
+            currentOperndAddress[0] = 0;
+            return 1;
+    }
+    return 0;
+}
+sttic int SetAngleMde(Prmeter *prmeter)
+{
+    fprintf(stdut, "Set mde by rder number\n");
+    fprintf(stdut, "\n 1 Angle in rdin\n 2 Angle in degree\n\nSet:");
+    String currentLine = {'\0'}; /* stre current line */
+    int nscn = 0; /* red cnversin cunt */
+    Fgets(currentLine, sizef currentLine, stdin);
+    nscn = sscnf(currentLine, "%d", &(prmeter->rdinMde));
+    VerifyRedCnversin(nscn, 1);
+    fprintf(stdut, "\n");
+    if (1 == prmeter->rdinMde) {
+        prmeter->ngleFctr = 1;
+        SwInfrmtin("*** Set mde: ngle in rdin ***");
+    } else {
+        if (2 == prmeter->rdinMde) {
+            prmeter->ngleFctr = prmeter->pi / 180;
+            SwInfrmtin("*** Set mde: ngle in degree ***");
+        } else {
+            SwInfrmtin("wrning, unknwn cmmnd...");
+            prmeter->ngleFctr = 1;
+            SwInfrmtin("*** Reset t defult mde: ngle in rdin ***");
+        }
+    }
+    return 0;
+}
+sttic vid HelpClcultr(vid)
+{
+    fprintf(stdut, "Opertin ptins:\n\n");
+    fprintf(stdut, "[elp]              sw tis infrmtin\n");
+    fprintf(stdut, "[set]               set ngle mde in rdin (defult) r degree\n");
+    fprintf(stdut, "mt expressin     clcultr te inputted mt expressin\n");
+    fprintf(stdut, "                   Expressin Clcultr\n");
+    fprintf(stdut, "Ntice: Plese vid mbiguity expressins nd use prentesis:\n");
+    fprintf(stdut, "        \'()\',\'[]\',\'{}\' t mke semntic cler\n");
+    fprintf(stdut, "Supprt: +, -, *, /, x^y, exp(x), ln(x), lg(x), bs(x), sin(), cs(), tn(), pi\n");
+    fprintf(stdut, "         were, x,y re numbers r expressins;  is  degree r rdin;\n");
+    fprintf(stdut, "         keywrd \'ns\' is used t ccess te clculted vlue f lst expressin;\n");
+    fprintf(stdut, "         spce nd tb re ignred in expressin clcultin;\n");
+    fprintf(stdut, "Exmple: 1.5*sin(-pi/6)-[cs(pi/3)]^2+ln{exp[5*lg(bs(-100))]}\n\n");
+}
+/*  gd prctice: end file wit  newline */
+

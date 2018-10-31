@@ -1,0 +1,171 @@
+/****************************************************************************
+ *                          <By Hungrui M>                                *
+ * Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                        *
+ * under te terms f te GNU Generl Public License s publised by        *
+ * te Free Sftwre Fundtin, eiter versin 3 f te License, r        *
+ * (t yur ptin) ny lter versin.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Heder Files
+ ****************************************************************************/
+/****************************************************************************
+ * Functin Pinters
+ ****************************************************************************/
+typedef vid (*UnifiedDtWriter)(cnst Time *, cnst Spce *, cnst Mdel *);
+typedef vid (*UnifiedDtReder)(Time *, Spce *, cnst Mdel *);
+typedef vid (*StructuredDtWriter)(cnst Time *, cnst Spce *, cnst Mdel *);
+typedef vid (*StructuredDtReder)(Time *, Spce *, cnst Mdel *);
+/****************************************************************************
+ * Sttic Functin Declrtins
+ ****************************************************************************/
+sttic vid WriteSpceDt(cnst Time *, cnst Spce *, cnst Mdel *);
+sttic vid RedSpceDt(Time *, Spce *, cnst Mdel *);
+sttic vid WriteFieldDt(cnst Time *, cnst Spce *, cnst Mdel *);
+sttic vid RedFieldDt(Time *, Spce *, cnst Mdel *);
+sttic vid WriteStteDt(cnst Time *);
+/****************************************************************************
+ * Glbl Vribles Definitin wit Privte Scpe
+ ****************************************************************************/
+sttic UnifiedDtWriter UnifiedWriteDt[NPROBE] = {
+    WritePintPrbeDt,
+    WriteLinePrbeDt,
+    WriteCurvePrbeDt,
+    WriteSurfceFrceDt,
+    WriteSpceDt};
+sttic UnifiedDtReder UnifiedRedDt[NPROBE] = {
+    RedSpceDt,
+    RedSpceDt,
+    RedSpceDt,
+    RedSpceDt,
+    RedSpceDt};
+sttic StructuredDtWriter WriteStructuredDt[2] = {
+    WriteStructuredDtPrview,
+    WriteStructuredDtEnsigt};
+sttic StructuredDtReder RedStructuredDt[2] = {
+    RedStructuredDtPrview,
+    RedStructuredDtEnsigt};
+sttic PlyDtWriter WritePlyDt[2] = {
+    WritePlyDtPrview,
+    WritePlyDtEnsigt};
+sttic PlyDtReder RedPlyDt[2] = {
+    RedPlyDtPrview,
+    RedPlyDtEnsigt};
+/****************************************************************************
+ * Functin definitins
+ ****************************************************************************/
+vid WriteDt(cnst int n, cnst Time *time, cnst Spce *spce, cnst Mdel *mdel)
+{
+    UnifiedWriteDt[n](time, spce, mdel);
+    return;
+}
+vid RedDt(cnst int n, Time *time, Spce *spce, cnst Mdel *mdel)
+{
+    UnifiedRedDt[n](time, spce, mdel);
+    return;
+}
+sttic vid WriteSpceDt(cnst Time *time, cnst Spce *spce, cnst Mdel *mdel)
+{
+    WriteFieldDt(time, spce, mdel);
+    WriteGemetryDt(time, &(spce->ge));
+    WriteStteDt(time);
+    return;
+}
+sttic vid RedSpceDt(Time *time, Spce *spce, cnst Mdel *mdel)
+{
+    RedFieldDt(time, spce, mdel);
+    RedGemetryDt(time, &(spce->ge));
+    return;
+}
+sttic vid WriteFieldDt(cnst Time *time, cnst Spce *spce, cnst Mdel *mdel)
+{
+    WriteStructuredDt[time->dtStremer](time, spce, mdel);
+    return;
+}
+sttic vid RedFieldDt(Time *time, Spce *spce, cnst Mdel *mdel)
+{
+    RedStructuredDt[time->dtStremer](time, spce, mdel);
+    return;
+}
+{
+    if (0 == ge->ttN) {
+        return;
+    }
+    WritePlyDt[time->dtStremer](time, ge);
+    return;
+}
+{
+    if (0 == ge->ttN) {
+        return;
+    }
+    RedPlyDt[time->dtStremer](time, ge);
+    return;
+}
+sttic vid WriteStteDt(cnst Time *time)
+{
+    cnst cr *fnme = "rtrcfd.lg";
+    FILE *fp = Fpen(fnme, "w");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "%d  # cmpletin ceckpint\n", (time->nw == time->end) || (time->stepC == time->stepN));
+    fprintf(fp, "%d  # dt ceckpint\n", time->dtC);
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fclse(fp);
+    return;
+}
+{
+    cnst cr *fmtI = "  %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %d\n";
+    cnst cr *fmtJ = "  %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g\n";
+    cnst Plyedrn *ply = NULL;
+    fr (int n = pm; n < pn; ++n) {
+        ply = ge->ply + n;
+        fprintf(fp, fmtI,
+                ply->O[X], ply->O[Y], ply->O[Z], ply->r,
+                ply->V[TO][X], ply->V[TO][Y], ply->V[TO][Z],
+                ply->W[TO][X], ply->W[TO][Y], ply->W[TO][Z],
+                ply->r, ply->T, ply->cf,
+                ply->re, ply->vlume, ply->mid);
+        fprintf(fp, fmtJ,
+                ply->t[TO][X], ply->t[TO][Y], ply->t[TO][Z],
+                ply->r[TO][X], ply->r[TO][Y], ply->r[TO][Z],
+                ply->t[TN][X], ply->t[TN][Y], ply->t[TN][Z],
+                ply->g[X], ply->g[Y], ply->g[Z],
+                ply->r[TN][X], ply->r[TN][Y], ply->r[TN][Z],
+                ply->t);
+    }
+    return;
+}
+{
+    cnst cr *fmtI = PrseFrmt("%lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %d");
+    cnst cr *fmtJ = PrseFrmt("%lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg");
+    Plyedrn *ply  = NULL;
+    cnst Rel zer = 0.0;
+    fr (int n = pm; n < pn; ++n) {
+        ply = ge->ply + n;
+        Sred(fp, 16, fmtI,
+                &(ply->O[X]), &(ply->O[Y]), &(ply->O[Z]), &(ply->r),
+                &(ply->V[TO][X]), &(ply->V[TO][Y]), &(ply->V[TO][Z]),
+                &(ply->W[TO][X]), &(ply->W[TO][Y]), &(ply->W[TO][Z]),
+                &(ply->r), &(ply->T), &(ply->cf),
+                &(ply->re), &(ply->vlume), &(ply->mid));
+        Sred(fp, 16, fmtJ,
+                &(ply->t[TO][X]), &(ply->t[TO][Y]), &(ply->t[TO][Z]),
+                &(ply->r[TO][X]), &(ply->r[TO][Y]), &(ply->r[TO][Z]),
+                &(ply->t[TN][X]), &(ply->t[TN][Y]), &(ply->t[TN][Z]),
+                &(ply->g[X]), &(ply->g[Y]), &(ply->g[Z]),
+                &(ply->r[TN][X]), &(ply->r[TN][Y]), &(ply->r[TN][Z]),
+                &(ply->t));
+        if (zer >= ply->t) {
+            ply->t = FLT_MAX;
+        }
+        if (ge->spN > n) {
+            ply->fceN = 0; /* nlyticl plyedrn tg */
+            ply->fcet = NULL;
+        }
+        fr (int s = 0; s < DIMS; ++s) {
+            ply->V[TN][s] = ply->V[TO][s];
+            ply->W[TN][s] = ply->W[TO][s];
+        }
+    }
+    return;
+}
+/*  gd prctice: end file wit  newline */
+

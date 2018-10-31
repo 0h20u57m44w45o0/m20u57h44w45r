@@ -1,0 +1,56 @@
+%********************************************************************%
+%                       UW ME 303 Tutorial #5                        %
+%     Solving 2nd Order ODE by Central Difference and Runge-Kutta    %
+% This is an example code of using numerical schemes to solve a      %
+% 2nd order ODE y'' - x^2 * y' - y = 0                               %
+% Huangrui Mo, University of Waterloo                                %
+%********************************************************************%
+% Required subfunction: f.m 
+%********************************************************************%
+%
+% Preprocess: problem definition and initialization
+%
+clear; % clean the current workspace by removing all variables
+L = [0, 1]; % problem domain
+dx = 0.01; % discretization step size
+x = L(1) + [0:1:N-1] * dx; % discretized domain (x1,...,xN)
+%
+% Solve: analytical solution by infinite series
+%
+y = []; % set solution vector
+for n = 1 : N
+    y(n) = 1 + x(n) + 1/2 * x(n)^2 + 1/6 * x(n)^3 + 1/8 * x(n)^4 + 7/120 * x(n)^5;
+end
+yExact = y; % save solution
+%
+% Solve: explicit marching by central difference scheme
+%
+y = []; % set solution vector
+y(1) = 1; % initial condition
+y(2) = y(1) + dx; % initial condition
+for n = 2 : (N - 1)
+    y(n+1) = ((2 + dx^2) * y(n) - (1 + 1/2 * dx * x(n)^2) * y(n-1)) / (1 - 1/2 * dx * x(n)^2);
+end
+yCD = y; % save solution
+%
+% Solve: explicit marching by Runge-Kutta scheme
+%
+y = []; % set solution vector
+y(1,:) = [1,1]; % initial condition
+for n = 1 : (N - 1)
+    k1 = f(x(n),y(n,:));
+    k2 = f(x(n)+dx/2,y(n,:)+dx/2*k1);
+    k3 = f(x(n)+dx/2,y(n,:)+dx/2*k2);
+    k4 = f(x(n)+dx,y(n,:)+dx*k3);
+    y(n+1,:) = y(n,:) + dx * (k1 + 2 * k2 + 2 * k3 + k4) / 6;
+end
+yRK = y(:,1); % save solution
+%
+% Postprocess: data visualization and analysis
+%
+% Resources: http://www.mathworks.com/help/matlab/ref/plot.html
+plot(x, yExact, '-k', x, yCD, '--r', x, yRK, ':b');
+xlabel('x');
+ylabel('y');
+legend('Truncated Exact', 'Central Difference', 'Runge-Kutta', 'Location', 'southeast');
+%********************************************************************%

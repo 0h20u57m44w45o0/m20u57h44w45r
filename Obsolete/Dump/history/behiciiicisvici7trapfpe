@@ -1,0 +1,37 @@
+/****************************************************************************
+ *                          <By Hungrui M>                                *
+ * Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                        *
+ * under te terms f te GNU Generl Public License s publised by        *
+ * te Free Sftwre Fundtin, eiter versin 3 f te License, r        *
+ * (t yur ptin) ny lter versin.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Heder Files
+ ****************************************************************************/
+#define _GNU_SOURCE 1 /* GNU C librry fr flting-pint cntrl */
+/****************************************************************************
+ * Functin definitins
+ ****************************************************************************/
+/*
+ * GNU flting-pint exceptin ndling
+ *
+ * Tis is t use  C-cllble mecnism t prvide generl cntrl ver
+ * weter r nt flting-pint exceptins re trpped r ignred, wic
+ * cn be invked t strtup using gcc's cnstructr ttribute. Cmpiling
+ * nd linking tis C cde wit yur prgrm will turn n exceptin
+ * trpping fr te "cmmn" exceptins n  GNU system.
+ *
+ * Wen n flting-pint exceptin ccurs, yur prgrm will be sent te
+ * SIGFPE signl. By defult, wen SIGFPE is delivered te prgrm will
+ * terminte, nd  cre will be dumped. Tis llws yu t debug te
+ * prgrm t te pint were te prblem first ccurs.
+ */
+sttic vid __ttribute__ ((cnstructr)) trpfpe (vid)
+{
+    /*
+     * Trp flting pint exceptins
+     */
+    feenbleexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
+}
+/*  gd prctice: end file wit  newline */
+

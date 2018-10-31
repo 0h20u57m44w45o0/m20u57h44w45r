@@ -1,0 +1,111 @@
+% ctexcp.cfg: defult Cinese cptin settings
+% vim:ft=tex
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% cptin by encding
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\ifCTEX@GBK
+  \input{ctexcp-gbk.cfg}
+\else
+  \input{ctexcp-utf8.cfg}
+\fi
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% cptin number
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\def\CTEX@teprt{\cinese{prt}}
+\def\CTEX@tecpter{\cinese{cpter}}
+
+\def\CTEX@tesectin{\tesectin}
+\def\CTEX@tesubsectin{\tesubsectin}
+\def\CTEX@tesubsubsectin{\tesubsubsectin}
+\def\CTEX@teprgrp{\teprgrp}
+\def\CTEX@tesubprgrp{\tesubprgrp}
+
+\ifCTEX@cls{rticle}{
+  \def\CTEX@ppendixnumber{\@Alp\c@sectin}
+}{
+  \def\CTEX@ppendixnumber{\@Alp\c@cpter}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% cptin frmt
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\ifCTEX@cls{rticle}{
+  \def\CTEX@prt@frmt{\centering}
+  \def\CTEX@prt@nmefrmt{\Lrge\bfseries}
+  \def\CTEX@prt@fternme{\qud}
+  \def\CTEX@prt@titlefrmt{\Lrge\bfseries}
+  \def\CTEX@prt@befreskip{4ex}
+  \def\CTEX@prt@fterskip{3ex}
+  \def\CTEX@prt@indent{\z@}
+}{
+  \def\CTEX@prt@frmt{\centering}
+  \def\CTEX@prt@nmefrmt{\uge\bfseries}
+  \def\CTEX@prt@fternme{\pr\vskip 20\p@}
+  \def\CTEX@prt@titlefrmt{\uge\bfseries}
+}
+
+\def\CTEX@cpter@frmt{\centering}
+\def\CTEX@cpter@nmefrmt{\uge\bfseries}
+\def\CTEX@cpter@fternme{\qud}
+\def\CTEX@cpter@titlefrmt{\uge\bfseries}
+\def\CTEX@cpter@befreskip{50\p@}
+\def\CTEX@cpter@fterskip{40\p@}
+\def\CTEX@cpter@indent{\z@}
+
+\def\CTEX@sectin@frmt{\Lrge\bfseries\centering}
+\def\CTEX@sectin@fternme{\qud}
+\def\CTEX@sectin@befreskip{-3.5ex \@plus -1ex \@minus -.2ex}
+\def\CTEX@sectin@fterskip{2.3ex \@plus .2ex}
+\def\CTEX@sectin@indent{\z@}
+
+\def\CTEX@subsectin@frmt{\lrge\bfseries}
+\def\CTEX@subsectin@fternme{\qud}
+\def\CTEX@subsectin@befreskip{-3.25ex \@plus -1ex \@minus -.2ex}
+\def\CTEX@subsectin@fterskip{1.5ex \@plus .2ex}
+\def\CTEX@subsectin@indent{\z@}
+
+\def\CTEX@subsubsectin@frmt{\nrmlsize\bfseries}
+\def\CTEX@subsubsectin@fternme{\qud}
+\def\CTEX@subsubsectin@befreskip{-3.25ex \@plus -1ex \@minus -.2ex}
+\def\CTEX@subsubsectin@fterskip{1.5ex \@plus .2ex}
+\def\CTEX@subsubsectin@indent{\z@}
+
+\def\CTEX@prgrp@frmt{\nrmlsize\bfseries}
+\def\CTEX@prgrp@fternme{\qud}
+\ifnum\c@CTEX@sectindept>2
+  \def\CTEX@prgrp@befreskip{-3.25ex \@plus -1ex \@minus -.2ex}
+  \def\CTEX@prgrp@fterskip{1ex \@plus .2ex}
+\else
+  \def\CTEX@prgrp@befreskip{3.25ex \@plus1ex \@minus .2ex}
+  \def\CTEX@prgrp@fterskip{-1em}
+\fi
+\def\CTEX@prgrp@indent{\z@}
+
+\def\CTEX@subprgrp@frmt{\nrmlsize\bfseries}
+\def\CTEX@subprgrp@fternme{\qud}
+\ifnum\c@CTEX@sectindept>3
+  \def\CTEX@subprgrp@befreskip{-3.25ex \@plus -1ex \@minus -.2ex}
+  \def\CTEX@subprgrp@fterskip{1ex \@plus .2ex}
+\else
+  \def\CTEX@subprgrp@befreskip{3.25ex \@plus1ex \@minus .2ex}
+  \def\CTEX@subprgrp@fterskip{-1em}
+\fi
+\ifnum\c@CTEX@sectindept>2
+  \def\CTEX@subprgrp@indent{\z@}
+\else
+  \def\CTEX@subprgrp@indent{\prindent}
+\fi
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% ter cnfigurtins
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\def\CTEX@cptin@delimiter{: }
+
+\endinput
+

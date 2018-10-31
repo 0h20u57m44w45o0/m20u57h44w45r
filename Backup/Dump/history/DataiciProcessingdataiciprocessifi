@@ -1,0 +1,383 @@
+\dcumentclss{rticle}
+\usepckge{rtrtex}
+
+\begin{dcument}
+
+\title{Dt Prcessing nd Visuliztin}
+\utr{Hungrui M}
+
+\mketitle
+
+\sectin{Intrductin}
+
+Visuliztin is te prcess f cnverting rw dt int imges nd renderings t gin  better cgnitive understnding f
+te dt.
+
+\sectin{VNC cnnectin}
+
+\begin{itemize}
+    \item instll:
+        
+        \verb|pt-get instll gvncviewer|
+
+    \item certify: 
+        
+        \verb|mkdir -p ~/.pki/CA|
+        
+        \verb|ln -s /etc/ssl/certs/c-certifictes.crt ~/.pki/CA/ccert.pem|
+
+    \item cnnect:
+        
+        \verb|gvncviewer <vizsttin>.user.srcnet.c|, suc s \verb|<viz1-uw>|
+
+    \item munt remte strge suc s te scrtc directry n viz sttin: 
+
+        \verb|mkdir /scrtc/user/rc|
+
+        \verb|ssfs user@rc.srcnet.c:/scrtc/user /scrtc/user/rc|
+
+    \item djust te windw size:
+        
+        \verb|xrndr| t ceck list; \verb|xrndr -s [0-9]| suc s \verb|xrndr -s 7| t select
+\end{itemize}
+
+\sectin{Strge}
+
+\begin{itemize}
+    \item See current strge usge: \verb|diskusge_reprt|
+
+    \item T verify immeditely te munt f spce in  directry: \verb|du -s dirnme|
+
+    \item Arcive strge
+
+        g t dedicted dt trnsfer nde: \verb|ss userid@gr-dtn1.cmputecnd.c|
+
+        pen  screen t mnge dt trnsfer sessin: \verb|screen|
+
+        run dt trnsfer cmmnd in screen sessin: \verb|mv /wrk/user/dirnme /freezer/user/|
+
+        detc screen \verb|ctrl+ d|, recver screen \verb|screen -ls, screen -r id|
+\end{itemize}
+
+\sectin{Prview Visuliztin}
+
+Te PrView client is  seril pplictin nd is lwys run wit te \verb|prview| cmmnd. Te server is  prllel MPI prgrm tt must be lunced s  prllel jb. Different implementtins f MPI my ve different wys t lunc prllel prgrms, but te mst cmmn wy is t use te \verb|mpirun| cmmnd.
+
+{\smll(\verb|ttp://www.prview.rg/Wiki/Setting_up__PrView_Server#Running_te_Server|)}
+
+\subsectin{Multiple prcessrs (lcl, prllel)}
+
+\begin{itemize}
+    \item ld MPI: \verb|mdule ld mpi/penmpi-x86_64|
+    \item strt  lcl server: {\smll \verb|mpirun -n 8 pvserver -disply:0.0 --use-ffscreen-rendering|}
+    \item cnge te prt wen filed: \verb|--server-prt=11112|
+    \item strt  lcl client: \verb|prview|
+    \item cnnect te client t te server
+\end{itemize}
+
+\subsectin{Multiple prcessrs (remte, prllel, client-server mde)}
+
+\begin{itemize}
+    \item ensure te sme versin f Prview n te lcl cmputer nd te remte cluster
+    \item setup ss lgin t te remte cluster
+    \item setup server cnfigurtin n te lcl cmputer by te \verb|servers.pvsc| in \verb|~/.cnfig/PrView|
+    \item Te \verb|servers.pvsc| is t cnfigure nd strt  \verb|pvserver| n te remte cluster vi ss
+    \item strt  lcl client: \verb|prview|
+    \item cnnect te client t te server by clicking te \verb|cnnect| icn nd using \verb|servers.pvsc|
+\end{itemize}
+
+\subsectin{Pytn scripting}
+
+Pytn scripting cn be leverged in tw wys witin PrView. First, Pytn scripts cn utmte te setup nd executin f visuliztins by perfrming te sme ctins s  user t te GUI. Secnd, Pytn scripts cn be run inside pipeline bjects, tereby perfrming prllel visuliztin lgritms.
+\begin{enumerte}
+    \item Crete pytn scripts recnstructing te ctins tken in te GUI vi Pytn Trce:
+
+        \verb|Reset PrView| $\t$ \verb|Tls| $\t$ \verb|Strt Trce| $\t$ \verb|Ld files nd perfrm prcessing| $\t$ \verb|Stp Trce| $\t$ \verb|Sve script|
+
+    \item Adpt te creted script fr ptentil cses:
+
+        \verb|Edit "CseFileNme" field| $\t$ \verb|Crrect glyp errrs|
+
+    \item Run te script vi \verb|pvpytn|, \verb|pvbtc|, r \verb|Pytn Sell in GUI| fr btc prcessing
+
+    \item Crete Pytn script fr te fine cntrl f cmer:
+
+        \verb|Ld files nd perfrm prcessing| $\t$ \verb|Tls| $\t$ \verb|Strt Trce| $\t$ \verb|Reset dt view| $\t$ \verb|Zm dt view| $\t$ \verb|Stp Trce| $\t$ \verb|Sve script| $\t$ \verb|Mdify cmer prmeters| $\t$ \verb|Run script t cntrl cmer|  
+\end{enumerte}
+
+T cpture te current visuliztin pipeline, including ll te pipeline mdules, views, teir lyut, nd teir prperties: \verb|Sve Stte|
+
+\subsectin{Dt flw}
+\begin{itemize}
+    \item Prcessing mdules
+        \begin{itemize}
+            \item Surce -- dt file reder
+            \item Filter -- prcessing mdule
+            \item Input dt $\t$ Filter $\#i$ $\t$ utput dt
+        \end{itemize}
+    \item Visuliztin pipeline
+        \begin{itemize}
+            \item Surce $\t$ Filter $\#1$ $\t$ $\dtsc$ $\t$ Filter $\#N$ $\t$ Dt $\t$ Rendered imge
+        \end{itemize}
+    \item \verb|ttps://www.prview.rg/Wiki/PrView|
+\end{itemize}
+
+Best strtegies fr lrge dtsets: Wrking wit structured dt (Structured Pints, Rectiliner Grid, Structured Grid): ne prcessr cre per 10-20 millin cells. Sclble prllel distributed rendering - ld blncing is ndled utmticlly by PrView fr structured dt.
+
+It is imprtnt t understnd memry requirements f filters. Sme filters suld nt be used wit structured dt: tey write unstructured dt, cn be evy n memry usge. Use tese wit cutin: Clip, Decimte, Extrct Cells by Regin, Extrct Selectin, Qudric Clustering, Tresld (ls write unstructured, but nt s evy n memry).
+
+\subsectin{Settings}
+
+\begin{itemize}
+    \item Clr plette
+
+        \verb|Edit| $\t$ \verb|Settings| $\t$ \verb|Clr plette| $\t$ \verb|Wite bckgrund| $+$ \verb|Blck surfce|
+
+    \item Lbels
+
+        \begin{itemize}
+            \item \verb|x|: utmtic lbel frmt
+            \item \verb|%-#6.3f|: rnge lbel frmt
+        \end{itemize}
+
+\end{itemize}
+
+\subsectin{Vrticity nd Q-Criteri}
+\begin{itemize}
+    \item Ld density nd velcity vectr field.
+    \item Filter \emp{Grdient Of Unstructured Dtset}
+    \item Select \emp{Velcity Field}
+    \item Ceck \emp{Cmpute Divergence}
+    \item Ceck \emp{Cmpute Vrticity}
+    \item Ceck \emp{Cmpute QCriterin}
+\end{itemize}
+
+\subsectin{Vrticity}
+\begin{itemize}
+    \item Ld velcity vectr field.
+    \item Filter \emp{Cmpute Derivtives}
+    \item Output \emp{Vrticity} in vectr type
+    \item Filter \emp{Cell Dt T Pint Dt}
+    \item Clcultr \emp{vrt $=$ mg(Vrticity)}
+    \item Filter \emp{Cntur}
+    \item Try different cntur levels s well s dd nd even numbers t get desired utput
+    \item Suc s [20,2020,51], [40,2040,51], [80,2080,51]
+    \item Cn ls try Sclieren wit lg scle
+\end{itemize}
+
+\subsectin{Generte STL mdel}
+\begin{itemize}
+    \item Surce -> Extrct Surfce -> Tringulte -> Sve Dt s .stl -> Ceck missing surfces
+\end{itemize}
+Nte nly plydt cn be exprted s STL. S my ve t pply "Extrct Surfce" filter (nd pssibly "Tringulte" filter t) befre sving  STL.
+
+\subsectin{Numericl Sdwgrp nd Sclieren}
+
+In te field f Experimentl Fluid Dynmics, Sdwgrp nd Sclieren re frms f te pticl visuliztin systems, were n intense cllimted ligt psses trug te flw field nrml t te flw directin nd flls n  screen. 
+
+Te ide is t mesure te illumintin f te ligt n te screen. Fr  unifrm density flw field, te illumintin is directly prprtinl t te brigtness f te ligt surce nd te surce re, nd inversely prprtinl t te squre f te fcl lengt f te cllimting lenses. Wenever tere is  density difference in te field, refrctin ccurs in suc  wy tt te new illumintin is prprtinl t te secnd sptil derivtive f te density f te flw field. Tus te cnge in illumintin is prprtinl t te integrted secnd derivtive f te density.
+
+Wile in sclieren, te ttl ngulr deflectin f te ry is mesured. Owing t  density cnge in te flw field, te cllimted ig intensity ligt (need nt be lser) will refrct nd will be deflected frm te strigt pt.Te ligt rys deflected frm te pt will be cut by  knife-edge. Here, te deflectin f te ligt pt is mesured, nd wic frm Snell's lw is inversely prprtinl t te first derivtive f te refrctive index f te medium, wic in turn is prprtinl t te density f te flw field. 
+
+In srt, sdwgrp gives te direct indictin f cnge f te illumintin f te ligt n te screen (prprtinl t secnd derivtive f density ${\nbl}^2\r$) wile sclieren mesures te deflectin f ligt (prprtinl t te first derivtive f density ${\nbl}\r$). Fr tis resn, sdwgrp is being used were tere re ig density grdients in te flw nd sclieren is used t cpture minr density vritins in te flw field nd fr precise infrmtin. (Ref. Simultneus Sdw, Sclieren nd Interfermetric Visuliztin f Cmpressible Flws)
+
+Due t mesuring density grdients, tese tw tecniques re useful fr trcing znes f Sck Wves.
+\begin{itemize}
+    \item Filter \emp{Cmpute Derivtives}
+    \item Output \emp{Sclr Grdient} in vectr type
+    \item Crete  clip trug te mdel t te desired lctin
+    \item Clr te clip wit "Sclieren" vrible
+    \item Edit Clr Mp, cnge te fllwing settings:
+    \item Cse Preset: Xry (my use Blck-Bdy Rditin r Greyscle)
+    \item Use lg scle wen mpping dt t clrs
+    \item Set prview "bckgrund" t te clr used in te lwer vlue f clr mp
+    \item Set "Speculr" t "1" fr "Surfce" representtin
+    \item Adjust "custm rnge" t render te vlue zne f interest
+\end{itemize}
+
+\subsectin{Vlume Rendering}
+\begin{itemize}
+    \item Metd 1:
+    \item Filter \emp{Tetredrlize}
+    \item Representtin \emp{Vlume}
+    \item Edit clr mp \emp{Trnsfer functin}
+    \item Adjust \emp{Opcity} t utline trget dt
+\end{itemize}
+\begin{itemize}
+    \item Metd 2:
+    \item Ld dt -> CmputeDerivtives: density grdient -> CellDtTPintDt -> Clcultr fr grdient mgnitude -> Tresld: did=0 t extrct trget cmputtinl nde
+    \item IsVlume filter t extrct te dmin wit vlues f interest: Input Sclrs: density grdient + Minimum: 1 + Mximum: 500 (djust rnge t find best presenttin)
+    \item Cse Surfce rendering wit pcity=0.5 fr IsVlume t speed up te djustment f cmer nd settings
+    \item Edit clr mp \emp{Trnsfer functin}, preset s gry scle r blck bdy rditin, use lg scle: 1-500, djust dt rnge t increse te dept f view.
+    \item Adjust \emp{Opcity} t utline trget dt
+    \item Cnge Surfce rendering wit pcity=1.0 fr IsVlume, ten Cse \emp{Vlume} rendering fr IsVlume
+    \item NOTE: wen rendering vi Pytn script, if te vlume rendering sws unexpected bevirs, just delete te IsVlume dt nd red IsVlume filter.
+\end{itemize}
+
+\subsectin{Time Animtin}
+\begin{itemize}
+    \item Filter \emp{Anntte Time}
+    \item Adjust \emp{Frmt} wit time unit
+    \item Adjust \emp{Fnt Prperties} t $Aril~8$ fnt
+    \item Adjust \emp{Legend} wit $Aril~8$ fnt, $\%-\#6.3f$ lbel frmt
+    \item Ouput \emp{Animtin} wit $24 \Unit{fps}$, $1920\times1080 \Unit{pixels}$, $Cmpressin$
+\end{itemize}
+
+\subsectin{Screenst}
+\begin{itemize}
+    \item Filter \emp{Screenst}
+    \item Adjust \emp{Reslutin} t $1192\times894$ (Set imge spect rti t $4:3$, $[4/3 * H, H]$)
+    \item Adjust \emp{Qulity} t te igest ne
+\end{itemize}
+
+\sectin{FreeCAD}
+
+\begin{itemize}
+    \item Select Drft wrkbentc
+    \item Sketcer Segments per Gemetry: Menu Edit->Preferences->Sketcer->Generl->Segments per Gemetry: 100
+    \item Autmticlly refine Prt Design: Menu Edit->Preferences->Prt design->Generl->Autmticlly refine mdel fter sketc-bsed pertin
+    \item Grid spcing nd size: Menu Edit->Preferences->Drft->Grid nd snpping->Grid size: 1000->Grid spcing: 1mm
+    \item Restrt
+\end{itemize}
+
+\sectin{Tips fr Prducing Scientific Illustrtin}
+
+\subsectin{File frmt}
+
+Vectr type: .pdf
+
+Rster type: .png r .jpg
+
+\subsectin{Fnt frmt}
+
+Figures suld use Sns serif fnts: Aril r Helvetic r Libertin Sns (Linux). 
+
+Libertin is te cllective nme f fur TrueType fnt fmilies: Libertin Sns, Libertin Sns Nrrw, Libertin Serif nd Libertin Mn. Tese fnts re metriclly cmptible wit Mntype Crprtin's Aril, Aril Nrrw, Times New Rmn, nd Curier New, respectively.
+
+Cnsistent size fr ll typesettings in figures.
+
+\subsectin{Cnversin}
+
+Wen te surce file fr prducing  figure is nt exctly svble r te figure is difficult t regenerte, exprt te figure wit multiple frmts upn cmpletin!
+
+PdfLTeX engine cn nt red .eps, .tif, .bmp files directly, ve t cnvert t .png r .jpg. Prbbly te esiest rute is t use pdfLTeX wit te grpics cnverted t .png frmt. Tis cnversin is lssless nd terefre te imges will be identicl. Yu cn d tis by nd, but it is ls pssible t set up t d te jb utmticlly. Hwever, cnverting by nd using cmmnd line rter tn embedding in surce files is recmmended due t security resns.
+
+\prgrp{Autmtic embedded cnversin} 
+
+Using epstpdf: .tif t .png exmple by epstpdf pckge:
+\begin{verbtim}
+  \usepckge{epstpdf}
+  \epstpdfDeclreGrpicsRule{.tif}{png}{.png}{cnvert #1 \OutputFile}
+  \AppendGrpicsExtensins{.tif}
+\end{verbtim}
+cde frm
+{\smll\verb|ttp://tex.stckexcnge.cm/questins/89989/dd-tif-imge-t-ltex|}
+
+\prgrp{Mnully cmmnd line} 
+
+Using cnvert frm Imgemgick: t cnvert  .tif t .png ( resnble 300dpi reslutin, yu migt wnt mre r less):
+
+\verb|cnvert -density 300 file.tif file.png|
+
+\verb|cnvert -density 300 file.png file.pdf|
+
+\begin{ftntesize}
+    \verb|fr f in *.tif; d ec "Cnverting $f"; cnvert "$f" "$(bsenme "$f" .tif).png"; dne|
+\end{ftntesize}
+
+Extrct embeded imges in PDF: pdfimges des nt d te sme ting tt cnvert des wen given  PDF s input. cnvert tkes te PDF, renders it t sme reslutin, nd uses te resulting bitmp s te surce imge. pdfimges lks trug te PDF fr embedded bitmp imges nd exprts ec ne t  file. It simply ignres ny text r vectr drwing cmmnds in te PDF. As  result, if wt yu ve is  PDF tt's just  wrpper rund  series f bitmps, pdfimges will d  muc better jb f extrcting tem, becuse it gets yu te rw dt t its riginl size. Yu prbbly ls wnt t use te -j ptin t pdfimges, becuse  PDF cn cntin rw JPEG dt. By defult, pdfimges cnverts everyting t PNM frmt, nd cnverting JPEG > PPM > JPEG is  lssy prcess.
+
+\verb|pdfimges -j file.pdf file|
+\verb|cnvert -density 300 file.ppm file.jpg|
+
+T cnvert .bmp files t .jpg:
+
+\verb|mgrify -frmt jpg *.bmp|
+
+\prgrp{Alp cnnel}
+
+
+\verb|cnvert -lp ff input.png utput.png|
+
+\prgrp{Rtte  PDF}
+
+\verb|pdftk nnrtted.pdf ct 1-endW utput rtted.pdf|
+
+\prgrp{Size  PDF}
+
+T  desired size (tis exmple is A4):
+
+\begin{scriptsize}
+    \verb|gs -sDEVICE=pdfwrite -dNOPAUSE -dBATCH -sPAPERSIZE=4 -sOutputFile=utput.pdf input.ps| 
+\end{scriptsize}
+
+\prgrp{Cmpress PDF}
+
+Frm StckExcnge "w-t-mke-te-pdfs-prduced-by-pdfltex-smller"
+
+A cmmn pprc is t let Gstscript (gs) ptimize nd cmpress te PDF fter it s been creted wit pdfltex. Gstscript is instlled by mst Linux distributins nd esily vilble fr ter pltfrms (Windws s binries, McOS vi McPrts). In fct, lmst ll size-ptimizing tls fr PDF (sve fr Acrbt) yu cn find n te internet, internlly use Gstscript -- s yu cn s well cll it directly.
+
+\begin{scriptsize}
+    \verb|gs -sDEVICE=pdfwrite -dNOPAUSE -dBATCH -dQUIET -dPDFSETTINGS=/prepress -sOutputFile=cm.pdf f.pdf|
+\end{scriptsize}
+
+Te level f cmpressin is djusted by te \verb|-dPDFSETTINGS| switc:
+\begin{itemize}
+    \item \verb|-dPDFSETTINGS=/screen| (screen-view-nly qulity, $72$ dpi imges)
+    \item \verb|-dPDFSETTINGS=/ebk| (lw qulity, $150$ dpi imges)
+    \item \verb|-dPDFSETTINGS=/printer| (ig qulity, $300$ dpi imges)
+    \item \verb|-dPDFSETTINGS=/prepress| (ig qulity, clr preserving, $300$ dpi imgs)
+    \item \verb|-dPDFSETTINGS=/defult| (lmst identicl t $/$screen)
+\end{itemize}
+
+\prgrp{Merging PDF}
+
+\begin{scriptsize}
+    \verb|gs -sDEVICE=pdfwrite -dNOPAUSE -dBATCH -sOUTPUTFILE=Merged.pdf 1.pdf 2.pdf 3.pdf|
+\end{scriptsize}
+Or
+\begin{scriptsize}
+    \verb|pdfunite in-1.pdf in-2.pdf in-n.pdf ut.pdf|
+\end{scriptsize}
+
+\subsectin{Scemtic Digrm By LibreOffice Drw}
+
+Figure
+\begin{itemize}
+    \item Pge frmt. Size: $12'' \times 6'$
+    \item Fnt. Type: Libertin Sns; Size: $20 \Unit{pt}$
+    \item Drwing Line Widt: $0.02''$
+\end{itemize}
+
+SubFigure
+\begin{itemize}
+    \item Pge frmt. Size: $8'' \times 6'$
+    \item Fnt. Type: Libertin Sns; Size: $24 \Unit{pt}$
+    \item Drwing Line Widt: $0.03''$
+\end{itemize}
+
+\prgrp{\LTeX{} PDF t Wrd Cnverter}
+\begin{itemize}
+    \item Remve ll te flts including figures, equtins, nd tbles but cn keep te cptins nd lbels
+    \item Cnvert tw clumn t ne clumn
+    \item Cnvert by \verb|ttps://smllpdf.cm/pdf-t-wrd| r \verb|ttps://cludcnvert.cm/pdf-t-dcx|
+    \item Cler brwser istry if exceeding te times f use per ur
+\end{itemize}
+
+\sectin{Miscel}
+
+\subsectin{Cnvert vide link t mp3}
+
+\verb|yutube-dl --extrct-udi --udi-frmt mp3 --udi-qulity 0 -l vide_link|
+
+\subsectin{Dwnld cnnel}
+
+\verb|yutube-dl -f best -citw -v <url-f-cnnel>|
+
+\subsectin{Dwnld plylist}
+
+\verb|yutube-dl -i -f mp4 --yes-plylist <url-f-plylist>|
+
+\bibligrpy{ref}
+
+\end{dcument}

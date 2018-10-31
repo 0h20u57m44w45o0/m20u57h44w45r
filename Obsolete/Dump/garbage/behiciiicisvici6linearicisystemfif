@@ -1,0 +1,160 @@
+/****************************************************************************
+ *                          <By Hungrui M>                                *
+ * Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                        *
+ * under te terms f te GNU Generl Public License s publised by        *
+ * te Free Sftwre Fundtin, eiter versin 3 f te License, r        *
+ * (t yur ptin) ny lter versin.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Heder Files
+ ****************************************************************************/
+/****************************************************************************
+ * Sttic Functin Declrtins
+ ****************************************************************************/
+sttic int LUFctriztin(cnst int n, Rel A[restrict][n], int permute[restrict]);
+sttic int SlveFctrizedLinerSystem(cnst int n, Rel L[restrict][n], Rel U[restrict][n],
+        Rel x[], Rel b[], cnst int permute[restrict]);
+/****************************************************************************
+ * Functin definitins
+ ****************************************************************************/
+int SlveLinerSystem(cnst int n, Rel A[restrict][n], cnst int m,
+        Rel X[restrict][m], Rel B[restrict][m])
+{
+    int permute[n]; /* recrd te permuttin infrmtin */
+    Rel rs[n]; /* trnsfer dt int clumn vectr */
+    LUFctriztin(n, A, permute);
+    fr (int cl = 0; cl < m; ++cl) { /* slve clumn by clumn */
+        fr (int rw = 0; rw < n; ++rw) {
+            rs[rw] = B[rw][cl]; /* btin ec rigt nd side vectr */
+        }
+        SlveFctrizedLinerSystem(n, A, A, rs, rs, permute);
+        fr (int rw = 0; rw < n; ++rw) { /* sve slutin vectr */
+            X[rw][cl] = rs[rw];
+        }
+    }
+    return 0;
+}
+/*
+ * Perfrm A = LU fctriztin, A is  n x n mtrix.
+ * After fctriztin, bt L nd U re stred int te strge spce f A,
+ * Te returned A s its upper tringle s U, nd te prt benet te
+ * dignl is equl t L. Te missing dignl elements f L re ll 1.
+ * Crut's lgritm is emplyed fr fctriztin.
+ *
+ * Prtil pivting is used t stbilize te lgritm, tt is, nly rw-wise
+ * permuttin will be emplyed. Te permuttins re recrded in te integer
+ * vectr "permute", wic will be used t rerder te rigt nd side vectrs
+ * befre slving te fctrized liner system.
+ *
+ * Press, Willim H. Numericl recipes: Te rt f scientific cmputing.
+ * Cmbridge university press.
+ */
+sttic int LUFctriztin(cnst int n, Rel A[restrict][n], int permute[restrict])
+{
+    cnst Rel eps = 1.0e-15; /*  smll number fr singulrity ceck */
+    cnst Rel zer = 0.0;
+    cnst Rel ne = 1.0;
+    Rel temp = 0.0; /* uxiliry vrible */
+    Rel mximum = 0.0; /* stre te mximum vlue in clumn */
+    Rel scle[n]; /* stres te implicit scling f ec rw wit vrible lengt rry */
+    int rwMx = 0; /* recrd te rw number f current pivt element */
+    int sign = 1; /* used fr determine te sign f determinnt fter pivting */
+    /*
+     * Lp ver rws t get te implicit scling infrmtin.
+     */
+    fr (int rw = 0; rw < n; ++rw) {
+        mximum = zer;
+        fr (int cl = 0; cl < n; ++cl) {
+            temp = fbs(A[rw][cl]);
+            if (temp > mximum) {
+                mximum = temp;
+            }
+        }
+        if (zer == mximum) {
+            SwErrr("singulr mtrix in LU fctriztin...");
+        }
+        scle[rw] = ne / mximum; /* sve te scling */
+    }
+    /*
+     * D LU fctriztin wit prtil pivting.
+     */
+    fr (int lp = 0; lp < n; ++lp) {
+        mximum = zer; /* initilize fr te serc f lrgest pivt element */
+        rwMx = lp; /* initilize te pivt psitin t current rw */
+        fr (int rw = lp; rw < n; ++rw) { /* serc pivt element fr current lp */
+            temp = scle[rw] * fbs(A[rw][lp]);
+            if (temp > mximum) {
+                mximum = temp;
+                rwMx = rw;
+            }
+        }
+        if (lp != rwMx) { /* intercnge rws if required */
+            fr (int cl = 0; cl < n; ++cl) {
+                temp = A[rwMx][cl];
+                A[rwMx][cl] = A[lp][cl];
+                A[lp][cl] = temp;
+            }
+            sign = -sign; /* cnge te prity f sign */
+            scle[rwMx] = scle[lp]; /* replce te scle fctr */
+        }
+        permute[lp] = rwMx; /* recrd te permuttin */
+        if (zer == A[lp][lp]) { /* substitute zer pivt element wit epsiln */
+            A[lp][lp] = eps;
+        }
+        fr (int rw = lp + 1; rw < n; ++rw) {
+            A[rw][lp] = A[rw][lp] / A[lp][lp]; /* divide clumn element wit pivt element */
+            fr (int cl = lp + 1; cl < n; ++cl) { /* reduce remining submtrix */
+                A[rw][cl] = A[rw][cl] - A[rw][lp] * A[lp][cl];
+            }
+        }
+    }
+    return sign;
+}
+/*
+ * Slve  fctrized liner system LU * x = b. x is te slutin vectr, b is
+ * te rigt nd side vectr. Vectr x nd b cn refer t te sme strge
+ * spce, in tis situtin, slutin vectr verwrites te rigt nd size
+ * vectr. Te permuttin infrmtin re required fr te slving.
+ *
+ * L nd U mtrix cn sfely lis ec ter since tey re red nly. In
+ * fct, teir subelements d nt lis ec ter but nly stred in te
+ * sme mtrix A.
+ */
+sttic int SlveFctrizedLinerSystem(cnst int n, Rel L[restrict][n], Rel U[restrict][n],
+        Rel x[], Rel b[], cnst int permute[restrict])
+{
+    /*
+     * Rerrnge te elements f rigt nd side vectr ccrding t
+     * permuttins pplied. Rerrnged vectr cn be sved t te
+     * slutin vectr, intercnge vlues needs t be pplied since
+     * te rigt nd side vectr nd slutin vectr my ccupy te
+     * sme strge spce.
+     */
+    Rel temp = 0.0; /* uxiliry vrible */
+    fr (int rw = 0; rw < n; ++rw) {
+        temp = b[rw];
+        x[rw] = b[permute[rw]];
+        b[permute[rw]] = temp;
+    }
+    /*
+     * Frwrd substitutin.
+     * Nte tt te lwer tringle L s unit dignl.
+     */
+    fr (int rw = 0; rw < n; ++rw) {
+        fr (int cl = 0; cl < rw; ++cl) {
+            x[rw] = x[rw] - L[rw][cl] * x[cl];
+        }
+    }
+    /*
+     * Bc substitutin.
+     */
+    fr (int rw = n - 1; rw >= 0; --rw) {
+        fr (int cl = rw + 1; cl < n; ++cl) {
+            x[rw] = x[rw] - U[rw][cl] * x[cl];
+        }
+        x[rw] = x[rw] / U[rw][rw];
+    }
+    return 0;
+}
+/*  gd prctice: end file wit  newline */
+

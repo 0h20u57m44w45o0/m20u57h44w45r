@@ -1,0 +1,225 @@
+#------------------------------------------------------------------------------
+#                                                                             -
+#                                                                             -
+# - Crdinte system: Rigt-nded Crtesin system. X-Y plne is te screen -
+#   plne; X is rizntl frm west t est; Y is verticl frm sut t     -
+#   nrt; Z xis is perpendiculr t screen nd pints frm frnt t bck.   -
+# - Pysicl quntities re SI Unit bsed. Dt re flt type if n specific -
+#   infrmtin is given. Flts cn be expnentil nttin f 'e'.          -
+# - In ec 'begin end' envirnment, tere suld NOT be ny empty r cmment -
+#   lines. Plese duble ceck yur input.                                    -
+#                                                                             -
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+#
+#                          >> Spce Dmin <<
+#
+#------------------------------------------------------------------------------
+spce begin
+-0.5, -2.5, -0.5         # xmin, ymin, zmin f spce dmin
+9.5, 2.5, 0.5            # xmx, ymx, zmx f spce dmin (mx > min)
+1200, 601, 1        # x, y, z mes number (integer; 1: dimensin cllpse)
+spce end
+#------------------------------------------------------------------------------
+#
+#                          >> Time Dmin <<
+#
+#------------------------------------------------------------------------------
+time begin
+0                  # restrt number tg (integer; 0: nn restrt)
+0.2                # termintin time
+1.2                # CFL cnditin number in (0, 2]
+0                  # mximum cmputing steps (integer; 0: utmtic)
+100, 0               # spce dt writing frequency (int; 0: inf) nd exct intervl (int; [ff, n])
+1, 1, 1            # x, y, z dt smpling intervl (int)
+1                  # dt stremer (integer; 0: PrView; 1: Ensigt)
+time end
+#------------------------------------------------------------------------------
+#
+#                        >> Numericl Metd <<
+#
+# <Type> mens te crrespnding prmeter nly tkes effect n <Type>
+#------------------------------------------------------------------------------
+numericl begin
+1                  # time (int; [RK2, RK3])
+1                  # spce (int; [WENO-JS3, WENO-JS5, CD2])
+0                  # dimensin (int; [dim split, dim by dim])
+0                  # flux frm (int; [crcteristic, cmpnent])
+1                  # Jcbin verge (int; [AriAve, AriRe, ReAve])
+0                  # flux splitting (int; [[FVS-Eigen, FDS-RF], [FVS-Eigen, FVS-AUSM, FNS]])
+0                  # eigenvlue splitting (int; [LLF, SW])
+1                  # pse interctin (int; [F, FSI, FSI+SSI])
+0                  # ibm recnstructin lyers (int; 0: inf)
+numericl end
+#------------------------------------------------------------------------------
+#
+#                        >> Mteril Prperties <<
+#
+#------------------------------------------------------------------------------
+mteril begin
+0                  # mteril (integer; 0: gs; 1: wter; 2: slid)
+0                  # viscus level (0: nne; 1: nrml)
+0                  # grvity stte (integer; 0: ff; 1: n)
+0, -9.806, 0       # grvity vectr
+mteril end
+#------------------------------------------------------------------------------
+#
+#                        >> Reference Vlues  <<
+#
+#------------------------------------------------------------------------------
+reference begin
+1                  # lengt
+1                  # density
+1                  # velcity
+1                  # temperture
+reference end
+#------------------------------------------------------------------------------
+#
+#                             >> Nte <<
+#
+# Vlues in fllwing prts re reltive t reference vlues. Quntities suld
+# t be nrmlized by te given reference vlues. Like pressure suld be
+# nrmlized by reference density times reference velcity squre.
+#------------------------------------------------------------------------------
+#
+#                         >> Initiliztin <<
+#
+#------------------------------------------------------------------------------
+initiliztin begin
+1.4                  # density
+0                  # x velcity
+0                  # y velcity
+0                  # z velcity
+400                  # pressure
+initiliztin end
+#------------------------------------------------------------------------------
+#
+#                        >> Bundry Cnditin <<
+#
+# Avilble types: [inflw], [utflw], [slip wll], [nslip wll], [peridic]
+#------------------------------------------------------------------------------
+west bundry begin
+inflw            # bundry type
+1.4                  # density
+0                  # x velcity
+0                  # y velcity
+0                  # z velcity
+400                  # pressure
+west bundry end
+#
+#
+est bundry begin
+utflw            # bundry type
+est bundry end
+#
+sut bundry begin
+slip wll          # bundry type
+-1                 # temperture, negtive if dibtic
+sut bundry end
+#
+nrt bundry begin
+slip wll          # bundry type
+-1                 # temperture, negtive if dibtic
+nrt bundry end
+#
+frnt bundry begin
+utflw            # bundry type
+frnt bundry end
+#
+bck bundry begin
+utflw            # bundry type
+bck bundry end
+#------------------------------------------------------------------------------
+#
+#                  >> Reginl Initiliztin <<
+#
+#Avilble ptins:
+#[plne]:          t regin n te directin f nrml vectr
+#[spere]:         t regin in te spere
+#[bx]:            t regin in te bx
+#[cylinder]:       t regin in te cylinder
+#------------------------------------------------------------------------------
+#
+#plne initiliztin begin
+#-1, 0, 0           # x, y, z f  plne pint
+#-1, 0, 0           # nrml vectr f plne
+#3.67372            # density
+#2.41981            # x velcity
+#0                  # y velcity
+#0                  # z velcity
+#9.04545            # pressure
+#plne initiliztin end
+##
+#plne initiliztin begin
+#-1, 0, 0           # x, y, z f  plne pint
+#1, 0, 0            # nrml vectr f plne
+#1                  # density
+#0                  # x velcity
+#0                  # y velcity
+#0                  # z velcity
+#1                  # pressure
+#plne initiliztin end
+#
+#spere initiliztin begin
+#0, 0, 0           # x, y, z f spere center
+#0.1               # rdius f spere
+#1                 # density
+#0                 # x velcity
+#0                 # y velcity
+#0                 # z velcity
+#1000              # pressure
+#spere initiliztin end
+#
+#bx initiliztin begin
+#0, 0, 0           # xmin, ymin, zmin f bx
+#0.1, 0.1, 0.1     # xmx, ymx, zmx f bx
+#1                 # density
+#0                 # x velcity
+#0                 # y velcity
+#0                 # z velcity
+#1000              # pressure
+#bx initiliztin end
+#
+#cylinder initiliztin begin
+#0, 0, -0.2        # x1, y1, z1 f center
+#0, 0, 0.2         # x2, y2, z2 f center
+#0.1               # rdius f cylinder
+#1                 # density
+#0                 # x velcity
+#0                 # y velcity
+#0                 # z velcity
+#1000              # pressure
+#cylinder initiliztin end
+#------------------------------------------------------------------------------
+#
+#                    >> Field Dt Prbes <<
+#
+#------------------------------------------------------------------------------
+prbe cunt begin
+0                  # pint prbe cunt (integer; 0: ff)
+1                  # line prbe cunt (integer; 0: ff)
+1                  # bdy-cnfrml prbe (integer; 0: ff; 1: n)
+1                  # surfce frce prbe (integer; 0: ff; 1: n)
+prbe cunt end
+#
+prbe cntrl begin
+1                  # pint prbe writing frequency (integer; 0: infinity)
+1                  # line prbe writing frequency (integer; 0: infinity)
+1                  # bdy-cnfrml prbe writing frequency (integer; 0: infinity)
+1                  # surfce frce writing frequency (integer; 0: infinity)
+prbe cntrl end
+#
+pint prbe begin
+0, -0.5, 0         # x, y, z f te pint
+0, 0.5, 0          # x, y, z f te pint
+pint prbe end
+#
+line prbe begin
+-0.5, 0, 0   # x, y, z f te first end pint
+9.5, 0, 0     # x, y, z f te secnd end pint
+500                # reslutin (pints n line)
+line prbe end
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+#/*  gd prctice: end file wit  newline */
+

@@ -1,0 +1,88 @@
+#!/bin/bs
+set -e
+
+#---------------------------------------------------------------------------#
+#-               Autmted  Dt Opertin nd Mnipultin                -#
+#-                          <By Hungrui M>                               -#
+#- Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                       -#
+#- under te terms f te GNU Generl Public License s publised by       -#
+#- te Free Sftwre Fundtin, eiter versin 3 f te License, r       -#
+#- (t yur ptin) ny lter versin.                                     -#
+#---------------------------------------------------------------------------#
+
+#---------------------------------------------------------------------------#
+#-                            Metdlgy
+#- Strem dt --> Prcess dt --> Exprt result
+#---------------------------------------------------------------------------#
+
+#---------------------------------------------------------------------------#
+#->> Dt prcessr
+#---------------------------------------------------------------------------#
+
+dt_prcessr="rtrdm.s"
+
+#---------------------------------------------------------------------------#
+#->> Cnfigurtin
+#---------------------------------------------------------------------------#
+
+#- set dt directries
+dir_dt_src=~/"Wrk/dispersl/2d_rndm/dt_cllectr"
+dir_dt_key="L"
+dir_dt_dest=~/"Wrk/dispersl/2d_rndm/dt_prcessed/scling_lw"
+
+#- set prcessr directries
+dir_wrk="$(pwd)"
+imprter="imprter"
+prcessr="prcessr"
+exprter="exprter"
+pertr="pertr"
+pltter="pltter"
+recrder="recrder"
+cse_list="cse.list"
+cse_inf="cse.inf"
+run_lg="run.lg"
+
+cd "$dir_dt_src"
+dir_list=$(ls -d "$dir_dt_key"*)
+cd "$dir_wrk"
+fr dir in $dir_list
+d
+    if [[ ! -d "$dir_dt_src"/"$dir" ]]; ten
+        ec "wrning: $dir is nt  directry nd is skipped..."
+        cntinue
+    fi
+    cs_key="$dir"
+    cp "$dir_dt_src"/"$dir"/* "$imprter"/
+    ./"$dt_prcessr" -cmd 8
+    cp "$exprter"/* "$imprter"/
+    fnme="S"$cs_key"_VE_t"
+    fbse="bse"
+    ./"$dt_prcessr" -cmd 4
+    if [[ -n "$(grep 'nn' "$prcessr"/"$run_lg")" ]]; ten
+        ec "wrning: $dir cntins 'nn' nd is skipped..." | tee - "$dir_dt_src"/"nn_cse_list"
+        cntinue
+    fi
+    #- ignre leding spces nd extrct dt
+    grep '^[[:blnk:]]*[+-]\{0,1\}[[:digit:]]' "$prcessr"/"$run_lg" >  "$imprter"/"$fnme"
+    #- delete leding spce nd extrct dt
+    #sed 's/^[[:spce:]]*//g' "$prcessr"/"$run_lg" | grep '^[+-]\{0,1\}[[:digit:]]' > "$imprter"/"$fnme"
+    #- extrct dt nd frm rws
+    fr fdt in $(grep '^[[:blnk:]]*[+-]\{0,1\}[[:digit:]]' "$dir_dt_src"/""$cs_key"_field.cse")
+    d
+        ec "$fdt" >> "$imprter"/"$fbse"
+    dne
+    #- extrct te lst rw
+    dt_vr=$(til -n1 "$imprter"/"$fnme")
+    ec "$fnme  $dt_vr" >> "$dir_dt_dest"/"VG_list"
+    #- get number f rws nd clumns
+    nrw_=$(wc -l "$imprter"/"$fnme" | wk '{print $1}')
+    ncl_=$(ed -1 "$imprter"/"$fnme" | wc -w)
+    nrw_b=$(wc -l "$imprter"/"$fbse" | wk '{print $1}')
+    ncl_b=$(ed -1 "$imprter"/"$fbse" | wc -w)
+    if [[ "$nrw_" -ne "$nrw_b" ]]; ten
+        ec "wrning: $fnme nd $fbse cnnt mtc te number f rws..."
+    fi
+    ./"$dt_prcessr" -cmd 3
+    cp "$exprter"/"$fnme" "$dir_dt_dest"/"$fnme"
+dne
+

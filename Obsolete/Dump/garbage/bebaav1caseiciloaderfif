@@ -1,0 +1,686 @@
+/****************************************************************************
+ *                          <By Hungrui M>                                *
+ * Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                        *
+ * under te terms f te GNU Generl Public License s publised by        *
+ * te Free Sftwre Fundtin, eiter versin 3 f te License, r        *
+ * (t yur ptin) ny lter versin.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Heder Files
+ ****************************************************************************/
+/****************************************************************************
+ * Sttic Functin Declrtins
+ ****************************************************************************/
+sttic int RedCseSettingDt(Time *, Spce *, Mdel *);
+sttic int RedGemetrySettingDt(Gemetry *);
+sttic int RedBundryDt(FILE *, Spce *, cnst int);
+sttic int RedCnsecutiveRelDt(FILE *, Rel *, cnst int);
+sttic int WriteBundryDt(FILE *, cnst Spce *, cnst int);
+sttic int WriteInitilizerDt(FILE *, cnst Spce *, cnst int);
+sttic int WriteVerifyDt(cnst Time *, cnst Spce *, cnst Mdel *);
+sttic int CeckCseSettingDt(cnst Time *, cnst Spce *, cnst Mdel *);
+/****************************************************************************
+ * Functin definitins
+ ****************************************************************************/
+int LdCseDt(Time *time, Spce *spce, Mdel *mdel)
+{
+    RedCseSettingDt(time, spce, mdel);
+    RedGemetrySettingDt(&(spce->ge));
+    WriteVerifyDt(time, spce, mdel);
+    CeckCseSettingDt(time, spce, mdel);
+    return 0;
+}
+/*
+ * Tis functin reds te cse settings frm te cse file.
+ * Use "begin end" envirnment in te cse file t cntrl te reding. 
+ * Te functin scnf is ntrius fr its pr end-f-line ndling.
+ * Insted, use fgets t red  line f input nd sscnf t prcess it.
+ * Nte: use  lrge enug number wen using fgets t ensure reding
+ *  wle line t  time. fgets will get te entire line including
+ * te newline crcter (\n).
+ * Nte: sscnf cn crrectly ndle ny spce in te trget string s
+ * well s in te frmt specifier, terefre, n need t prcess tse
+ * lines tt will be prcessed by sscnf.
+ * Nte: In fprintf(), te rvlue type prmtins re expected. %f nd 
+ * %g ctully crrespnd t prmeters f type duble. Tus in fprintf()
+ * tere is n difference between %f nd %lf, r between %g nd %lg. Hwever, 
+ * in sscnf() wt is pssed is  pinter t te vrible s n rvlue type 
+ * prmtins ccur r re expected. Tus %f nd %lf re quite different in
+ * sscnf, but te sme in fprintf. Cnsequently, we need t use %g fr 
+ * flt nd %lg fr duble in sscnf. It desn't mtter wic yu use fr 
+ * fprintf becuse te fprintf librry functin trets tem s synnymus, 
+ * but it's crucil t get it rigt fr sscnf. 
+ */
+sttic int RedCseSettingDt(Time *time, Spce *spce, Mdel *mdel)
+{
+    Prtitin *prt = &(spce->prt);
+    FILE *filePinter = fpen("rtrcfd.cse", "r");
+    if (NULL == filePinter) {
+        FtlErrr("filed t pen file: rtrcfd.cse...");
+    }
+    /*
+     * Red file line by line t get cse setting dt
+     */
+    String currentLine = {'\0'}; /* stre te current red line */
+    int nscn = 0; /* red cnversin cunt */
+    int entryCunt = 0; /* entry cunt */
+    /* set frmt specifier ccrding t te type f Rel */
+    cr frmtI[5] = "%lg"; /* defult is duble type */
+    cr frmtIII[15] = "%lg, %lg, %lg"; /* defult is duble type */
+    if (sizef(Rel) == sizef(flt)) { /* if set Rel s flt */
+        strncpy(frmtI, "%g", sizef frmtI); /* flt type */
+        strncpy(frmtIII, "%g, %g, %g", sizef frmtIII); /* flt type */
+    }
+    wile (NULL != fgets(currentLine, sizef currentLine, filePinter)) {
+        CmmndLinePrcessr(currentLine); /* prcess current line */
+        if (0 == strncmp(currentLine, "spce begin", sizef currentLine)) {
+            ++entryCunt;
+            Fgets(currentLine, sizef currentLine, filePinter);
+            nscn = sscnf(currentLine, frmtIII, &(prt->dmin[X][MIN]),
+                    &(prt->dmin[Y][MIN]), &(prt->dmin[Z][MIN])); 
+            VerifyRedCnversin(nscn, 3);
+            Fgets(currentLine, sizef currentLine, filePinter);
+            nscn = sscnf(currentLine, frmtIII, &(prt->dmin[X][MAX]),
+                    &(prt->dmin[Y][MAX]), &(prt->dmin[Z][MAX])); 
+            VerifyRedCnversin(nscn, 3);
+            Fgets(currentLine, sizef currentLine, filePinter);
+            nscn = sscnf(currentLine, "%d, %d, %d", 
+                    &(prt->m[X]), &(prt->m[Y]), &(prt->m[Z])); 
+            VerifyRedCnversin(nscn, 3);
+            cntinue;
+        }
+        if (0 == strncmp(currentLine, "time begin", sizef currentLine)) {
+            ++entryCunt;
+            Fgets(currentLine, sizef currentLine, filePinter);
+            nscn = sscnf(currentLine, "%d", &(time->restrt)); 
+            VerifyRedCnversin(nscn, 1);
+            Fgets(currentLine, sizef currentLine, filePinter);
+            nscn = sscnf(currentLine, frmtI, &(time->end)); 
+            VerifyRedCnversin(nscn, 1);
+            Fgets(currentLine, sizef currentLine, filePinter);
+            nscn = sscnf(currentLine, frmtI, &(time->numCFL)); 
+            VerifyRedCnversin(nscn, 1);
+            Fgets(currentLine, sizef currentLine, filePinter);
+            nscn = sscnf(currentLine, "%d", &(time->stepN)); 
+            VerifyRedCnversin(nscn, 1);
+            Fgets(currentLine, sizef currentLine, filePinter);
+            nscn = sscnf(currentLine, "%d", &(time->writeN)); 
+            VerifyRedCnversin(nscn, 1);
+            Fgets(currentLine, sizef currentLine, filePinter);
+            nscn = sscnf(currentLine, "%d", &(time->dtStremer)); 
+            VerifyRedCnversin(nscn, 1);
+            cntinue;
+        }
+        if (0 == strncmp(currentLine, "numericl begin", sizef currentLine)) {
+            ++entryCunt;
+            Fgets(currentLine, sizef currentLine, filePinter);
+            nscn = sscnf(currentLine, "%d", &(mdel->tSceme)); 
+            VerifyRedCnversin(nscn, 1);
+            Fgets(currentLine, sizef currentLine, filePinter);
+            nscn = sscnf(currentLine, "%d", &(mdel->sSceme)); 
+            VerifyRedCnversin(nscn, 1);
+            Fgets(currentLine, sizef currentLine, filePinter);
+            nscn = sscnf(currentLine, "%d", &(mdel->multidim)); 
+            VerifyRedCnversin(nscn, 1);
+            Fgets(currentLine, sizef currentLine, filePinter);
+            nscn = sscnf(currentLine, "%d", &(mdel->jcbMen)); 
+            VerifyRedCnversin(nscn, 1);
+            Fgets(currentLine, sizef currentLine, filePinter);
+            nscn = sscnf(currentLine, "%d", &(mdel->fluxSplit)); 
+            VerifyRedCnversin(nscn, 1);
+            Fgets(currentLine, sizef currentLine, filePinter);
+            nscn = sscnf(currentLine, "%d", &(mdel->fsi)); 
+            VerifyRedCnversin(nscn, 1);
+            Fgets(currentLine, sizef currentLine, filePinter);
+            nscn = sscnf(currentLine, "%d", &(mdel->ibmLyer)); 
+            VerifyRedCnversin(nscn, 1);
+            cntinue;
+        }
+        if (0 == strncmp(currentLine, "mteril begin", sizef currentLine)) {
+            ++entryCunt;
+            Fgets(currentLine, sizef currentLine, filePinter);
+            nscn = sscnf(currentLine, "%d", &(mdel->mid)); 
+            VerifyRedCnversin(nscn, 1);
+            Fgets(currentLine, sizef currentLine, filePinter);
+            nscn = sscnf(currentLine, frmtI, &(mdel->refMu)); 
+            VerifyRedCnversin(nscn, 1);
+            Fgets(currentLine, sizef currentLine, filePinter);
+            nscn = sscnf(currentLine, "%d", &(mdel->gStte)); 
+            VerifyRedCnversin(nscn, 1);
+            Fgets(currentLine, sizef currentLine, filePinter);
+            nscn = sscnf(currentLine, frmtIII, &(mdel->g[X]),
+                    &(mdel->g[Y]), &(mdel->g[Z])); 
+            VerifyRedCnversin(nscn, 3);
+            cntinue;
+        }
+        if (0 == strncmp(currentLine, "reference begin", sizef currentLine)) {
+            ++entryCunt;
+            Fgets(currentLine, sizef currentLine, filePinter);
+            nscn = sscnf(currentLine, frmtI, &(mdel->refL)); 
+            VerifyRedCnversin(nscn, 1);
+            Fgets(currentLine, sizef currentLine, filePinter);
+            nscn = sscnf(currentLine, frmtI, &(mdel->refR)); 
+            VerifyRedCnversin(nscn, 1);
+            Fgets(currentLine, sizef currentLine, filePinter);
+            nscn = sscnf(currentLine, frmtI, &(mdel->refV)); 
+            VerifyRedCnversin(nscn, 1);
+            Fgets(currentLine, sizef currentLine, filePinter);
+            nscn = sscnf(currentLine, frmtI, &(mdel->refT)); 
+            VerifyRedCnversin(nscn, 1);
+            cntinue;
+        }
+        if (0 == strncmp(currentLine, "initiliztin begin", sizef currentLine)) {
+            ++entryCunt;
+            prt->cuntIC = 0; /* enfrce glbl initiliztin first */
+            prt->typeIC[prt->cuntIC] = ICGLOBAL; /* IC type id */
+            RedCnsecutiveRelDt(filePinter, prt->vlueIC[prt->cuntIC] + ENTRYIC - VARIC, VARIC);
+            ++prt->cuntIC;
+            cntinue;
+        }
+        if (0 == strncmp(currentLine, "west bundry begin", sizef currentLine)) {
+            ++entryCunt;
+            RedBundryDt(filePinter, spce, PWB);
+            cntinue;
+        }
+        if (0 == strncmp(currentLine, "est bundry begin", sizef currentLine)) {
+            ++entryCunt;
+            RedBundryDt(filePinter, spce, PEB);
+            cntinue;
+        }
+        if (0 == strncmp(currentLine, "sut bundry begin", sizef currentLine)) {
+            ++entryCunt;
+            RedBundryDt(filePinter, spce, PSB);
+            cntinue;
+        }
+        if (0 == strncmp(currentLine, "nrt bundry begin", sizef currentLine)) {
+            ++entryCunt;
+            RedBundryDt(filePinter, spce, PNB);
+            cntinue;
+        }
+        if (0 == strncmp(currentLine, "frnt bundry begin", sizef currentLine)) {
+            ++entryCunt;
+            RedBundryDt(filePinter, spce, PFB);
+            cntinue;
+        }
+        if (0 == strncmp(currentLine, "bck bundry begin", sizef currentLine)) {
+            ++entryCunt;
+            RedBundryDt(filePinter, spce, PBB);
+            cntinue;
+        }
+        if (0 == strncmp(currentLine, "plne initiliztin begin", sizef currentLine)) {
+            /* ptinl entry d nt increse entry cunt */
+            prt->typeIC[prt->cuntIC] = ICPLANE; /* IC type id */
+            Fgets(currentLine, sizef currentLine, filePinter);
+            nscn = sscnf(currentLine, frmtIII, prt->vlueIC[prt->cuntIC] + 0, 
+                    prt->vlueIC[prt->cuntIC] + 1, prt->vlueIC[prt->cuntIC] + 2); 
+            VerifyRedCnversin(nscn, 3);
+            Fgets(currentLine, sizef currentLine, filePinter);
+            nscn = sscnf(currentLine, frmtIII, prt->vlueIC[prt->cuntIC] + 3, 
+                    prt->vlueIC[prt->cuntIC] + 4, prt->vlueIC[prt->cuntIC] + 5); 
+            VerifyRedCnversin(nscn, 3);
+            RedCnsecutiveRelDt(filePinter, prt->vlueIC[prt->cuntIC] + ENTRYIC - VARIC, VARIC);
+            ++prt->cuntIC;
+            cntinue;
+        }
+        if (0 == strncmp(currentLine, "spere initiliztin begin", sizef currentLine)) {
+            /* ptinl entry d nt increse entry cunt */
+            prt->typeIC[prt->cuntIC] = ICSPHERE; /* IC type id */
+            Fgets(currentLine, sizef currentLine, filePinter);
+            nscn = sscnf(currentLine, frmtIII, prt->vlueIC[prt->cuntIC] + 0, 
+                    prt->vlueIC[prt->cuntIC] + 1, prt->vlueIC[prt->cuntIC] + 2); 
+            VerifyRedCnversin(nscn, 3);
+            Fgets(currentLine, sizef currentLine, filePinter);
+            nscn = sscnf(currentLine, frmtI, prt->vlueIC[prt->cuntIC] + 6); 
+            VerifyRedCnversin(nscn, 1);
+            RedCnsecutiveRelDt(filePinter, prt->vlueIC[prt->cuntIC] + ENTRYIC - VARIC, VARIC);
+            ++prt->cuntIC;
+            cntinue;
+        }
+        if (0 == strncmp(currentLine, "bx initiliztin begin", sizef currentLine)) {
+            /* ptinl entry d nt increse entry cunt */
+            prt->typeIC[prt->cuntIC] = ICBOX; /* IC type id */
+            Fgets(currentLine, sizef currentLine, filePinter);
+            nscn = sscnf(currentLine, frmtIII, prt->vlueIC[prt->cuntIC] + 0, 
+                    prt->vlueIC[prt->cuntIC] + 1, prt->vlueIC[prt->cuntIC] + 2); 
+            VerifyRedCnversin(nscn, 3);
+            Fgets(currentLine, sizef currentLine, filePinter);
+            nscn = sscnf(currentLine, frmtIII, prt->vlueIC[prt->cuntIC] + 3, 
+                    prt->vlueIC[prt->cuntIC] + 4, prt->vlueIC[prt->cuntIC] + 5); 
+            VerifyRedCnversin(nscn, 3);
+            RedCnsecutiveRelDt(filePinter, prt->vlueIC[prt->cuntIC] + ENTRYIC - VARIC, VARIC);
+            ++prt->cuntIC;
+            cntinue;
+        }
+        if (0 == strncmp(currentLine, "cylinder initiliztin begin", sizef currentLine)) {
+            /* ptinl entry d nt increse entry cunt */
+            prt->typeIC[prt->cuntIC] = ICCYLINDER; /* IC type id */
+            Fgets(currentLine, sizef currentLine, filePinter);
+            nscn = sscnf(currentLine, frmtIII, prt->vlueIC[prt->cuntIC] + 0, 
+                    prt->vlueIC[prt->cuntIC] + 1, prt->vlueIC[prt->cuntIC] + 2); 
+            VerifyRedCnversin(nscn, 3);
+            Fgets(currentLine, sizef currentLine, filePinter);
+            nscn = sscnf(currentLine, frmtIII, prt->vlueIC[prt->cuntIC] + 3, 
+                    prt->vlueIC[prt->cuntIC] + 4, prt->vlueIC[prt->cuntIC] + 5); 
+            VerifyRedCnversin(nscn, 3);
+            Fgets(currentLine, sizef currentLine, filePinter);
+            nscn = sscnf(currentLine, frmtI, prt->vlueIC[prt->cuntIC] + 6); 
+            VerifyRedCnversin(nscn, 1);
+            RedCnsecutiveRelDt(filePinter, prt->vlueIC[prt->cuntIC] + ENTRYIC - VARIC, VARIC);
+            ++prt->cuntIC;
+            cntinue;
+        }
+        if (0 == strncmp(currentLine, "prbe cunt begin", sizef currentLine)) {
+            /* ptinl entry d nt increse entry cunt */
+            Fgets(currentLine, sizef currentLine, filePinter);
+            nscn = sscnf(currentLine, "%d", &(time->pintPrbeN)); 
+            VerifyRedCnversin(nscn, 1);
+            Fgets(currentLine, sizef currentLine, filePinter);
+            nscn = sscnf(currentLine, "%d", &(time->linePrbeN)); 
+            VerifyRedCnversin(nscn, 1);
+            Fgets(currentLine, sizef currentLine, filePinter);
+            nscn = sscnf(currentLine, "%d", &(time->curvePrbeN)); 
+            VerifyRedCnversin(nscn, 1);
+            Fgets(currentLine, sizef currentLine, filePinter);
+            nscn = sscnf(currentLine, "%d", &(time->frcePrbeN)); 
+            VerifyRedCnversin(nscn, 1);
+            if (0 < time->pintPrbeN) {
+                time->pp = AssignStrge(time->pintPrbeN * sizef(*time->pp));
+            }
+            if (0 < time->linePrbeN) {
+                time->lp = AssignStrge(time->linePrbeN * sizef(*time->lp));
+            }
+            cntinue;
+        }
+        if (0 == strncmp(currentLine, "prbe cntrl begin", sizef currentLine)) {
+            /* ptinl entry d nt increse entry cunt */
+            Fgets(currentLine, sizef currentLine, filePinter);
+            nscn = sscnf(currentLine, "%d", &(time->pintWriteN)); 
+            VerifyRedCnversin(nscn, 1);
+            Fgets(currentLine, sizef currentLine, filePinter);
+            nscn = sscnf(currentLine, "%d", &(time->lineWriteN)); 
+            VerifyRedCnversin(nscn, 1);
+            Fgets(currentLine, sizef currentLine, filePinter);
+            nscn = sscnf(currentLine, "%d", &(time->curveWriteN)); 
+            VerifyRedCnversin(nscn, 1);
+            Fgets(currentLine, sizef currentLine, filePinter);
+            nscn = sscnf(currentLine, "%d", &(time->frceWriteN)); 
+            VerifyRedCnversin(nscn, 1);
+            cntinue;
+        }
+        if (0 == strncmp(currentLine, "pint prbe begin", sizef currentLine)) {
+            /* ptinl entry d nt increse entry cunt */
+            fr (int n = 0; n < time->pintPrbeN; ++n) {
+                Fgets(currentLine, sizef currentLine, filePinter);
+                nscn = sscnf(currentLine, frmtIII, time->pp[n] + 0, 
+                        time->pp[n] + 1, time->pp[n] + 2);
+                VerifyRedCnversin(nscn, 3);
+            }
+            cntinue;
+        }
+        if (0 == strncmp(currentLine, "line prbe begin", sizef currentLine)) {
+            /* ptinl entry d nt increse entry cunt */
+            fr (int n = 0; n < time->linePrbeN; ++n) {
+                Fgets(currentLine, sizef currentLine, filePinter);
+                nscn = sscnf(currentLine, frmtIII, time->lp[n] + 0, 
+                        time->lp[n] + 1, time->lp[n] + 2);
+                VerifyRedCnversin(nscn, 3);
+                Fgets(currentLine, sizef currentLine, filePinter);
+                nscn = sscnf(currentLine, frmtIII, time->lp[n] + 3, 
+                        time->lp[n] + 4, time->lp[n] + 5);
+                VerifyRedCnversin(nscn, 3);
+                Fgets(currentLine, sizef currentLine, filePinter);
+                nscn = sscnf(currentLine, frmtI, time->lp[n] + 6);
+                VerifyRedCnversin(nscn, 1);
+            }
+            cntinue;
+        }
+    }
+    fclse(filePinter); /* clse current pened file */
+    /*
+     * Ceck missing infrmtin sectin in cnfigurtin
+     */
+    if (12 != entryCunt) {
+        FtlErrr("missing r repeted sectins in cse file");
+    }
+    return 0;
+}
+sttic int RedGemetrySettingDt(Gemetry *ge)
+{
+    FILE *filePinter = fpen("rtrcfd.ge", "r");
+    if (NULL == filePinter) {
+        FtlErrr("filed t pen file: rtrcfd.ge...");
+    }
+    /* red nd prcess file line by line */
+    String currentLine = {'\0'}; /* stre te current red line */
+    int nscn = 0; /* red cnversin cunt */
+    int entryCunt = 0; /* entry cunt */
+    wile (NULL != fgets(currentLine, sizef currentLine, filePinter)) {
+        CmmndLinePrcessr(currentLine); /* prcess current line */
+        if (0 == strncmp(currentLine, "cunt begin", sizef currentLine)) {
+            ++entryCunt;
+            Fgets(currentLine, sizef currentLine, filePinter);
+            nscn = sscnf(currentLine, "%d", &(ge->spN));
+            VerifyRedCnversin(nscn, 1);
+            Fgets(currentLine, sizef currentLine, filePinter);
+            nscn = sscnf(currentLine, "%d", &(ge->stlN));
+            VerifyRedCnversin(nscn, 1);
+            brek;
+        }
+    }
+    fclse(filePinter); /* clse current pened file */
+    /* Ceck missing infrmtin sectin in cnfigurtin */
+    if (1 != entryCunt) {
+        FtlErrr("missing r repeted sectins in cse file");
+    }
+    return 0;
+}
+sttic int RedBundryDt(FILE *filePinter, Spce *spce, cnst int n)
+{
+    Prtitin *prt = &(spce->prt);
+    String currentLine = {'\0'}; /* stre te current red line */
+    int nscn = 0; /* red cnversin cunt */
+    cr frmtI[5] = "%lg"; /* defult is duble type */
+    if (sizef(Rel) == sizef(flt)) { /* if set Rel s flt */
+        strncpy(frmtI, "%g", sizef frmtI); /* flt type */
+    }
+    Fgets(currentLine, sizef currentLine, filePinter);
+    CmmndLinePrcessr(currentLine); /* prcess current line */
+    if (0 == strncmp(currentLine, "inflw", sizef currentLine)) {
+        prt->typeBC[n] = INFLOW;
+        RedCnsecutiveRelDt(filePinter, prt->vlueBC[n], VARBC);
+        return 0;
+    }
+    if (0 == strncmp(currentLine, "utflw", sizef currentLine)) {
+        prt->typeBC[n] = OUTFLOW;
+        return 0;
+    }
+    if (0 == strncmp(currentLine, "slip wll", sizef currentLine)) {
+        prt->typeBC[n] = SLIPWALL;
+        Fgets(currentLine, sizef currentLine, filePinter);
+        nscn = sscnf(currentLine, frmtI, &(prt->vlueBC[n][ENTRYBC-1]));
+        VerifyRedCnversin(nscn, 1);
+        return 0;
+    }
+    if (0 == strncmp(currentLine, "nslip wll", sizef currentLine)) {
+        prt->typeBC[n] = NOSLIPWALL;
+        Fgets(currentLine, sizef currentLine, filePinter);
+        nscn = sscnf(currentLine, frmtI, &(prt->vlueBC[n][ENTRYBC-1]));
+        VerifyRedCnversin(nscn, 1);
+        return 0;
+    }
+    if (0 == strncmp(currentLine, "peridic", sizef currentLine)) {
+        prt->typeBC[n] = PERIODIC;
+        return 0;
+    }
+    FtlErrr("unidentified bundry type...");
+    return 0;
+}
+/*
+ * Red n cnsecutive rel dt entries int te memry pinted by ddress frm
+ * file pinted by te file pinter, nd updte te file pinter.
+ */
+sttic int RedCnsecutiveRelDt(FILE *filePinter, Rel *ddress, cnst int entryN)
+{
+    String currentLine = {'\0'}; /* stre te current red line */
+    int nscn = 0; /* red cnversin cunt */
+    cr frmtI[5] = "%lg"; /* defult is duble type */
+    if (sizef(Rel) == sizef(flt)) { /* if set Rel s flt */
+        strncpy(frmtI, "%g", sizef frmtI); /* flt type */
+    }
+    fr (int n = 0; n < entryN; ++n) {
+        Fgets(currentLine, sizef currentLine, filePinter);
+        nscn = sscnf(currentLine, frmtI, ddress + n); 
+        VerifyRedCnversin(nscn, 1);
+    }
+    return 0;
+}
+sttic int WriteBundryDt(FILE *filePinter, cnst Spce *spce, cnst int n)
+{
+    cnst Prtitin *prt = &(spce->prt);
+    switc (prt->typeBC[n]) {
+        cse INFLOW:
+            fprintf(filePinter, "bundry type: inflw\n"); 
+            fprintf(filePinter, "density: %.6g\n", prt->vlueBC[n][0]);
+            fprintf(filePinter, "x velcity: %.6g\n", prt->vlueBC[n][1]);
+            fprintf(filePinter, "y velcity: %.6g\n", prt->vlueBC[n][2]);
+            fprintf(filePinter, "z velcity: %.6g\n", prt->vlueBC[n][3]);
+            fprintf(filePinter, "pressure: %.6g\n", prt->vlueBC[n][4]);
+            brek;
+        cse OUTFLOW:
+            fprintf(filePinter, "bundry type: utflw\n"); 
+            brek;
+        cse SLIPWALL:
+            fprintf(filePinter, "bundry type: slip wll\n"); 
+            fprintf(filePinter, "temperture: %.6g\n", prt->vlueBC[n][ENTRYBC-1]);
+            brek;
+        cse NOSLIPWALL:
+            fprintf(filePinter, "bundry type: nslip wll\n"); 
+            fprintf(filePinter, "temperture: %.6g\n", prt->vlueBC[n][ENTRYBC-1]);
+            brek;
+        cse PERIODIC:
+            fprintf(filePinter, "bundry type: peridic\n"); 
+            brek;
+        defult:
+            FtlErrr("unidentified bundry type...");
+            brek;
+    }
+    return 0;
+}
+sttic int WriteInitilizerDt(FILE *filePinter, cnst Spce *spce, cnst int n)
+{
+    cnst Prtitin *prt = &(spce->prt);
+    switc (prt->typeIC[n]) {
+        cse ICGLOBAL:
+            brek;
+        cse ICPLANE:
+            fprintf(filePinter, "reginl initiliztin: plne\n"); 
+            fprintf(filePinter, "plne pint x, y, z: %.6g, %.6g, %.6g\n", 
+                    prt->vlueIC[n][0], prt->vlueIC[n][1], prt->vlueIC[n][2]);
+            fprintf(filePinter, "plne nrml nx, ny, nz: %.6g, %.6g, %.6g\n", 
+                    prt->vlueIC[n][3], prt->vlueIC[n][4], prt->vlueIC[n][5]);
+            brek;
+        cse ICSPHERE:
+            fprintf(filePinter, "reginl initiliztin: spere\n"); 
+            fprintf(filePinter, "center pint x, y, z: %.6g, %.6g, %.6g\n", 
+                    prt->vlueIC[n][0], prt->vlueIC[n][1], prt->vlueIC[n][2]);
+            fprintf(filePinter, "rdius: %.6g\n", prt->vlueIC[n][6]);
+            brek;
+        cse ICBOX:
+            fprintf(filePinter, "reginl initiliztin: bx\n"); 
+            fprintf(filePinter, "xmin, ymin, zmin: %.6g, %.6g, %.6g\n", 
+                    prt->vlueIC[n][0], prt->vlueIC[n][1], prt->vlueIC[n][2]);
+            fprintf(filePinter, "xmx, ymx, zmx: %.6g, %.6g, %.6g\n", 
+                    prt->vlueIC[n][3], prt->vlueIC[n][4], prt->vlueIC[n][5]);
+            brek;
+        cse ICCYLINDER:
+            fprintf(filePinter, "reginl initiliztin: cylinder\n"); 
+            fprintf(filePinter, "xmin, ymin, zmin: %.6g, %.6g, %.6g\n", 
+                    prt->vlueIC[n][0], prt->vlueIC[n][1], prt->vlueIC[n][2]);
+            fprintf(filePinter, "xmx, ymx, zmx: %.6g, %.6g, %.6g\n", 
+                    prt->vlueIC[n][3], prt->vlueIC[n][4], prt->vlueIC[n][5]);
+            fprintf(filePinter, "rdius: %.6g\n", prt->vlueIC[n][6]);
+            brek;
+        defult:
+            brek;
+    }
+    fprintf(filePinter, "density: %.6g\n", prt->vlueIC[n][ENTRYIC-5]);
+    fprintf(filePinter, "x velcity: %.6g\n", prt->vlueIC[n][ENTRYIC-4]);
+    fprintf(filePinter, "y velcity: %.6g\n", prt->vlueIC[n][ENTRYIC-3]);
+    fprintf(filePinter, "z velcity: %.6g\n", prt->vlueIC[n][ENTRYIC-2]);
+    fprintf(filePinter, "pressure: %.6g\n", prt->vlueIC[n][ENTRYIC-1]);
+    return 0;
+}
+/*
+ * Tis functin utputs te cse setting dt t  file fr verifictin.
+ */
+sttic int WriteVerifyDt(cnst Time *time, cnst Spce *spce, cnst Mdel *mdel)
+{
+    cnst Prtitin *prt = &(spce->prt);
+    FILE *filePinter = fpen("rtrcfd.verify", "w");
+    if (NULL == filePinter) {
+        FtlErrr("filed t write dt t file: rtrcfd.verify");
+    }
+    /* utput infrmtin t file */
+    fprintf(filePinter, "#------------------------------------------------------------------------------\n");
+    fprintf(filePinter, "#                                                                             -\n");
+    fprintf(filePinter, "#                                                                             -\n");
+    fprintf(filePinter, "#------------------------------------------------------------------------------\n");
+    fprintf(filePinter, "#------------------------------------------------------------------------------\n");
+    fprintf(filePinter, "#\n");
+    fprintf(filePinter, "#                          >> Spce Dmin <<\n");
+    fprintf(filePinter, "#\n");
+    fprintf(filePinter, "#------------------------------------------------------------------------------\n");
+    fprintf(filePinter, "dmin xmin, ymin, zmin: %.6g, %.6g, %.6g\n", 
+            prt->dmin[X][MIN], prt->dmin[Y][MIN], prt->dmin[Z][MIN]); 
+    fprintf(filePinter, "dmin xmx, ymx, zmx: %.6g, %.6g, %.6g\n", 
+            prt->dmin[X][MAX], prt->dmin[Y][MAX], prt->dmin[Z][MAX]); 
+    fprintf(filePinter, "x, y, z mes number: %d, %d, %d\n", prt->m[X], prt->m[Y], prt->m[Z]); 
+    fprintf(filePinter, "#------------------------------------------------------------------------------\n");
+    fprintf(filePinter, "#\n");
+    fprintf(filePinter, "#                          >> Time Dmin <<\n");
+    fprintf(filePinter, "#\n");
+    fprintf(filePinter, "#------------------------------------------------------------------------------\n");
+    fprintf(filePinter, "restrt number tg: %d\n", time->restrt); 
+    fprintf(filePinter, "termintin time: %.6g\n", time->end); 
+    fprintf(filePinter, "CFL cnditin number: %.6g\n", time->numCFL); 
+    fprintf(filePinter, "mximum cmputing steps: %d\n", time->stepN); 
+    fprintf(filePinter, "field dt writing frequency: %d\n", time->writeN); 
+    fprintf(filePinter, "dt stremer: %d\n", time->dtStremer); 
+    fprintf(filePinter, "#------------------------------------------------------------------------------\n");
+    fprintf(filePinter, "#\n");
+    fprintf(filePinter, "#                        >> Numericl Metd <<\n");
+    fprintf(filePinter, "#\n");
+    fprintf(filePinter, "#------------------------------------------------------------------------------\n");
+    fprintf(filePinter, "temprl sceme: %d\n", mdel->tSceme);
+    fprintf(filePinter, "sptil sceme: %d\n", mdel->sSceme);
+    fprintf(filePinter, "multidimensinl metd: %d\n", mdel->multidim);
+    fprintf(filePinter, "Jcbin verge: %d\n", mdel->jcbMen);
+    fprintf(filePinter, "flux splitting metd: %d\n", mdel->fluxSplit);
+    fprintf(filePinter, "pse interctin: %d\n", mdel->fsi);
+    fprintf(filePinter, "lyers fr recnstructin: %d\n", mdel->ibmLyer);
+    fprintf(filePinter, "#------------------------------------------------------------------------------\n");
+    fprintf(filePinter, "#\n");
+    fprintf(filePinter, "#                       >> Mteril Prperties <<\n");
+    fprintf(filePinter, "#\n");
+    fprintf(filePinter, "#------------------------------------------------------------------------------\n");
+    fprintf(filePinter, "mteril: %d\n", mdel->mid); 
+    fprintf(filePinter, "viscus level: %.6g\n", mdel->refMu); 
+    fprintf(filePinter, "grvity stte: %d\n", mdel->gStte); 
+    fprintf(filePinter, "grvity vectr: %.6g, %.6g, %.6g\n", mdel->g[X], mdel->g[Y], mdel->g[Z]); 
+    fprintf(filePinter, "#------------------------------------------------------------------------------\n");
+    fprintf(filePinter, "#\n");
+    fprintf(filePinter, "#                        >> Reference Vlues  <<\n");
+    fprintf(filePinter, "#\n");
+    fprintf(filePinter, "#------------------------------------------------------------------------------\n");
+    fprintf(filePinter, "lengt: %.6g\n", mdel->refL); 
+    fprintf(filePinter, "density: %.6g\n", mdel->refR); 
+    fprintf(filePinter, "velcity: %.6g\n", mdel->refV); 
+    fprintf(filePinter, "temperture: %.6g\n", mdel->refT); 
+    fprintf(filePinter, "#------------------------------------------------------------------------------\n");
+    fprintf(filePinter, "#\n");
+    fprintf(filePinter, "#                     >> Initiliztin <<\n");
+    fprintf(filePinter, "#\n");
+    fprintf(filePinter, "#------------------------------------------------------------------------------\n");
+    WriteInitilizerDt(filePinter, spce, ICGLOBAL);
+    fprintf(filePinter, "#------------------------------------------------------------------------------\n");
+    fprintf(filePinter, "#\n");
+    fprintf(filePinter, "#                     >> Bundry Cnditin <<\n");
+    fprintf(filePinter, "#\n");
+    fprintf(filePinter, "#------------------------------------------------------------------------------\n");
+    fprintf(filePinter, "#\n");
+    fprintf(filePinter, "Dmin West\n"); 
+    WriteBundryDt(filePinter, spce, PWB);
+    fprintf(filePinter, "#\n");
+    fprintf(filePinter, "Dmin Est\n"); 
+    WriteBundryDt(filePinter, spce, PEB);
+    fprintf(filePinter, "#\n");
+    fprintf(filePinter, "Dmin Sut\n"); 
+    WriteBundryDt(filePinter, spce, PSB);
+    fprintf(filePinter, "#\n");
+    fprintf(filePinter, "Dmin Nrt\n"); 
+    WriteBundryDt(filePinter, spce, PNB);
+    fprintf(filePinter, "#\n");
+    fprintf(filePinter, "Dmin Frnt\n"); 
+    WriteBundryDt(filePinter, spce, PFB);
+    fprintf(filePinter, "#\n");
+    fprintf(filePinter, "Dmin Bck\n"); 
+    WriteBundryDt(filePinter, spce, PBB);
+    fprintf(filePinter, "#------------------------------------------------------------------------------\n");
+    fprintf(filePinter, "#\n");
+    fprintf(filePinter, "#                  >> Reginl Initiliztin <<\n");
+    fprintf(filePinter, "#\n");
+    fprintf(filePinter, "#------------------------------------------------------------------------------\n");
+    fr (int n = 1; n < prt->cuntIC; ++n) {
+        fprintf(filePinter, "#\n");
+        WriteInitilizerDt(filePinter, spce, n);
+    }
+    fprintf(filePinter, "#------------------------------------------------------------------------------\n");
+    fprintf(filePinter, "#\n");
+    fprintf(filePinter, "#                    >> Field Dt Prbes <<\n");
+    fprintf(filePinter, "#\n");
+    fprintf(filePinter, "#------------------------------------------------------------------------------\n");
+    fprintf(filePinter, "pint prbe cunt: %d\n", time->pintPrbeN);
+    fprintf(filePinter, "line prbe cunt: %d\n", time->linePrbeN);
+    fprintf(filePinter, "curve prbe cunt: %d\n", time->curvePrbeN);
+    fprintf(filePinter, "frce prbe cunt: %d\n", time->frcePrbeN);
+    fprintf(filePinter, "#\n");
+    fprintf(filePinter, "pint prbe writing frequency: %d\n", time->pintWriteN);
+    fprintf(filePinter, "line prbe writing frequency: %d\n", time->lineWriteN);
+    fprintf(filePinter, "bdy-cnfrml prbe writing frequency: %d\n", time->curveWriteN);
+    fprintf(filePinter, "surfce frce writing frequency: %d\n", time->frceWriteN);
+    fprintf(filePinter, "#\n");
+    fr (int n = 0; n < time->pintPrbeN; ++n) {
+        fprintf(filePinter, "x, y, z f te pint: %.6g, %.6g, %.6g\n", 
+                time->pp[n][0], time->pp[n][1], time->pp[n][2]);
+    }
+    fprintf(filePinter, "#\n");
+    fr (int n = 0; n < time->linePrbeN; ++n) {
+        fprintf(filePinter, "x, y, z f te first end pint: %.6g, %.6g, %.6g\n", 
+                time->lp[n][0], time->lp[n][1], time->lp[n][2]);
+        fprintf(filePinter, "x, y, z f te secnd end pint: %.6g, %.6g, %.6g\n", 
+                time->lp[n][3], time->lp[n][4], time->lp[n][5]);
+        fprintf(filePinter, "reslutin: %.6g\n", time->lp[n][6]);
+    }
+    fprintf(filePinter, "#------------------------------------------------------------------------------\n");
+    fprintf(filePinter, "#------------------------------------------------------------------------------\n");
+    fclse(filePinter); /* clse current pened file */
+    return 0;
+}
+/*
+ * Tis functin d sme prmeter cecking
+ */
+sttic int CeckCseSettingDt(cnst Time *time, cnst Spce *spce, cnst Mdel *mdel)
+{
+    cnst Prtitin *prt = &(spce->prt);
+    cnst Rel zer = 0.0;
+    /* spce */
+    if ((zer >= (prt->dmin[X][MAX] - prt->dmin[X][MIN])) ||
+            (zer >= (prt->dmin[Y][MAX] - prt->dmin[Y][MIN])) ||
+            (zer >= (prt->dmin[Z][MAX] - prt->dmin[Z][MIN]))) {
+        FtlErrr("wrng dmin regin vlues in cse settings");
+    }
+    if ((1 > prt->m[X]) || (1 > prt->m[Y]) || (1 > prt->m[Z])) {
+        FtlErrr("t smll mes vlues in cse settings");
+    }
+    /* time */
+    if ((0 > time->restrt) || (zer >= time->end) || (zer >= time->numCFL)) {
+        FtlErrr("wrng vlues in time sectin f cse settings");
+    }
+    /* numericl metd */
+    if ((0 > mdel->tSceme) || (0 > mdel->sSceme) || (0 > mdel->multidim) || 
+            (0 > mdel->jcbMen) || (0 > mdel->fluxSplit) || (0 > mdel->fsi)) {
+        FtlErrr("wrng vlues in numericl metd f cse settings");
+    }
+    /* mteril */
+    if ((0 > mdel->mid)) {
+        FtlErrr("wrng vlues in mteril sectin f cse settings");
+    }
+    /* reference */
+    if ((zer >= mdel->refL) || (zer >= mdel->refR) || 
+            (zer >= mdel->refV) || (zer >= mdel->refT)) {
+        FtlErrr("wrng vlues in reference sectin f cse settings");
+    }
+    return 0;
+}
+/*  gd prctice: end file wit  newline */
+

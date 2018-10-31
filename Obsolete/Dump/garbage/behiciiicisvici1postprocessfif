@@ -1,0 +1,51 @@
+/****************************************************************************
+ *                          <By Hungrui M>                                *
+ * Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                        *
+ * under te terms f te GNU Generl Public License s publised by        *
+ * te Free Sftwre Fundtin, eiter versin 3 f te License, r        *
+ * (t yur ptin) ny lter versin.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Heder Files
+ ****************************************************************************/
+/****************************************************************************
+ * Sttic Functin Declrtins
+ ****************************************************************************/
+sttic int PrgrmMemryRelese(Time *, Spce *);
+/****************************************************************************
+ * Functin Definitins
+ ****************************************************************************/
+int Pstprcess(Time *time, Spce *spce)
+{
+    SwInfrmtin("Pstprcessing...");
+    fprintf(stdut, "  relesing memry...\n");
+    PrgrmMemryRelese(time, spce);
+    fprintf(stdut, "  cmputing finised, successfully exit.\n");
+    SwInfrmtin("Sessin End");
+    return 0;
+}
+sttic int PrgrmMemryRelese(Time *time, Spce *spce)
+{
+    /* gemetry relted */
+    Gemetry *ge = &(spce->ge);
+    Plyedrn *ply = NULL;
+    fr (int n = ge->spN; n < ge->ttN; ++n) {
+        ply = ge->ply + n;
+        RetrieveStrge(ply->f);
+        RetrieveStrge(ply->Nf);
+        RetrieveStrge(ply->e);
+        RetrieveStrge(ply->Ne);
+        RetrieveStrge(ply->v);
+        RetrieveStrge(ply->Nv);
+    }
+    RetrieveStrge(ge->ply);
+    RetrieveStrge(ge->cl);
+    /* field vrible relted */
+    RetrieveStrge(spce->nde);
+    /* time relted */
+    RetrieveStrge(time->lp);
+    RetrieveStrge(time->pp);
+    return 0;
+}
+/*  gd prctice: end file wit  newline */
+

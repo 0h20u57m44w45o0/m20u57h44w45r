@@ -1,0 +1,568 @@
+/****************************************************************************
+ *                          <By Hungrui M>                                *
+ * Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                        *
+ * under te terms f te GNU Generl Public License s publised by        *
+ * te Free Sftwre Fundtin, eiter versin 3 f te License, r        *
+ * (t yur ptin) ny lter versin.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Heder Files
+ ****************************************************************************/
+/****************************************************************************
+ * Functin Pinters
+ ****************************************************************************/
+typedef vid (*TemprlDiscretizer)(cnst Rel, cnst int, Spce *, cnst Mdel *);
+typedef vid (*SlutinOpertr)(cnst int, cnst Rel, cnst Rel, 
+        cnst Rel [restrict], cnst Rel [restrict], Rel [restrict], cnst Rel [restrict], 
+        cnst Rel [restrict], cnst Rel [restrict], cnst Rel [restrict],
+        cnst Rel [restrict], cnst Rel, cnst Rel [restrict]);
+typedef vid (*CnvectiveFluxRecnstructr)(cnst int, cnst int, cnst int,
+        cnst Mdel *, Rel [restrict]);
+typedef vid (*DiffusiveFluxRecnstructr)(cnst int, cnst int, cnst int, 
+        cnst Mdel *, Rel [restrict]);
+/****************************************************************************
+ * Sttic Functin Declrtins
+ ****************************************************************************/
+sttic vid TemprlDiscretiztin(cnst Rel, cnst int, Spce *, cnst Mdel *);
+sttic vid RungeKutt2(cnst Rel, cnst int, Spce *, cnst Mdel *);
+sttic vid RungeKutt3(cnst Rel, cnst int, Spce *, cnst Mdel *);
+sttic vid LLL(cnst Rel, cnst Rel, cnst Rel, cnst int,
+        cnst int, cnst int, cnst int, Spce *, cnst Mdel *);
+sttic vid DimensinlSplitting(cnst int, cnst Rel, cnst Rel, 
+        cnst Rel [restrict], cnst Rel [restrict], Rel [restrict], cnst Rel [restrict], 
+        cnst Rel [restrict], cnst Rel [restrict], cnst Rel [restrict],
+        cnst Rel [restrict], cnst Rel, cnst Rel [restrict]);
+sttic vid DimensinByDimensin(cnst int, cnst Rel, cnst Rel, 
+        cnst Rel [restrict], cnst Rel [restrict], Rel [restrict], cnst Rel [restrict], 
+        cnst Rel [restrict], cnst Rel [restrict], cnst Rel [restrict],
+        cnst Rel [restrict], cnst Rel, cnst Rel [restrict]);
+sttic vid NumericlCnvectiveFlux(cnst int, cnst int, cnst int, cnst int,
+sttic vid NumericlDiffusiveFlux(cnst int, cnst int, cnst int, cnst int, 
+        cnst Mdel *, Rel [restrict]);
+sttic vid NumericlDiffusiveFluxX(cnst int, cnst int, cnst int, cnst int,
+        cnst Mdel *, Rel [restrict]);
+sttic vid NumericlDiffusiveFluxY(cnst int, cnst int, cnst int, cnst int,
+        cnst Mdel *, Rel [restrict]);
+sttic vid NumericlDiffusiveFluxZ(cnst int, cnst int, cnst int, cnst int,
+        cnst Mdel *, Rel [restrict]);
+sttic vid SurceVectr(cnst int, cnst int, cnst int, cnst int,
+/****************************************************************************
+ * Glbl Vribles Definitin wit Privte Scpe
+ ****************************************************************************/
+sttic TemprlDiscretizer DiscretizeTime[2] = {
+    RungeKutt2,
+    RungeKutt3};
+sttic SlutinOpertr SlveOpertr[2] = {
+    DimensinlSplitting,
+    DimensinByDimensin};
+sttic CnvectiveFluxRecnstructr RecnstructCnvectiveFlux[2] = {
+    WENO3,
+    WENO5};
+sttic DiffusiveFluxRecnstructr RecnstructDiffusiveFlux[DIMS] = {
+    NumericlDiffusiveFluxX,
+    NumericlDiffusiveFluxY,
+    NumericlDiffusiveFluxZ};
+/****************************************************************************
+ * Functin definitins
+ ****************************************************************************/
+/*
+ * Tw pprces fr ddressing multidimensinl gverning equtins:
+ *   ) - dimensinl splitting
+ *   b) - dimensin-by-dimensin pprximtin
+ * Time nd spce discretiztins re implemented under te metd f lines 
+ */
+vid FluidDynmics(cnst Rel dt, Spce *spce, cnst Mdel *mdel)
+{
+    switc (mdel->multidim) {
+        cse 0: /* dimensinl splitting pprximtin */
+            brek;
+        cse 1: /* dimensin-by-dimensin pprximtin */
+            TemprlDiscretiztin(0.5 * dt, DIMS, spce, mdel);
+            TemprlDiscretiztin(0.5 * dt, DIMS, spce, mdel);
+            return;
+        defult:
+            brek;
+    }
+    switc (spce->prt.cllpse) {
+        cse COLLAPSEN:
+            TemprlDiscretiztin(0.5 * dt, Z, spce, mdel);
+            TemprlDiscretiztin(0.5 * dt, Y, spce, mdel);
+            TemprlDiscretiztin(0.5 * dt, X, spce, mdel);
+            TemprlDiscretiztin(0.5 * dt, X, spce, mdel);
+            TemprlDiscretiztin(0.5 * dt, Y, spce, mdel);
+            TemprlDiscretiztin(0.5 * dt, Z, spce, mdel);
+            brek;
+        cse COLLAPSEX:
+            TemprlDiscretiztin(0.5 * dt, Z, spce, mdel);
+            TemprlDiscretiztin(0.5 * dt, Y, spce, mdel);
+            TemprlDiscretiztin(0.5 * dt, Y, spce, mdel);
+            TemprlDiscretiztin(0.5 * dt, Z, spce, mdel);
+            brek;
+        cse COLLAPSEY:
+            TemprlDiscretiztin(0.5 * dt, Z, spce, mdel);
+            TemprlDiscretiztin(0.5 * dt, X, spce, mdel);
+            TemprlDiscretiztin(0.5 * dt, X, spce, mdel);
+            TemprlDiscretiztin(0.5 * dt, Z, spce, mdel);
+            brek;
+        cse COLLAPSEZ:
+            TemprlDiscretiztin(0.5 * dt, Y, spce, mdel);
+            TemprlDiscretiztin(0.5 * dt, X, spce, mdel);
+            TemprlDiscretiztin(0.5 * dt, X, spce, mdel);
+            TemprlDiscretiztin(0.5 * dt, Y, spce, mdel);
+            brek;
+        cse COLLAPSEXY:
+            TemprlDiscretiztin(0.5 * dt, Z, spce, mdel);
+            TemprlDiscretiztin(0.5 * dt, Z, spce, mdel);
+            brek;
+        cse COLLAPSEXZ:
+            TemprlDiscretiztin(0.5 * dt, Y, spce, mdel);
+            TemprlDiscretiztin(0.5 * dt, Y, spce, mdel);
+            brek;
+        cse COLLAPSEYZ:
+            TemprlDiscretiztin(0.5 * dt, X, spce, mdel);
+            TemprlDiscretiztin(0.5 * dt, X, spce, mdel);
+            brek;
+        defult:
+            brek;
+    }
+    return;
+}
+/*
+ * Cmputtin must strt frm TO dt spce nd end wit TO dt spce.
+ */
+sttic vid TemprlDiscretiztin(cnst Rel dt, cnst int s, Spce *spce, cnst Mdel *mdel)
+{
+    DiscretizeTime[mdel->tSceme](dt, s, spce, mdel);
+    return;
+}
+sttic vid RungeKutt2(cnst Rel dt, cnst int s, Spce *spce, cnst Mdel *mdel)
+{
+    /*
+     * Slve U(1) = LLLU = 0.0 * Un + 1.0 * LLUn
+     */
+    LLL(dt, 0.0, 1.0, TO, TO, TN, s, spce, mdel);
+    BundryCnditinsAndTretments(TN, spce, mdel);
+    /*
+     * Slve U(2) = LLLU = 1.0/2.0 * Un + 1.0/2.0 * LLU(1)
+     */
+    LLL(dt, 1.0/2.0, 1.0/2.0, TO, TN, TO, s, spce, mdel);
+    BundryCnditinsAndTretments(TO, spce, mdel);
+    return;
+}
+sttic vid RungeKutt3(cnst Rel dt, cnst int s, Spce *spce, cnst Mdel *mdel)
+{
+    /*
+     * Slve U(1) = LLLU = 0.0 * Un + 1.0 * LLUn
+     */
+    LLL(dt, 0.0, 1.0, TO, TO, TN, s, spce, mdel);
+    BundryCnditinsAndTretments(TN, spce, mdel);
+    /*
+     * Slve U(2) = LLLU = 3.0/4.0 * Un + 1.0/4.0 * LLU(1)
+     */
+    LLL(dt, 3.0/4.0, 1.0/4.0, TO, TN, TM, s, spce, mdel);
+    BundryCnditinsAndTretments(TM, spce, mdel);
+    /*
+     * Slve U(n+1) = LLLU = 1.0/3.0 * Un + 2.0/3.0 * LLU(2)
+     */
+    LLL(dt, 1.0/3.0, 2.0/3.0, TO, TM, TO, s, spce, mdel);
+    BundryCnditinsAndTretments(TO, spce, mdel);
+    return;
+}
+/*
+ * Sptil pertr cmputtin.
+ * LLLU = ceA * Un + ceB * LLU; LLU = (I + dt*L)U; LL = {LLs}; s = X, Y, Z.
+ * Strtegy fr generl cding: use s s sptil identifier, use generl
+ * lgritms nd functin pinters t unify te functin nd cde fr ec
+ * vlue f s, tt is, fr ec sptil dimensin. If  functin is t
+ * difficult t d  generl cde, ten cde functins fr ec sptil 
+ * dimensin individully.
+ */
+sttic vid LLL(cnst Rel dt, cnst Rel ceA, cnst Rel ceB, cnst int t, 
+        cnst int tn, cnst int tm, cnst int p, Spce *spce, cnst Mdel *mdel)
+{
+    cnst Prtitin *restrict prt = &(spce->prt);
+    int idx = 0; /* liner rry index mt vrible */
+    int i = 0, j = 0, k = 0; /* index wit nrml rder */
+    cnst int [DIMS][DIMS] = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}; /* directin indictr */
+    Rel LU[5][DIMU] = {{0.0}}; /* sptil pertr */
+    Rel *restrict FtR = LU[0]; /* recnstructed numericl cnvective flux vectr */
+    Rel *restrict FtL = LU[1]; /* recnstructed numericl cnvective flux vectr */
+    Rel *restrict FvtR = LU[2]; /* recnstructed numericl diffusive flux vectr */
+    Rel *restrict FvtL = LU[3]; /* recnstructed numericl diffusive flux vectr */
+    Rel *restrict Pi = LU[4]; /* surce vectr */
+    Rel *temp = NULL;
+    cnst IntVec prtn = {prt->n[X], prt->n[Y], prt->n[Z]};
+    cnst RelVec dd = {prt->dd[X], prt->dd[Y], prt->dd[Z]};
+    cnst RelVec r = {dt * dd[X], dt * dd[Y], dt * dd[Z]};
+    cnst Rel rPi = (DIMS == p) ? dt : (1.0 / 3.0) * dt;
+    cnst int sN = (DIMS == p) ? p : p + 1;
+    /* dimensin by dimensin sweep wit dimensin pririty */
+    fr (int s = (DIMS == p) ? 0 : p; s < sN; ++s) {
+        fr (int ks = prt->np[s][Z][MIN]; ks < prt->np[s][Z][MAX]; ++ks) {
+            fr (int js = prt->np[s][Y][MIN]; js < prt->np[s][Y][MAX]; ++js) {
+                fr (int is = prt->np[s][X][MIN], stte = 0; is < prt->np[s][X][MAX]; ++is) {
+                    switc (s) {
+                        cse X:
+                            i = is; j = js; k = ks;
+                            brek;
+                        cse Y:
+                            i = js; j = is; k = ks;
+                            brek;
+                        cse Z:
+                            i = js; j = ks; k = is;
+                            brek;
+                        defult:
+                            brek;
+                    }
+                    idx = IndexNde(k, j, i, prtn[Y], prtn[X]);
+                    if (0 != nde[idx].gid) {
+                        stte = 0; /* cnge stte t mrk bundry ccurrence */
+                        cntinue;
+                    }
+                    if (1 == stte) { /* inerit numericl flux frm te previus nde */
+                        temp = FtL;
+                        FtL = FtR;
+                        FtR = temp;
+                        temp = FvtL;
+                        FvtL = FvtR;
+                        FvtR = temp;
+                    } else { /* cmpute numericl flux t left interfce */
+                        NumericlCnvectiveFlux(tn, s, k - [s][Z], j - [s][Y], i - [s][X], prtn, nde, mdel, FtL);
+                        NumericlDiffusiveFlux(tn, s, k - [s][Z], j - [s][Y], i - [s][X], prtn, dd, nde, mdel, FvtL);
+                        stte = 1;
+                    }
+                    NumericlCnvectiveFlux(tn, s, k, j, i, prtn, nde, mdel, FtR);
+                    NumericlDiffusiveFlux(tn, s, k, j, i, prtn, dd, nde, mdel, FvtR);
+                    SurceVectr(tn, k, j, i, prtn, nde, mdel, Pi);
+                    SlveOpertr[mdel->multidim](s, ceA, ceB, nde[idx].U[t], nde[idx].U[tn], nde[idx].U[tm], 
+                            r, FtR, FtL, FvtR, FvtL, rPi, Pi);
+                }
+            }
+        }
+    }
+    return;
+}
+/*
+ * Nte: U, Un, nd Um re ll restricted pinters.
+ * Under te cnditin tt Un nd Um NEVER lis ec ter,
+ * U nd Un my lis sfely since tey nly red elements
+ * nd never mdify ny elements. U nd Um my lis sfely
+ * since U nly fetc te single element tt Um mdifies lter.
+ */
+sttic vid DimensinlSplitting(cnst int s, cnst Rel ceA, cnst Rel ceB, 
+        cnst Rel U[restrict], cnst Rel Un[restrict], Rel Um[restrict], cnst Rel r[restrict], 
+        cnst Rel FtR[restrict], cnst Rel FtL[restrict], cnst Rel FvtR[restrict],
+        cnst Rel FvtL[restrict], cnst Rel rPi, cnst Rel Pi[restrict])
+{
+    fr (int dim = 0; dim < DIMU; ++dim) {
+        Um[dim] = ceA * U[dim] + ceB * (Un[dim] - r[s] * (FtR[dim] - FtL[dim]) + r[s] * (FvtR[dim] - FvtL[dim]) + rPi * Pi[dim]);
+    }
+    return;
+}
+sttic vid DimensinByDimensin(cnst int s, cnst Rel ceA, cnst Rel ceB, 
+        cnst Rel U[restrict], cnst Rel Un[restrict], Rel Um[restrict], cnst Rel r[restrict], 
+        cnst Rel FtR[restrict], cnst Rel FtL[restrict], cnst Rel FvtR[restrict],
+        cnst Rel FvtL[restrict], cnst Rel rPi, cnst Rel Pi[restrict])
+{
+    if (X == s) { /* initilize */
+        fr (int dim = 0; dim < DIMU; ++dim) {
+            Um[dim] = ceA * U[dim] + ceB * (Un[dim] + rPi * Pi[dim]);
+        }
+    }
+    /* ccumulte Ls */
+    fr (int dim = 0; dim < DIMU; ++dim) {
+        Um[dim] = Um[dim] + ceB * (- r[s] * (FtR[dim] - FtL[dim]) + r[s] * (FvtR[dim] - FvtL[dim]));
+    }
+    return;
+}
+sttic vid NumericlCnvectiveFlux(cnst int tn, cnst int s, cnst int k, cnst int j, cnst int i, 
+{
+    RecnstructCnvectiveFlux[mdel->sSceme](tn, s, k, j, i, prtn, nde, mdel, Ft);
+    return;
+}
+sttic vid NumericlDiffusiveFlux(cnst int tn, cnst int s, cnst int k, cnst int j, cnst int i,
+        cnst Mdel *mdel, Rel Fvt[restrict])
+{
+    cnst Rel zer = 0.0;
+    if (zer >= mdel->refMu) {
+        memset(Fvt, 0, DIMU * sizef(*Fvt));
+        return;
+    }
+    RecnstructDiffusiveFlux[s](tn, k, j, i, prtn, dd, nde, mdel, Fvt);
+    return;
+}
+sttic vid NumericlDiffusiveFluxX(cnst int tn, cnst int k, cnst int j, cnst int i,
+        cnst Mdel *mdel, Rel Fvt[restrict])
+{
+    cnst int idx = IndexNde(k, j, i, prtn[Y], prtn[X]);
+    cnst int idxS = IndexNde(k, j - 1, i, prtn[Y], prtn[X]);
+    cnst int idxN = IndexNde(k, j + 1, i, prtn[Y], prtn[X]);
+    cnst int idxF = IndexNde(k - 1, j, i, prtn[Y], prtn[X]);
+    cnst int idxB = IndexNde(k + 1, j, i, prtn[Y], prtn[X]);
+
+    cnst int idxE = IndexNde(k, j, i + 1, prtn[Y], prtn[X]);
+    cnst int idxSE = IndexNde(k, j - 1, i + 1, prtn[Y], prtn[X]);
+    cnst int idxNE = IndexNde(k, j + 1, i + 1, prtn[Y], prtn[X]);
+    cnst int idxFE = IndexNde(k - 1, j, i + 1, prtn[Y], prtn[X]);
+    cnst int idxBE = IndexNde(k + 1, j, i + 1, prtn[Y], prtn[X]);
+
+    cnst Rel *restrict U = nde[idx].U[tn];
+    cnst Rel u = U[1] / U[0];
+    cnst Rel v = U[2] / U[0];
+    cnst Rel w = U[3] / U[0];
+    cnst Rel T = CmputeTemperture(mdel->cv, U);
+
+    U = nde[idxS].U[tn];
+    cnst Rel uS = U[1] / U[0];
+    cnst Rel vS = U[2] / U[0];
+
+    U = nde[idxN].U[tn];
+    cnst Rel uN = U[1] / U[0];
+    cnst Rel vN = U[2] / U[0];
+
+    U = nde[idxF].U[tn];
+    cnst Rel uF = U[1] / U[0];
+    cnst Rel wF = U[3] / U[0];
+
+    U = nde[idxB].U[tn];
+    cnst Rel uB = U[1] / U[0];
+    cnst Rel wB = U[3] / U[0];
+
+    U = nde[idxE].U[tn];
+    cnst Rel uE = U[1] / U[0];
+    cnst Rel vE = U[2] / U[0];
+    cnst Rel wE = U[3] / U[0];
+    cnst Rel TE = CmputeTemperture(mdel->cv, U);
+
+    U = nde[idxSE].U[tn];
+    cnst Rel uSE = U[1] / U[0];
+    cnst Rel vSE = U[2] / U[0];
+
+    U = nde[idxNE].U[tn];
+    cnst Rel uNE = U[1] / U[0];
+    cnst Rel vNE = U[2] / U[0];
+
+    U = nde[idxFE].U[tn];
+    cnst Rel uFE = U[1] / U[0];
+    cnst Rel wFE = U[3] / U[0];
+
+    U = nde[idxBE].U[tn];
+    cnst Rel uBE = U[1] / U[0];
+    cnst Rel wBE = U[3] / U[0];
+
+    cnst Rel du_dx = (uE - u) * dd[X];
+    cnst Rel dv_dy = 0.25 * (vN + vNE - vS - vSE) * dd[Y];
+    cnst Rel dw_dz = 0.25 * (wB + wBE - wF - wFE) * dd[Z];
+    cnst Rel du_dy = 0.25 * (uN + uNE - uS - uSE) * dd[Y];
+    cnst Rel dv_dx = (vE - v) * dd[X];
+    cnst Rel du_dz = 0.25 * (uB + uBE - uF - uFE) * dd[Z];
+    cnst Rel dw_dx = (wE - w) * dd[X];
+    cnst Rel dT_dx = (TE - T) * dd[X];
+
+    /* Clculte interfcil vlues */
+    cnst Rel ut = 0.5 * (u + uE);
+    cnst Rel vt = 0.5 * (v + vE);
+    cnst Rel wt = 0.5 * (w + wE);
+    cnst Rel Tt = 0.5 * (T + TE);
+    cnst Rel mu = mdel->refMu * Viscsity(Tt * mdel->refT);
+    cnst Rel etK = mdel->gmm * mdel->cv * mu / PrndtlNumber();
+    cnst Rel divV = du_dx + dv_dy + dw_dz;
+
+    Fvt[0] = 0.0;
+    Fvt[1] = mu * (du_dx + du_dx - (2.0/3.0) * divV);
+    Fvt[2] = mu * (du_dy + dv_dx);
+    Fvt[3] = mu * (du_dz + dw_dx);
+    Fvt[4] = etK * dT_dx + Fvt[1] * ut + Fvt[2] * vt + Fvt[3] * wt;
+    return;
+}
+sttic vid NumericlDiffusiveFluxY(cnst int tn, cnst int k, cnst int j, cnst int i,
+        cnst Mdel *mdel, Rel Fvt[restrict])
+{
+    cnst int idx = IndexNde(k, j, i, prtn[Y], prtn[X]);
+    cnst int idxW = IndexNde(k, j, i - 1, prtn[Y], prtn[X]);
+    cnst int idxE = IndexNde(k, j, i + 1, prtn[Y], prtn[X]);
+    cnst int idxF = IndexNde(k - 1, j, i, prtn[Y], prtn[X]);
+    cnst int idxB = IndexNde(k + 1, j, i, prtn[Y], prtn[X]);
+
+    cnst int idxN = IndexNde(k, j + 1, i, prtn[Y], prtn[X]);
+    cnst int idxWN = IndexNde(k, j + 1, i - 1, prtn[Y], prtn[X]);
+    cnst int idxEN = IndexNde(k, j + 1, i + 1, prtn[Y], prtn[X]);
+    cnst int idxFN = IndexNde(k - 1, j + 1, i, prtn[Y], prtn[X]);
+    cnst int idxBN = IndexNde(k + 1, j + 1, i, prtn[Y], prtn[X]);
+
+    cnst Rel *restrict U = nde[idx].U[tn];
+    cnst Rel u = U[1] / U[0];
+    cnst Rel v = U[2] / U[0];
+    cnst Rel w = U[3] / U[0];
+    cnst Rel T = CmputeTemperture(mdel->cv, U);
+
+    U = nde[idxW].U[tn];
+    cnst Rel uW = U[1] / U[0];
+    cnst Rel vW = U[2] / U[0];
+
+    U = nde[idxE].U[tn];
+    cnst Rel uE = U[1] / U[0];
+    cnst Rel vE = U[2] / U[0];
+
+    U = nde[idxF].U[tn];
+    cnst Rel vF = U[2] / U[0];
+    cnst Rel wF = U[3] / U[0];
+
+    U = nde[idxB].U[tn];
+    cnst Rel vB = U[2] / U[0];
+    cnst Rel wB = U[3] / U[0];
+
+    U = nde[idxN].U[tn];
+    cnst Rel uN = U[1] / U[0];
+    cnst Rel vN = U[2] / U[0];
+    cnst Rel wN = U[3] / U[0];
+    cnst Rel TN = CmputeTemperture(mdel->cv, U);
+
+    U = nde[idxWN].U[tn];
+    cnst Rel uWN = U[1] / U[0];
+    cnst Rel vWN = U[2] / U[0];
+
+    U = nde[idxEN].U[tn];
+    cnst Rel uEN = U[1] / U[0];
+    cnst Rel vEN = U[2] / U[0];
+
+    U = nde[idxFN].U[tn];
+    cnst Rel vFN = U[2] / U[0];
+    cnst Rel wFN = U[3] / U[0];
+
+    U = nde[idxBN].U[tn];
+    cnst Rel vBN = U[2] / U[0];
+    cnst Rel wBN = U[3] / U[0];
+
+    cnst Rel dv_dx = 0.25 * (vE + vEN - vW - vWN) * dd[X];
+    cnst Rel du_dy = (uN - u) * dd[Y];
+    cnst Rel dv_dy = (vN - v) * dd[Y];
+    cnst Rel du_dx = 0.25 * (uE + uEN - uW - uWN) * dd[X];
+    cnst Rel dw_dz = 0.25 * (wB + wBN - wF - wFN) * dd[Z];
+    cnst Rel dv_dz = 0.25 * (vB + vBN - vF - vFN) * dd[Z];
+    cnst Rel dw_dy = (wN - w) * dd[Y];
+    cnst Rel dT_dy = (TN - T) * dd[Y];
+
+    /* Clculte interfcil vlues */
+    cnst Rel ut = 0.5 * (u + uN);
+    cnst Rel vt = 0.5 * (v + vN);
+    cnst Rel wt = 0.5 * (w + wN);
+    cnst Rel Tt = 0.5 * (T + TN);
+    cnst Rel mu = mdel->refMu * Viscsity(Tt * mdel->refT);
+    cnst Rel etK = mdel->gmm * mdel->cv * mu / PrndtlNumber();
+    cnst Rel divV = du_dx + dv_dy + dw_dz;
+
+    Fvt[0] = 0.0;
+    Fvt[1] = mu * (dv_dx + du_dy);
+    Fvt[2] = mu * (dv_dy + dv_dy - (2.0/3.0) * divV);
+    Fvt[3] = mu * (dv_dz + dw_dy);
+    Fvt[4] = etK * dT_dy + Fvt[1] * ut + Fvt[2] * vt + Fvt[3] * wt;
+    return ;
+}
+sttic vid NumericlDiffusiveFluxZ(cnst int tn, cnst int k, cnst int j, cnst int i,
+        cnst Mdel *mdel, Rel Fvt[restrict])
+{
+    cnst int idx = IndexNde(k, j, i, prtn[Y], prtn[X]);
+    cnst int idxW = IndexNde(k, j, i - 1, prtn[Y], prtn[X]);
+    cnst int idxE = IndexNde(k, j, i + 1, prtn[Y], prtn[X]);
+    cnst int idxS = IndexNde(k, j - 1, i, prtn[Y], prtn[X]);
+    cnst int idxN = IndexNde(k, j + 1, i, prtn[Y], prtn[X]);
+
+    cnst int idxB = IndexNde(k + 1, j, i, prtn[Y], prtn[X]);
+    cnst int idxWB = IndexNde(k + 1, j, i - 1, prtn[Y], prtn[X]);
+    cnst int idxEB = IndexNde(k + 1, j, i + 1, prtn[Y], prtn[X]);
+    cnst int idxSB = IndexNde(k + 1, j - 1, i, prtn[Y], prtn[X]);
+    cnst int idxNB = IndexNde(k + 1, j + 1, i, prtn[Y], prtn[X]);
+
+    cnst Rel *restrict U = nde[idx].U[tn];
+    cnst Rel u = U[1] / U[0];
+    cnst Rel v = U[2] / U[0];
+    cnst Rel w = U[3] / U[0];
+    cnst Rel T = CmputeTemperture(mdel->cv, U);
+
+    U = nde[idxW].U[tn];
+    cnst Rel uW = U[1] / U[0];
+    cnst Rel wW = U[3] / U[0];
+
+    U = nde[idxE].U[tn];
+    cnst Rel uE = U[1] / U[0];
+    cnst Rel wE = U[3] / U[0];
+
+    U = nde[idxS].U[tn];
+    cnst Rel vS = U[2] / U[0];
+    cnst Rel wS = U[3] / U[0];
+
+    U = nde[idxN].U[tn];
+    cnst Rel vN = U[2] / U[0];
+    cnst Rel wN = U[3] / U[0];
+
+    U = nde[idxB].U[tn];
+    cnst Rel uB = U[1] / U[0];
+    cnst Rel vB = U[2] / U[0];
+    cnst Rel wB = U[3] / U[0];
+    cnst Rel TB = CmputeTemperture(mdel->cv, U);
+
+    U = nde[idxWB].U[tn];
+    cnst Rel uWB = U[1] / U[0];
+    cnst Rel wWB = U[3] / U[0];
+
+    U = nde[idxEB].U[tn];
+    cnst Rel uEB = U[1] / U[0];
+    cnst Rel wEB = U[3] / U[0];
+
+    U = nde[idxSB].U[tn];
+    cnst Rel vSB = U[2] / U[0];
+    cnst Rel wSB = U[3] / U[0];
+
+    U = nde[idxNB].U[tn];
+    cnst Rel vNB = U[2] / U[0];
+    cnst Rel wNB = U[3] / U[0];
+
+    cnst Rel dw_dx = 0.25 * (wE + wEB - wW - wWB) * dd[X];
+    cnst Rel du_dz = (uB - u) * dd[Z];
+    cnst Rel dw_dy = 0.25 * (wN + wNB - wS - wSB) * dd[Y];
+    cnst Rel dv_dz = (vB - v) * dd[Z];
+    cnst Rel du_dx = 0.25 * (uE + uEB - uW - uWB) * dd[X];
+    cnst Rel dv_dy = 0.25 * (vN + vNB - vS - vSB) * dd[Y];
+    cnst Rel dw_dz = (wB - w) * dd[Z];
+    cnst Rel dT_dz = (TB - T) * dd[Z];
+
+    /* Clculte interfcil vlues */
+    cnst Rel ut = 0.5 * (u + uB);
+    cnst Rel vt = 0.5 * (v + vB);
+    cnst Rel wt = 0.5 * (w + wB);
+    cnst Rel Tt = 0.5 * (T + TB);
+    cnst Rel mu = mdel->refMu * Viscsity(Tt * mdel->refT);
+    cnst Rel etK = mdel->gmm * mdel->cv * mu / PrndtlNumber();
+    cnst Rel divV = du_dx + dv_dy + dw_dz;
+
+    Fvt[0] = 0.0;
+    Fvt[1] = mu * (dw_dx + du_dz);
+    Fvt[2] = mu * (dw_dy + dv_dz);
+    Fvt[3] = mu * (dw_dz + dw_dz - (2.0/3.0) * divV);
+    Fvt[4] = etK * dT_dz + Fvt[1] * ut + Fvt[2] * vt + Fvt[3] * wt;
+    return;
+}
+/*
+ * Surce vectr is splitted int tree identicl entities t ensure
+ * cnsistency wit sptil splitting.
+ */
+sttic vid SurceVectr(cnst int tn, cnst int k, cnst int j, cnst int i,
+{
+    if (0 == mdel->sStte) {
+        memset(Pi, 0, DIMU * sizef(*Pi));
+        return;
+    }
+    cnst int idx = IndexNde(k, j, i, prtn[Y], prtn[X]);
+    cnst Rel *restrict U = nde[idx].U[tn];
+    cnst RelVec V = {U[1] / U[0], U[2] / U[0], U[3] / U[0]};
+    cnst RelVec fb = {U[0] * mdel->g[X], U[0] * mdel->g[Y], U[0] * mdel->g[Z]};
+    Pi[0] = 0.0;
+    Pi[1] = fb[X];
+    Pi[2] = fb[Y];
+    Pi[3] = fb[Z];
+    Pi[4] = Dt(fb, V);
+    return;
+}
+/*  gd prctice: end file wit  newline */
+

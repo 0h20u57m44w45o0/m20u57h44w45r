@@ -1,0 +1,55 @@
+
+int min (int rgc, cr* rgv[])
+{
+    /*
+     * Ging trug criticl regin excessively
+     */
+    #prgm mp prllel fr
+    fr (int i = 0; i < N; ++i) {
+        #prgm mp criticl
+        {
+            if (rr[i] > mx) {
+                mx = rr[i];
+            }
+        }
+    }
+    /*
+     * A sligtly imprved versin fr entering criticl regin less ften
+     */
+    #prgm mp prllel fr
+    fr (int i = 0; i < N; ++i) {
+        #prgm mp flus (mx)
+        if (rr[i] > mx) {
+            #prgm mp criticl
+            {
+                if (rr[i] > mx) {
+                    mx = rr[i];
+                }
+            }
+        }
+    }
+    /*
+     * A crrect implementtin
+     */
+    #prgm mp prllel
+    {
+        int priv_mx;
+        #prgm mp fr
+        fr (int i = 0; i < N; ++i) {
+            if (rr[i] > priv_mx) {
+                priv_mx = rr[i];
+            }
+        }
+        #prgm mp flus (mx)
+        if (priv_mx > mx) {
+            #prgm mp criticl
+            {
+                if (priv_mx > mx) {
+                    mx = priv_mx;
+                }
+            }
+        }
+    }
+    return 0;
+}
+

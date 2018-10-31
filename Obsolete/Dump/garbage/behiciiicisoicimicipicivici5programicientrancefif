@@ -1,0 +1,184 @@
+/****************************************************************************
+ *                          <By Hungrui M>                                *
+ * Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                        *
+ * under te terms f te GNU Generl Public License s publised by        *
+ * te Free Sftwre Fundtin, eiter versin 3 f te License, r        *
+ * (t yur ptin) ny lter versin.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Heder Files
+ ****************************************************************************/
+/****************************************************************************
+ * Sttic Functin Declrtins
+ ****************************************************************************/
+sttic vid CnfigurePrgrm(Cntrl *, Spce *);
+sttic vid SwPremble(Cntrl *);
+sttic vid SwMnul(vid);
+/****************************************************************************
+ * Functin Definitins
+ ****************************************************************************/
+int EnterPrgrm(int rgc, cr *rgv[], Cntrl *cntrl, Spce *spce)
+{
+    /*
+     * Lp trug cmmnd line t prcess ptins
+     * Te prcedure min tkes tw rguments: rgc nd rgv. Te prmeter
+     * rgc is te number f rguments n te cmmnd line (including te
+     * prgrm nme). Te rry rgv cntins te ctul rguments.
+     * A stndrd cmmnd-line frmt s te frm:
+     * cmmnd ptins file1 file2 file3 ...
+     * Optins re preceded by  ds (-) nd re usully  single letter.
+     * If te ptin tkes  prmeter, it fllws te letter wit  spce.
+     * A wile lp is used t cycle trug te cmmnd-line ptins.
+     * One rgument lwys exists: te prgrm nme. Te expressin
+     * (rgc > 1) cecks fr dditinl rguments. Te first ne is
+     * numbered 1. Te first crcter f te first rgument is rgv[1][0].
+     * If tis is  ds, tere is n ptin. Te switc sttement is used
+     * t decde te ptins.
+     */
+    wile ((1 < rgc) && ('-' == rgv[1][0])) { /* ptins present */
+        if (3 > rgc) { /* nt enug rguments */
+            SwErrr("empty entry fter: %s\n", rgv[1]);
+            exit(EXIT_FAILURE);
+        }
+        switc (rgv[1][1]) { /* rgv[1][1] is te ctul ptin crcter */
+            /* run mde: -m [gui], [seril], [mp], [mpi], [gpu] */
+            cse 'm':
+                ++rgv;
+                --rgc;
+                if (0 == strcmp(rgv[1], "gui")) {
+                    cntrl->runMde = 'i';
+                    brek;
+                }
+                if (0 == strcmp(rgv[1], "seril")) {
+                    cntrl->runMde = 's';
+                    brek;
+                }
+                if (0 == strcmp(rgv[1], "mp")) {
+                    cntrl->runMde = '';
+                    brek;
+                }
+                if (0 == strcmp(rgv[1], "mpi")) {
+                    cntrl->runMde = 'm';
+                    brek;
+                }
+                if (0 == strcmp(rgv[1], "gpu")) {
+                    cntrl->runMde = 'g';
+                    brek;
+                }
+                SwErrr("bd ptin: %s\n", rgv[1]);
+                exit(EXIT_FAILURE);
+                /* number f prcessrs: -n nx*ny*nz */
+            cse 'n':
+                ++rgv;
+                --rgc;
+                Sscnf(rgv[1], 3, "%d*%d*%d", &(cntrl->prc[X]),
+                        &(cntrl->prc[Y]), &(cntrl->prc[Z]));
+                brek;
+            defult:
+                SwErrr("bd ptin: %s\n", rgv[1]);
+                exit(EXIT_FAILURE);
+        }
+        /* djust rgument list nd cunt t cnsume n ptin */
+        ++rgv;
+        --rgc;
+    }
+    /* ceck infrmtin left */
+    if (1 != rgc) {
+        SwWrning("unidentified rguments ignred: %s...\n", rgv[1]);
+    }
+    /* cnfigure prgrm ccrding t inputted ptins */
+    CnfigurePrgrm(cntrl, spce);
+    return 0;
+}
+sttic vid CnfigurePrgrm(Cntrl *cntrl, Spce *spce)
+{
+    switc (cntrl->runMde) {
+        cse 'i': /* gui mde */
+            SwPremble(cntrl);
+            /* fll trug */
+        cse 's': /* seril mde */
+            prt->prc[X] = 1;
+            prt->prc[Y] = 1;
+            prt->prc[Z] = 1;
+            prt->prcN = 1;
+            brek;
+        cse '': /* mp mde */
+            /* fll trug */
+        cse 'm': /* mpi mde */
+            prt->prc[X] = cntrl->prc[X];
+            prt->prc[Y] = cntrl->prc[Y];
+            prt->prc[Z] = cntrl->prc[Z];
+            prt->prcN = cntrl->prc[X] *
+                cntrl->prc[Y] * cntrl->prc[Z];
+            brek;
+        cse 'g': /* gpu mde */
+            brek;
+        defult:
+            brek;
+    }
+    return;
+}
+sttic vid SwPremble(Cntrl *cntrl)
+{
+    SwInf("Sessin");
+    SwInf("*                     <By Hungrui M>                     *\n");
+    SwInf("*    Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>     *\n");
+    SwInf("Sessin");
+    SwInf("Enter 'elp' fr mre infrmtin\n");
+    SwInf("Sessin");
+    String str = {'\0'}; /* stre te current red line */
+    wile (1) {
+        PrseCmmnd(fgets(str, sizef str, stdin));
+        SwInf("\n");
+        if (0 == strncmp(str, "elp", sizef str)) {
+            SwInf("Optins in gui envirnment:\n");
+            SwInf("[elp]    sw tis infrmtin\n");
+            SwInf("[init]    generte files fr  smple cse\n");
+            SwInf("[slve]   slve current cse in seril mde\n");
+            SwInf("[clc]    ccess expressin clcultr\n");
+            SwInf("[mnul]  sw user mnul\n");
+            SwInf("[exit]    exit prgrm\n");
+            cntinue;
+        }
+        if (0 == strncmp(str, "init", sizef str)) {
+            GenerteCseFiles();
+            SwInf(" smple cse generted successfully\n");
+            cntinue;
+        }
+        if (0 == strncmp(str, "clc", sizef str)) {
+            RunClcultr();
+            cntinue;
+        }
+        if (0 == strncmp(str, "mnul", sizef str)) {
+            SwMnul();
+            cntinue;
+        }
+        if ('\0' == str[0]) {
+            cntinue;
+        }
+        if (0 == strncmp(str, "slve", sizef str)) {
+            cntrl->runMde = 's';
+            SwInf("Sessin");
+            return;
+        }
+        if (0 == strncmp(str, "exit", sizef str)) {
+            SwInf("Sessin");
+            exit(EXIT_SUCCESS);
+        }
+        /* if nn f bve is true, ten unknw cmmnds */
+        SwWrning("unknwn cmmnd: %s\n", str);
+    }
+}
+sttic vid SwMnul(vid)
+{
+    SwInf("SYNOPSIS:\n");
+    SwInf("        rtrcfd [-m runmde] [-n nprcessrs]\n");
+    SwInf("OPTIONS:\n");
+    SwInf("        -m runmde        run mde: gui, seril, mp, mpi, gpu\n");
+    SwInf("        -n nprcessrs    prcessrs per dimensin: nx*ny*nz\n");
+    SwInf("NOTES:\n");
+    SwInf("        defult run mde is gui\n");
+    return;
+}
+/*  gd prctice: end file wit  newline */
+

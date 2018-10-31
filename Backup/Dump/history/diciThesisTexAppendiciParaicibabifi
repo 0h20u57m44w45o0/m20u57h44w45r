@@ -1,0 +1,474 @@
+\cpter{OpenMP}
+
+OpenMP (Open Multi-Prcessing) is n pplictin prgrmming interfce (API) tt supprts multi-pltfrm sred memry multiprcessing prgrmming in C/C++. It cnsists f  set f cmpiler directives, librry rutines, nd envirnment vribles tt influence run-time bevir.
+
+OpenMP is  multi-treding, sred ddress mdel. Treds cmmunicte by sring vribles. Hwever, cce memry is nt sred due t te grwing discrepncy in prcessr nd memry speed. Prcessrs ve been cnsistently getting fster, wile te speed wit wic dt cn be red frm nd written t memry s nt incresed t te sme rte. In respnse, cmputers re built wit ierrcicl memry systems, in wic  smll, expensive, nd very fst memry clled cce memry, r "cce" fr srt, supplies te prcessr wit dt nd instructins t ig rtes. Ec prcessr needs its wn privte cce if it is t be fed quickly; ence, nt ll memry is sred.
+
+Dt is cpied int cce frm min memry: blcks f cnsecutive memry lctins re trnsferred t  time. Since te cce is very smll in cmprisn t min memry,  new blck my displce dt tt ws previusly cpied in. Hence, it is useful t lern w t structure prgrm cde t mke sure tt cce is utilized well. Wen  prcessr f n SMP stres results f lcl cmputtins in its privte cce, te new vlues re ccessible nly t cde executing n tt prcessr. If n extr precutins re tken, tey will nt be vilble t instructins executing elsewere n n SMP mcine until fter te crrespnding blck f dt is displced frm cce. But it my nt be cler wen tis will ppen. In fct, since te ld vlues migt still be in ter privte cces, cde executing n ter prcessrs migt cntinue t use tem even ten. Tis is knwn s te memry cnsistency prblem. Terefre, te prgrmmer must be wre f te OpenMP memry mdel, wic prvides fr sred nd privte dt nd specifies wen updted sred vlues re gurnteed t be vilble t ll f te cde in n OpenMP prgrm.
+
+Unintended sring f dt cuses rce cnditins: A dt rce cnditin exists wen tw treds my cncurrently ccess te sme sred vrible between syncrniztin pints, witut lding ny cmmn lcks nd wit t lest ne tred mdifying te vrible. A bug cused by  dt rce cnditin leds t nndeterministic bevir. A dt rce ls implies tt flse sring ccurs, pssibly degrding perfrmnce. Depending n te dt type nd rdwre detils, te write pertin t memry migt be brken int severl smller stres. Dt rcing will ten crrupt te result. Te prgrm's utcme cnges s te treds re sceduled differently. A prllel prgrm suld vid rce cnditins t be tred sfe: te prgrm suld get te sme nswer ec time yu run te prgrm. Te terminlgy tred-sfe refers t te situtin tt, in  multitreded prgrm, te sme functins nd te sme resurces my be ccessed cncurrently by multiple flws f cntrl.
+
+T cntrl rce cnditins: Use syncrniztin t prtect dt cnflicts.
+
+Syncrniztin is used t impse rder cnstrints nd t prtect ccess t sred dt
+
+Syncrniztin is expensive s: Cnge w dt is ccessed t minimize te need fr syncrniztin.
+
+OpenMP dds supprt fr prllel prgrmming t C in  very clen wy. Unlike tred librries, little cnge is needed t existing prgrms t ve tem run n multiple prcessrs in prllel. In fct, te bsic cnstructs f OpenMP re s nn-intrusive tt prgrms using tem but cmpiled by  cmpiler tt desn't supprt OpenMP will still wrk (ltug sequentilly, f curse).
+
+OpenMP prvides mens fr te user t
+\begin{itemize}
+    \item crete tems f treds fr prllel executin,
+    \item specify w t sre wrk mng te members f  tem,
+    \item declre bt sred nd privte vribles, nd
+    \item syncrnize treds nd enble tem t perfrm certin pertins exclusively (i.e., witut interference by ter treds).
+\end{itemize}
+
+One f te pwerful fetures f OpenMP is tt ne cn write  prllel prgrm, wile preserving te (riginl) sequentil surce. In  wy, te sequentil versin is "built-in." If ne des nt cmpile using te OpenMP ptin (flg), r uses  cmpiler tt des nt supprt OpenMP, te directives re simply ignred, nd  sequentil executble is generted. Hwever, OpenMP ls prvides runtime functins tt return infrmtin frm te executin envirnment. In rder t ensure tt te prgrm will still cmpile nd execute crrectly in sequentil mde in teir presence, specil cre needs t be tken wen using tem. Fr exmple, let’s sy ne wises t use te \verb|mp_get_tred_num()| functin tt returns te tred number. If te pplictin is cmpiled witut OpenMP trnsltin, te result will be n unreslved reference t link time.
+
+\lstinputlisting[lnguge=C]{pr_mp_inc.c}
+
+Prs:
+\begin{itemize}
+    \item Prtble multitreding cde (in C/C++ nd ter lnguges, ne typiclly s t cll pltfrm-specific primitives in rder t get multitreding).
+    \item Simple: need nt del wit messge pssing s MPI des.
+    \item Dt lyut nd decmpsitin is ndled utmticlly by directives.
+    \item Sclbility cmprble t MPI n sred-memry systems.
+    \item Incrementl prllelism: cn wrk n ne prt f te prgrm t ne time, n drmtic cnge t cde is needed.
+    \item Unified cde fr bt seril nd prllel pplictins: OpenMP cnstructs re treted s cmments wen sequentil cmpilers re used.
+    \item Originl (seril) cde sttements need nt, in generl, be mdified wen prllelized wit OpenMP. Tis reduces te cnce f indvertently intrducing bugs.
+    \item Bt crse-grined nd fine-grined prllelism re pssible.
+    \item In irregulr multipysics pplictins wic d nt dere slely t te SPMD mde f cmputtin, s encuntered in tigtly cupled fluid-prticulte systems, te flexibility f OpenMP cn ve  big perfrmnce dvntge ver MPI.
+    \item Cn be used n vrius ccelertrs suc s GPGPU.
+\end{itemize}
+
+Cns:
+\begin{itemize}
+    \item Risk f intrducing difficulty t debug syncrniztin bugs nd rce cnditins.
+    \item Only runs efficiently in sred-memry multiprcessr pltfrms (see wever Intel's Cluster OpenMP nd ter distributed sred memry pltfrms).
+    \item Requires  cmpiler tt supprts OpenMP.
+    \item Sclbility is limited by memry rcitecture.
+    \item N supprt fr cmpre-nd-swp.
+    \item Relible errr ndling is missing.
+    \item Lcks fine-grined mecnisms t cntrl tred-prcessr mpping.
+    \item Hig cnce f ccidentlly writing flse sring cde.
+\end{itemize}
+
+OpenMP prgrms wrk ccrding t  frk-jin prllelism, illustrted in Fig.~\ref{fig:pr_mp_frk_jint}. Prllelism dded incrementlly until perfrmnce gls re met, tt is, te sequentil prgrm evlves int  prllel prgrm. Te OpenMP runtime mintins  tred pl, nd every time  prllel sectin is encuntered, it distributes wrk ver te treds in te pl. Wen ll treds re dne, sequentil executin is resumed. Te tred tt encunters te prllel cnstruct becmes te mster f te new tem. Ec tred in te tem is ssigned  unique tred number (ls referred t s te "tred id") t identify it. Tey rnge frm zer (fr te mster tred) up t ne less tn te number f treds witin te tem, nd tey cn be ccessed by te prgrmmer.
+\begin{figure}[!tbp]
+    \centering
+    \cptin{Illustrtin f te frk-jin prllelism mdel: te prgrm splits ('frks') int sectins tt re executed in prllel nd jin int  sequentil sectin wen dne. Tis ccurs multiple times ver te lifetime f te prgrm.}
+    \lbel{fig:pr_mp_frk_jint}
+\end{figure}
+
+Te sectin f cde tt is ment t run in prllel is mrked ccrdingly, wit  cmpiler directive tt will cuse te treds t frm befre te sectin is executed. Ec tred s n id ttced t it wic cn be btined using  functin (clled \verb|mp_get_tred_num()|). Te tred id is n integer, nd te mster tred s n id f $0$. After te executin f te prllelized cde, te treds jin bck int te mster tred, wic cntinues nwrd t te end f te prgrm.
+
+By defult, ec tred executes te prllelized sectin f cde independently. Wrksring cnstructs cn be used t divide  tsk mng te treds s tt ec tred executes its llcted prt f te cde. Bt tsk prllelism nd dt prllelism cn be cieved using OpenMP in tis wy.
+
+
+\begin{enumerte}
+    \item Te first step in creting n OpenMP prgrm frm  sequentil ne is t identify te prllelism it cntins.
+    \item Te secnd step in creting n OpenMP prgrm is t express, using OpenMP, te prllelism tt s been identified. A uge prcticl benefit f OpenMP is tt it cn be pplied t incrementlly crete  prllel prgrm frm n existing sequentil cde. Te develper cn insert directives int  prtin f te prgrm nd leve te rest in its sequentil frm. Once te resulting prgrm versin s been successfully cmpiled nd tested, nter prtin f te cde cn be prllelized. Te prgrmmer cn terminte tis prcess nce te desired speedup s been btined.
+\end{enumerte}
+
+\sectin{Setting up}
+\begin{itemize}
+    \item Cmpiler: GNU C Cmpiler r Intel C Cmpiler.
+    \item Build system: Mke.
+    \item Tred cecker: Intel Tred Cecker (dignse dt rces, dedlcks, stlled treds, bndned lcks etc.), Sun Studi Tred Anlyzer.
+\end{itemize}
+
+\sectin{Cre elements}
+
+As illustrted in Fig.~\ref{fig:pr_mp_extensin}, te cre elements f OpenMP re te cnstructs fr tred cretin, wrkld distributin (wrk sring), dt-envirnment mngement, tred syncrniztin, user-level runtime rutines nd envirnment vribles.
+\begin{figure}[!tbp]
+    \centering
+    \cptin{Crt f OpenMP cnstructs.}
+    \lbel{fig:pr_mp_extensin}
+\end{figure}
+
+Mst f te cnstructs in OpenMP re cmpiler directives.
+
+\verb|#prgm mp cnstruct [cluse [cluse]...]|
+
+Mst OpenMP cnstructs pply t  "structured blck":  blck f ne r mre sttements wit ne pint f entry t te tp nd ne pint f exit t te bttm. It's OK t ve n \verb|exit()| witin te structured blck.
+
+Ec tred executes  cpy f te cde witin te structured blck.
+
+Te OpenMP specific prgms re listed belw.
+
+\prgrp{Tred cretin}
+
+Te prgm \verb|mp prllel| is used t frk dditinl treds t crry ut te wrk enclsed in te cnstruct in prllel. Te riginl tred will be dented s mster tred wit tred ID $0$.
+
+Exmple (C prgrm): Disply "Hell, wrld." using multiple treds.
+\lstinputlisting[lnguge=C]{pr_mp_tred.c}
+
+\prgrp{Wrking-sring cnstructs}
+
+Used t specify w t ssign independent wrk t ne r ll f te treds.
+\begin{itemize}
+    \item \verb|mp fr| r \verb|mp d|: used t split up lp itertins mng te treds, ls clled lp cnstructs.
+    \item \verb|sectins|: ssigning cnsecutive but independent cde blcks t different treds. By defult, tere is  brrier t te end f te "mp sectins". Use te "nwit" cluse t turn ff te brrier.
+        \lstinputlisting[lnguge=C]{pr_mp_sectin_exp.c}
+    \item \verb|mster|: dentes  structured blck tt is executed nly by te \verb|mster| tred (te tred wic frked ff ll te ters during te executin f te OpenMP directive). N implicit brrier; Te ter treds just skip it (n syncrniztin is implied). Fr crrect results,  brrier must be inserted befre ny ccesses t te vribles mdified in te mster cnstruct.
+        \lstinputlisting[lnguge=C]{pr_mp_mster_exp.c}
+    \item \verb|single|: dentes  cde blck tt is executed by nly ne tred (nt necessrily te \verb|mster| tred),  brrier is implied t te end f te \verb|single| blck (cn remve te brrier wit  \verb|nwit| cluse)
+        \lstinputlisting[lnguge=C]{pr_mp_single_exp.c}
+\end{itemize}
+
+Exmple: initilize te vlue f  lrge rry in prllel, using ec tred t d prt f te wrk
+\lstinputlisting[lnguge=C]{pr_mp_cnstruct.c}
+Te lp cunter i is declred inside te prllel fr lp in C99 style, wic gives ec tred  unique nd privte versin f te vrible.
+
+A prllel regin is  blck f cde tt will be executed by multiple treds. It is invked by te 'Prllel' directive. Wen  tred reces  PARALLEL directive, it cretes  tem f treds nd becmes te mster f te tem. Te mster is  member f tt tem nd s tred number 0 witin tt tem. Strting frm te beginning f tis prllel regin, te cde is duplicted nd ll treds will execute tt cde.
+
+Tere is n implied brrier t te end f  prllel sectin. Only te mster tred cntinues executin pst tis pint. If ny tred termintes witin  prllel regin, ll treds in te tem will terminte, nd te wrk dne up until tt pint is undefined.
+
+\prgrp{Cluses}
+
+Since OpenMP is  sred memry prgrmming mdel, mst vribles in OpenMP cde re visible t ll treds by defult. But smetimes privte vribles re necessry t vid rce cnditins nd tere is  need t pss vlues between te sequentil prt nd te prllel regin (te cde blck executed in prllel), s dt envirnment mngement is intrduced s dt sring ttribute cluses by ppending tem t te OpenMP directive. Te different types f cluses re:
+
+Dt sring ttribute cluses
+\begin{itemize}
+    \item \verb|sred|: te dt witin  prllel regin is sred, wic mens visible nd ccessible by ll treds simultneusly. By defult, ll vribles in te wrk sring regin re sred except te lp itertin cunter. In C, te index vribles f te prllel fr-lp re privte by defult, but tis des nt extend t te index vribles f lps t  deeper nesting level.
+        \lstinputlisting[lnguge=C]{pr_mp_lp_cunter.c}
+    \item \verb|privte|: te dt witin  prllel regin is privte t ec tred, wic mens ec tred will ve  lcl cpy nd use it s  temprry vrible. A privte vrible is nt initilized nd te vlue is nt mintined fr use utside te prllel regin. By defult, te lp itertin cunters in te OpenMP lp cnstructs re privte. Smetimes prgrmmers frget t mrk privte vribles s suc. Our first dvice t C nd C++ prgrmmers is t use te scping rules f te lnguge itself. C nd C++ bt llw vribles t be declred inside  prllel regin. Tese vribles will be privte (except in rre edge cses described in te specifictin, e.g. sttic vribles), nd it is terefre nt necessry t explicitly mrk tem s suc, viding te mistke ltgeter.
+    \item \verb|defult|: llws te prgrmmer t stte tt te defult dt scping witin  prllel regin will be eiter sred, r nne fr C/C++. Te nne ptin frces te prgrmmer t declre ec vrible in te prllel regin using te dt sring ttribute cluses.
+    \item \verb|firstprivte|: like privte except initilized t riginl vlue. Initilizes ec privte cpy wit te crrespnding vlue frm te mster tred.
+        \lstinputlisting[lnguge=C]{pr_mp_dt_ttribute.c}
+    \item \verb|lstprivte|: like privte except riginl vlue is updted fter cnstruct. Te finl vlue f  privte inside  prllel lp cn be trnsmitted t te sred vrible utside te lp.
+    \item \verb|reductin|:  sfe wy f jining wrk frm ll treds fter cnstruct.
+\end{itemize}
+
+Defult strge ttributes
+\begin{itemize}
+    \item Sred Memry prgrmming mdel: Mst vribles re \verb|sred| by defult.
+    \item Glbl vribles re \verb|sred| mng treds (C: File scpe vribles, sttic, nd dynmiclly llcted memry (llcte, mllc, new))
+    \item But nt everyting is sred. Stck vribles in functins clled frm prllel regins re \verb|privte|; Autmtic vribles witin  sttement blck re \verb|privte|.
+    \item One cn selectively cnge strge ttributes fr cnstructs using te dt sring ttribute cluses.
+\end{itemize}
+
+Syncrniztin cluses
+\begin{itemize}
+    \item \verb|criticl|: ssigns  unique glbl nme t te criticl regin nd prvides mutul exclusin. Te enclsed cde blck will be executed by nly ne tred t  time, nd te ter treds wit teir turn. It is ften used t prtect sred dt frm rce cnditins. Wen  tred encunters  criticl cnstruct, it wits until n ter tred is executing  criticl regin wit te sme nme. In ter wrds, tere is never  risk tt multiple treds will execute te cde cntined in te sme criticl regin t te sme time.
+
+        An ptinl nme cn be given t  criticl cnstruct. In cntrst t te rules gverning ter lnguge fetures, tis nme is glbl nd terefre suld be unique. Oterwise te bevir f te pplictin is undefined.
+
+        Criticl regins in OpenMP ve glbl binding nd teir scpe extends t ll ccurrences f te criticl cnstruct tt ve te sme nme (in tt respect ll unnmed cnstructs sre te sme specil internl nme), n mtter were tey ccur in te cde. 
+
+        Te binding tred set fr  criticl regin is ll treds. Regin executin is restricted t  single tred t  time mng ll te treds in te prgrm, witut regrd t te tem(s) t wic te treds belng. Tt's wy it is strngly recmmended tt nmed criticl regins suld be used, especilly if te sets f prtected resurces re disjint. Nming te regins elimintes te cnce tt tw unrelted criticl cnstruct culd blck ec ter.
+        \lstinputlisting[lnguge=C]{pr_mp_criticl_exp.c}
+        We d nt need t enfrce  certin rdering f ccesses ere, but we must ensure tt nly ne updte my tke plce t  time. Tis is precisely wt te criticl cnstruct gurntees.
+
+        One needs t vid putting mre cde inside  criticl regin tn necessry r ging trug te criticl regin mre ften tn necessry, tereby ptentilly blcking ter treds lnger tn needed. Te prgrmmer needs t ceck if ec nd every line f cde tt is inside  criticl regin relly needs t be tere. Cmputtins tt cnnt led t dt rces d nt need t be prtected nd suld be seprted. Cmplicted functin clls, fr exmple, ve n business being in tere mst f te time, nd suld be clculted befrend if pssible. As n exmple, cnsider te fllwing piece f cde:
+        \lstinputlisting[lnguge=C]{pr_mp_criticl_dem.c}
+    \item \verb|tmic|: prvides mutul exclusin nly fr memry updte. Te memry updte (write, r red-mdify-write) in te next instructin will be perfrmed tmiclly. It des nt mke te entire sttement tmic; nly te memry updte is tmic. A cmpiler migt use specil rdwre instructins fr better perfrmnce tn wen using criticl.
+        \lstinputlisting[lnguge=C]{pr_mp_tmic_exp.c}
+    \item \verb|rdered|: dentes te structured blck executed in te sequentil rder, in wic itertins wuld be executed in  sequentil lp
+        \lstinputlisting[lnguge=C]{pr_mp_rdered_exp.c}
+    \item \verb|brrier|: ec tred wits until ll f te ter treds f  tem ve reced tis pint. An implicit brrier syncrniztin is impsed t te end f  wrksring cnstruct nd t te end f  prllel regin.
+    \item \verb|nwit|: specifies tt treds cmpleting ssigned wrk cn prceed witut witing fr ll treds in te tem t finis. In te bsence f tis cluse, treds encunter  brrier syncrniztin t te end f te wrk sring cnstruct.
+\end{itemize}
+
+Sceduling cluses
+\begin{itemize}
+    \item \verb|scedule|(type, cunk): Tis is useful if te wrk sring cnstruct is  d-lp r fr-lp. Te itertin(s) in te wrk sring cnstruct re ssigned t treds ccrding t te sceduling metd defined by tis cluse. Te tree types f sceduling re:
+        \begin{enumerte}
+            \item \verb|sttic|: Here, ll te treds re llcted itertins befre tey execute te lp itertins. Te itertins re divided mng treds eqully by defult. Hwever, specifying n integer fr te prmeter cunk will llcte cunk number f cntiguus itertins t  prticulr tred.
+            \item \verb|dynmic|: Here, sme f te itertins re llcted t  smller number f treds. Once  prticulr tred finises its llcted itertin, it returns t get nter ne frm te itertins tt re left. Te prmeter cunk defines te number f cntiguus itertins tt re llcted t  tred t  time.
+            \item \verb|guided|: A lrge cunk f cntiguus itertins re llcted t ec tred dynmiclly (s bve). Te cunk size decreses expnentilly wit ec successive llctin t  minimum size specified in te prmeter cunk
+        \end{enumerte}
+\end{itemize}
+
+IF cntrl
+\begin{itemize}
+    \item \verb|if|: Tis will cuse te treds t prllelize te tsk nly if  cnditin is met. Oterwise te cde blck executes serilly.
+\end{itemize}
+
+Te if cluse is supprted n te prllel cnstruct nly, were it is used t specify cnditinl executin. Since sme vereds re inevitbly incurred wit te cretin nd termintin f  prllel regin, it is smetimes necessry t test weter tere is enug wrk in te regin t wrrnt its prlleliztin. Te min purpse f tis cluse is t enble suc  test t be specified. Te syntx f te cluse is if(sclr-lgicl-expressin ). If te lgicl expressin evlutes t true, wic mens it is f type integer nd s  nn-zer vlue in C/C++, te prllel regin will be executed by  tem f treds. If it evlutes t flse, te regin is executed by  single tred nly.
+\lstinputlisting[lnguge=C]{pr_mp_if_exp.c}
+It uses te if cluse t ceck weterte vlue f vrible n exceeds 5. If s, te prllel regin is executed by te number f treds specified. Oterwise, ne tred executes te regin: in ter wrds, it is ten n inctive prllel regin. Num treds Cluse: Te num treds cluse is supprted n te prllel cnstruct nly nd cn be used t specify w mny treds suld be in te tem executing te prllel regin. Te syntx is \verb|num_treds|(sclr-integer-expressin ). Any expressin tt evlutes t n integer vlue cn be used. Te cde sws  simple exmple demnstrting te use f te \verb|num_treds| nd \verb|if| cluses. T demnstrte te pririty rules, we insert  cll t te OpenMP runtime functin mp \verb|set_num_treds|, setting te number f treds t fur. We will verride it vi te cluses.
+
+Initiliztin
+\begin{itemize}
+    \item \verb|firstprivte|: te dt is privte t ec tred, but initilized using te vlue f te vrible using te sme nme frm te mster tred.
+    \item \verb|lstprivte|: te dt is privte t ec tred. Te vlue f tis privte dt will be cpied t  glbl vrible using te sme nme utside te prllel regin if current itertin is te lst itertin in te prllelized lp. A vrible cn be bt firstprivte nd lstprivte.
+    \item \verb|tredprivte|: Te dt is  glbl dt, but it is privte in ec prllel regin during te runtime. Te difference between tredprivte nd privte is te glbl scpe sscited wit tredprivte nd te preserved vlue crss prllel regins.
+\end{itemize}
+
+Dt cpying
+\begin{itemize}
+    \item \verb|cpyin|: similr t firstprivte fr privte vribles, tredprivte vribles re nt initilized, unless using cpyin t pss te vlue frm te crrespnding glbl vribles. N cpyut is needed becuse te vlue f  tredprivte vrible is mintined trugut te executin f te wle prgrm.
+    \item \verb|cpyprivte|: used wit single t supprt te cpying f dt vlues frm privte bjects n ne tred (te single tred) t te crrespnding bjects n ter treds in te tem.
+\end{itemize}
+
+Oters
+\begin{itemize}
+    \item \verb|flus|: frces dt t be updted in memry s ter treds see te mst recent vlue. If  tred updtes sred dt, te new vlues will first be sved in  register nd ten stred bck t te lcl cce. Te updtes re tus nt necessrily immeditely visible t ter treds, since treds executing n ter prcessrs d nt ve ccess t eiter f tese memries. Tis is knwn s te dt cnsistency prblem. At syncrniztin pints in te prgrm, te OpenMP stndrd specifies tt ll mdifictins re written bck t min memry nd re tus vilble t ll treds. Between tese syncrniztin pints, treds re permitted t ve new vlues fr sred vribles stred in teir lcl memry rter tn in te glbl sred memry. As  result, ec tred executing n OpenMP cde ptentilly s its wn temprry view f te vlues f sred dt. Tis pprc, clled  relxed cnsistency mdel, mkes it esier fr te system t ffer gd prgrm perfrmnce. But smetimes tis is nt enug. Smetimes updted vlues f sred vlues must becme visible t ter treds in-between syncrniztin pints. Te OpenMP API prvides te flus directive t mke tis pssible. Te purpse f te flus directive is t mke  tred's temprry view f sred dt cnsistent wit te vlues in memry. 
+
+        Te flus pertin pplies t ll vribles specified in te list. If n list is prvided, it pplies t ll tred-visible sred dt. If te flus pertin is invked by  tred tt s updted te vribles, teir new vlues will be flused t memry nd terefre be ccessible t ll ter treds. If te cnstruct is invked by  tred tt s nt updted  vlue, it will ensure tt ny lcl cpies f te dt re replced by te ltest vlue frm min memry. Sme cre is required wit its use. First, tis des nt syncrnize te ctins f different treds: rter, it frces te executing tred t mke its sred dt vlues cnsistent wit sred memry. Secnd, since te cmpiler rerders pertins t ennce prgrm perfrmnce, ne cnnt ssume tt te flus pertin will remin exctly in te psitin, reltive t ter pertins, in wic it ws plced by te prgrmmer.  Wt cn be gurnteed is tt it will nt cnge its psitin reltive t ny pertins invlving te flused vribles. Implicit flus pertins wit n list ccur t te fllwing lctins: All explicit nd implicit brriers (e.g., t te end f  prllel regin r wrksring cnstruct), Entry t nd exit frm criticl regins, Entry t nd exit frm lck rutines.
+
+        Te OpenMP memry mdel is  cmplicted best. One f its cmplictins is wen reding  sred vrible witut flusing it first, it is nt gurnteed t be up t dte. Actully, te prblem is even mre cmplicted, s nt nly te reding tred s t flus te vrible, but ls ny tred writing t it befrend. Befre  syncrniztin ppens, every write t  sred vrible must be fllwed by  flus, nd every red t  mdified sred vrible must be preceded by  flus. Te first flus ensures tt te updted vlues re mde visible t te successr tred befre te syncrniztin tkes plce. Te secnd flus ensures tt te successr tred re reding te updted vlues.
+
+        Fr instnce, tere is  well knwn pttern clled te prducer-cnsumer pttern:
+        \begin{enumerte}
+            \item One tred prduces vlues tt nter tred cnsumes.
+            \item Often used wit  strem f prduced vlues t implement "pipeline prllelism".
+            \item Te key is t implement pirwise syncrniztin between treds.
+        \end{enumerte}
+        Seril
+        \lstinputlisting[lnguge=C]{pr_mp_pr_cn_.c}
+        Prllel
+        \lstinputlisting[lnguge=C]{pr_mp_pr_cn_b.c}
+\end{itemize}
+
+Tred ffinity
+
+Sme vendrs recmmend setting te prcessr ffinity n OpenMP treds t sscite tem wit prticulr prcessr cres. Tis minimizes tred migrtin nd cntext-switcing cst mng cres. It ls imprves te dt lclity nd reduces te cce-cerency trffic mng te cres (r prcessrs).
+
+Te SPMD pttern
+
+Te mst cmmn pprc fr prllel lgritms is te SPMD r Single Prgrm Multiple Dt pttern. Ec tred runs te sme prgrm (Single Prgrm), but using te tred ID, tey perte n different dt (Multiple Dt) r tke sligtly different pts trug te cde.
+
+In OpenMP tis mens:
+\begin{enumerte}
+    \item A prllel regin "ner te tp f te cde".
+    \item Pick up tred ID nd number f treds.
+    \item Use tem t split up lps nd select different blcks f dt t wrk n.
+\end{enumerte}
+
+A prllel cnstruct by itself cretes n SPMD r "Single Prgrm Multiple Dt" prgrm, i.e., ec tred redundntly executes te sme cde. Hw d yu split up ptwys trug te cde between treds witin  tem? Tis is clled wrksring.
+
+Te lp wrksring cnstruct \verb|#prgm mp fr| splits up lp itertins mng te treds in  tem. Te lp cunt vrible "i" is mde "privte" t ec tred by defult. Yu culd d tis explicitly wit  \verb|privte(i)| cluse.
+
+A mtivting exmple fr lp wrksring cnstructs
+\lstinputlisting[lnguge=C]{pr_mp_lp_exp.c}
+
+Wrking wit lps:
+\begin{enumerte}
+    \item Find cmpute intensive lps
+    \item Mke te lp itertins independent. S tey cn sfely execute in ny rder witut lp-crried dependencies ( lp-crried dependence: te lp itertins re dependent n ec ter, wic destrys te prllelism.)
+    \item Plce te pprprite OpenMP directive nd test
+\end{enumerte}
+
+Reductin:
+
+Hw d we ndle tis cse?
+\lstinputlisting[lnguge=C]{pr_mp_reductin_exp.c}
+
+\verb|reductin(pertr : list)|: te vrible s  lcl cpy in ec tred, but te vlues f te lcl cpies will be summrized (reduced) int  glbl sred vrible. Tis is very useful if  prticulr pertin (specified in pertr fr tis prticulr cluse) n  vrible runs itertively, s tt its vlue t  prticulr itertin depends n its vlue t  prir itertin. Te steps tt led up t te pertinl increment re prllelized, but te treds updtes te glbl vrible in  tred sfe mnner. Tis wuld be required in prllelizing numericl integrtin f functins nd differentil equtins, s  cmmn exmple. Te prgrmmer must identify te pertins nd te vribles tt will ld te result vlues: te rest f te wrk cn ten be left t te cmpiler.
+\begin{enumerte}
+    \item OpenMP reductin cluse: \verb|reductin (p : list)|
+    \item Inside  prllel r  wrksring cnstruct:
+        \begin{enumerte}
+            \item  A lcl cpy f ec list vrible is mde nd initilized depending n te "p"
+                \begin{tble}[!tbp]
+                    \centering
+                    %\ftntesize% fntsize
+                    %\setlengt{\tbclsep}{4pt}% clumn seprtin
+                    %\renewcmmnd{\rrystretc}{1.5}% rw spce 
+                    \begin{tbulr}{lc}
+                        \line\line
+                        %\multiclumn{num_f_cls_t_merge}{lignment}{cntents} \\
+                        %\cline{i-j}% prtil line frm clumn i t clumn j
+                         Opertr & Initiliztin vlue\\
+                        \line
+                         $+$ & $0$\\
+                         $*$ & $1$\\
+                         $-$ & $0$\\
+                         $\&$ & $\sim0$\\
+                         $|$ & $0$\\
+                         $\t{}$ & $0$\\
+                         $\&\&$ & $1$\\
+                         $||$ & $0$\\
+                        \line\line
+                    \end{tbulr}
+                    \cptin{Opertrs nd initl vlues supprted n te reductin cluse in C/C++. Te initiliztin vlue is te vlue f te lcl cpy f te reductin vrible. Tis vlue is pertr, dt type, nd lnguge dependent.}
+                    \lbel{tb:pr_mp_reductin}
+                \end{tble}
+            \item Cmpiler finds stndrd reductin expressins cntining "p" nd uses tem t updte te lcl cpy.
+                \lstinputlisting[lnguge=C]{pr_mp_reductin_p.c}
+            \item Lcl cpies re reduced int  single vlue nd cmbined wit te riginl glbl vlue. Tt is, depending n te pertr used, te initil vlue f te sred reductin vrible my be updted, nt verwritten.
+                
+                Te rder in wic tred-specific vlues re cmbined is unspecified. Terefre, were flting-pint dt re cncerned, tere my be numericl differences between te results f  sequentil nd prllel run, r even f tw prllel runs using te sme number f treds. Tis is  result f te limittin in precisin wit wic cmputers represent flting-pint numbers: results my vry sligtly, depending n te rder in wic pertins re perfrmed. It is nt  cuse fr cncern if te vlues re ll f rugly te sme mgnitude. It is gd t keep tis in mind wen using te reductin cluse.
+        \end{enumerte}
+    \item Te vribles in "list" must be sred in te enclsing prllel regin, tug it is nt necessry t specify te crrespnding vribles explicitly in  "sred" cluse.
+    \item Aggregte types (including rrys), pinter types, nd reference types re nt supprted. A reductin vrible must nt be cnst-qulified. Te pertr specified n te cluse cn nt be verlded wit respect t te vribles tt pper in te cluse.
+\end{enumerte}
+
+Runtime envirnment rutines:
+\begin{itemize}
+    \item Mdify/Ceck te number f treds: \verb|mp_set_num_treds()|, \verb|mp_get_num_treds()|, \verb|mp_get_tred_num()|, \verb|mp_get_mx_treds()|
+    \item Are we in n ctive prllel regin?: \verb|mp_in_prllel()|
+    \item D yu wnt te system t dynmiclly vry te number f treds frm ne prllel cnstruct t nter?  \verb|mp_set_dynmic()|, \verb|mp_get_dynmic()|;
+    \item Hw mny prcessrs in te system? \verb|mp_num_prcs()|
+\end{itemize}
+T use  knwn, fixed number f treds in  prgrm:
+\begin{enumerte}
+    \item tell te system tt yu dn't wnt dynmic djustment f te number f treds, 
+    \item set te number f treds
+    \item ten sve te number yu gt.
+    \item even in tis cse, te system my give yu fewer treds tn requested. If te precise number f treds mtters, test fr it nd respnd ccrdingly.
+\end{enumerte}
+\lstinputlisting[lnguge=C]{pr_mp_fixed_treds.c}
+
+Lck rutines: A lck implies  memry fence ( "flus") f ll tred visible vribles. Nte:  tred lwys ccesses te mst recent cpy f te lck, s yu dn't need t use  flus n te lck vrible.
+
+A simple lck is vilble if it is unset. \verb|mp_init_lck()|, \verb|mp_set_lck()|, \verb|mp_unset_lck()|, \verb|mp_test_lck()|, \verb|mp_destry_lck()|
+\lstinputlisting[lnguge=C]{pr_mp_lck_exp.c}
+
+A nested lck is vilble if it is unset r if it is set but wned by te tred executing te nested lck functin \verb|mp_init_nest_lck()|, \verb|mp_set_nest_lck()|, \verb|mp_unset_nest_lck()|, \verb|mp_test_nest_lck()|, \verb|mp_destry_nest_lck()|
+
+\sectin{Exmples} \lbel{subsec:Exmples}
+
+\subsubsectin{Numericl integrtin}
+
+Clculte $\pi$ using numericl integrtin
+\begin{equtin}
+    \pi = \int_{0}^{1} \frc{4.0}{1 + x^2} \,\mtrm{d}x
+\end{equtin}
+
+Seril $\pi$ prgrm
+\lstinputlisting[lnguge=C]{pr_mp_pi_.c}
+Prllel $\pi$ prgrm using  prllel cnstruct
+\lstinputlisting[lnguge=C]{pr_mp_pi_b.c}
+Prllel $\pi$ prgrm witut flse sring
+\lstinputlisting[lnguge=C]{pr_mp_pi_c.c}
+\begin{enumerte}
+    \item Flse sring: nn-sred independent dt elements suc s rry elements ppen t sre te sme cce line s ec updte invlidtes te cce line, cusing te cce lines t "sls independent dt bck nd frt" between treds. Tere is n flse sring wit red-nly dt, becuse te cce lines re nt invlidted.
+
+        One f te fctrs limiting sclble perfrmnce is flse sring. It is  side effect f te cce-line grnulrity f cce cerence implemented in sred-memry systems. Any time  cce line is mdified, cce cerence strts t d its wrk. It ntifies ter cces lding  cpy f te sme line tt te line s been mdified elsewere. At suc  pint, te cpy f te line n ter prcessrs is invlidted. If te dt in te line is still needed,  new, up-t-dte cpy f it must be fetced. Cnsequently, wen tw treds updte different dt elements in te sme cce line, tey interfere wit ec ter. Tis effect is knwn s flse sring. We nte tt  mdest munt f flse sring des nt ve  significnt impct n perfrmnce. If, wever, sme r ll f te treds updte te sme cce line frequently, perfrmnce degrdes.
+
+    \item Pr sclbility: if yu prmte sclrs t n rry t supprt te cretin f n SPMD prgrm, te rry elements re cntiguus in memry nd ence sre cce lines.
+    \item Slutin:
+        \begin{itemize}
+            \item Wen updtes t n item re frequent, wrk wit lcl cpies f dt insted f n rry indexed by te tred ID.
+            \item Pd rrys s elements yu use re n distinct cce lines.
+            \item In generl, using privte dt insted f sred dt significntly reduces te risk f flse sring. In cntrst wit pdding, tis is ls  prtble ptimiztin.
+            \item Prllel te utermst lp. Prlleliztin f te i-lp wuld result in unfvrble memry ccess, giving rise t flse sring f dt.
+        \end{itemize}
+\end{enumerte}
+Prllel $\pi$ prgrm wit reductin
+\lstinputlisting[lnguge=C]{pr_mp_pi_d.c}
+Prllel $\pi$ prgrm using Mnte Crl clcultins: using Rndm numbers t slve tug prblems. Smple  prblem dmin t estimte res, cmpute prbbilities, find ptiml vlues, etc. Fr exmple, cmputing $\pi$ wit  digitl drt brd.
+\begin{enumerte}
+    \item Trw drts t te circle/squre.
+    \item Prbbility f flling in circle is prprtinl t rti f res: $P = A_c / A_s = \pi / 4$.
+    \item Cmpute $\pi$ by rndmly csing pints, cunt te frctin tt flls in te circle, cmpute $\pi$.
+\end{enumerte}
+\lstinputlisting[lnguge=C]{pr_mp_pi_e.c}
+
+Mtrix multiplictin
+\lstinputlisting[lnguge=C]{pr_mp_mtrix.c}
+
+\sectin{Perfrmnce expecttins}
+
+One migt expect t get n $N$ times speedup wen running  prgrm prllelized using OpenMP n  $N$ prcessr pltfrm. Hwever, tis seldm ccurs fr tese resns:
+\begin{itemize}
+    \item Wen  dependency exists,  prcess must wit until te dt it depends n is cmputed.
+    \item Wen multiple prcesses sre  nn-prllel prf resurce (like  file t write in), teir requests re executed sequentilly. Terefre, ec tred must wit until te ter tred releses te resurce.
+    \item A lrge prt f te prgrm my nt be prllelized by OpenMP, wic mens tt te tereticl upper limit f speedup is limited ccrding t Amdl's lw.
+    \item N prcessrs in  symmetric multiprcessing (SMP) my ve N times te cmputtin pwer, but te memry bndwidt usully des nt scle up N times. Quite ften, te riginl memry pt is sred by multiple prcessrs nd perfrmnce degrdtin my be bserved wen tey cmpete fr te sred memry bndwidt.
+    \item Mny ter cmmn prblems ffecting te finl speedup in prllel cmputing ls pply t OpenMP, like ld blncing nd syncrniztin vered.
+\end{itemize}
+
+\sectin{Best prctice} \lbel{sec:tips}
+
+Finding certin kinds f bugs in prllel prgrms cn be difficult, s n pplictin develper suld endevr t prevent tem by dpting best prctices frm te strt.
+
+\sectin{Generl}
+
+\begin{enumerte}
+    \item Wt elps wen prllelizing n pplictin is t ve  clen sequentil versin t strt wit. In prticulr, te cntrl nd dt flw trug te prgrm suld be strigtfrwrd.
+    \item Use f glbl dt tt is mdified suld be minimized t reduce te cnce f intrducing  dt rce cnditin. Smeting else tt elps wen prllelizing lps is t vid  bulky lp bdy, wic mkes te specifictin f dt-sring ttributes tedius nd errr prne. If te lp bdy perfrms  substntil munt f wrk, ne suld pus it int  functin. All vribles lcl t te functin re privte by defult, ften drmticlly reducing te dt-sring list. Tis is nt nly mre plesing t te eye but ls esier t mintin.
+    \item Use reductin were pplicble. If te pertin yu need is nt predefined, implement it yurself.
+    \item Wen ding I/O (eiter t te screen r t  file), lrge time svings re pssible by writing te infrmtin t  buffer first (tis cn smetimes even be dne in prllel) nd ten pusing it t te device in ne run.
+    \item Test yur prgrms wit multiple cmpilers nd ll wrnings turned n, becuse different cmpilers will find different mistkes.
+    \item Use tls suc s te Intel Tred Cecker, wic elp yu t detect prgrmming errrs nd write better perfrming prgrms.
+\end{enumerte}
+
+\sectin{Prllel regin}
+
+\begin{enumerte}
+    \item Interctin wit te Executin Envirnment. Te OpenMP stndrd prvides severl mens wit wic te prgrmmer cn interct wit te executin envirnment, eiter t btin infrmtin frm it r t influence te executin f  prgrm. If  prgrm relies n sme prperty f te envirnment, fr exmple, expects tt  certin minimum number f treds will execute  prllel regin, ten te prgrmmer must test fr its stisfctin explicitly. Once  tem f treds is frmed t execute  prllel regin, te number f treds in it will nt be cnged. Hwever, te number f treds t be used t execute future prllel regins cn be specified in severl wys:
+        \begin{itemize}
+            \item At te cmmnd line, te \verb|OMP_NUM_THREADS| envirnment vrible my be set by \verb|exprt OMP_NUM_THREADS=integer| prir t prgrm executin. Te vlue specified will be used t initilize te \verb|ntreds-vr| cntrl vrible.
+            \item During prgrm executin, te number f treds t be used t execute  prllel regin my be set r mdified vi te \verb|mp_set_num_treds| librry rutine. Its syntx is \verb|mp_set_num_treds|(sclr-integer-expressin), were te evlutin f te expressin must result in  psitive integer. Yu must invke \verb|mp_set_num_treds()| befre te strt f tt prllel regin.
+            \item Finlly, it is pssible t use te \verb|num_treds| cluse tgeter wit  prllel cnstruct t specify w mny treds suld be in te tem executing tt specific prllel regin. If tis is given, it temprrily verrides bt f te previus cnstructs.
+        \end{itemize}
+        Te envirnment vribles defined by te stndrd cn be set prir t prgrm executin. Te librry rutines cn ls be used t give vlues t cntrl vribles nd verride vlues set vi envirnment vribles. Bt te envirnment vribles nd te librry rutines cntrl te upper limit f te size f te tred tem tt OpenMP wuld spwn fr ll prllel regins (in te cse f \verb|OMP_NUM_THREADS|) r fr ny cnsequent prllel regin (fter  cll t \verb|mp_set_num_treds()|).Te \verb|num_treds| cluse nly temprrily verrides bt f te previus cnstructs.
+    \item If yu rely n te number f treds in  prllel regin (e.g. fr mnul wrk distributin), mke sure yu ctully get tis number (by cecking \verb|mp_get_num_treds()| fter entering te regin). Smetimes, te runtime system will give yu less treds, even wen te dynmic djustment f treds is ff!
+    \item Simply trwing \verb|#prgm mp prllel fr| befre lps rrely leds t big perfrmnce gins, becuse f vered suc s tred cretin nd sceduling. Yu terefre ve t serc fr ptentil fr finer-grined prllelism.
+    \item If ving multiple prllel lps ner ec ter, try t crete  single prllel regin encmpssing ll wrksring fr lps rter tn t encpsulte ec lp in n individul prllel regin. Mximizing prllel regins cn reduce vered frm te prllel cnstruct nd ffer mre pprtunities fr using dt in cce nd prvide  bigger cntext fr ter cmpiler ptimiztins.
+        \lstinputlisting[lnguge=C]{pr_mp_multi_lp.c}
+    \item Wen yu ve nested lps, try t prllelize nly te uter lp. Lp rerdering tecniques cn smetimes elp ere. Bewre f nested prllelism, s mny cmpilers still d nt supprt it, nd even if it is supprted, nested prllelism my nt give yu ny speed increses.
+    \item Wen prllelizing inner lps, lwys vid prllel cnstruct in inner lps. Oterwise, we repetedly experience te vereds f te prllel cnstruct. A mre efficient slutin is t split te \verb|#prgm mp prllel fr| cnstruct int its cnstituent directives. Mve te \verb|#prgm mp prllel| t enclse te entire lp nest, nd te \verb|#prgm mp fr| remins t te inner lp level.
+    \item Try t get rid f te privte cluse, nd declre privte vribles t te beginning f te prllel regin using te scping rule insted. Amng ter resns, tis mkes yur dt-sring ttribute cluses mre mngeble.
+    \item Use \verb|defult(nne)|, it will frce ec vrible t be explicitly declred in  dt-sring ttribute cluse, r else te cmpiler will cmplin. It mkes yu tink but yur dt-sring ttribute cluses fr ll vribles nd vids sme errrs. Mrever, fr gd perfrmnce, it is ften best t minimize sring f vribles.
+\end{enumerte}
+
+\sectin{Wrksring cnstructs}
+
+\begin{enumerte}
+    \item Address Pr Ld Blnce. Fr ec lp yu prllelize, ceck weter r nt every itertin f te lp s t d te sme munt f wrk. If tis is nt te cse, te sttic wrk scedule (wic is ften te defult in cmpilers) migt urt yur perfrmnce nd yu suld cnsider dynmic r guided sceduling.
+        \lstinputlisting[lnguge=C]{pr_mp_dynmic_ld.c}
+    \item Wtever kind f scedule yu cse, explicitly specify it in te wrksring cnstruct, s te defult is implementtin-defined!
+    \item If yu use rdered, remember tt yu lwys ve t use bt te rdered cluse nd te rdered cnstruct.
+\end{enumerte}
+
+\sectin{Syncrniztin}
+
+\begin{enumerte}
+    \item If mre tn ne tred ccesses  vrible nd ne f te ccesses is  write, yu must use syncrniztin, even if it is just  simple pertin like $i = 1$.  Tere re n gurntees by OpenMP n te results terwise!
+    \item Use tmic insted f criticl if pssible, becuse te cmpiler migt be ble t ptimize ut te tmic, wile it cn rrely d tt fr criticl.
+    \item Try t put s little cde inside criticl regins s pssible. Cmplicted functin clls, fr exmple, cn ften be crried ut befrend.
+    \item Try t vid te csts sscited wit repetedly clling criticl regins, fr instnce by cecking fr  cnditin befre entering te criticl regin.
+    \item Only use lcks wen necessry nd resrt t te criticl cluse in ll ter cses. If yu ve t use lcks, mke sure t invke \verb|mp_set_lck()| nd \verb|mp_unset_lck()| frm te sme tred.
+    \item Avid nesting f criticl regins, nd if needed, bewre f dedlcks.
+    \item Bewre f te OpenMP memry mdel. Even if yu nly red  sred vrible, yu ve t flus it befrend.
+\end{enumerte}
+
+\sectin{SPMD using OpenMP}
+
+Wile OpenMP is well suited fr relizing fine-grined prlleliztin, ne ls cn use it t ccmplis very crse-grined prllelism. T d s, ne cretes cde tt enclses  prgrm’s entire cmputtin in ne lrge prllel regin. Tis pprc typiclly invlves  iger prgrmming effrt but cn prvide ig levels f sclbility. It requires te prgrmmer t ssign dt nd wrk explicitly t treds. Te mst typicl usge is t emply dt prllelism, were sme r ll f te dt is prtitined s tt ec tred receives its wn prtin. Te treds will wrk n teir prt f te dt. Sred dt structures re creted t ld tse vlues tt re sred in te resulting prgrm; in mny cses, tis is just  smll frctin f te ttl munt f prgrm dt. Tis is te SPMD (single prgrm multiple dt) prgrmming style. Nte tt te vilbility f sred memry permits vrints f tis ide t be used. Fr exmple, it is pssible tt  mjr prt f te prgrm is n SPMD cde wile ter prts re nt. Likewise, sme f te dt structures migt be distributed mng te treds wile ters remin sred. In relity, SPMD style prgrms re exmples f  lw-level tred-specific prgrmming style tt s te fllwing crcteristics:
+\begin{enumerte}
+    \item Te cde cntins  smll number f lrge prllel regins.
+    \item Wrk sring is cntrlled by te user, bsed n te tred identifier (ID).
+    \item Fr true SPMD cdes, wrk sring is bsed n distributing mjr dt structures mng treds. Usully, mst f te dt is privte.
+\end{enumerte}
+Demnstrte  directive-bsed cde frgment nd n equivlent SPMD style cde. Te simple exmple sws tt te SPMD prgrmming style requires mre user effrt tn simply inserting directives int te cde. S, wt is te dvntge? It is becuse te directive-bsed is 1D prllelism nd te SPMD style is 3D type prllelism. Te true strengt f te SPMD style becmes pprent wen it is pplied t lrge pplictins. Wen using wit dt prllelism tgeter, it permits treds cnsistently updte specific subprts f te dt, wic my substntilly reduce te cst f memry ccesses, nd s te ptentil fr sclbility s te extreme number f treds fr 1D type decmpsitin is restricted by te number f ndes n te prllelized dimensin.
+\lstinputlisting[lnguge=C]{pr_mp_fine_crse.c}
+
+\sectin{Debug}
+\begin{enumerte}
+    \item Prllel executin f te cde my expse prblems in te sequentil cde tt ve nt mnifested temselves erlier. Terefre, te first step wen debugging  prllel pplictin suld lwys be te verifictin f te sequentil versin. T tis end, te prgrmmer suld disble te OpenMP directives.
+        \begin{enumerte}
+            \item Enble s mny cmpiler dignstic ptins s pssible.
+            \item Try different cmpiler ptimiztins. Te bug migt lredy sw up fr  specific set f ptins pplied t te sequentil versin.
+            \item Run te lps prllelized wit OpenMP bckwrds. If te result is wrng, te lp(s) cnnt be executed in prllel. Te reverse is nt true. If te result is ky, it des nt utmticlly men te lp cn be prllelized.
+        \end{enumerte}
+
+    \item Verifictin f te Prllel Cde.
+        \begin{enumerte}
+            \item At tis pint it cn be elpful t cnsider te nture f te runtime bevir. Fr exmple, if te bug is predictble nd des nt seem t depend n te number f treds used,  dt rce is less likely.
+            \item It is ls gd prctice t find te lwest cmpiler ptimiztin level fr wic te bug ccurs. A bug in te use f te flus directive my sw up nly if te cmpiler rerders te sttements.
+            \item Run te OpenMP versin f te prgrm n ne tred. If te errr sws up ten, tere is mst likely  bsic errr in te cde.
+            \item Selectively enble/disble OpenMP directives t zm in n te prt f te prgrm were te errr rigintes.
+            \item If  dt rce is suspected: 1) Use s mny treds s pssible. Te iger te number f treds, te mre likely te dt rce is t sw up. 2) Te use f sttic nd externl vribles in C/C++ migt cuse dt t be sred unintentinlly
+            \item Ceck tt te librries used re tred-sfe in cse ne r mre f teir functins re clled witin  prllel regin.
+        \end{enumerte}
+\end{enumerte}
+
+One f te biggest drwbcks f sred-memry prllel prgrmming is tt it migt led t te intrductin f  certin type f bug tt mnifests itself trug silent dt crruptin. T mke mtters wrse, te runtime bevir f cde wit tis kind f errr is ls nt reprducible: if ne executes te sme errneus prgrm  secnd time, te prblem migt nt sw up. cmmnly knwn s  dt rce cnditin. Tis is smetimes ls referred t simply s  dt rce r rce cnditin.
+\lstinputlisting[lnguge=C]{pr_mp_pitflls.c}
+
+Wen debugging n OMP prgrm, it is gd t use te entire number f prcesses f  desktp cmputer s tt te ld is significntly imblnced due t t lest ne prcess is ccupied severely by te system t revel syncrniztin prblems.
+
+\sectin{Orpn directives}
+
+Prcedures Subrutines nd functins cn cmplicte te use f prllel prgrmming APIs. In rder t ccmmdte tem, mjr cnges t  prgrm my smetimes be needed. One f te innvtive fetures f OpenMP is te fct tt directives my be inserted int te prcedures tt re invked frm witin  prllel regin. Tese ve cme t be knwn s rpn directives,  term tt indictes tt tey re nt in te rutine in wic te prllel regin is specified.  (Fr cmpiler buffs, tis mens tt tey re nt witin te lexicl extent f te prllel cnstruct.)
+
+OpenMP permits te use f wrk-sring cnstructs nd syncrniztin pertins in  different prcedure frm te ne in wic te crrespnding prllel regin ws creted. Tis mkes it esier fr te pplictin develper t crete lrge prllel regins witut unnecessry prgrm mdifictin. Hwever,  prcedure cntining rpn directives my ptentilly be invked frm witin multiple different prllel regins, s well s in  sequentil prt f te cde, t run time. Cnsequently, te cnstructs my be ctive in sme executin instnces nd ignred in ters. Te implementtin must ensure tt tese cses re distinguised nd delt wit pprpritely.
+\lstinputlisting[lnguge=C]{pr_mp_rpn_directive.c}
+Orpn directives – Here, te mp fr directive in functin \verb|updte_| is n rpn directive. If tis functin is invked frm utside  prllel regin, te mp fr directive is ignred. Nte tt te use f rpn directives cn elp mximize te size f te prllel regin. Te cde belw sws w tis cn be cieved. Te cmpiler s inserted n instructin tt tests weter r nt it is being executed in prllel. If s, te cde t implement te fr directive is perfrmed: ec tred btins its set f itertins nd crries ut its sre f te wrk. If, wever, te test sws tt te instructin is in  sequentil prt f te cde, te riginl lp is executed in full by te tred tt encunters it.

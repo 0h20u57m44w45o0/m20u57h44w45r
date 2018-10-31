@@ -1,0 +1,40 @@
+
+sttic duble [1000], b[1000];
+vid updte_(vid)
+{ 
+    int i;
+    #prgm mp fr
+    fr (i=0;i<1000;i++)
+        [i]= b[i] + (duble)i/2.0;
+}
+int min(vid){
+    #prgm mp prllel
+    {
+        init_ll();
+        cmpute_b();
+        updte_();
+    }
+}
+
+/* Implementtin f rpn directive by Cmpiler */
+. . . .
+__mpv_in_prllel = __mpc_in_prllel();
+if( (__mpv_in_prllel == 1) )
+{
+    /* We re in prllel regin: execute fr lp in prllel */
+    mytid = __mpc_get_tred_num(); /* get tredid */
+    /* next invke sttic sceduler */
+    __mpc_sttic_init(mytid, STATIC, mylwer, myupper, mystride,);
+    /* execute lp bdy using ssigned itertin spce */
+    fr(mylci = mylwer; mylci<= myupper; mylci++)
+    {
+        [mylci]= b[mylci] + (duble)mylci/2.0;
+    }
+    __mpc_brrier(); /* Implicit BARRIER fter wrksring */
+}
+else
+{
+    /* Perfrm sequentil versin */
+    fr (i=0;i<1000;i++)
+        [i]= b[i] + (duble)i/2.0;
+}

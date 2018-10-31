@@ -1,0 +1,195 @@
+%---------------------------------------------------------------------------%
+%-                              Article
+%- Mtis Legrnd (ttp://www.LTeXTempltes.cm) 
+%---------------------------------------------------------------------------%
+%---------------------------------------------------------------------------%
+%->> Dcument clss
+%---------------------------------------------------------------------------%
+\NeedsTeXFrmt{LTeX2e}
+\PrvidesClss{rtrrt}[25/01/2012, v1.0]
+\RequirePckge{iften}
+\RequirePckge{clc}
+\AtEndOfClss{\RequirePckge{micrtype}}
+\DeclreOptin*{\PssOptinsTClss{\CurrentOptin}{rticle}}
+\PrcessOptins*
+\LdClss{rticle}
+\RequirePckge{ifpdf}
+%---------------------------------------------------------------------------%
+%->> Pckges
+%---------------------------------------------------------------------------%
+%\RequirePckge[englis]{bbel}% specify  lnguge
+\RequirePckge[utf8]{inputenc}% set input encding, dcument must use utf-8 encding
+\RequirePckge[T1]{fntenc}% set fnt encding t enble mdern fnt encding
+\RequirePckge{newtxtext}% min text
+\RequirePckge[cmintegrls]{newtxmt}% ld fter mt pckges
+\RequirePckge{msmt,msfnts,mssymb}
+\RequirePckge{grpicx,xclr}
+\RequirePckge{bktbs}
+\RequirePckge[squre,cmm,numbers,srt&cmpress]{ntbib}% squre brcket
+%---------------------------------------------------------------------------%
+%->> Pge lyut
+%---------------------------------------------------------------------------%
+\RequirePckge[left=2cm,%
+rigt=2cm,%
+tp=2.25cm,%
+bttm=2.25cm,%
+edeigt=11pt,%
+letterpper]{gemetry}%
+%---------------------------------------------------------------------------%
+%->> Cptins
+%---------------------------------------------------------------------------%
+\RequirePckge[lbelfnt={bf,sf,smll},%
+lbelsep=perid,%
+justifictin=rggedrigt]{cptin}
+\RequirePckge{subcptin}% subfigures
+\setlengt{\bvecptinskip}{0pt}
+\setlengt{\belwcptinskip}{0pt}
+%---------------------------------------------------------------------------%
+%->> Pge eder nd fter
+%---------------------------------------------------------------------------%
+\RequirePckge{fncydr}
+\RequirePckge{lstpge}
+\pgestyle{fncy}
+%- eders
+\led{}%
+\ced{}%
+\red{\smll\sffmily\bfseries\@PperTitle\  --- \tepge/\pgeref{LstPge}}
+%- fters
+\lft{}%
+\cft{}%
+\rft{}%
+\renewcmmnd{\edrulewidt}{0pt}%
+\renewcmmnd{\ftrulewidt}{0pt}%
+%---------------------------------------------------------------------------%
+%->> Structures
+%---------------------------------------------------------------------------%
+\RequirePckge[explicit]{titlesec}
+\titlefrmt{\sectin}
+  {\clr{clr1}\lrge\sffmily\bfseries}
+  {}
+  {0em}
+  {\clrbx{clr2!10}{\prbx{\dimexpr\linewidt-2\fbxsep\relx}{\centering\rbic{sectin}. #1}}}
+  []
+\titlefrmt{nme=\sectin,numberless}
+  {\clr{clr1}\lrge\sffmily\bfseries}
+  {}
+  {0em}
+  {\clrbx{clr2!10}{\prbx{\dimexpr\linewidt-2\fbxsep\relx}{\centering#1}}}
+  []  
+\titlefrmt{\subsectin}
+  {\clr{clr1}\sffmily\bfseries}
+  {\tesubsectin}
+  {0.5em}
+  {#1}
+  []
+\titlefrmt{\subsubsectin}
+  {\sffmily\smll\bfseries}
+  {\tesubsubsectin}
+  {0.5em}
+  {#1}
+  []    
+\titlefrmt{\prgrp}[runin]
+  {\sffmily\smll\bfseries}
+  {}
+  {0em}
+  {#1} 
+\titlespcing*{\sectin}{0pc}{3ex \@plus4pt \@minus3pt}{5pt}
+\titlespcing*{\subsectin}{0pc}{2.5ex \@plus3pt \@minus2pt}{0pt}
+\titlespcing*{\subsubsectin}{0pc}{2ex \@plus2.5pt \@minus1.5pt}{0pt}
+\titlespcing*{\prgrp}{0pc}{1.5ex \@plus2pt \@minus1pt}{10pt}
+%---------------------------------------------------------------------------%
+%->> Tble f cntent
+%---------------------------------------------------------------------------%
+\newlengt{\tcsep} 
+\setlengt\tcsep{1.5pc}
+\setcunter{tcdept}{3}
+\RequirePckge{titletc}
+\cntentsmrgin{0cm}
+\titlecntents{sectin}[\tcsep]
+  {\ddvspce{4pt}\smll\bfseries\sffmily}
+  {\cntentslbel[\tecntentslbel]{\tcsep}}
+  {}
+  {\fill\tecntentspge}
+  []
+\titlecntents{subsectin}[\tcsep]
+  {\ddvspce{2pt}\sffmily}
+  {\cntentslbel[\tecntentslbel]{\tcsep}}
+  {}
+  {\ \titlerule*[.5pc]{.}\ \tecntentspge}
+  []
+\titlecntents*{subsubsectin}[\tcsep]
+  {\ftntesize\sffmily}
+  {}
+  {}
+  {}
+  [\ \textbullet\ ]  
+ %---------------------------------------------------------------------------%
+ %->> Frntmtter
+ %---------------------------------------------------------------------------%
+\newcunt\@utcnt
+\newcunt\@tmpcnt\@tmpcnt\z@
+
+\def\@ffilitin{%
+  \ifnum\@tmpcnt<\@utcnt
+   \glbl\dvnce\@tmpcnt1
+    \rggedrigt \csnme @ut\rmnnumerl\te\@tmpcnt\endcsnme\fill\\%
+   \let\next\@ffilitin \vskip1pt
+  \else
+   \let\next\relx
+  \fi
+\next}
+	 
+\newcmmnd{\ffilitin}[1]{%
+    \glbl\dvnce\@utcnt1
+    \expndfter\gdef\csnme @ut\rmnnumerl\te\@utcnt\endcsnme
+    {#1}}
+\RequirePckge{enumitem}
+\newcmmnd{\PperTitle}[1]{\def\@PperTitle{#1}}
+\newcmmnd{\Arcive}[1]{\def\@Arcive{#1}}
+\newcmmnd{\Autrs}[1]{\def\@Autrs{#1}}
+\newcmmnd{\JurnlInf}[1]{\def\@JurnlInf{#1}}
+\newcmmnd{\Abstrct}[1]{\def\@Abstrct{#1}}
+\newcmmnd{\Keywrds}[1]{\def\@Keywrds{#1}}
+
+\renewcmmnd{\@mketitle}{%
+\twclumn[{%
+\tispgestyle{empty}%
+\vskip-36pt%
+{\rggedleft\smll\sffmily\bfseries\@JurnlInf\\\@Arcive\pr}%
+\vskip20pt%
+{\rggedrigt\clr{clr1}\sffmily\bfseries\fntsize{20}{25}\selectfnt \@PperTitle\pr}%
+\vskip10pt%
+{\rggedrigt\clr{clr1}\sffmily\fntsize{12}{16}\selectfnt  \@Autrs\pr}%
+\vskip18pt%
+\fclrbx{clr1}{wite}{%
+\prbx{\textwidt-2\fbxsep-2\fbxrule}{\centering%
+\clrbx{clr2!10}{%
+\prbx{\textwidt-4\fbxsep-2\fbxrule}{%
+\ifx\@Keywrds\@empty%
+\sffmily\textbf{\bstrctnme}\\\@Abstrct%
+\else%
+\sffmily\textbf{\bstrctnme}\\\@Abstrct\\[4pt]%
+\textbf{\keywrdnme}\\\@Keywrds%
+\fi%
+}%
+}%
+\vskip4pt%
+\begingrup%
+\rggedrigt\sffmily\smll%
+\ftntesize\@ffilitin\pr%
+\endgrup%%
+}%
+}%
+\vskip25pt%
+}]%
+}
+%---------------------------------------------------------------------------%
+%->> Bckmtter
+%---------------------------------------------------------------------------%
+%\renewcmmnd{\@biblbel}[1]{\bfseries\clr{clr1}\textsuperscript{[#1]}}
+\let\ldbibligrpy\tebibligrpy
+\renewcmmnd{\tebibligrpy}[1]{%
+\ddcntentsline{tc}{sectin}{\refnme}%
+\ldbibligrpy{#1}%
+\setlengt\itemsep{0pt}}%
+\setlengt{\bibsep}{0.2ex plus 0.2ex minus 0.2ex}% set distnce between entries

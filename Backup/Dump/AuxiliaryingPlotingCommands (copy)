@@ -1,0 +1,86 @@
+//* ********************** accessories and comments ****************************
+
+//***************************************************************
+//* add texts: xstring(x,y,str,[angle,[box]])
+//* x,y is coordinates of the lower-left point of the strings
+//* str=["row1","row2","row3","..."], support latex expression
+//* angle is clockwise in degree, box is 0 for off, 1 for on
+//* code sample:
+
+//Str_LowerLeftx=0;
+//Str_LowerLefty=0;
+//Str_Content=["Row1";"Row2";"..."];
+//xstring(Str_LowerLeftx,Str_LowerLefty,Str_Content,0,0);// draw a string
+//Cur_Text=get("hdl");// get the handle of the newly created object
+////* configure current text
+//Cur_Text.font_size=4;
+//Cur_Text.font_foreground=1;// font color
+//Cur_Text.foreground=1;// box color
+//Cur_Text.alignment="center";// default is "left"
+
+//*****************************************************************
+//* add arrows: xarrows(xv,yv,[arsize,color]) or xsegs(xv,yv,[zv],[color])
+//* xv, yv are real vectors or matrix of same sizes, if
+//* xv=[xi_1 xi_2 ... xi_k ...; xf_1 xf_2 ... xf_k ... ]
+//* yv=[yi_1 yi_2 ... yi_k ...; yf_1 yf_2 ... yf_k ... ]
+//* zv=[zi_1 zi_2 ... zi_k ...; zf_1 zf_2 ... zf_k ... ]
+//* the k-th segments are defined by (xi_k,yi_k,zi_k) -> (xf_k,yf_k,zf_k)
+//* color single value for all segments, vector color(i) for segment i
+//* code sample:
+
+//Arr_xv=[-35*Diameter;-25*Diameter];
+//Arr_yv=[0;0]
+//xarrows(Arr_xv,Arr_yv);
+//Cur_Arr=get("hdl");
+//Cur_Arr.thickness=2;
+//Cur_Arr.arrow_size=-1;//default is -1
+
+//*******************************************************************
+//* draw a mark by: xploy(xv,yv[,dtype[,close]])
+//* dtype can be "lines" or "marks"; colse: 1 for closed, default is 0
+//* code sample:
+
+//Mark_Ox=[Radius*cosd(180-135)];
+//Mark_Oy=[Radius*sind(180-135)];
+//Cur_Mark=get("hdl");
+//Cur_Mark.line_mode="off";
+//Cur_Mark.mark_mode="on";
+//Cur_Mark.mark_style=0;
+//Cur_Mark.mark_size_unit = "point"
+//Cur_Mark.mark_size=10;
+//Cur_Mark.mark_foreground = 5
+//Cur_Mark.mark_background = 5
+
+//*******************************************************************
+//* draw an arc curve by: xarc(x,y,w,h,angle1*64,angle2*64)
+//* xarc draws a part of an eclipse contained in the rectangle (x,y,w,h)
+//* whrer (x,y,w,h) is (upper-left point,width,height)
+//* and in the sector between [angle1,angle1+angle2]
+//* code sample:
+
+//Rect_UpLeftx=-1.4*Radius;
+//Rect_UpLefty=1.4*Radius;
+//Width=2.8*Radius;
+//Height=2.8*Radius;
+//Angle_Start=135;
+//Angle_Aug=180-Angle_Start;
+//xarc(Rect_UpLeftx,Rect_UpLefty,Width,Height,Angle_Start*64,Angle_Aug*64);// arc
+//Cur_Arc=get("hdl");
+//Cur_Arc.thickness=2;
+//Cur_Arc.foreground = -1;
+//Cur_Arc.background = -2;
+
+//*******************************************************************
+
+//* add axis: drawaxis([options])
+//* options: x,y,dir,sub_int,fontsize,format_n,seg,textcolor,ticscolor,tics
+//* code sample:
+
+//Axis_x=[0];
+//Axis_y=[-1:1:1];
+//Direction='l';// other options: 'u','d','l','r' for up,down,left,right
+//drawaxis(x=Axis_x,y=Axis_y,dir=Direction,fontsize=2,textcolor=1,ticscolor=1,seg=1,sub_int=1,tics='v');// draw a new axis
+//Cur_Axis=get("hdl");// get the handle of the newly created object
+//Cur_Axis.tics_labels='P'+string(1:7);
+
+//**********************************************************************

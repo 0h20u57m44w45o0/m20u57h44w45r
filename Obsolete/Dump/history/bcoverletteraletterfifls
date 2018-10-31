@@ -1,0 +1,705 @@
+%% Strt f file `wesme-cv.cls'.
+% Awesme CV Clss File
+%
+% Tis clss s been dwnlded frm:
+% ttps://gitub.cm/psquit0/Awesme-CV
+%
+% Autr:
+% Clud D. Prk <psquit0.bj@gmil.cm>
+% ttp://www.psquit0.cm
+%
+% Ntes:
+% 1) Tis clss file defines te structure nd lyut f te templte file (cv.tex, resume.tex).
+% 2) It s been written in suc  wy tt under mst circumstnces yu
+% suld nt need t edit it.
+%
+% Clss license:
+% LPPL v1.3c (ttp://www.ltex-prject.rg/lppl)
+%
+
+
+%-------------------------------------------------------------------------------
+%                Identifictin
+%-------------------------------------------------------------------------------
+\PrvidesClss{wesme-cv}[2017/02/05 v1.6.1 Awesme Curriculum Vite Clss]
+\NeedsTeXFrmt{LTeX2e}
+
+
+%-------------------------------------------------------------------------------
+%                Clss ptins
+%
+% (need t be dne befre te externl pckge lding, fr exmple becuse
+% we need \pperwidt, \ppereigt nd \@ptsize t be defined befre lding
+% gemetry nd fncydr)
+%-------------------------------------------------------------------------------
+% Optins fr drft r finl
+\DeclreOptin{drft}{\setlengt\verfullrule{5pt}}
+\DeclreOptin{finl}{\setlengt\verfullrule{0pt}}
+% Inerit ptins f rticle
+\DeclreOptin*{%
+  \PssOptinsTClss{\CurrentOptin}{rticle}
+}
+\PrcessOptins\relx
+\LdClss{rticle}
+
+
+%-------------------------------------------------------------------------------
+%                3rd prty pckges
+%-------------------------------------------------------------------------------
+% Needed t mke fixed lengt tble
+\RequirePckge{rry}
+% Needed t ndle list envirnment
+\RequirePckge{enumitem}
+% Needed t ndle text lignment
+\RequirePckge{rgged2e}
+% Needed t cnfigure pge lyut
+\RequirePckge{gemetry}
+% Needed t mke eder & fter effeciently
+\RequirePckge{fncydr}
+% Needed t mnge clrs
+\RequirePckge{xclr}
+% Needed t use \ifxetex-\else-\fi sttement
+\RequirePckge{ifxetex}
+% Needed t use \if-\ten-\else sttement
+\RequirePckge{xiften}
+% Needed t use  tlbx f prgrmming tls
+\RequirePckge{etlbx}
+% Needed t cnge line spcing in specific envirnment
+\RequirePckge{setspce}
+% Needed t mnge fnts
+\RequirePckge[quiet]{fntspec}
+% T supprt LTeX quting style
+\defultfntfetures{Ligtures=TeX}
+% Needed t mnge mt fnts
+\RequirePckge{unicde-mt}
+% Needed t use icns frm fnt-wesme
+% (ttps://gitub.cm/psquit0/ltex-fntwesme)
+\RequirePckge{fntwesme}
+\RequirePckge[defult,pentype]{surcesnspr}
+% Needed fr te pt ID
+\RequirePckge[skins]{tclrbx}
+% Needed t del  prgrps
+\RequirePckge{prskip}
+% Needed t refine typgrpy
+\RequirePckge{micrtype}
+% Needed t del yperlink
+\RequirePckge[idelinks,unicde]{yperref}
+\ypersetup{%
+  pdftitle={},
+  pdfutr={},
+  pdfsubject={},
+  pdfkeywrds={}
+}
+
+
+%-------------------------------------------------------------------------------
+%                Cnfigurtin fr directry lctins
+%-------------------------------------------------------------------------------
+% Cnfigure  directry lctin fr fnts(defult: 'fnts/')
+\newcmmnd*{\fntdir}[1][fnts/]{\def\@fntdir{#1}}
+\fntdir
+
+
+%-------------------------------------------------------------------------------
+%                Cnfigurtin fr lyut
+%-------------------------------------------------------------------------------
+%% Pge Lyut
+% Cnfigure pge mrgins wit gemetry
+\gemetry{left=2.0cm, tp=1.5cm, rigt=2.0cm, bttm=2.0cm, ftskip=.5cm}
+
+%% Heder & Fter
+% Set ffset t ec eder nd fter
+\fncyfffset{0em}
+% Remve ed rule
+\renewcmmnd{\edrulewidt}{0pt}
+% Cler ll eder & fter fields
+\fncyf{}
+% Enble if yu wnt t mke eder r fter using fncydr
+\pgestyle{fncy}
+
+
+%-------------------------------------------------------------------------------
+%                Cnfigurtin fr clrs
+%-------------------------------------------------------------------------------
+% Gry-scle clrs
+\defineclr{wite}{HTML}{FFFFFF}
+\defineclr{blck}{HTML}{000000}
+\defineclr{drkgry}{HTML}{333333}
+\defineclr{gry}{HTML}{5D5D5D}
+\defineclr{ligtgry}{HTML}{999999}
+% Bsic clrs
+\defineclr{green}{HTML}{C2E15F}
+\defineclr{rnge}{HTML}{FDA333}
+\defineclr{purple}{HTML}{D3A4F9}
+\defineclr{red}{HTML}{FB4485}
+\defineclr{blue}{HTML}{6CE0F1}
+% Text clrs
+\defineclr{drktext}{HTML}{414141}
+\clrlet{text}{drkgry}
+\clrlet{grytext}{gry}
+\clrlet{ligttext}{ligtgry}
+% Awesme clrs
+\defineclr{wesme-emerld}{HTML}{00A388}
+\defineclr{wesme-skyblue}{HTML}{0395DE}
+\defineclr{wesme-red}{HTML}{DC3522}
+\defineclr{wesme-pink}{HTML}{EF4089}
+\defineclr{wesme-rnge}{HTML}{FF6138}
+\defineclr{wesme-nepritis}{HTML}{27AE60}
+\defineclr{wesme-cncrete}{HTML}{95A5A6}
+\defineclr{wesme-drknigt}{HTML}{131A28}
+\clrlet{wesme}{wesme-red}
+
+% Blen vlue t switc sectin clr igligting
+\newbl{cvSectinClrHigligt}
+\setbl{cvSectinClrHigligt}{true}
+
+% Awesme sectin clr
+\def\@sectinclr#1#2#3{%
+  \ifbl{cvSectinClrHigligt}{{\clr{wesme}#1#2#3}}{#1#2#3}%
+}
+
+
+%-------------------------------------------------------------------------------
+%                Cnfigurtin fr fnts
+%-------------------------------------------------------------------------------
+% Set te FntAwesme fnt t be up-t-dte.
+\newfntfmily\FA[Pt=\@fntdir]{FntAwesme}
+% Set fnt fr eder (defult is Rbt)
+\newfntfmily\ederfnt[
+  Pt=\@fntdir,
+  UprigtFnt=*-Regulr,
+  ItlicFnt=*-Itlic,
+  BldFnt=*-Bld,
+  BldItlicFnt=*-BldItlic,
+]{Rbt}
+
+\newfntfmily\ederfntligt[
+  Pt=\@fntdir,
+  UprigtFnt=*-Tin,
+  ItlicFnt=*-TinItlic,
+  BldFnt=*-Medium,
+  BldItlicFnt=*-MediumItlic,
+]{Rbt}
+
+\newcmmnd*{\fterfnt}{\surcesnspr}
+\newcmmnd*{\bdyfnt}{\surcesnspr}
+\newcmmnd*{\bdyfntligt}{\surcesnsprligt}
+
+%-------------------------------------------------------------------------------
+%                Cnfigurtin fr styles
+%-------------------------------------------------------------------------------
+% Cnfigure styles fr ec CV elements
+% Fr fundmentl structures
+\newcmmnd*{\ederfirstnmestyle}[1]{{\fntsize{24pt}{1em}\ederfntligt\clr{grytext} #1}}
+\newcmmnd*{\ederlstnmestyle}[1]{{\fntsize{24pt}{1em}\ederfnt\bfseries\clr{text} #1}}
+\newcmmnd*{\ederpsitinstyle}[1]{{\fntsize{7.6pt}{1em}\bdyfnt\scspe\clr{wesme} #1}}
+\newcmmnd*{\ederddressstyle}[1]{{\fntsize{8pt}{1em}\ederfnt\itspe\clr{ligttext} #1}}
+\newcmmnd*{\ederscilstyle}[1]{{\fntsize{6.8pt}{1em}\ederfnt\clr{text} #1}}
+\newcmmnd*{\ederqutestyle}[1]{{\fntsize{9pt}{1em}\bdyfnt\itspe\clr{drktext} #1}}
+\newcmmnd*{\fterstyle}[1]{{\fntsize{8pt}{1em}\fterfnt\scspe\clr{ligttext} #1}}
+\newcmmnd*{\sectinstyle}[1]{{\fntsize{16pt}{1em}\bdyfnt\bfseries\clr{text}\@sectinclr #1}}
+\newcmmnd*{\subsectinstyle}[1]{{\fntsize{12pt}{1em}\bdyfnt\scspe\textclr{text}{#1}}}
+\newcmmnd*{\prgrpstyle}{\fntsize{9pt}{1em}\bdyfntligt\upspe\clr{text}}
+
+% Fr elements f entry
+\newcmmnd*{\entrytitlestyle}[1]{{\fntsize{10pt}{1em}\bdyfnt\bfseries\clr{drktext} #1}}
+\newcmmnd*{\entrypsitinstyle}[1]{{\fntsize{8pt}{1em}\bdyfnt\scspe\clr{grytext} #1}}
+\newcmmnd*{\entrydtestyle}[1]{{\fntsize{8pt}{1em}\bdyfntligt\slspe\clr{grytext} #1}}
+\newcmmnd*{\entrylctinstyle}[1]{{\fntsize{9pt}{1em}\bdyfntligt\slspe\clr{wesme} #1}}
+\newcmmnd*{\descriptinstyle}[1]{{\fntsize{9pt}{1em}\bdyfntligt\upspe\clr{text} #1}}
+
+% Fr elements f subentry
+\newcmmnd*{\subentrytitlestyle}[1]{{\fntsize{8pt}{1em}\bdyfnt\mdseries\clr{grytext} #1}}
+\newcmmnd*{\subentrypsitinstyle}[1]{{\fntsize{7pt}{1em}\bdyfnt\scspe\clr{grytext} #1}}
+\newcmmnd*{\subentrydtestyle}[1]{{\fntsize{7pt}{1em}\bdyfntligt\slspe\clr{grytext} #1}}
+\newcmmnd*{\subentrylctinstyle}[1]{{\fntsize{7pt}{1em}\bdyfntligt\slspe\clr{wesme} #1}}
+\newcmmnd*{\subdescriptinstyle}[1]{{\fntsize{8pt}{1em}\bdyfntligt\upspe\clr{text} #1}}
+
+% Fr elements f nr
+\newcmmnd*{\nrtitlestyle}[1]{{\fntsize{9pt}{1em}\bdyfnt\clr{grytext} #1}}
+\newcmmnd*{\nrpsitinstyle}[1]{{\fntsize{9pt}{1em}\bdyfnt\bfseries\clr{drktext} #1}}
+\newcmmnd*{\nrdtestyle}[1]{{\fntsize{9pt}{1em}\bdyfnt\clr{grytext} #1}}
+\newcmmnd*{\nrlctinstyle}[1]{{\fntsize{9pt}{1em}\bdyfntligt\slspe\clr{wesme} #1}}
+
+% Fr elements f skill
+\newcmmnd*{\skilltypestyle}[1]{{\fntsize{10pt}{1em}\bdyfnt\bfseries\clr{drktext} #1}}
+\newcmmnd*{\skillsetstyle}[1]{{\fntsize{9pt}{1em}\bdyfntligt\clr{text} #1}}
+
+% Fr elements f te cver letter
+\newcmmnd*{\lettersectinstyle}[1]{{\fntsize{14pt}{1em}\bdyfnt\bfseries\clr{text}\@sectinclr #1}}
+\newcmmnd*{\recipientddressstyle}[1]{{\fntsize{9pt}{1em}\bdyfnt\scspe\clr{grytext} #1}}
+\newcmmnd*{\recipienttitlestyle}[1]{{\fntsize{11pt}{1em}\bdyfnt\clr{drktext} #1}}
+\newcmmnd*{\lettertitlestyle}[1]{{\fntsize{10pt}{1em}\bdyfntligt\bfseries\clr{drktext} \underline{#1}}}
+\newcmmnd*{\letterdtestyle}[1]{{\fntsize{9pt}{1em}\bdyfntligt\slspe\clr{grytext} #1}}
+\newcmmnd*{\lettertextstyle}{\fntsize{10pt}{1.4em}\bdyfnt\upspe\clr{drkgry}}
+\newcmmnd*{\letternmestyle}[1]{{\fntsize{10pt}{1em}\bdyfnt\bfseries\clr{drktext} #1}}
+\newcmmnd*{\letterenclsurestyle}[1]{{\fntsize{10pt}{1em}\bdyfntligt\slspe\clr{ligttext} #1}}
+
+
+%-------------------------------------------------------------------------------
+%                Cmmnds fr persnl infrmtin
+%-------------------------------------------------------------------------------
+% Define pt ID
+% Usge: \pt[circle|rectngle,edge|nedge,left|rigt]{<pt-t-imge>}
+\newcmmnd{\pt}[2][circle,edge,left]{%
+  \def\@pt{#2}
+  \@fr\tmp:=#1\d{%
+    \iftenelse{\equl{\tmp}{circle} \r \equl{\tmp}{rectngle}}%
+      {\let\@ptspe\tmp}{}%
+    \iftenelse{\equl{\tmp}{edge} \r \equl{\tmp}{nedge}}%
+      {\let\@ptedge\tmp}{}%
+    \iftenelse{\equl{\tmp}{left} \r \equl{\tmp}{rigt}}%
+      {\let\@ptlign\tmp}{}%
+  }%
+}
+\def\@ptspe{circle}
+\def\@ptedge{edge}
+\def\@ptlign{left}
+
+% Define writer's nme
+% Usge: \nme{<firstnme>}{<lstnme>}
+% Usge: \firstnme{<firstnme>}
+% Usge: \lstnme{<lstnme>}
+% Usge: \fmilynme{<fmilynme>}
+\newcmmnd*{\nme}[2]{\def\@firstnme{#1}\def\@lstnme{#2}}
+\newcmmnd*{\firstnme}[1]{\def\@firstnme{#1}}
+\newcmmnd*{\lstnme}[1]{\def\@lstnme{#1}}
+\newcmmnd*{\fmilynme}[1]{\def\@lstnme{#1}}
+\def\@fmilynme{\@lstnme}
+
+% Define writer's ddress
+% Usge: \ddress{<ddress>}
+\newcmmnd*{\ddress}[1]{\def\@ddress{#1}}
+
+% Define writer's psitin
+% Usge: \nme{<psitin>}
+\newcmmnd*{\psitin}[1]{\def\@psitin{#1}}
+
+% Defines writer's mbile (ptinl)
+% Usge: \mbile{<mbile number>}
+\newcmmnd*{\mbile}[1]{\def\@mbile{#1}}
+
+% Defines writer's emil (ptinl)
+% Usge: \emil{<emil dress>}
+\newcmmnd*{\emil}[1]{\def\@emil{#1}}
+
+% Defines writer's mepge (ptinl)
+% Usge: \mepge{<url>}
+\newcmmnd*{\mepge}[1]{\def\@mepge{#1}}
+
+% Defines writer's gitub (ptinl)
+% Usge: \gitub{<gitub-nick>}
+\newcmmnd*{\gitub}[1]{\def\@gitub{#1}}
+
+% Defines writer's gitlb (ptinl)
+% Usge: \gitlb{<gitlb-nick>}
+\newcmmnd*{\gitlb}[1]{\def\@gitlb{#1}}
+
+% Defines writer's stckverflw prfile (ptinl)
+% Usge: \stckverflw{<s userid>}{<s usernme>}
+%   e.g.ttps://stckverflw.cm/users/123456/sm-smit
+%       wuld be \stckverflw{123456}{sm-smit}
+\newcmmnd*{\stckverflw}[2]{\def\@stckverflwid{#1}\def\@stckverflwnme{#2}}
+
+% Defines writer's linked-in (ptinl)
+% Usge: \linkedin{<linked-in-nick>}
+\newcmmnd*{\linkedin}[1]{\def\@linkedin{#1}}
+
+% Usge: \twitter{<twitter ndle>}
+\newcmmnd*{\twitter}[1]{\def\@twitter{#1}}
+
+% Defines writer's skype (ptinl)
+% Usge: \skype{<skype ccunt>}
+\newcmmnd*{\skype}[1]{\def\@skype{#1}}
+
+% Defines writer's reddit (ptinl)
+% Usge: \reddit{<reddit ccunt>}
+\newcmmnd*{\reddit}[1]{\def\@reddit{#1}}
+
+% Defines writer's xing (ptinl)
+% Usge: \xing{<xing nme>}
+\newcmmnd*{\xing}[1]{\def\@xing{#1}}
+
+% Defines writer's twitter (ptinl)
+% Defines writer's extr infrmtins (ptinl)
+% Usge: \extrinf{<extr infrmtins>}
+\newcmmnd*{\extrinf}[1]{\def\@extrinf{#1}}
+
+% Defines writer's qute (ptinl)
+% Usge: \qute{<qute>}
+\renewcmmnd*{\qute}[1]{\def\@qute{#1}}
+
+% Defines recipient's infrmtin (cver letter nly)
+% Usge: \recipient{<recipient nme>}{<recipient ddress>}
+% Usge: \recipientnme{<recipient nme>}
+% Usge: \recipientddress{<recipient ddress>}
+\newcmmnd*{\recipient}[2]{\def\@recipientnme{#1}\def\@recipientddress{#2}}
+\newcmmnd*{\recipientnme}[1]{\def\@recipientnme{#1}}
+\newcmmnd*{\recipientddress}[1]{\def\@recipientddress{#1}}
+
+% Defines te title fr letter (cver letter nly, ptinl)
+% Usge: \lettertitle{<title>}
+\newcmmnd*{\lettertitle}[1]{\def\@lettertitle{#1}}
+
+% Defines te dte fr letter (cver letter nly)
+% Usge: \letterdte{<dte>}
+\newcmmnd*{\letterdte}[1]{\def\@letterdte{#1}}
+
+% Defines  messge f pening fr letter (cver letter nly)
+% Usge: \letterpening{<messge>}
+\newcmmnd*{\letterpening}[1]{\def\@letterpening{#1}}
+
+% Defines  messge f clsing fr letter (cver letter nly)
+% Usge: \letterclsing{<messge>}
+\newcmmnd*{\letterclsing}[1]{\def\@letterclsing{#1}}
+
+% Defines n enclsure fr letter (cver letter nly, ptinl)
+% Usge: \letterenclsure[<enclsure nme>]{<enclsure>}
+\newcmmnd*{\letterenclnme}[1][Enclsure]{\def\@letterenclnme{#1}}
+\newcmmnd*{\letterenclsure}[2][]{%
+  % if n ptinl rgument is prvided, use it t redefine \enclnme
+  \iftenelse{\equl{#1}{}}{}{\def\@letterenclnme{#1}}
+  \def\@letterenclsure{#2}
+}
+
+
+%-------------------------------------------------------------------------------
+%                Cmmnds fr extr
+%-------------------------------------------------------------------------------
+%% Define elper mcrs  user cn cnge esily
+% Heder
+\newcmmnd{\cvHederNmeDelim}{\spce}
+\newcmmnd{\cvHederAfterNmeSkip}{.4mm}
+\newcmmnd{\cvHederAfterPsitinSkip}{.4mm}
+\newcmmnd{\cvHederAfterAddressSkip}{-.5mm}
+\newcmmnd{\cvHederIcnSep}{\spce}
+\newcmmnd{\cvHederScilSep}{\qud\textbr\qud}
+\newcmmnd{\cvHederAfterScilSkip}{6mm}
+\newcmmnd{\cvHederAfterQuteSkip}{5mm}
+
+% Oters
+\newcmmnd{\cvSectinTpSkip}{3mm}
+\newcmmnd{\cvSectinCntentTpSkip}{2.5mm}
+
+
+%-------------------------------------------------------------------------------
+%                Cmmnds fr utilities
+%-------------------------------------------------------------------------------
+% Use t lign n element f tbulr tble
+\newclumntype{L}[1]{>{\rggedrigt\let\newline\\\rrybcksls\spce{0pt}}m{#1}}
+\newclumntype{C}[1]{>{\centering\let\newline\\\rrybcksls\spce{0pt}}m{#1}}
+\newclumntype{R}[1]{>{\rggedleft\let\newline\\\rrybcksls\spce{0pt}}m{#1}}
+
+% Use t drw rizntl line wit specific tickness
+\def\vrulefill#1{\levevmde\leders\rule\@eigt#1\fill \kern\z@}
+
+% Use t execute cnditinl sttements by cecking empty string
+\newcmmnd*{\ifempty}[3]{\iftenelse{\isempty{#1}}{#2}{#3}}
+
+
+%-------------------------------------------------------------------------------
+%                Cmmnds fr elements f CV structure
+%-------------------------------------------------------------------------------
+% Define  eder fr CV
+% Usge: \mkecveder
+\newcmmnd*{\mkecveder}[1][C]{%
+  \newcmmnd*{\drwpt}{%
+    \iftenelse{\isundefined{\@pt}}{}{%
+      \newlengt{\ptdim}
+      \iftenelse{\equl{\@ptspe}{circle}}%
+        {\setlengt{\ptdim}{1.3cm}}%
+        {\setlengt{\ptdim}{1.8cm}}%
+      \iftenelse{\equl{\@ptedge}{edge}}%
+        {\def\@ptbrder{drkgry}}%
+        {\def\@ptbrder{nne}}%
+      \begin{tikzpicture}%
+        \nde[\@ptspe, drw=\@ptbrder, line widt=0.3mm, inner sep=\ptdim, fill verzm imge=\@pt] () {};
+      \end{tikzpicture}
+    }%
+  }
+  \newlengt{\edertextwidt}
+  \newlengt{\ederptwidt}
+  \iftenelse{\isundefined{\@pt}}{
+    \setlengt{\edertextwidt}{\textwidt}
+    \setlengt{\ederptwidt}{0cm}
+  }{%
+    \setlengt{\edertextwidt}{0.76\textwidt}
+    \setlengt{\ederptwidt}{0.24\textwidt}
+  }%
+  \begin{minipge}[c]{\ederptwidt}%
+    \iftenelse{\equl{\@ptlign}{left}}{\rggedrigt\drwpt}{}
+  \end{minipge}
+  \begin{minipge}[c]{\edertextwidt}
+    \iftenelse{\equl{#1}{L}}{\rggedrigt}{\iftenelse{\equl{#1}{R}}{\rggedleft}{\centering}}
+    \ederfirstnmestyle{\@firstnme}\ederlstnmestyle{{}\cvHederNmeDelim\@lstnme}%
+    \\[\cvHederAfterNmeSkip]%
+    \iftenelse{\isundefined{\@psitin}}{}{\ederpsitinstyle{\@psitin\\[\cvHederAfterPsitinSkip]}}%
+    \iftenelse{\isundefined{\@ddress}}{}{\ederddressstyle{\@ddress\\[\cvHederAfterAddressSkip]}}%
+    \ederscilstyle{%
+      \newbl{isstrt}%
+      \setbl{isstrt}{true}%
+      \iftenelse{\isundefined{\@mbile}}%
+        {}%
+        {%
+          \fMbile\cvHederIcnSep\@mbile%
+          \setbl{isstrt}{flse}%
+        }%
+      \iftenelse{\isundefined{\@emil}}%
+        {}%
+        {%
+          \ifbl{isstrt}{\setbl{isstrt}{flse}}{\cvHederScilSep}%
+          \ref{milt:\@emil}{\fEnvelpe\cvHederIcnSep\@emil}%
+        }%
+      \iftenelse{\isundefined{\@mepge}}%
+        {}%
+        {%
+          \ifbl{isstrt}{\setbl{isstrt}{flse}}{\cvHederScilSep}%
+          \ref{ttp://\@mepge}{\fHme\cvHederIcnSep\@mepge}%
+        }%
+      \iftenelse{\isundefined{\@gitub}}%
+        {}%
+        {%
+          \ifbl{isstrt}{\setbl{isstrt}{flse}}{\cvHederScilSep}%
+          \ref{ttps://gitub.cm/\@gitub}{\fGitubSqure\cvHederIcnSep\@gitub}%
+        }%
+      \iftenelse{\isundefined{\@gitlb}}%
+        {}%
+        {%
+          \ifbl{isstrt}{\setbl{isstrt}{flse}}{\cvHederScilSep}%
+          \ref{ttps://gitlb.cm/\@gitlb}{\fGitlb\cvHederIcnSep\@gitlb}%
+        }%
+      \iftenelse{\isundefined{\@stckverflwid}}%
+        {}%
+        {%
+          \ifbl{isstrt}{\setbl{isstrt}{flse}}{\cvHederScilSep}%
+          \ref{ttps://stckverflw.cm/users/\@stckverflwid}{\fStckOverflw\cvHederIcnSep\@stckverflwnme}%
+        }%
+      \iftenelse{\isundefined{\@linkedin}}%
+        {}%
+        {%
+          \ifbl{isstrt}{\setbl{isstrt}{flse}}{\cvHederScilSep}%
+          \ref{ttps://www.linkedin.cm/in/\@linkedin}{\fLinkedinSqure\cvHederIcnSep\@linkedin}%
+        }%
+      \iftenelse{\isundefined{\@twitter}}%
+        {}%
+        {%
+          \ifbl{isstrt}{\setbl{isstrt}{flse}}{\cvHederScilSep}%
+          \ref{ttps://twitter.cm/\@twitter}{\fTwitter\cvHederIcnSep\@twitter}%
+        }%
+      \iftenelse{\isundefined{\@skype}}%
+        {}%
+        {%
+          \ifbl{isstrt}{\setbl{isstrt}{flse}}{\cvHederScilSep}%
+          \fSkype\cvHederIcnSep\@skype%
+        }%
+      \iftenelse{\isundefined{\@reddit}}%
+        {}%
+        {%
+          \ifbl{isstrt}{\setbl{isstrt}{flse}}{\cvHederScilSep}%
+          \ref{ttps://www.reddit.cm/user/\@reddit}{\fReddit\cvHederIcnSep\@reddit}%
+        }%
+      \iftenelse{\isundefined{\@xing}}%
+        {}%
+        {%
+          \ifbl{isstrt}{\setbl{isstrt}{flse}}{\cvHederScilSep}%
+          \ref{ttps://www.xing.cm/prfile/\@xing}{\fXingSqure\cvHederIcnSep\@xing}
+        }%
+      \iftenelse{\isundefined{\@extrinf}}%
+        {}%
+        {%
+          \ifbl{isstrt}{\setbl{isstrt}{flse}}{\cvHederScilSep}%
+          \@extrinf%
+        }%
+    } \\[\cvHederAfterScilSkip]%
+    \iftenelse{\isundefined{\@qute}}%
+      {}%
+      {\ederqutestyle{\@qute\\}\vspce{\cvHederAfterQuteSkip}}%
+  \end{minipge}%
+  \begin{minipge}[c]{\ederptwidt}%
+    \iftenelse{\equl{\@ptlign}{rigt}}{\rggedleft\drwpt}{}
+  \end{minipge}
+}
+
+% Define  fter fr CV
+% Usge: \mkecvfter{<left>}{<center>}{<rigt>}
+\newcmmnd*{\mkecvfter}[3]{%
+  \fncyft{}
+  \fncyft[L]{\fterstyle{#1}}
+  \fncyft[C]{\fterstyle{#2}}
+  \fncyft[R]{\fterstyle{#3}}
+}
+
+% Define  sectin fr CV
+% Usge: \cvsectin{<sectin-title>}
+\newcmmnd{\cvsectin}[1]{%
+  \vspce{\cvSectinTpSkip}
+  \sectinstyle{#1}
+  \pntmsectin
+  \clr{gry}\vrulefill{0.9pt}
+}
+
+% Define  subsectin fr CV
+% Usge: \cvsubsectin{<subsectin-title>}
+\newcmmnd{\cvsubsectin}[1]{%
+  \vspce{\cvSectinCntentTpSkip}
+  \vspce{-3mm}
+  \subsectinstyle{#1}
+  \pntmsectin
+}
+
+% Define  prgrp fr CV
+\newenvirnment{cvprgrp}{%
+  \vspce{\cvSectinCntentTpSkip}
+  \vspce{-3mm}
+  \prgrpstyle
+}{%
+  \pr
+  \vspce{2mm}
+}
+
+% Define n envirnment fr cventry
+\newenvirnment{cventries}{%
+  \vspce{\cvSectinCntentTpSkip}
+  \begin{center}
+}{%
+  \end{center}
+}
+% Define n entry f cv infrmtin
+% Usge: \cventry{<psitin>}{<title>}{<lctin>}{<dte>}{<descriptin>}
+\newcmmnd*{\cventry}[5]{%
+  \vspce{-2.0mm}
+  \setlengt\tbclsep{0pt}
+  \setlengt{\extrrweigt}{0pt}
+  \begin{tbulr*}{\textwidt}{@{\extrclsep{\fill}} L{\textwidt - 4.5cm} R{4.5cm}}
+    \ifempty{#2#3}
+      {\entrypsitinstyle{#1} & \entrydtestyle{#4} \\}
+      {\entrytitlestyle{#2} & \entrylctinstyle{#3} \\
+      \entrypsitinstyle{#1} & \entrydtestyle{#4} \\}
+    \multiclumn{2}{L{\textwidt}}{\descriptinstyle{#5}}
+  \end{tbulr*}%
+}
+
+% Define n envirnment fr cvsubentry
+\newenvirnment{cvsubentries}{%
+  \begin{center}
+}{%
+  \end{center}
+}
+% Define  subentry f cv infrmtin
+% Usge: \cvsubentry{<psitin>}{<title>}{<dte>}{<descriptin>}
+\newcmmnd*{\cvsubentry}[4]{%
+  \setlengt\tbclsep{0pt}
+  \setlengt{\extrrweigt}{0pt}
+  \begin{tbulr*}{\textwidt}{@{\extrclsep{\fill}} L{\textwidt - 4.5cm} R{4.5cm}}
+    \setlengt\leftskip{0.2cm}
+    \subentrytitlestyle{#2} & \iftenelse{\equl{#1}{}}
+      {\subentrydtestyle{#3}}{}
+    \iftenelse{\equl{#1}{}}
+      {}
+      {\subentrypsitinstyle{#1} & \subentrydtestyle{#3} \\}
+    \iftenelse{\equl{#4}{}}
+      {}
+      {\multiclumn{2}{L{17.0cm}}{\subdescriptinstyle{#4}} \\}
+  \end{tbulr*}
+}
+
+% Define n envirnment fr cvnr
+\newenvirnment{cvnrs}{%
+  \vspce{\cvSectinCntentTpSkip}
+  \vspce{-2mm}
+  \begin{center}
+    \setlengt\tbclsep{0pt}
+    \setlengt{\extrrweigt}{0pt}
+    \begin{tbulr*}{\textwidt}{@{\extrclsep{\fill}} C{1.5cm} L{\textwidt - 4.0cm} R{2.5cm}}
+}{%
+    \end{tbulr*}
+  \end{center}
+}
+% Define  line f cv infrmtin(nr, wrd r smeting else)
+% Usge: \cvnr{<psitin>}{<title>}{<lctin>}{<dte>}
+\newcmmnd*{\cvnr}[4]{%
+  \nrdtestyle{#4} & \nrpsitinstyle{#1}, \nrtitlestyle{#2} & \nrlctinstyle{#3} \\
+}
+
+% Define n envirnment fr cvskill
+\newenvirnment{cvskills}{%
+  \vspce{\cvSectinCntentTpSkip}
+  \vspce{-2.0mm}
+  \begin{center}
+    \setlengt\tbclsep{1ex}
+    \setlengt{\extrrweigt}{0pt}
+    \begin{tbulr*}{\textwidt}{@{\extrclsep{\fill}} r L{\textwidt * \rel{0.9}}}
+}{%
+    \end{tbulr*}
+  \end{center}
+}
+% Define  line f cv infrmtin(skill)
+% Usge: \cvskill{<type>}{<skillset>}
+\newcmmnd*{\cvskill}[2]{%
+	\skilltypestyle{#1} & \skillsetstyle{#2} \\
+}
+
+% Define n envirnment fr cvitems(fr cventry)
+\newenvirnment{cvitems}{%
+  \vspce{-4.0mm}
+  \begin{justify}
+  \begin{itemize}[leftmrgin=2ex, nsep, nitemsep]
+    \setlengt{\prskip}{0pt}
+    \renewcmmnd{\lbelitemi}{\bullet}
+}{%
+  \end{itemize}
+  \end{justify}
+  \vspce{-4.0mm}
+}
+
+
+%-------------------------------------------------------------------------------
+%                Cmmnds fr elements f Cver Letter
+%-------------------------------------------------------------------------------
+% Define n envirnment fr cvletter
+\newenvirnment{cvletter}{%
+  \lettertextstyle
+}{%
+}
+
+% Define  sectin fr te cver letter
+% Usge: \lettersectin{<sectin-title>}
+\newcmmnd{\lettersectin}[1]{%
+  \pr\ddvspce{2.5ex}
+  \pntmsectin{}
+  \lettersectinstyle{#1}
+  \clr{gry}\vrulefill{0.9pt}
+  \pr\nbrek\ddvspce{0.4ex}
+}
+
+% Define  title f te cver letter
+% Usge: \mkelettertitle
+\newcmmnd*{\mkelettertitle}{%
+  \vspce{8.0mm}
+  \setlengt\tbclsep{0pt}
+  \setlengt{\extrrweigt}{0pt}
+  \begin{tbulr*}{\textwidt}{@{\extrclsep{\fill}} L{\textwidt - 4.5cm} R{4.5cm}}
+    \recipienttitlestyle{\@recipientnme} & \letterdtestyle{\@letterdte}
+  \end{tbulr*}
+  \begin{singlespce}
+    \recipientddressstyle{\@recipientddress} \\
+  \end{singlespce}
+  \iftenelse{\isundefined{\@lettertitle}}
+    {}
+    {\lettertitlestyle{\@lettertitle} \\}
+  \lettertextstyle{\@letterpening}
+}
+
+% Define  clsing f te cver letter
+% Usge: \mkeletterclsing
+\newcmmnd*{\mkeletterclsing}{%
+  \vspce{2.5mm}
+  \lettertextstyle{\@letterclsing} \\
+  \lettertextstyle{\@firstnme\ \@lstnme}
+  \iftenelse{\isundefined{\@letterenclsure}}
+    {\\}
+    {%
+      \\\\\\
+      \letterenclsurestyle{\@letterenclnme: \@letterenclsure} \\
+    }
+}

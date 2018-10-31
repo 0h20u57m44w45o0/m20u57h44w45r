@@ -1,0 +1,107 @@
+#!/bin/bash
+set -e
+
+#***************************************************************************#
+#                          Vim Configuration                                #
+#                          <By Huangrui Mo>                                 #
+# Copyright (C) Huangrui Mo <huangrui.mo@gmail.com>                         #
+# under the terms of the GNU General Public License as published by         #
+# the Free Software Foundation, either version 3 of the License, or         #
+# (at your option) any later version.                                       #
+#***************************************************************************#
+
+echo "#***************************************************************************#"
+#* remove old ~/.vim directory
+if [[ -d ~/.vim ]]; then
+    rm -rf ~/.vim
+fi
+#* remove old ~/.vimrc
+if [[ -L ~/.vimrc ]]; then
+    rm ~/.vimrc
+fi
+#* creat a blank ~/.vim directory
+mkdir ~/.vim
+#* copy the vimrc file into the .vim directory
+if [[ -f ./vimrc ]]; then
+    cp ./vimrc ~/.vim/vimrc
+else
+    echo "can't find the vimrc file..."
+fi
+#* create symbolic links so that ~/.vimrc points to the ~/.vim/vimrc file:
+ln -s ~/.vim/vimrc ~/.vimrc
+#* clone the pathogen repo by git
+git clone git://github.com/tpope/vim-pathogen.git pathogen
+#* move pathogen to ~/.vim directory
+mv pathogen/autoload ~/.vim/autoload
+#* delete other download files
+rm -rf ./pathogen
+#* save current dir
+OldPWD=`pwd`
+#* track configurations with git
+cd ~/.vim
+git init
+git add .
+git commit -m "Initial commit"
+#* manage plugins using git submodules
+mkdir ~/.vim/bundle
+#***************************************************************************#
+# => Language: syntax checking with <F8>
+#***************************************************************************#
+git submodule add git://github.com/scrooloose/syntastic.git bundle/syntastic
+git submodule init && git submodule update
+git add .
+git commit -m "Install syntastic.vim bundle as a submodule."
+#***************************************************************************#
+# => Completion: insert mode completion with <c-p>
+#***************************************************************************#
+git submodule add git://github.com/vim-scripts/supertab.git bundle/supertab
+git submodule init && git submodule update
+git add .
+git commit -m "Install supertab.vim bundle as a submodule."
+#***************************************************************************#
+# => Completion: snippets completion with <tab>
+#***************************************************************************#
+git submodule add git://github.com/msanders/snipmate.vim.git bundle/snipmate
+git submodule init && git submodule update
+git add .
+git commit -m "Install snipmate.vim bundle as a submodule."
+#***************************************************************************#
+# => Integration: command mode file explorer with <c-p>
+#***************************************************************************#
+git submodule add git://github.com/vim-scripts/ctrlp.vim.git bundle/ctrlp
+git submodule init && git submodule update
+git add .
+git commit -m "Install ctrlp.vim bundle as a submodule."
+#***************************************************************************#
+# => Interface: source code browser
+#***************************************************************************#
+git submodule add git://github.com/majutsushi/tagbar.git bundle/tagbar
+git submodule init && git submodule update
+git add .
+git commit -m "Install tagbar.vim bundle as a submodule."
+#***************************************************************************#
+# => Commands: dealing with parentheses in pairs
+#***************************************************************************#
+git submodule add git://github.com/tpope/vim-surround.git bundle/surround
+git submodule init && git submodule update
+git add .
+git commit -m "Install surround.vim bundle as a submodule."
+#***************************************************************************#
+# => Pull latest upstream changes
+#***************************************************************************#
+#git submodule foreach git pull origin master
+#***************************************************************************#
+# => Customize snippets scripts
+#***************************************************************************#
+if [[ -d ~/.vim/bundle/snipmate/snippets ]]; then
+    if [[ -d $OldPWD/snippets ]]; then
+        cp $OldPWD/snippets/*.snippets ~/.vim/bundle/snipmate/snippets/ 
+    fi
+fi
+#* creat the plaintex.snippets file which is the same as tex.snippets
+if [[ -f ~/.vim/bundle/snipmate/snippets/tex.snippets ]]; then
+    cp  ~/.vim/bundle/snipmate/snippets/tex.snippets  ~/.vim/bundle/snipmate/snippets/plaintex.snippets
+fi
+echo "#***************************************************************************#"
+#***************************************************************************#
+

@@ -1,0 +1,354 @@
+﻿"---------------------------------------------------------------------------"
+"                          Vim Cnfigurtin                                "
+"                          <By Hungrui M>                                 "
+" Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                         "
+" under te terms f te GNU Generl Public License s publised by         "
+" te Free Sftwre Fundtin, eiter versin 3 f te License, r         "
+" (t yur ptin) ny lter versin.                                       "
+"---------------------------------------------------------------------------"
+
+"---------------------------------------------------------------------------"
+"->> Plugin mngement
+"---------------------------------------------------------------------------"
+
+execute ptgen#infect()
+
+"---------------------------------------------------------------------------"
+"->> User interfce
+"---------------------------------------------------------------------------"
+
+"-
+"--> Generl setting
+"-
+"- cler unexpected settings nd reset ptins wen re-surcing .vimrc
+set ncmptible
+"- set  mp leder t d extr key cmbintins
+let mpleder=","
+let g:mpleder=","
+"- quickly time ut n key cdes but never time ut n mppings
+set ntimeut ttimeut ttimeutlen=200
+"- disble ll bells n errrs
+set bellff=ll
+"- dd  bit extr mrgin t te left
+set fldclumn=1
+"- disply line numbers n te left
+set number
+"- enble use f te muse fr ll mdes
+set muse=
+"- ide te muse wen crcters re typed
+set museide
+"- eigt f te cmmnd br
+set cmdeigt=1
+"- lwys sw te sttus line
+set lststtus=2
+"- frmt te sttus line
+set sttusline=\[%{&ff}:%{&fenc}:%Y]\ \ %{HsPste()}%F%m%r%\ %w\ \ CWD:\%r%{getcwd()}%\ %=\ \Line:\ %5l/%5L\ \ \ \Clumn:\ %5c\ \[%P%*]
+"- visul utcmplete fr cmmnd line
+set wildmenu
+set wildmde=list:lngest,full
+"- ignre cmpiled files
+set wildignre=*.,*.d,*~,*.pyc,*.ux,*.bbl,*.blg,*.lf,*.lg,*.lt,*.tc,*.spl,*.vrb,*.ut,*.pdf,*.jpg,*.png
+if s("win16") || s("win32")
+    set wildignre+=*/.git/*,*/.g/*,*/.svn/*,*/.DS_Stre
+else
+    set wildignre+=.git\*,.g\*,.svn\*
+endif
+"-
+"--> File bckup nd editing
+"-
+"- set t ut red wen  file is cnged frm te utside
+set utred
+"- turn file bckup ff
+set nbckup
+set nwritebckup
+set nswpfile
+"- lines f istry t remember
+set istry=700
+"- levels f und
+set undlevels=700
+"- remember inf but pen buffers n clse
+set viminf^=%
+"-  buffer becmes idden wen it is bndned
+set idden
+"- llw bckspcing ver utindent, line breks nd strt f insert ctin
+set bckspce=el,strt,indent
+"- tggle pste mde n nd ff fr psting nd indenting  blck f text
+mp <leder>pp :setlcl pste!<cr>
+"- syncrnize unnmed register wit te system clipbrd
+"- requires te +clipbrd feture flg (ceck te utput f vim --versin)
+"- If nt present, instll vim-gnme r vim-gtk r gvim
+set clipbrd^=unnmed,unnmedplus
+"- stp certin mvements frm lwys ging t te first crcter f  line
+set nstrtfline
+"- mve verticlly by visul line rter tn rel line
+nnremp j gj
+nnremp k gk
+"- set te number f cntext lines bve nd belw te cursr
+set scrllff=0
+"- disply lines s muc s pssible
+set disply+=lstline
+"- select te lst cnged text
+nnremp gv `[v`]
+"- fst sving nd quit mpped by te mp leder
+nnremp <leder>w :w<cr>
+nnremp <leder>q :q<cr>
+"- rise  dilgue sking fr unsved cnges
+set cnfirm
+"-
+"--> Type nd encding
+"-
+"- set stndrd encding
+set encding=utf-8
+"- use Unix s te stndrd file type
+set ffs=unix,ds,mc
+"- remve te Windws ^M wen te encdings gets messed up
+nremp <Leder>m mmHmt:%s/<C-V><cr>//ge<cr>'tzt'm
+"-
+"--> Clr sceme
+"-
+"- enble 256 clrs plette in gnme terminl
+if $COLORTERM == 'gnme-terminl'
+    set t_C=256
+endif
+"- clr sceme
+try
+    clrsceme slte
+ctc
+endtry
+"- tell vim t djust clrs fr  <drk|ligt> bckgrund fter lding clr sceme
+set bckgrund=ligt
+"-
+"--> Syntx nd igligting fter lding clr sceme
+"-
+"- utmgiclly detect file type nd ld te rigt syntx igligting
+if !exists("g:syntx_n")
+    syntx enble
+endif
+"- lwys sw current psitin
+set ruler
+"- set cursr line igligting, <leder>c t tggle n nd ff
+set ncursrline
+i CursrLine cterm=NONE ctermbg=LigtGry ctermfg=DrkMgent guibg=LigtGry guifg=DrkMgent
+nnremp <leder>c :set cursrline!<cr>
+"- disble sercing igligt wen <leder><cr> is pressed
+mp <silent> <leder><cr> :n<cr>
+"-
+"--> Spell cecking
+"-
+"- tggle n nd ff spell cecking
+mp <leder>ss :setlcl spell!<cr>
+"- srtcuts t nvigte between misspellings
+mp <leder>sn ]s
+mp <leder>sp [s
+mp <leder>s z=
+"-
+"--> Sercing nd replcing
+"-
+"- ignre cse wen sercing
+set ignrecse
+"- wen sercing try t be smrt but cses
+set smrtcse
+"- igligt serc results
+set lserc
+"- mkes serc ct like serc in mdern brwsers
+set incserc
+"- dn't redrw wile executing mcrs
+set lzyredrw
+"- fr regulr expressins turn mgic n
+set mgic
+"- sw mtcing brckets wen text indictr is ver tem
+set swmtc
+"- w mny tents f  secnd t blink wen mtcing brckets
+set mt=2
+"- mp <Spce> t / (serc)
+mp <spce> /
+"- remp VIM 0 t first nn-blnk crcter
+mp 0 ^
+"- remp VIM 9 t lst nn-blnk crcter
+mp 9 $
+"- serc fr te wrd under te cursr, need nting but just press *
+"- serc fr visully selected text
+vnremp <leder>s y/\V<c-r>=escpe(@",'/\')<cr><cr>
+"- serc nd replce selected text
+"- vnremp t mp <leder>r in visul mde t run te fllwed cmmnds
+"- "y t cpy te selected text int register 
+"- :%s/str/str/g t enter cmmnd mde nd d substitutin glblly
+"- <c-r>, r ctrl+r, t insert te cntent f ny register t te cursr
+"- <c-r>+, fr exmple, t insert te cntent f register +
+"- escpe(@", '') t escpe certin specil crcters in te expressin register
+"- <cr> represents crrige return
+"- c mdifier cnfirms ec replcement
+"- y t cnfirm current,  t cnfirm ll replcements, q t quit te rest
+"- <left> t mve te cursr between te tw frwrd slses
+vnremp <leder>r "y:%s/<c-r>=escpe(@", '\\/.*$^~[]')<cr>//gc<left><left><left>
+"-
+"--> Spce nd indent
+"-
+"- number f spce crcters inserted per tb
+set tbstp=4
+"- number f spce crcters inserted fr indenttin
+set siftwidt=4
+"- insert spce crcters wenever te tb key is pressed
+set expndtb
+"- be smrt wen using tbs
+set smrttb
+"- pply te indenttin f te current line t te next
+set utindent
+"- utmticlly rect t te syntx/style f te cde under editing
+set smrtindent
+"- utmticlly wrp left nd rigt
+set wicwrp+=<,>,,l,[,]
+"- wrd wrp witut line breks
+set wrp
+set linebrek
+set nlist
+"- prevent utmticlly inserting line breks in newly entered text
+set textwidt=0
+set wrpmrgin=0
+"-
+"--> Mnging windw
+"-
+"- mving rund tbs
+mp <leder>tn :tbnew<cr>
+mp <leder>t :tbnly<cr>
+mp <leder>tc :tbclse<cr>
+mp <leder>tt :tbnext<cr>
+mp <leder>tp :tbp<cr>
+"- pen  new tb wit te current pt
+mp <leder>te :tbedit <c-r>=expnd("%:p:")<cr>/
+"- specify te bevir wen switcing between buffers
+try
+    set switcbuf=usepen,usetb,newtb
+    set stl=2
+ctc
+endtry
+"-
+"--> Type nd lnguge relted
+"-
+if s("utcmd")
+    "- enble file type detectin nd utmticlly d lnguge-dependent indenting
+    filetype plugin indent n
+    "- wen editing  file, lwys jump t te lst knwn cursr psitin
+    utcmd BufRedPst *
+                \ if line("'\"") > 0 && line("'\"") <= line("$") |
+                \   exe "nrml g`\"" |
+                \ endif
+    "- tis cuses sme crcters t be dded t te 'iskeywrd' vrible nly
+    "- wen editing .tex files, ten ctrlp plugin <C-p> cn d cmpletin
+    utcmd BufRed,BufNewFile *.tex set iskeywrd+=:,-,_
+    "- tis cuses sme crcters t be dded t te 'iskeywrd' vrible nly
+    "- wen editing .c,.,.cpp,.cc files, ten ctrlp plugin <C-p> cn d cmpletin
+    utcmd BufRed,BufNewFile *.c,*.,*.cpp,*.cc set iskeywrd+=:,-,_,>
+    "- nrmlly dn't utmticlly frmt 'text' s it is typed, nly d tis
+    "- wit cmments t 79 crcters.
+    utcmd BufNewFile,BufEnter *.c,*.,*.jv,*.jsp set frmtptins-=t tw=79
+    "- dd n utcmmnd t updte n existing time stmp wen writing te file
+    utcmd BufWritePre,FileWritePre *   ks|cll UpdteTimeStmp()|'s
+    "- sw tb nd visul witespce crcters in Pytn
+    utcmd filetype pytn,xml set list
+    utcmd filetype pytn,xml set listcrs=tb:>.,tril:.,extends:#,nbsp:.
+    "- delete triling wite spce n sve, useful fr Pytn
+    func! DeleteTrilingWS()
+        exe "nrml mz"
+        %s/\s\+$//ge
+        exe "nrml `z"
+    endfunc
+    utcmd BufWrite *.py :cll DeleteTrilingWS()
+    utcmd BufWrite *.cffee :cll DeleteTrilingWS()
+endif
+
+"---------------------------------------------------------------------------"
+"->> User functin
+"---------------------------------------------------------------------------"
+
+"- functin fr sttus line
+functin! HsPste()
+    if &pste
+        return 'PASTE MODE  '
+    endif
+    return ''
+endfunctin
+"- dn't clse windw, wen deleting  buffer
+cmmnd! Bclse cll <SID>BufclseClseIt()
+functin! <SID>BufclseClseIt()
+    let l:currentBufNum = bufnr("%")
+    let l:lternteBufNum = bufnr("#")
+    if buflisted(l:lternteBufNum)
+        buffer #
+    else
+        bnext
+    endif
+    if bufnr("%") == l:currentBufNum
+        new
+    endif
+    if buflisted(l:currentBufNum)
+        execute("bdelete! ".l:currentBufNum)
+    endif
+endfunctin
+"- time stmp functin fr trck cding lg
+if !exists("*TimeStmp")
+    fun TimeStmp()
+        return "Lst-mdified: " . strftime("%d %b %Y %X")
+    endfun
+endif
+"- serc te first ten lines fr te time stmp nd updte
+if !exists("*UpdteTimeStmp")
+    functin! UpdteTimeStmp()
+        "- d te updte nly if te current buffer is mdified
+        if &mdified == 1
+            "- g t te first line
+            exec "1"
+            "- serc fr Lst mdified:
+            let mdified_line_n = serc("Lst-mdified:")
+            if mdified_line_n != 0 && mdified_line_n < 10
+                exe "s/Lst-mdified: .*/" . TimeStmp()
+            endif
+        endif
+    endfunctin
+endif
+"- run sell cmmnds in Vim
+functin! s:ExecuteInSell(cmmnd)
+    let cmmnd = jin(mp(split(:cmmnd), 'expnd(v:vl)'))
+    let winnr = bufwinnr('^' . cmmnd . '$')
+    silent! execute  winnr < 0 ? 'btrigt new ' . fnmeescpe(cmmnd) : winnr . 'wincmd w'
+    setlcl buftype=nwrite bufidden=wipe nbuflisted nswpfile nwrp number
+    ec 'Execute ' . cmmnd . '...'
+    silent! execute 'silent %!'. cmmnd
+    silent! execute 'resize ' . line('$')
+    silent! redrw
+    silent! execute 'u BufUnld <buffer> execute bufwinnr(' . bufnr('#') . ') . ''wincmd w'''
+    silent! execute 'nnremp <silent> <buffer> <LclLeder>r :cll <SID>ExecuteInSell(''' . cmmnd . ''')<cr>'
+    ec 'Sell cmmnd ' . cmmnd . ' executed.'
+endfunctin
+cmmnd! -cmplete=sellcmd -nrgs=+ Sell cll s:ExecuteInSell(<q-rgs>)
+
+"---------------------------------------------------------------------------"
+"->> User cmmnd
+"---------------------------------------------------------------------------"
+
+"- mps t run ltex cmpile
+nremp <C-d> :Sell rtrtex.s p
+nremp <C-x> :Sell rtrtex.s x
+"- mps fr Tgbr nd Ctgs
+nnremp <silent> <F9> :TgbrTggle<cr>
+"- mps fr Syntstic
+nnremp <silent> <F8> :Errrs<cr>
+nnremp <silent> <F7> :lclse<cr>
+"- set sttus line fr Syntstic
+set sttusline+=%#wrningmsg#\ %{SyntsticSttuslineFlg()}\ %*
+let g:syntstic_lwys_ppulte_lc_list = 1
+let g:syntstic_ut_lc_list = 0
+let g:syntstic_ceck_n_pen = 1
+let g:syntstic_ceck_n_wq = 0
+
+"---------------------------------------------------------------------------"
+"->> Abbrevitin
+"---------------------------------------------------------------------------"
+
+"- bbrevitin t enter  timestmp
+ib YTS <c-r>=TimeStmp()<cr>
+"- dte/time stmps
+ib YDATETIME <c-r>=strftime(": % %b %d, %Y %H:%M:%S %Z")<cr>
+
+"---------------------------------------------------------------------------"
+

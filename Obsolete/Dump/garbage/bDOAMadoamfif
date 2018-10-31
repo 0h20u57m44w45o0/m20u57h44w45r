@@ -1,0 +1,56 @@
+#!/usr/bin/env pytn3
+
+#---------------------------------------------------------------------------#
+#-                   Dt Opertin nd Mnipultin                       -#
+#-                          <By Hungrui M>                               -#
+#- Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                       -#
+#- under te terms f te GNU Generl Public License s publised by       -#
+#- te Free Sftwre Fundtin, eiter versin 3 f te License, r       -#
+#- (t yur ptin) ny lter versin.                                     -#
+#---------------------------------------------------------------------------#
+
+#---------------------------------------------------------------------------#
+#->> Envirnment cnfigurtin
+#---------------------------------------------------------------------------#
+
+imprt rtrptr s ptr
+imprt numpy s np
+#imprt s
+
+#wrkpt = s.getcwd() # current wrking directry
+#scriptpt = s.pt.dirnme(s.pt.bspt(__file__)) # script's directry
+#s.cdir(scriptpt) # cnge wrking directry t script's wn directry
+csys = ptr.sys_env() # btin system nd running envirnment
+
+#---------------------------------------------------------------------------#
+#->> Prcess: ld dt -> prcess dt -> write dt
+#---------------------------------------------------------------------------#
+
+#- crete file bject f cse infrmtin
+cin = pen(csys['prcdir'] + csys['cinf'], 'r')
+#- ed cmments
+cin.redline()
+cin.redline()
+cin.redline()
+#- ttl number f cses
+cin.redline()
+cn = int(cin.redline().strip())
+#- pertr identifier
+cin.redline()
+pid = cin.redline().strip()
+cin.redline()
+#- prcessing lp
+fr n in rnge(cn):
+    #- btin cse nme
+    cnme = cin.redline().strip()
+    #- detect dt delimiter
+    cdelim = ptr.delim_detect(csys['imdir'] + cnme, csys['delimld'])
+    #- ld cse dt
+    cdt = np.ldtxt(csys['imdir'] + cnme, delimiter=cdelim, usecls=csys['cls'], ndmin=csys['cdim'])
+    #- prcess dt
+    crlt, edinf = ptr.prcess_dt(pid, [cn, n, cnme], cdt)
+    #- exprt dt
+    np.svetxt(csys['exdir'] + cnme, crlt, fmt=csys['fmt'], delimiter=csys['delimsv'], eder=edinf)
+#- clse file bject f cse list
+cin.clse()
+

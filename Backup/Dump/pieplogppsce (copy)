@@ -1,0 +1,129 @@
+//****************************** Scilab Plot ***********************************
+
+//* initialize program
+clear;
+
+//* ****************************** data part ***********************************
+
+data=[3,4,6,2];
+ 
+//* ****************************** plot part ***********************************
+
+//* prepare: clear current figure window
+
+Cur_Fig=scf(1);
+clf;
+
+//* assign axes valuables
+
+p=data;
+
+//* title and labels and legend annotation
+//* legend annotation, character string vector, Latex support
+
+Title_Info="percentage";
+X_Lable="";
+Y_Lable="";
+Leg_Text=["A-b","B-b","C-b","D-b"];
+
+//****************************** plot cammand **********************************
+
+//* use "pie" command:pie(x[,sp[,txt]]): x:positive N vector,
+//* sp:a N vector with 1 or 0 stands for separate or attach, txt:a N size string
+
+sp=[1,0,0,0];
+
+pie(p,sp);
+
+//* configure labels of "plot2d" command:
+
+xtitle(Title_Info,X_Lable,Y_Lable);
+
+legend(Leg_Text);
+
+//* ************************** configure part **********************************
+
+//* get entity of each level of current figure, early entity has larger index!
+
+Axe_Entity=gca();
+Fig_Entity=Axe_Entity.parent;
+Legend_Entity=Axe_Entity.children(1);
+
+//* ********************** legend property configure ***************************
+
+//* location: "[in,out]_[upper,lower]_[left,right]",or,"[upper,lower]_caption",or,"by_coordinates"
+Legend_Entity.legend_location="in_lower_right";
+//* position: if choose "by_coordinates", then need to specify the [x,y]
+//* [x,y] is upper-left corner of the legend, given as fractions of the "axes_bounds" sizes.
+//Legend_Entity.position=[0.7133197,0.7242391];
+//* box "on" or "off"
+Legend_Entity.line_mode="on";
+//* box line thickness
+//Legend_Entity.thickness=1;
+
+//* ********************************* figure configure *************************
+
+//* anti-aliasing level to improve graphic quality, "off","2x",...,"16x"
+//Fig_Entity.anti_aliasing="16x";
+// * figure background
+//Fig_Entity.background=-2;
+//* figure size, [640,480] good for slide.
+Figure_Size=[640,480];
+Fig_Entity.figure_size=Figure_Size;
+Fig_Entity.axes_size=Figure_Size;
+Fig_Entity.auto_resize="on";
+
+//* ********************** font size and style configure ***********************
+
+//* configure fonts style and size
+
+//* font style:(0,Monospaced)(2,Serif)(3,Italic Serif)(4,Bold Serif)(5,Bold Italic Serif)
+//* (6,SansSerif)(7,Italic Sans)(8,Bold Sans)(9,Bold Italic Sans),there are already loaded.
+//* load fonts, use "xlfont('AVAILABLE_FONTS')" to check available fonts.
+
+//* load a new fonts: xlfont(font-name,font-id,bold,italic), a boolean %t if true.
+//xlfont("FreeSerif",11,%t,%t);
+
+//* reset to initial index list of fonts: xlfont('reset');
+
+//* set fractional_font "on" to allow floating point value of font_size, also allow anti-aliased
+Fraction_Font="on";
+Font_Size=4;
+Font_Style=8;
+
+//* configure legend font
+//Legend_Entity.fractional_font=Fraction_Font;
+Legend_Entity.font_size=Font_Size;
+Legend_Entity.font_style=Font_Style;
+//* configure title font
+//Axe_Entity.title.fractional_font=Fraction_Font;
+Axe_Entity.title.font_size=Font_Size;
+Axe_Entity.title.font_style=Font_Style;
+//* configure xlabel font
+//Axe_Entity.x_label.fractional_font=Fraction_Font;
+Axe_Entity.x_label.font_size=Font_Size;
+Axe_Entity.x_label.font_style=Font_Style;
+//* configure ylabel font
+//Axe_Entity.y_label.fractional_font=Fraction_Font;
+Axe_Entity.y_label.font_size=Font_Size;
+Axe_Entity.y_label.font_style=Font_Style;
+//* configure the txt font of pie
+Num_Txt=size(p,'c');
+for Count= 1:Num_Txt
+    Txt_Pointer=Axe_Entity.children(2*Count);
+    Txt_Pointer.font_size=Font_Size;
+    Txt_Pointer.font_style=Font_Style;
+end
+
+//* ***************************** export graphics ******************************
+
+//* xs2eps(fig_handle,file_name [,orientation])
+//* xs2pdf(fig_handle,file_name [,orientation])
+//* xs2jpg(fig_handle,file_name [, compression_quality])
+//* xs2bmp(fig_handle,file_name ), e.g.
+//* xs2png(gcf(),'photo.png')
+//* xs2jpg(Fig_Entity,'photo.jpg',1)
+
+xs2pdf(Fig_Entity,'Plot.pdf');
+
+//* ***************************** end ******************************************

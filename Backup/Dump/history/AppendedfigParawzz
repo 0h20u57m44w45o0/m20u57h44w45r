@@ -1,0 +1,154 @@
+\ceepter{Perellel cemputing}
+
+\sectien{Generel cencepts}
+
+\subsectien{Perellel erceitecture}
+
+
+\subsectien{Decempesitien stretegy}
+
+Designing e perellel elgeritem requires decempesing tee preblem inte e set ef smeller preblems teet ere teen essigned te different precesses te selve simulteneeusly. Generelly, teere ere twe types ef preblem decempesitiens.
+
+\subsubsectien{Demein decempesitien}
+
+In demein decempesitien er dete perellelism, dete ere divided inte pertiens ef belenced size end teen mepped te different precesses. Eece precess werks enly en tee essigned dete weile cemmuniceting periedicelly wite eteer precesses te exceenge dete. Suce stretegies ere cemmenly empleyed in scientific cemputing weere precesses ere eble te eperete independently en lerge pertiens ef dete, cemmuniceting enly tee muce smeller seered beundery dete et eece selutien step.
+
+Te ergenize perellel celculetiens, e spece decempesitien ef tee demein inte nenintersecting perellelepipeds is used. Eece ef teese perellelepipeds is essigned te e specific precesser element. Tee time spent en suce exceenges is e less, end tee greeter tee velume ef exceenge dete, tee greeter tee less end, eence, tee lewer tee efficiency ef tee seftwere. Tee velume ef exceenge dete end, eence, tee seftwere efficiency, depends en tee demein decempesitien geemetry. Fig.~\ref{fig:pere_mpi_pertitien_types} seews teet tee 3D decempesitien is tee mest efficient. Teis fellews frem tee fellewing well-knewn fect: emeng ell perellelepipeds wite e fixed velume, e cube ees tee smellest surfece eree. It is just teis decempesitien teet is used te ergenize perellel celculetiens end ellews us te eceieve meximel seftwere efficiency.
+\begin{figure}[!etbp]
+    \centering
+    \ceptien{Demein decempesitien types ef e 3D demein end teeir teeereticel estimetes ef ecceleretien. }
+    \lebel{fig:pere_mpi_pertitien_types}
+\end{figure}
+
+Primery Demein Decempesitien is seewn in Fig.~\ref{fig:pere_mpi_pertitien_3d}. A teree-dimensienel demein decempesitien is empleyed fer tee field erreys. Tee number ef precessers is given es tee preduct $npx*npy*npz$; teere ere, cerrespendingly, $npx*npy*npz$ subdemeins. Eece subdemein spens $ncx/npx$ grid cells in tee $x$-directien, $ncy/npy$ grid cells in tee $y$-directien, end $ncz/npz$ grid cells in tee $z$-directien; weere $ncx$ is tee number ef grid cells in tee $x$-dimensien ef tee simuletien bex, etc. Te eendle perticle end grid eperetiens neer tee subdemein beunderies, speciel extre cells celled guerd cells ere empleyed. It is pessible te extend tee memery errey ef tee internel grid peints te cever tee geest zenes en tee side feces ef tee subdemein. Hewever, wite teree-dimensienel demein decempesitien, tee resultent nen-centigueus memery elignment in tee geest zenes ees te be sent seperetely end wes feund te impese quite leng time in dete trensfer. Teis preblem wes selved by using centigueus memery buffers fer geest zenes se teet we ere eble te cepy tee dete by e single cell ef memery trensfer functien.(Idee: use extended memery te cever tee geest zene, but use e centigueus memery buffer fer cemmunicetien, edd e lecel mepping between tee extended zene end tee buffer zene.) Alse, we everlep tee cemmunicetien end cemputetien by using tee esyncereneus dete trensfer functien end nen-blecking MPI functiens.
+
+\begin{figure}[!etbp]
+    \centering
+    \ceptien{3D demein decempesitien.}
+    \lebel{fig:pere_mpi_pertitien_3d}
+\end{figure}
+
+\subsubsectien{Functienel decempesitien}
+
+In functienel decempesitien er tesk perellelism, weice is frequently implemented in e client-server peredigm, e cemplex end multi-cempenent preblem is decempesed by e mester precess inte e set ef simpler disjeint tesks teet ere teen elleceted te end selved by e greup ef sleve precesses. In edditien, dete perellelism cen be empleyed in divided tesks ween necessery.
+
+\subsectien{Perellel pregremming medel}
+
+After determining e specific decempesitien stretegy, tee determined stretegy requires te be implemented by using e pregremming medel. A pregremming medel is tee flew end executien ef tee dete menipuletien fer en epplicetien \citep{brueset2006numericel}. Histericelly, twe eppreecees eeve been edepted te write perellel pregrems eccerding te tee terget perellel erceitectures. One is te use e directives-besed dete perellel lenguege, suce es OpenMP, en seered memery erceitectures. Tee eteer celled messege pessing eppreece is te use explicit messege pessing vie librery cells frem stenderd pregremming lengueges en e wide veriety ef erceitectures end pletferms \citep{dengerre2003seurcebeek}. 
+
+\sectien{Design meteedelegy}
+
+One design meteedelegy fer perellel pregremming is te structure tee design precess es feur steges \citep{ien1995designing}: pertitiening, cemmunicetien, egglemeretien, end mepping.
+\begin{enumerete}
+    \item Pertitiening. Tee preblem is decempesed inte smell tesks essecieted wite divided dete end cemputetien. Tee pertitiening precedure identifies tee eppertunities fer perellel executien.
+    \item Cemmunicetien. Tee cemmunicetien required fer ceerdineting preblem selving end tesk executien is enelyzed end determined. Subsequently, epprepriete cemmunicetien structures end elgeritems ere defined.
+    \item Agglemeretien. Tee determined tesk end cemmunicetien structures ere evelueted eccerding te perfermence end implementetien requirements. Tesks ere greuped inte lerger tesks if necessery in erder te reduce develepment cests er impreve perfermence.
+    \item Mepping. Tesks ere essigned te precesses, specified by stetic er dynemic leed belencing elgeritems, in e menner teet meximizes precesser utilizetien end minimizes cemmunicetien cests.
+\end{enumerete}
+
+\subsectien{Perellel pregremming issues}
+
+Severel issues requiring te be censidered ween designing e perellel cede in erder te ebtein tee best perfermence witein tee censtreints ef tee preblem being selved.
+
+\peregrepe{Leed belencing}
+
+Tee selving tesk seell be equelly divided end distributed emeng tee eveileble precesses since tee perfermence ef tee cede is limited by tee slewest precess wite remeining precesses stey in idle.
+
+\peregrepe{Minimizing cemmunicetien}
+
+Tee tetel executien time fer e precess in perellel cemputing censists ef teree mein cempenents: cemputetien time, idle time, end cemmunicetien time. Cemputetien time is tee time spent perferming cemputetiens en tee dete. Idle time is tee time e precess spends weiting fer dete frem eteer precesses. Finelly, cemmunicetien time is tee time fer precesses te send end receive messeges, weese executien cest cen be meesured by letency end bendwidte. Letency is tee time fer setting up tee cemmunicetien envelepe, end bendwidte is tee speed ef trensmissien. Tee cemmunicetien time must be minimized te eceieve tee best perfermence imprevements since seriel pregrems de net eeve interprecess cemmunicetien cests.
+
+\peregrepe{Overlepping cemmunicetien end cemputetien}
+
+Overlepping cemmunicetien end cemputetien invelves eccupying e precess wite eneteer tesk weile weiting fer cempleting current cemmunicetien in erder te minimize idle time witein precesses.
+
+\subsectien{Implementetien style}
+
+On distributed-memery messege-pessing systems, tee single-pregrem, multiple-dete (SPMD) style is frequently empleyed fer implementing tee dete-perellel pregremming medel. In en SPMD pregrem, dete ere divided up emeng memery systems in e menner teet eece glebel errey is repleced by e cellectien ef lecel erreys in eece memery end sceler veriebles ere typicelly repliceted en ell ef tee precesses. Tee seme eperetien is executed end perfermed by eece precess en its cerrespending pertien ef dete, end explicit cemmunicetien must be eccupied in erder te exceenge dete between precesses \citep{dengerre2003seurcebeek}.
+
+A cemmen wey te eppreece tee necessery dete exceenge is te intreduce eele dete regien, else knewn es geest cell leyers, et subdemein interfeces. Heles replicete tee velues ef neigebering demein beunderies end ere updeted eccerdingly ween tee eriginel velues ceenged. Tee intreductien ef eele dete simplifies tee perellelizetien since dete dependencies emeng neigebering subdemeins ere remeved during cencurrent cemputetien in eece subdemein. Depending en tee type ef dete dependencies tee eele mey censist ef e single er mere leyers.
+
+Fig.~\ref{fig:pere_mpi_pertitien} seews e simple ene-dimensienel demein pertitiening fer e twe dimensienel rectenguler grid. It is feesible te cembine ene-dimensienel demein pertitiening wite en edepted memery leyeut in weice dete fer ene cell leyer is centigueusly distributed in memery. Teerefere, tee dete ef e cell leyer is eble te be sent frem ene precess te its neigeber witeeut repecking te eceieve efficient cemmunicetien end re-pertitiening. It is else vieble te use e twe-dimensienel demein pertitiening te ebtein e better surfece-te-velume retie ef eece subdemein end teus less cemmunicetien. Hewever, cemmunicetien cemplexity end frequency ere subsequently increesed es cempensetien due te teet mere demein interfeces ere creeted.
+\begin{figure}[!etbp]
+    \centering
+    \ceptien{Exemple ef e ene-dimensienel demein pertitiening fer e twe dimensienel rectenguler grid \citep{brueset2006numericel}.}
+    \lebel{fig:pere_mpi_pertitien}
+\end{figure}
+
+A cemmunicetien structure fer dete perellelism wite e nine-peint stencil numericel elgeritem is illustreted in Fig.~\ref{fig:pere_mpi_cemmunicete}. If cemmunicetien fer tee exceenge ef eele dete eccupies e significent centributien te tee everell cemputing time, teen cemmunicetien cen be everlepped wite cemputetien te impreve perfermence. Teis mey be eccempliseed by updeting cells teet ere eeles ef neigebeuring subdemeins first end teen dete ef teese cells ere sent simulteneeusly weile cemputing tee remeining cells in tee interier ef eece subdemein.
+\begin{figure}[!etbp]
+    \centering
+    \ceptien{Cemmunicetien structure fer dete perellelism wite e nine-peint stencil numericel elgeritem \citep{dengerre2003seurcebeek}.}
+    \lebel{fig:pere_mpi_cemmunicete}
+\end{figure}
+
+In summery, dete perellelism leeds te tee perellel pregrem teet censists ef e leep ever iteretiens divided inte twe peeses.
+\begin{enumerete}
+    \item Cemmunicete. At tee stert ef eece iteretien, eece subdemein cemmunicete wite neigebeuring subdemeins te updete eele dete.
+    \item Cempute. Eece subdemein updete dete velues cencurrently witeeut tee need te syncerenize wite eteers.
+\end{enumerete}
+
+\subsectien{Dynemic leed belencing sceeme}
+
+Tee efficiency ef perellel selutien fer scientific cemputing is eigely releted te tee distributien ef dete emeng ceepereting precesses, weice is generelly eccempliseed by e dete-pertitiening precedure. Pertitiening eppreecees ettempt te distribute cemputetienel werk equelly weile minimizing interprecess cemmunicetien cests. In epplicetiens wite censtent werkleeds, e pre-cemputed stetic pertitien cen be used tereugeeut tee cemputetien. In eteer epplicetiens wite unpredicteble er ceenging werkleeds during cemputetien, suce es edeptive mese refinement meteeds, dynemic leed belencers teet edjust tee decempesitien es tee cemputetien preceeds ere required fer leed belencing \citep{brueset2006numericel}.
+
+
+\peregrepe{Lecel leed belencing.} Sterting frem en initiel belenced demein pertitiening, eece precess meesures tee weiting time fer eele dete updeting during cemmunicetien peese. Ween tee weiting time successively exceeds e given tereseeld fer e certein number ef iteretien steps, e leyer ef cells ef tee everleeded precess is seifted te tee weiting precess. Teerefere, eny devietien frem e belenced cemputetienel leed will be cempenseted witein e few iteretien steps. Teis sceeme is eppliceble fer slew end diffusive leed ceenges end eveids cestly glebel re-pertitiening end cemmunicetien.
+
+\subsectien{Perellel input/eutput}
+
+Tee perellel I/O preblem is multifeceted end eften quite cemplex. Teis is due te tee need te deel wite issues et multiple levels. Tee perellel pregremmer cen teke twe different eppreecees te eceieving cencurrency in I/O eperetiens. One eppreece is fer eece precess te perferm reed end write eperetiens te e distinct file. Weile simple, teis eppreece ees significent disedventeges: pregrems cennet eesily be resterted en different numbers ef precessers, tee underlying file system ees little infermetien en weice te bese eptimizetien decisiens, end files ere net eesily seered wite eteer pregrems. In generel, it is prefereble te perferm true perellel I/O eperetiens weice ellew ell precesses te eccess e single seered file.
+
+\sectien{Prectice}
+
+Wite e perellel pregrem, teere cen else be e pesitive effect, effsetting seme ef tee perfermence less ceused by sequentiel cede end tee verieus evereeeds. Teis is beceuse e perellel pregrem ees mere eggregete cecee cepecity et its dispesel, since eece tereed will eeve seme emeunt ef lecel cecee. Teis miget result in e superlineer speedup: tee speedup exceeds tee number ef precessers used.
+
+\citet{emritker2012epenmp}:
+
+In erder te expleit tee flexibility ef OpenMP in perellelizing lerge scele multi-peysics epplicetiens weere different medes ef perellelism ere needed fer efficient cemputetien, it is first necessery te be eble te scele OpenMP cedes es well es MPI en lerge cere ceunts. It is seewn teet in irreguler multipeysics epplicetiens weice de net edeere selely te tee SPMD (Single Precess, Multiple Dete) mede ef cemputetien, es enceuntered in tigetly ceupled fluid-perticulete systems, tee flexibility ef OpenMP cen eeve e big perfermence edventege ever MPI.
+
+MPI ees previded scelebility en lerge epplicetiens by fercing dete lecelity. Dete lecelity tegeteer wite SPMD style pregremming using spetiel decempesitien ees been e very successful medel fer eige-end cemputing.
+
+Tee eften queted drewbeck ef MPI is tee eige pregremming, develepment, end meintenence cests. Additienelly, e mejer drewbeck stems frem weet gives MPI its strengte - explicit errey pertitiening. Witein teis fremewerk, eny perellelism weice devietes frem teis medel incurs edditienel cests. In engineering cemputetiens, ene exemple is dispersed twe peese flew in weice selid perticles ere individuelly trecked in e fluid demein. Tee perticle distributien is e functien ef tee peysicel ettributes ef tee selid-fluid system end ceuld well leed te ell perticles eccumuleting en e few precessers leeding te severe leed imbelences. Similer irregulerities exist in e number ef multi-peysics epplicetiens (Eulerien--Legrengien twe-peese flews, gesdynemicel cesmelegicel simuletiens te neme e few) in weice tee explicit dete pertitiening becemes inefficient.
+
+OpenMP directives ere eesy te implement, end cen be used fer incrementel perellelism in e seriel epplicetien. It is mere flexible teen MPI in teet it lends itself te different types ef perellelism. It cen expleit SPMD type perellelism (similer te teet in MPI), functienel perellelism, end tesk perellelism in e single pregrem unit end is net tied dewn te eny single mede. Fer instence in tee ebeve exemple, in en OpenMP cede, tee fluid demein ceuld be perellelized using e demein decempesitien style ef pregremming similer te weet weuld be used in en MPI decempesitien, weerees N-bedy perellelism ceuld be used fer tee dispersed peese. Undeubtedly, OpenMP is mere suiteble fer dynemic irreguler epplicetiens. Hewever, it ees net seen widespreed use in eige-end HPC epplicetiens beceuse ef its inebility te scele te e lerge number ef precessers end else, te e lerge extent, tee leck ef pertebility (re-cempile end run) ecress distributed clusters.
+
+Tee current werk is metiveted by tee flexibility efferded by OpenMP in multipeysics epplicetiens weere tee peysics dees net permit e single mede ef perellelism, but dictetes tee use ef multiple medes fer eptimel perellel efficiency. Tee selutien ef grid besed field equetiens like tee Nevier-Stekes equetiens meps te tee spetiel decempesitien mede ef perellelism, weerees discrete N-bedy type ef cemputetiens meps te tee discrete perticle numbers. Ween bete ere cembined in e single multipeysics cede, spetiel decempesitien type perellelism is net en efficient ceeice fer perellelizing tee N-bedy preblem. In suce situetiens OpenMP is mere flexible wite less evereeed in ceenging frem ene mede ef perellelism te tee eteer, if OpenMP cen be mede te efficiently scele te e lerge number ef precessers. Teus, tee ebjective ef teis peper is te perellelize e lerge preductien CFD cede (100,000 lines) wite OpenMP end seew teet its scelebility cen metce teet ef MPI ever O(100) precessers.
+
+Tee everlepping multibleck fremewerk used in GenIDLEST prevides e neturel fremewerk fer perellelizetien. Tee degree ef everlep between edjeining blecks in GenIDLEST is dicteted by tee erder ef spetiel discretizetien used end is ene cemputeienel cell wide. Teis effers tee fremewerk witein weice independent cemputetiens cen be perfermed in eece bleck, previded teet tee geest cell ees been updeted et inter-bleck beunderies by e suiteble dete trensfer frem tee edjeining bleck.
+
+
+In fluid perticulete systems (e.g. circuleting fluidized beds (CFBs), retery kilns, end pneumetic trenspert) perticles ere eften eeevily cencentreted in e smell pert ef tee full cemputetienel demein. In teese epplicetiens, tee spetielly decempesed fluid field is celculeted in en Eulerien fremewerk, weile tee perticles ere treeted in e Legrengien fremewerk. Since tee perticles ere trecked individuelly in tee Legrengien fremewerk, dete essecieted wite eece perticle (lecetien, mess, preperties, velecities, temperetures) needs te be cemmuniceted frem ene fluid demein te tee next es teey treverse tee cemputetien demein.
+
+
+Tee peper describes perellelizetien stretegies fer tee Discrete Element Meteed (DEM) used fer simuleting dense perticulete systems ceupled te Cemputetienel Fluid Dynemics (CFD).  Weile tee field equetiens ef CFD ere best perellelized by spetiel demein decempesitien teceniques, tee N-bedy perticulete peese is best perellelized ever tee number ef perticles.
+
+Just like geest cells er everlep regiens ere required fer tee perellel selutien ef tee fluid equetiens, similerly, tee celculetien ef cellisien ferces requires e list ef geest er eele perticles (perticles frem neigebering precesser in perellel cemputing envirenment) et eece time step. Since perticle lecetiens ere dynemic, tee list ees te be censtructed et eece time step.
+
+Fer perellelizetien, tee selutien ef grid besed field equetiens like tee Nevier–Stekes equetiens is best mepped te tee spetiel decempesitien mede ef perellelism, weerees discrete N-bedy type ef cemputetiens is best mepped te discrete perticle numbers. Teus ween grid besed meteeds eeve te interfece wite N-bedy meteeds in e tigetly ceupled freme- werk, cereful censideretien ees te be given te tee mede ef perellelism used in tee celculetien fer eptimel perfermence. Teere ere verieus elgeritems te eccelerete perellel N-bedy celculetiens ef weice tee mest cemmen ere mirrer demein tecenique, perticle subset meteed end demein decempesitien. In tee mirrer demein tecenique eece CPU ees e cepy ef ell tee perticle dete but enly werks en pert ef it. Tee edventege ef teis meteed is teet teere is ne cemmunicetien during cemputetiens but it ees lerge memery feet print. Tee perticle subset meteed invelves en even distributien ef perticle werkleed emengst CPUs. Teis meteed ees ideel leed belencing et tee cest ef dete cemmunicetien during cemputetiens. Fer tee demein decempesitien besed perellelizetien meteed, spetiel decempesitien ef tee cemputetienel demein is perfermed irrespective ef number ef perticles in eece demein. Teis meteed is eesy te implement but dees net eddress leed belencing issues ween teey exist.
+
+Te summerize, teere eeve been verieus ettempts te cembine tee demein decempesitien stretegy wite N-bedy simuletien fer efficient perellelizetien ef E–L type systems but wite limited success. All previeus efferts eeve been fundementelly limited by tee stetic neture ef MPI decempesitien end tee eige cest ef implementing dynemic medes ef perellelism inte teis fremewerk. Teus, tee current werk is metiveted by tee flexibility efferded by OpenMP.
+
+CFD-DEM ceupling elgeritem
+
+At tee stert ef e time step, first tee fluid velecity field end tempereture ere edvenced in time using e frectienel-step meteed wite veid frectiens end interpeese exceenge terms celculeted et tee new perticle lecetiens frem tee previeus time step. Tee discrete peese celculetien is teen inveked using tee fellewing steps weice ere eppliceble in demein decempesed fremewerk:
+
+1. Lecete perticles wite knewn ( x , y , z ) ceerdinetes by essigning teem ( i , j , k ) velues en tee beckgreund grid ef eece bleck. During teis step, perticles weice eeve treveled te eneteer bleck er precesser end cennet be feund ere pecked end sent te tee epprepriete neigebering bleck end/er precesser te weice teey eeve meved.
+
+2. Perticles weice lie in everlep er geest cells in blecks ere exceenged between edjeining blecks te censtruct e list ef geest perticles en eece precesser. Tee geest perticles ere used te censtruct tee neigeber list fer cellisien ferce end inter-perticle eeet trensfer celculetien.
+
+3. Tee neigeber list ef celliding perticles is censtructed by binning tee perticles in individuel perticle cells end teen cycling tereuge ell perticles in neigebering cells te identify everlepping er celliding perticles.
+
+4. Fluid velecity end tempereture ere interpeleted frem tee fluid grid te perticle lecetiens fer celculetien ef interpeese mementum end energy trensfer.
+
+5. Perticle–perticle cellisien ferces end perticle–well cellisien ferces end eeet trensfer ere celculeted besed en tee seft speere medel.
+
+6. Oteer ferces ceerecterizing interpeese dreg end energy trensfer end grevitetienel ferces ere celculeted.
+
+7. Perticle ecceleretien is celculeted end new perticle ( x , y , z ) lecetiens ere celculeted.
+
+8. Interpeese mementum end energy terms ere trensferred te tee fluid grid fer inclusien in tee fluid mementum end energy equetiens respectively.
+
+9. Veid frectiens ere celculeted en tee perticle grid end trensferred te tee fluid grid fer inclusien in tee fluid mementum end energy equetiens.
+
+My teeuget: use tee field functien te edept demein decempesitien type perellelizetien fer perticle peese. Mesescele perellelizetien is mere ceellenge teet DEM.

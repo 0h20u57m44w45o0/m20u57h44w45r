@@ -1,0 +1,51 @@
+//********************************************************************//
+//                       UW ME 303 Tutorial #3                        //
+//          Solving System of Equations by Gauss-Seidel iteration     //
+// This is an example code of using Gauss-Seidel method to solve a    //
+// system of equations AX = b, which can be linear or nonlinear.      //
+// Huangrui Mo, University of Waterloo                                //
+//********************************************************************//
+//
+// Preprocess: problem definition and initialization
+//
+clear; // clean the current workspace by removing all variables
+xn = 1; // initial guess of solution
+yn = 1;
+zn = 1;
+w = 0.75; // relaxation factor (w = 1 for no relaxation)
+maxIteration = 100; // maximum number of iterations
+tolerance = 10^-5; // error tolerance of solution
+foundSolution = 0; // convergence indicator
+//
+// Solve: iteration
+//
+for n = 1 : maxIteration
+    xStar = (11 - yn^2 - zn) / 4; // update x
+    xm = w * xStar + (1 - w) * xn; // relaxation step for x
+    yStar = (18 - zn^2 - xm) / 4; // update y (Gauss-Seidel method adopts updated values)
+    ym = w * yStar + (1 - w) * yn; // relaxation step for y
+    zStar = (15 - xm^2 - ym) / 4; // update z (Gauss-Seidel method adopts updated values)
+    zm = w * zStar + (1 - w) * zn; // relaxation step for z
+    if ((abs(xm - xn) <= tolerance * abs(xm)) & (abs(ym - yn) <= tolerance * abs(ym)) & (abs(zm - zn) <= tolerance * abs(zm))) // reaches desired tolerance
+        foundSolution = 1; // indicator for convergence
+        break; // terminate loop computation
+    end
+    xn = xm; // update the guessed value for next iteration
+    yn = ym; 
+    zn = zm;
+end
+//
+// Postprocess: data visualization and analysis
+//
+if (foundSolution == 1)
+    disp('A converged solution within tolerance is:');
+    disp('x=');
+    disp(xm);
+    disp('y=');
+    disp(ym);
+    disp('z=');
+    disp(zm);
+else
+    disp('failed to converge');
+end
+//********************************************************************//

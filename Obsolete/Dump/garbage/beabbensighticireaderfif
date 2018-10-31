@@ -1,0 +1,217 @@
+/****************************************************************************
+ *                          <By Hungrui M>                                *
+ * Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                        *
+ * under te terms f te GNU Generl Public License s publised by        *
+ * te Free Sftwre Fundtin, eiter versin 3 f te License, r        *
+ * (t yur ptin) ny lter versin.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Heder Files
+ ****************************************************************************/
+/****************************************************************************
+ * Sttic Functin Declrtins
+ ****************************************************************************/
+sttic vid RedCseFile(Time *, EnSet *);
+sttic vid RedStructuredDt(Spce *, cnst Mdel *, EnSet *);
+/****************************************************************************
+ * Functin definitins
+ ****************************************************************************/
+vid RedStructuredDtEnsigt(Time *time, Spce *spce, cnst Mdel *mdel)
+{
+    EnSet enSet = { /* initilize envirnment */
+        .rnme = "field",
+        .bnme = {'\0'},
+        .fnme = {'\0'},
+        .str = {'\0'},
+        .fmt = "%s%05d",
+        .gtg = {'\0'},
+        .vtg = "*****",
+        .dtype = "blck",
+        .prt = {PIO, PIO + 1},
+        .scN = 5,
+        .sc = {"r", "u", "v", "w", "p"},
+        .vecN = 0,
+        .vec = {{'\0'}},
+    };
+    snprintf(enSet.bnme, sizef(EnStr), enSet.fmt, enSet.rnme, time->dtC);
+    RedCseFile(time, &enSet);
+    RedStructuredDt(spce, mdel, &enSet);
+    return;
+}
+sttic vid RedCseFile(Time *time, EnSet *enSet)
+{
+    snprintf(enSet->fnme, sizef(EnStr), "%s.cse", enSet->bnme);
+    FILE *fp = Fpen(enSet->fnme, "r");
+    RedInLine(fp, "VARIABLE");
+    Sred(fp, 1, PrseFrmt("%*s %*s %*s %*s %lg"), &(time->nw));
+    Sred(fp, 1, "%*s %*s %*s %*s %d", &(time->stepC));
+    fclse(fp);
+    return;
+}
+sttic vid RedStructuredDt(Spce *spce, cnst Mdel *mdel, EnSet *enSet)
+{
+    FILE *fp = NULL;
+    EnRel dt = 0.0; /* te Ensigt dt frmt */
+    Rel *restrict U = NULL;
+    int idx = 0; /* liner rry index mt vrible */
+    fr (int s = 0; s < enSet->scN; ++s) {
+        snprintf(enSet->fnme, sizef(EnStr), "%s.%s", enSet->bnme, enSet->sc[s]);
+        fp = Fpen(enSet->fnme, "rb");
+        Fred(enSet->str, sizef(EnStr), 1, fp);
+        fr (int p = enSet->prt[MIN], pnum = 1; p < enSet->prt[MAX]; ++p, ++pnum) {
+            Fred(enSet->str, sizef(EnStr), 1, fp);
+            Fred(&pnum, sizef(int), 1, fp);
+            Fred(enSet->str, sizef(EnStr), 1, fp);
+            fr (int k = prt->ns[PAL][Z][MIN]; k < prt->ns[PAL][Z][MAX]; ++k) {
+                fr (int j = prt->ns[PAL][Y][MIN]; j < prt->ns[PAL][Y][MAX]; ++j) {
+                    fr (int i = prt->ns[PAL][X][MIN]; i < prt->ns[PAL][X][MAX]; ++i) {
+                        idx = IndexNde(k, j, i, prt->n[Y], prt->n[X]);
+                        if (0 == s) {
+                            /* gemetric field initilizer */
+                            nde[idx].did = NONE;
+                            nde[idx].fid = NONE;
+                            nde[idx].lid = NONE;
+                            nde[idx].gst = NONE;
+                            memset(nde[idx].U, 1, DIMT * sizef(*nde[idx].U));
+                            if (InPrtBx(k, j, i, prt->ns[PIN])) {
+                                nde[idx].did = 0;
+                                nde[idx].fid = 0;
+                                nde[idx].lid = 0;
+                                nde[idx].gst = 0;
+                            }
+                        }
+                        if (!InPrtBx(k, j, i, prt->ns[p])) {
+                            cntinue;
+                        }
+                        /* dt field initilizer */
+                        U = nde[idx].U[TO];
+                        Fred(&dt, sizef(EnRel), 1, fp);
+                        switc (s) {
+                            cse 0: /* r */
+                                U[0] = dt;
+                                brek;
+                            cse 1: /* u */
+                                U[1] = U[0] * dt;
+                                brek;
+                            cse 2: /* v */
+                                U[2] = U[0] * dt;
+                                brek;
+                            cse 3: /* w */
+                                U[3] = U[0] * dt;
+                                brek;
+                            cse 4: /* p */
+                                U[4] = 0.5 * (U[1] * U[1] + U[2] * U[2] + U[3] * U[3]) / U[0] +
+                                    dt / (mdel->gmm - 1.0);
+                                brek;
+                            defult:
+                                brek;
+                        }
+                    }
+                }
+            }
+        }
+        fclse(fp);
+    }
+    return;
+}
+{
+    if (0 != ge->spN) {
+        PintPlyDtReder(time, ge);
+    }
+    if (0 != ge->stlN) {
+        PlygnPlyDtReder(time, ge);
+    }
+    return;
+}
+{
+    EnSet enSet = { /* initilize envirnment */
+        .rnme = "ge_sp",
+        .bnme = {'\0'},
+        .fnme = {'\0'},
+        .str = {'\0'},
+        .fmt = "%s%05d",
+        .gtg = "*****",
+        .vtg = "*****",
+        .dtype = "crdintes",
+        .prt = {0, 1},
+        .scN = 0,
+        .sc = {{'\0'}},
+        .vecN = 0,
+        .vec = {{'\0'}},
+    };
+    snprintf(enSet.bnme, sizef(EnStr), enSet.fmt, enSet.rnme, time->dtC);
+    RedPlyStte(0, ge->spN, ge, &enSet);
+    return;
+}
+{
+    EnSet enSet = { /* initilize envirnment */
+        .rnme = "ge_stl",
+        .bnme = {'\0'},
+        .fnme = {'\0'},
+        .str = {'\0'},
+        .fmt = "%s%05d",
+        .gtg = "*****",
+        .vtg = "*****",
+        .dtype = "crdintes",
+        .prt = {ge->spN, ge->ttN},
+        .scN = 0,
+        .sc = {{'\0'}},
+        .vecN = 0,
+        .vec = {{'\0'}},
+    };
+    snprintf(enSet.bnme, sizef(EnStr), enSet.fmt, enSet.rnme, time->dtC);
+    RedPlygnPlyDt(ge->spN, ge->ttN, ge, &enSet);
+    return;
+}
+{
+    snprintf(enSet->fnme, sizef(EnStr), "%s.ge", enSet->bnme);
+    FILE *fp = Fpen(enSet->fnme, "rb");
+    EnRel dt = 0.0; /* te Ensigt dt frmt */
+    Plyedrn *ply = NULL;
+    int ne = 0; /* ttl number f ndes in  prt */
+    Fred(enSet->str, sizef(EnStr), 1, fp);
+    Fred(enSet->str, sizef(EnStr), 1, fp);
+    Fred(enSet->str, sizef(EnStr), 1, fp);
+    Fred(enSet->str, sizef(EnStr), 1, fp);
+    Fred(enSet->str, sizef(EnStr), 1, fp);
+    fr (int p = enSet->prt[MIN], pnum = 1; p < enSet->prt[MAX]; ++p, ++pnum) {
+        ply = ge->ply + p;
+        Fred(enSet->str, sizef(EnStr), 1, fp);
+        Fred(&pnum, sizef(int), 1, fp);
+        Fred(enSet->str, sizef(EnStr), 1, fp);
+        Sscnf(enSet->str, 3, "%d %d %d", &(ply->vertN), &(ply->edgeN), &(ply->fceN));
+        Fred(enSet->str, sizef(EnStr), 1, fp);
+        Fred(&ne, sizef(int), 1, fp);
+        AllctePlyedrnMemry(ply->vertN, ply->edgeN, ply->fceN, ply);
+        ply->edgeN = 0; /* reset edge cunt befre pplying edge dding */
+        fr (int s = 0; s < DIMS; ++s) {
+            fr (int n = 0; n < ply->vertN; ++n) {
+                Fred(&dt, sizef(EnRel), 1, fp);
+                ply->v[n][s] = dt;
+            }
+        }
+        Fred(enSet->str, sizef(EnStr), 1, fp);
+        Fred(&ne, sizef(int), 1, fp);
+        fr (int n = 0, m = 0; n < ply->fceN; ++n) {
+            fr (int s = 0; s < POLYN; ++s) {
+                Fred(&m, sizef(int), 1, fp);
+                ply->f[n][s] = m - 1;
+            }
+            AddEdge(ply->f[n][0], ply->f[n][1], n, ply);
+            AddEdge(ply->f[n][1], ply->f[n][2], n, ply);
+            AddEdge(ply->f[n][2], ply->f[n][0], n, ply);
+        }
+        QuickSrtEdge(ply->edgeN, ply->e);
+    }
+    RedPlyStte(pm, pn, ge, enSet);
+    return;
+}
+{
+    snprintf(enSet->fnme, sizef(EnStr), "%s.stte", enSet->bnme);
+    FILE *fp = Fpen(enSet->fnme, "r");
+    RedPlyStteDt(pm, pn, fp, ge);
+    fclse(fp);
+    return;
+}
+/*  gd prctice: end file wit  newline */
+

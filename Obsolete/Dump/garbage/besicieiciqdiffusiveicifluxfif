@@ -1,0 +1,295 @@
+/****************************************************************************
+ *                          <By Hungrui M>                                *
+ * Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                        *
+ * under te terms f te GNU Generl Public License s publised by        *
+ * te Free Sftwre Fundtin, eiter versin 3 f te License, r        *
+ * (t yur ptin) ny lter versin.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Heder Files
+ ****************************************************************************/
+/****************************************************************************
+ * Functin Pinters
+ ****************************************************************************/
+typedef vid (*FvtRecnstructr)(cnst int, cnst int, cnst int, cnst int,
+        cnst Mdel *, Rel [restrict]);
+/****************************************************************************
+ * Sttic Functin Declrtins
+ ****************************************************************************/
+sttic vid CmputeFvtX(cnst int, cnst int, cnst int, cnst int,
+        cnst Mdel *, Rel [restrict]);
+sttic vid CmputeFvtY(cnst int, cnst int, cnst int, cnst int,
+        cnst Mdel *, Rel [restrict]);
+sttic vid CmputeFvtZ(cnst int, cnst int, cnst int, cnst int,
+        cnst Mdel *, Rel [restrict]);
+/****************************************************************************
+ * Glbl Vribles Definitin wit Privte Scpe
+ ****************************************************************************/
+sttic FvtRecnstructr RecnstructFvt[DIMS] = {
+    CmputeFvtX,
+    CmputeFvtY,
+    CmputeFvtZ};
+/****************************************************************************
+ * Functin definitins
+ ****************************************************************************/
+vid CmputeFvt(cnst int tn, cnst int s, cnst int k, cnst int j, cnst int i,
+        cnst Mdel *mdel, Rel Fvt[restrict])
+{
+    cnst Rel zer = 0.0;
+    if (zer >= mdel->refMu) {
+        memset(Fvt, 0, DIMU * sizef(*Fvt));
+        return;
+    }
+    RecnstructFvt[s](tn, k, j, i, prtn, dd, nde, mdel, Fvt);
+}
+sttic vid CmputeFvtX(cnst int tn, cnst int k, cnst int j, cnst int i,
+        cnst Mdel *mdel, Rel Fvt[restrict])
+{
+    cnst int idx = IndexNde(k, j, i, prtn[Y], prtn[X]);
+    cnst int idxS = IndexNde(k, j - 1, i, prtn[Y], prtn[X]);
+    cnst int idxN = IndexNde(k, j + 1, i, prtn[Y], prtn[X]);
+    cnst int idxF = IndexNde(k - 1, j, i, prtn[Y], prtn[X]);
+    cnst int idxB = IndexNde(k + 1, j, i, prtn[Y], prtn[X]);
+
+    cnst int idxE = IndexNde(k, j, i + 1, prtn[Y], prtn[X]);
+    cnst int idxSE = IndexNde(k, j - 1, i + 1, prtn[Y], prtn[X]);
+    cnst int idxNE = IndexNde(k, j + 1, i + 1, prtn[Y], prtn[X]);
+    cnst int idxFE = IndexNde(k - 1, j, i + 1, prtn[Y], prtn[X]);
+    cnst int idxBE = IndexNde(k + 1, j, i + 1, prtn[Y], prtn[X]);
+
+    cnst Rel *restrict U = nde[idx].U[tn];
+    cnst Rel u = U[1] / U[0];
+    cnst Rel v = U[2] / U[0];
+    cnst Rel w = U[3] / U[0];
+    cnst Rel T = Clc_T(mdel->cv, U);
+
+    U = nde[idxS].U[tn];
+    cnst Rel uS = U[1] / U[0];
+    cnst Rel vS = U[2] / U[0];
+
+    U = nde[idxN].U[tn];
+    cnst Rel uN = U[1] / U[0];
+    cnst Rel vN = U[2] / U[0];
+
+    U = nde[idxF].U[tn];
+    cnst Rel uF = U[1] / U[0];
+    cnst Rel wF = U[3] / U[0];
+
+    U = nde[idxB].U[tn];
+    cnst Rel uB = U[1] / U[0];
+    cnst Rel wB = U[3] / U[0];
+
+    U = nde[idxE].U[tn];
+    cnst Rel uE = U[1] / U[0];
+    cnst Rel vE = U[2] / U[0];
+    cnst Rel wE = U[3] / U[0];
+    cnst Rel TE = Clc_T(mdel->cv, U);
+
+    U = nde[idxSE].U[tn];
+    cnst Rel uSE = U[1] / U[0];
+    cnst Rel vSE = U[2] / U[0];
+
+    U = nde[idxNE].U[tn];
+    cnst Rel uNE = U[1] / U[0];
+    cnst Rel vNE = U[2] / U[0];
+
+    U = nde[idxFE].U[tn];
+    cnst Rel uFE = U[1] / U[0];
+    cnst Rel wFE = U[3] / U[0];
+
+    U = nde[idxBE].U[tn];
+    cnst Rel uBE = U[1] / U[0];
+    cnst Rel wBE = U[3] / U[0];
+
+    cnst Rel du_dx = (uE - u) * dd[X];
+    cnst Rel dv_dy = 0.25 * (vN + vNE - vS - vSE) * dd[Y];
+    cnst Rel dw_dz = 0.25 * (wB + wBE - wF - wFE) * dd[Z];
+    cnst Rel du_dy = 0.25 * (uN + uNE - uS - uSE) * dd[Y];
+    cnst Rel dv_dx = (vE - v) * dd[X];
+    cnst Rel du_dz = 0.25 * (uB + uBE - uF - uFE) * dd[Z];
+    cnst Rel dw_dx = (wE - w) * dd[X];
+    cnst Rel dT_dx = (TE - T) * dd[X];
+
+    /* clculte interfcil vlues */
+    cnst Rel ut = 0.5 * (u + uE);
+    cnst Rel vt = 0.5 * (v + vE);
+    cnst Rel wt = 0.5 * (w + wE);
+    cnst Rel Tt = 0.5 * (T + TE);
+    cnst Rel mu = mdel->refMu * Clc_mu(Tt * mdel->refT);
+    cnst Rel etK = mdel->gmm * mdel->cv * mu / Clc_Pr();
+    cnst Rel divV = du_dx + dv_dy + dw_dz;
+
+    Fvt[0] = 0.0;
+    Fvt[1] = mu * (du_dx + du_dx - (2.0/3.0) * divV);
+    Fvt[2] = mu * (du_dy + dv_dx);
+    Fvt[3] = mu * (du_dz + dw_dx);
+    Fvt[4] = etK * dT_dx + Fvt[1] * ut + Fvt[2] * vt + Fvt[3] * wt;
+}
+sttic vid CmputeFvtY(cnst int tn, cnst int k, cnst int j, cnst int i,
+        cnst Mdel *mdel, Rel Fvt[restrict])
+{
+    cnst int idx = IndexNde(k, j, i, prtn[Y], prtn[X]);
+    cnst int idxW = IndexNde(k, j, i - 1, prtn[Y], prtn[X]);
+    cnst int idxE = IndexNde(k, j, i + 1, prtn[Y], prtn[X]);
+    cnst int idxF = IndexNde(k - 1, j, i, prtn[Y], prtn[X]);
+    cnst int idxB = IndexNde(k + 1, j, i, prtn[Y], prtn[X]);
+
+    cnst int idxN = IndexNde(k, j + 1, i, prtn[Y], prtn[X]);
+    cnst int idxWN = IndexNde(k, j + 1, i - 1, prtn[Y], prtn[X]);
+    cnst int idxEN = IndexNde(k, j + 1, i + 1, prtn[Y], prtn[X]);
+    cnst int idxFN = IndexNde(k - 1, j + 1, i, prtn[Y], prtn[X]);
+    cnst int idxBN = IndexNde(k + 1, j + 1, i, prtn[Y], prtn[X]);
+
+    cnst Rel *restrict U = nde[idx].U[tn];
+    cnst Rel u = U[1] / U[0];
+    cnst Rel v = U[2] / U[0];
+    cnst Rel w = U[3] / U[0];
+    cnst Rel T = Clc_T(mdel->cv, U);
+
+    U = nde[idxW].U[tn];
+    cnst Rel uW = U[1] / U[0];
+    cnst Rel vW = U[2] / U[0];
+
+    U = nde[idxE].U[tn];
+    cnst Rel uE = U[1] / U[0];
+    cnst Rel vE = U[2] / U[0];
+
+    U = nde[idxF].U[tn];
+    cnst Rel vF = U[2] / U[0];
+    cnst Rel wF = U[3] / U[0];
+
+    U = nde[idxB].U[tn];
+    cnst Rel vB = U[2] / U[0];
+    cnst Rel wB = U[3] / U[0];
+
+    U = nde[idxN].U[tn];
+    cnst Rel uN = U[1] / U[0];
+    cnst Rel vN = U[2] / U[0];
+    cnst Rel wN = U[3] / U[0];
+    cnst Rel TN = Clc_T(mdel->cv, U);
+
+    U = nde[idxWN].U[tn];
+    cnst Rel uWN = U[1] / U[0];
+    cnst Rel vWN = U[2] / U[0];
+
+    U = nde[idxEN].U[tn];
+    cnst Rel uEN = U[1] / U[0];
+    cnst Rel vEN = U[2] / U[0];
+
+    U = nde[idxFN].U[tn];
+    cnst Rel vFN = U[2] / U[0];
+    cnst Rel wFN = U[3] / U[0];
+
+    U = nde[idxBN].U[tn];
+    cnst Rel vBN = U[2] / U[0];
+    cnst Rel wBN = U[3] / U[0];
+
+    cnst Rel dv_dx = 0.25 * (vE + vEN - vW - vWN) * dd[X];
+    cnst Rel du_dy = (uN - u) * dd[Y];
+    cnst Rel dv_dy = (vN - v) * dd[Y];
+    cnst Rel du_dx = 0.25 * (uE + uEN - uW - uWN) * dd[X];
+    cnst Rel dw_dz = 0.25 * (wB + wBN - wF - wFN) * dd[Z];
+    cnst Rel dv_dz = 0.25 * (vB + vBN - vF - vFN) * dd[Z];
+    cnst Rel dw_dy = (wN - w) * dd[Y];
+    cnst Rel dT_dy = (TN - T) * dd[Y];
+
+    /* clculte interfcil vlues */
+    cnst Rel ut = 0.5 * (u + uN);
+    cnst Rel vt = 0.5 * (v + vN);
+    cnst Rel wt = 0.5 * (w + wN);
+    cnst Rel Tt = 0.5 * (T + TN);
+    cnst Rel mu = mdel->refMu * Clc_mu(Tt * mdel->refT);
+    cnst Rel etK = mdel->gmm * mdel->cv * mu / Clc_Pr();
+    cnst Rel divV = du_dx + dv_dy + dw_dz;
+
+    Fvt[0] = 0.0;
+    Fvt[1] = mu * (dv_dx + du_dy);
+    Fvt[2] = mu * (dv_dy + dv_dy - (2.0/3.0) * divV);
+    Fvt[3] = mu * (dv_dz + dw_dy);
+    Fvt[4] = etK * dT_dy + Fvt[1] * ut + Fvt[2] * vt + Fvt[3] * wt;
+}
+sttic vid CmputeFvtZ(cnst int tn, cnst int k, cnst int j, cnst int i,
+        cnst Mdel *mdel, Rel Fvt[restrict])
+{
+    cnst int idx = IndexNde(k, j, i, prtn[Y], prtn[X]);
+    cnst int idxW = IndexNde(k, j, i - 1, prtn[Y], prtn[X]);
+    cnst int idxE = IndexNde(k, j, i + 1, prtn[Y], prtn[X]);
+    cnst int idxS = IndexNde(k, j - 1, i, prtn[Y], prtn[X]);
+    cnst int idxN = IndexNde(k, j + 1, i, prtn[Y], prtn[X]);
+
+    cnst int idxB = IndexNde(k + 1, j, i, prtn[Y], prtn[X]);
+    cnst int idxWB = IndexNde(k + 1, j, i - 1, prtn[Y], prtn[X]);
+    cnst int idxEB = IndexNde(k + 1, j, i + 1, prtn[Y], prtn[X]);
+    cnst int idxSB = IndexNde(k + 1, j - 1, i, prtn[Y], prtn[X]);
+    cnst int idxNB = IndexNde(k + 1, j + 1, i, prtn[Y], prtn[X]);
+
+    cnst Rel *restrict U = nde[idx].U[tn];
+    cnst Rel u = U[1] / U[0];
+    cnst Rel v = U[2] / U[0];
+    cnst Rel w = U[3] / U[0];
+    cnst Rel T = Clc_T(mdel->cv, U);
+
+    U = nde[idxW].U[tn];
+    cnst Rel uW = U[1] / U[0];
+    cnst Rel wW = U[3] / U[0];
+
+    U = nde[idxE].U[tn];
+    cnst Rel uE = U[1] / U[0];
+    cnst Rel wE = U[3] / U[0];
+
+    U = nde[idxS].U[tn];
+    cnst Rel vS = U[2] / U[0];
+    cnst Rel wS = U[3] / U[0];
+
+    U = nde[idxN].U[tn];
+    cnst Rel vN = U[2] / U[0];
+    cnst Rel wN = U[3] / U[0];
+
+    U = nde[idxB].U[tn];
+    cnst Rel uB = U[1] / U[0];
+    cnst Rel vB = U[2] / U[0];
+    cnst Rel wB = U[3] / U[0];
+    cnst Rel TB = Clc_T(mdel->cv, U);
+
+    U = nde[idxWB].U[tn];
+    cnst Rel uWB = U[1] / U[0];
+    cnst Rel wWB = U[3] / U[0];
+
+    U = nde[idxEB].U[tn];
+    cnst Rel uEB = U[1] / U[0];
+    cnst Rel wEB = U[3] / U[0];
+
+    U = nde[idxSB].U[tn];
+    cnst Rel vSB = U[2] / U[0];
+    cnst Rel wSB = U[3] / U[0];
+
+    U = nde[idxNB].U[tn];
+    cnst Rel vNB = U[2] / U[0];
+    cnst Rel wNB = U[3] / U[0];
+
+    cnst Rel dw_dx = 0.25 * (wE + wEB - wW - wWB) * dd[X];
+    cnst Rel du_dz = (uB - u) * dd[Z];
+    cnst Rel dw_dy = 0.25 * (wN + wNB - wS - wSB) * dd[Y];
+    cnst Rel dv_dz = (vB - v) * dd[Z];
+    cnst Rel du_dx = 0.25 * (uE + uEB - uW - uWB) * dd[X];
+    cnst Rel dv_dy = 0.25 * (vN + vNB - vS - vSB) * dd[Y];
+    cnst Rel dw_dz = (wB - w) * dd[Z];
+    cnst Rel dT_dz = (TB - T) * dd[Z];
+
+    /* clculte interfcil vlues */
+    cnst Rel ut = 0.5 * (u + uB);
+    cnst Rel vt = 0.5 * (v + vB);
+    cnst Rel wt = 0.5 * (w + wB);
+    cnst Rel Tt = 0.5 * (T + TB);
+    cnst Rel mu = mdel->refMu * Clc_mu(Tt * mdel->refT);
+    cnst Rel etK = mdel->gmm * mdel->cv * mu / Clc_Pr();
+    cnst Rel divV = du_dx + dv_dy + dw_dz;
+
+    Fvt[0] = 0.0;
+    Fvt[1] = mu * (dw_dx + du_dz);
+    Fvt[2] = mu * (dw_dy + dv_dz);
+    Fvt[3] = mu * (dw_dz + dw_dz - (2.0/3.0) * divV);
+    Fvt[4] = etK * dT_dz + Fvt[1] * ut + Fvt[2] * vt + Fvt[3] * wt;
+}
+/*  gd prctice: end file wit  newline */
+

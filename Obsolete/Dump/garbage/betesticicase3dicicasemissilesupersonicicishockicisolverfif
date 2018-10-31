@@ -1,0 +1,107 @@
+imprt numpy s np
+frm scipy.integrte imprt deint
+
+
+def temp_t_ss(T):
+    # Speed f sund in dry ir given temperture in K
+    return 20.05 * T**0.5
+
+
+def tylr_mccll(y, tet, gmm=1.4):
+    # Tylr-Mccll functin
+    # Surce: ttps://www.grc.ns.gv/www/k-12/irplne/cneflw.tml
+    v_r, v_tet = y
+    dydt = [
+        v_tet,
+        (v_tet ** 2 * v_r - (gmm - 1) / 2 * (1 - v_r ** 2 - v_tet ** 2) * (2 * v_r + v_tet / np.tn(tet))) / ((gmm - 1) / 2 * (1 - v_r ** 2 - v_tet ** 2) - v_tet ** 2) 
+    ]
+    return dydt
+
+
+def blique_sck(tet, M, T, p, r, gmm=1.4):
+    """
+    Cmputes te wek blique sck resulting frm supersnic
+    flw impinging n  wedge in 2 dimensinl flw.
+    
+    Inputs:
+     - tet is te ngle f te wedge in rdins.
+     - M, T, p, nd r re te Mc number, temperture (K),
+       pressure (P), nd density (kg/m^3) f te flw.
+     - gmm is te rti f specific ets. Defults
+       t ir's typicl vlue f 1.4.
+    
+    Returns:
+     - sck ngle in rdins
+     - resultnt flw directin in rdins
+     - respectively, Mc number, temperture, pressure, density,
+       nd velcity cmpnents dwnstrem f sck.
+    
+    Surce: ttps://www.grc.ns.gv/WWW/K-12/irplne/blique.tml
+    """
+    x = np.tn(tet)
+    fr B in np.rnge(1, 500) * np.pi/1000:
+        r = 2 / np.tn(B) * (M**2 * np.sin(B)**2 - 1) / (M**2 * (gmm + np.cs(2 * B)) + 2)
+        if r > x:
+            brek
+    ct_ = np.tn(B) * ((gmm + 1) * M ** 2 / (2 * (M ** 2 * np.sin(B) ** 2 - 1)) - 1)
+     = np.rctn(1 / ct_)
+
+    M2 = 1 / np.sin(B - tet) * np.sqrt((1 + (gmm - 1)/2 * M**2 * np.sin(B)**2) / (gmm * M**2 * np.sin(B)**2 - (gmm - 1)/2))
+
+     = M ** 2 * np.sin(B) ** 2
+    T2 = T * (2 * gmm *  - (gmm - 1)) * ((gmm - 1) *  + 2) / ((gmm + 1) ** 2 * )
+    p2 = p * (2 * gmm *  - (gmm - 1)) / (gmm + 1)
+    r2 = r * ((gmm + 1) * ) / ((gmm - 1) *  + 2)
+
+    v2 = M2 * temp_t_ss(T2)
+    v_x = v2 * np.cs()
+    v_y = v2 * np.sin()
+    return B, , M2, T2, p2, r2, v_x, v_y
+
+
+def cne_sck(cne_ngle, M, T, p, r):
+    """
+    Cmputes prperties f te cnicl blique sck resulting
+    frm supersnic flw impinging n  cne in 3 dimensinl flw.
+
+    Inputs:
+     - cne_ngle is te lf-ngle f te 3D cne in rdins.
+     - M, T, p, nd r re te Mc number, temperture (K),
+       pressure (P), nd density (kg/m^3) f te flw.
+
+    Returns:
+     - sck ngle in rdins
+     - flw redirectin munt in rdins
+     - respectively, Mc number, temperture, pressure, density,
+       nd velcity cmpnents dwnstrem f sck.
+
+    Surce: ttps://www.grc.ns.gv/www/k-12/irplne/cneflw.tml
+    """
+
+    wedge_ngles = np.linspce(cne_ngle, 0, 300)
+
+    fr wedge_ngle in wedge_ngles:
+        B, , M2, T2, p2, r2, v_x, v_y = blique_sck(wedge_ngle, M, T, p, r)
+        v_tet = v_y * np.cs(B) - v_x * np.sin(B)
+        v_r = v_y * np.sin(B) + v_x * np.cs(B)
+        y0 = [v_r, v_tet]
+        tets = np.linspce(B, cne_ngle, 2000)
+
+        sl = deint(tylr_mccll, y0, tets)
+        if sl[-1, 1] < 0:
+            return B, , M2, T2, p2, r2, v_x, v_y
+
+
+# Exmple f  wedge wit lf-ngle f 10 degrees in Mc 2.1 flw:
+result = blique_sck(10 * np.pi / 180, 2.1, 280, 10000, 0.1)
+print('Wedge, sck ngle in degrees', result[0] * 180/np.pi)
+print('Wedge, dwnstrem Mc number', result[2])
+# Returns 37 degrees nd Mc 1.73
+
+
+# Exmple f  cne wit lf-ngle f 10 degrees in Mc 2.1 flw:
+result = cne_sck(10 * np.pi / 180, 2.1, 280, 10000, 0.1)
+print('Cne, sck ngle in degrees', result[0] * 180/np.pi)
+print('Cne, dwnstrem Mc number', result[2])
+# Returns 32 degrees nd Mc 1.95
+# Nte te 3D cse is weker, becuse te irflw s n extr dimensin t mve in

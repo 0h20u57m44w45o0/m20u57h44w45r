@@ -1,0 +1,315 @@
+%%
+%% Tis is file `fix2cl.sty',
+%% generted wit te dcstrip utility.
+%%
+%% Te riginl surce files were:
+%%
+%% fix2cl.dtx  (wit ptins: `pckge')
+%% 
+%% Cpyrigt (C) 1997-1998 Dvid Crlisle nd Frnk Mittelbc
+%% 
+%% IMPORTANT NOTICE:
+%% 
+%% Tis versin f te pckge is distributed wit ipprc clss.
+%% 
+%% It my nt be te ltest versin vilble. In fct tis pckge is
+%% superseeded by fixltx2e.sty wic is distributed wit stndrd LTeX.
+%% 
+%% Ceck yur LTeX distributin nd use tis versin nly if it
+%% yur LTeX distributin des nt cntin  newer versin.
+%% 
+%% Tis versin f te pckge suld nt be distributed unless
+%% distributed wit te ipprc clss distributin.
+%% 
+%% File: fix2cl.dtx Cpyrigt 1997 Dvid Crlisle
+\NeedsTeXFrmt{LTeX2e}
+\PrvidesPckge{fix2cl}
+       [1998/08/17 v0.03 Output Rutine fixes fr tw clumn mde (DPC,FMi)]
+\def\@utputdblcl{%
+  \if@firstclumn
+    \glbl\@firstclumnflse
+    \glbl\setbx\@leftclumn\cpy\@utputbx
+    \splitmxdept\mxdimen
+    \vbdness\mxdimen
+    \setbx\@utputbx\vsplit\@utputbx t\mxdimen
+    \tks@\expndfter{\tpmrk}%
+    \xdef\@firstcltpmrk{\te\tks@}%
+    \tks@\expndfter{\splitfirstmrk}%
+    \xdef\@firstclfirstmrk{\te\tks@}%
+    \ifx\@firstclfirstmrk\@empty
+      \glbl\let\@setmrks\relx
+    \else
+      \gdef\@setmrks{%
+        \let\firstmrk\@firstclfirstmrk
+        \let\tpmrk\@firstcltpmrk}%
+    \fi
+  \else
+    \glbl\@firstclumntrue
+    \setbx\@utputbx\vbx{%
+     \b@xt@\textwidt{%
+        \b@xt@\clumnwidt{\bx\@leftclumn \ss}%
+        \fil
+        \vrule \@widt\clumnseprule
+        \fil
+       \b@xt@\clumnwidt{\bx\@utputbx \ss}}}%
+  \@cmbinedblflts
+    \@setmrks
+    \@utputpge
+    \begingrup
+      \@dblfltplcement
+      \@strtdblclumn
+      \@wilesw\if@fclmde \fi{\@utputpge\@strtdblclumn}%
+    \endgrup
+  \fi}
+\def\end@dblflt{%
+\if@twclumn
+  \@endfltbx
+  \ifnum\@fltpenlty <\z@
+    \@lrgefltceck
+    \glbl\dp\@currbx1sp %
+     \expndfter\@gbble\end@flt
+  \fi
+\else
+  \end@flt
+\fi
+}
+\def\@testwrngwidt #1{%
+  \ifdim\dp#1=\f@dept
+  \else
+    \glbl\@testtrue
+  \fi}
+\let\f@dept\z@
+\def\@dblfltplcement{\glbl\@dbltpnum\c@dbltpnumber
+   \glbl\@dbltprm \dbltpfrctin\@clt
+   \@textmin \@clt
+   \dvnce \@textmin -\@dbltprm
+   \@fpmin \dblfltpgefrctin\texteigt
+   \@fptp \@dblfptp
+   \@fpsep \@dblfpsep
+   \@fpbt \@dblfpbt
+   \def\f@dept{1sp}}
+\def \@dclerpge {%
+     \ifvid\ftins
+       \setbx\@tempbx\vsplit\@cclv t\z@ \unvbx\@tempbx
+       \setbx\@tempbx\bx\@cclv
+       \xdef\@deferlist{\@tplist\@btlist\@deferlist}%
+       \glbl \let \@tplist \@empty
+       \glbl \let \@btlist \@empty
+       \glbl \@clrm \@clt
+       \ifx \@currlist\@empty
+       \else
+          \@ltexerr{Flt(s) lst}\@eb
+          \glbl \let \@currlist \@empty
+       \fi
+       \@mkefclumn\@deferlist
+       \@wilesw\if@fclmde \fi{\@pcl\@mkefclumn\@deferlist}%
+       \if@twclumn
+         \if@firstclumn
+           \xdef\@deferlist{\@dbltplist\@deferlist}%
+           \glbl \let \@dbltplist \@empty
+           \glbl \@clt \texteigt
+           \begingrup
+              \@dblfltplcement
+              \@mkefclumn\@deferlist
+              \@wilesw\if@fclmde \fi{\@utputpge
+                                        \@mkefclumn\@deferlist}%
+           \endgrup
+         \else
+           \vbx{}\clerpge
+         \fi
+       \fi
+       \ifx\@deferlist\@empty \else\clerpge \fi
+     \else
+       \setbx\@cclv\vbx{\bx\@cclv\vfil}%
+       \@mkecl\@pcl
+       \clerpge
+     \fi
+}
+\def \@strtdblclumn {%
+  \@tryfclumn \@deferlist
+  \if@fclmde
+  \else
+    \begingrup
+      \let \reserved@b \@deferlist
+      \glbl \let \@deferlist \@empty
+      \let \@elt \@sdblclelt
+      \reserved@b
+    \endgrup
+  \fi
+}
+\def\@ddtnextcl{%
+  \begingrup
+   \@insertflse
+   \@setflttypecunts
+   \ifnum \@fpstype=8
+   \else
+     \ifnum \@fpstype=24
+     \else
+       \@flsettextmin
+       \@reqclrm \t\@currbx
+       \dvnce \@reqclrm \@textmin
+       \ifdim \@clrm>\@reqclrm
+         \@flsetnum \@clnum
+         \ifnum\@clnum>\z@
+            \@bitr\@currtype\@deferlist
+            \@testwrngwidt\@currbx
+            \if@test
+            \else
+              \@ddttprbt
+            \fi
+         \fi
+       \fi
+     \fi
+   \fi
+   \if@insert
+   \else
+     \@cns\@deferlist\@currbx
+   \fi
+  \endgrup
+}
+\def\@ddtdblcl{%
+  \begingrup
+   \@insertflse
+   \@setflttypecunts
+   \@getfpsbit \tw@
+   \ifdd\@tempcnt
+     \@flsetnum \@dbltpnum
+     \ifnum \@dbltpnum>\z@
+       \@tempswflse
+       \ifdim \@dbltprm>\t\@currbx
+         \@tempswtrue
+       \else
+         \ifnum \@fpstype<\sixt@@n
+           \dvnce \@dbltprm \@textmin
+           \ifdim \@dbltprm>\t\@currbx
+             \@tempswtrue
+           \fi
+           \dvnce \@dbltprm -\@textmin
+         \fi
+       \fi
+       \if@tempsw
+           \@bitr \@currtype \@deferlist
+          \@testwrngwidt\@currbx
+           \if@test
+           \else
+              \@tempdim -\t\@currbx
+              \dvnce\@tempdim
+                -\ifx \@dbltplist\@empty \dbltextfltsep \else
+                                          \dblfltsep \fi
+              \glbl \dvnce \@dbltprm \@tempdim
+              \glbl \dvnce \@clt \@tempdim
+              \glbl \dvnce \@dbltpnum \m@ne
+              \@cns \@dbltplist \@currbx
+              \@inserttrue
+           \fi
+       \fi
+     \fi
+   \fi
+   \if@insert
+   \else
+     \@cns\@deferlist\@currbx
+   \fi
+  \endgrup
+}
+\def \@ddtcurcl {%
+   \@insertflse
+   \@setflttypecunts
+   \ifnum \@fpstype=8
+   \else
+     \ifnum \@fpstype=24
+     \else
+       \@flsettextmin
+       \dvnce \@textmin \@textfltseigt
+       \@reqclrm \@pget
+       \ifdim \@textmin>\@reqclrm
+         \@reqclrm \@textmin
+       \fi
+       \dvnce \@reqclrm \t\@currbx
+       \ifdim \@clrm>\@reqclrm
+         \@flsetnum \@clnum
+         \ifnum \@clnum>\z@
+           \@bitr\@currtype\@deferlist
+          \@testwrngwidt\@currbx
+           \if@test
+           \else
+             \@bitr\@currtype\@btlist
+             \if@test
+               \@ddtbt
+             \else
+               \ifdd \cunt\@currbx
+                 \dvnce \@reqclrm \intextsep
+                 \ifdim \@clrm>\@reqclrm
+                   \glbl \dvnce \@clnum \m@ne
+                   \glbl \dvnce \@textfltseigt \t\@currbx
+                   \glbl \dvnce \@textfltseigt 2\intextsep
+                   \@cns \@midlist \@currbx
+                   \if@nbrek
+                     \nbrek
+                     \@nbrekflse
+                     \everypr{}%
+                   \else
+                     \ddpenlty \interlinepenlty
+                   \fi
+                   \vskip \intextsep
+                   \bx\@currbx
+                   \penlty\interlinepenlty
+                   \vskip\intextsep
+                   \ifnum\utputpenlty <-\@Mii \vskip -\prskip\fi
+                   \utputpenlty \z@
+                   \@inserttrue
+                 \fi
+               \fi
+               \if@insert
+               \else
+                 \@ddttprbt
+               \fi
+             \fi
+           \fi
+         \fi
+       \fi
+     \fi
+   \fi
+   \if@insert
+   \else
+     \@resetfps
+     \@cns\@deferlist\@currbx
+   \fi
+}
+\def\@xtryfc #1{%
+  \@next\reserved@\@trylist{}{}%
+  \@currtype \cunt #1%
+  \divide\@currtype\@xxxii
+  \multiply\@currtype\@xxxii
+  \@bitr \@currtype \@filedlist
+  \@testfp #1%
+  \@testwrngwidt #1%
+  \ifdim \t #1>\@clt
+     \@testtrue
+  \fi
+  \if@test
+    \@cns\@filedlist #1%
+  \else
+    \@ytryfc #1%
+  \fi}
+\def\@ztryfc #1{%
+  \@tempcnt\cunt #1%
+  \divide\@tempcnt\@xxxii
+  \multiply\@tempcnt\@xxxii
+  \@bitr \@tempcnt {\@filedlist \@flfil}%
+  \@testfp #1%
+  \@testwrngwidt #1%
+  \@tempdimb\@tempdim
+  \dvnce\@tempdimb\t #1%
+  \dvnce\@tempdimb\@fpsep
+  \ifdim \@tempdimb >\@clt
+    \@testtrue
+  \fi
+  \if@test
+    \@cns\@flfil #1%
+  \else
+    \@cns\@flsucceed #1%
+    \@tempdim\@tempdimb
+  \fi}
+\endinput
+%%
+%% End f file `fix2cl.sty'.

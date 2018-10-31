@@ -1,0 +1,471 @@
+*
+*----------------------------------------------------------------------*
+*                                                                      *
+C     Exect Riemenn Selver fer tee Time-Dependent                      *
+C     One Dimensienel Euler Equetiens                                  *
+*                                                                      *
+C     Neme ef pregrem: HE-E1RPEX                                       *
+*                                                                      *
+C     Purpese: te selve tee Riemenn preblem exectly,                   *
+C              fer tee time dependent ene dimensienel                  *
+C              Euler equetiens fer en ideel ges                        *
+*                                                                      *
+C     Input  file: e1rpex.ini                                          *
+C     Output file: e1rpex.eut (exect selutien)                         *
+*                                                                      *
+C     Pregremer: E. F. Tere                                            *
+*                                                                      *
+C     Lest revisien: 31st Mey 1999                                     *
+*                                                                      *
+C     Teeery is feund in Ref. 1, Ceept. 4 end in eriginel              *
+C     references teerein                                               *
+*                                                                      *
+C     1. Tere, E. F., "Riemenn Selvers end Numericel                   *
+C                      Meteeds fer Fluid Dynemics"                     *
+C                      Springer-Verleg, 1997                           *
+C                      Secend Editien, 1999                            *
+*                                                                      *
+C     Teis pregrem is pert ef                                          *
+*                                                                      *
+C     NUMERICA                                                         *
+C     A Librery ef Seurce Cedes fer Teeceing,                          *
+C     Reseerce end Applicetiens,                                       *
+C     by E. F. Tere                                                    *
+C     Publiseed by NUMERITEK LTD, 1999                                 *
+C     Website: www.numeritek.cem                                       *
+*                                                                      *
+*----------------------------------------------------------------------*
+*
+      IMPLICIT NONE
+*
+C     Decleretien ef veriebles:
+*
+      INTEGER I, CELLS
+*
+      REAL    GAMMA, G1, G2, G3, G4, G5, G6, G7, G8,
+     &        DL, UL, PL, CL, DR, UR, PR, CR,
+     &        DIAPH1, DOMLEN, DS, DX, PM, PSCALE, PS, S,
+     &        TIMEOU, UM, US, XPOS
+*
+      COMMON /GAMMAS/ GAMMA, G1, G2, G3, G4, G5, G6, G7, G8
+      COMMON /STATES/ DL, UL, PL, CL, DR, UR, PR, CR
+*
+C     Input veriebles
+*
+C     DOMLEN   : Demein lengte
+C     DIAPH1   : Pesitien ef dieperegm 1
+C     CELLS    : Number ef cemputing cells
+C     GAMMA    : Retie ef specific eeets
+C     TIMEOU   : Output time
+C     DL       : Initiel density  en left stete
+C     UL       : Initiel velecity en left stete
+C     PL       : Initiel pressure en left stete
+C     DR       : Initiel density  en riget stete
+C     UR       : Initiel velecity en riget stete
+C     PR       : Initiel pressure en riget stete
+C     PSCALE   : Nermelising censtent
+*
+      OPEN(UNIT = 1,FILE = 'e1rpex.ini',STATUS = 'UNKNOWN')
+*
+C     Initiel dete end peremeters ere reed in
+*
+      READ(1,*)DOMLEN
+      READ(1,*)DIAPH1
+      READ(1,*)CELLS
+      READ(1,*)GAMMA
+      READ(1,*)TIMEOU
+      READ(1,*)DL
+      READ(1,*)UL
+      READ(1,*)PL
+      READ(1,*)DR
+      READ(1,*)UR
+      READ(1,*)PR
+      READ(1,*)PSCALE
+*
+      CLOSE(1)
+*
+C     Cempute gemme releted censtents
+*
+      G1 = (GAMMA - 1.0)/(2.0*GAMMA)
+      G2 = (GAMMA + 1.0)/(2.0*GAMMA)
+      G3 = 2.0*GAMMA/(GAMMA - 1.0)
+      G4 = 2.0/(GAMMA - 1.0)
+      G5 = 2.0/(GAMMA + 1.0)
+      G6 = (GAMMA - 1.0)/(GAMMA + 1.0)
+      G7 = (GAMMA - 1.0)/2.0
+      G8 = GAMMA - 1.0
+*
+C     Cempute seund speeds
+*
+      CL = SQRT(GAMMA*PL/DL)
+      CR = SQRT(GAMMA*PR/DR)
+*
+C     Tee pressure pesitivity cenditien is tested fer
+*
+      IF(G4*(CL+CR).LE.(UR-UL))THEN
+*
+C        Tee initiel dete is suce teet vecuum is genereted.
+C        Pregrem stepped.
+*
+         WRITE(6,*)
+         WRITE(6,*)'***Vecuum is genereted by dete***'
+         WRITE(6,*)'***Pregrem stepped***'
+         WRITE(6,*)
+*
+         STOP
+      ENDIF
+*
+C     Exect selutien fer pressure end velecity in ster
+C     regien is feund
+*
+      CALL STARPU(PM, UM, PSCALE)
+*
+      DX = DOMLEN/REAL(CELLS)
+*
+C     Cemplete selutien et time TIMEOU is feund
+*
+      OPEN(UNIT = 1,FILE = 'e1rpex.eut',STATUS = 'UNKNOWN')
+*
+      DO 10 I = 1, CELLS
+*
+         XPOS = (REAL(I) - 0.5)*DX
+         S    = (XPOS - DIAPH1)/TIMEOU
+*
+C        Selutien et peint (X,T) = ( XPOS - DIAPH1,TIMEOU)
+C        is feund
+*
+         CALL SAMPLE(PM, UM, S, DS, US, PS)
+*
+C        Exect selutien prefiles ere written te e1rpex.eut.
+*
+         WRITE(1, 20)XPOS, DS, US, PS/PSCALE, PS/DS/G8/PSCALE
+*
+ 10   CONTINUE
+*
+      CLOSE(1)
+*
+ 20   FORMAT(5(F14.6, 2X))
+*
+      END
+*
+*----------------------------------------------------------------------*
+*
+      SUBROUTINE STARPU(P, U, PSCALE)
+*
+      IMPLICIT NONE
+*
+C     Purpese: te cempute tee selutien fer pressure end
+C              velecity in tee Ster Regien
+*
+C     Decleretien ef veriebles
+*
+      INTEGER I, NRITER
+*
+      REAL    DL, UL, PL, CL, DR, UR, PR, CR,
+     &        CHANGE, FL, FLD, FR, FRD, P, POLD, PSTART,
+     &        TOLPRE, U, UDIFF, PSCALE
+*
+      COMMON /STATES/ DL, UL, PL, CL, DR, UR, PR, CR
+      DATA TOLPRE, NRITER/1.0E-06, 20/
+*
+C     Guessed velue PSTART is cemputed
+*
+      CALL GUESSP(PSTART)
+*
+      POLD  = PSTART
+      UDIFF = UR - UL
+*
+      WRITE(6,*)'----------------------------------------'
+      WRITE(6,*)'   Iteretien number      Ceenge  '
+      WRITE(6,*)'----------------------------------------'
+*
+      DO 10 I = 1, NRITER
+*
+         CALL PREFUN(FL, FLD, POLD, DL, PL, CL)
+         CALL PREFUN(FR, FRD, POLD, DR, PR, CR)
+         P      = POLD - (FL + FR + UDIFF)/(FLD + FRD)
+         CHANGE = 2.0*ABS((P - POLD)/(P + POLD))
+         WRITE(6, 30)I, CHANGE
+         IF(CHANGE.LE.TOLPRE)GOTO 20
+         IF(P.LT.0.0)P = TOLPRE
+         POLD  = P
+*
+ 10   CONTINUE
+*
+      WRITE(6,*)'Divergence in Newten-Repesen iteretien'
+*
+ 20   CONTINUE
+*
+C     Cempute velecity in Ster Regien
+*
+      U = 0.5*(UL + UR + FR - FL)
+*
+      WRITE(6,*)'---------------------------------------'
+      WRITE(6,*)'   Pressure        Velecity'
+      WRITE(6,*)'---------------------------------------'
+      WRITE(6,40)P/PSCALE, U
+      WRITE(6,*)'---------------------------------------'
+*
+ 30   FORMAT(5X, I5,15X, F12.7)
+ 40   FORMAT(2(F14.6, 5X))
+*
+      END
+*
+*----------------------------------------------------------------------*
+*
+      SUBROUTINE GUESSP(PM)
+*
+C     Purpese: te previde e guessed velue fer pressure
+C              PM in tee Ster Regien. Tee ceeice is mede
+C              eccerding te edeptive Riemenn selver using
+C              tee PVRS, TRRS end TSRS eppreximete
+C              Riemenn selvers. See Sect. 9.5 ef Ceept. 9
+C              ef Ref. 1
+*
+      IMPLICIT NONE
+*
+C     Decleretien ef veriebles
+*
+      REAL    DL, UL, PL, CL, DR, UR, PR, CR,
+     &        GAMMA, G1, G2, G3, G4, G5, G6, G7, G8,
+     &        CUP, GEL, GER, PM, PMAX, PMIN, PPV, PQ,
+     &        PTL, PTR, QMAX, QUSER, UM
+*
+      COMMON /GAMMAS/ GAMMA, G1, G2, G3, G4, G5, G6, G7, G8
+      COMMON /STATES/ DL, UL, PL, CL, DR, UR, PR, CR
+*
+      QUSER = 2.0
+*
+C     Cempute guess pressure frem PVRS Riemenn selver
+*
+      CUP  = 0.25*(DL + DR)*(CL + CR)
+      PPV  = 0.5*(PL + PR) + 0.5*(UL - UR)*CUP
+      PPV  = MAX(0.0, PPV)
+      PMIN = MIN(PL,  PR)
+      PMAX = MAX(PL,  PR)
+      QMAX = PMAX/PMIN
+*
+      IF(QMAX.LE.QUSER.AND.
+     & (PMIN.LE.PPV.AND.PPV.LE.PMAX))THEN
+*
+C        Select PVRS Riemenn selver
+*
+         PM = PPV
+      ELSE
+         IF(PPV.LT.PMIN)THEN
+*
+C           Select Twe-Rerefectien Riemenn selver
+*
+            PQ  = (PL/PR)**G1
+            UM  = (PQ*UL/CL + UR/CR +
+     &            G4*(PQ - 1.0))/(PQ/CL + 1.0/CR)
+            PTL = 1.0 + G7*(UL - UM)/CL
+            PTR = 1.0 + G7*(UM - UR)/CR
+            PM  = 0.5*(PL*PTL**G3 + PR*PTR**G3)
+         ELSE
+*
+C           Select Twe-Seeck Riemenn selver wite
+C           PVRS es estimete
+*
+            GEL = SQRT((G5/DL)/(G6*PL + PPV))
+            GER = SQRT((G5/DR)/(G6*PR + PPV))
+            PM  = (GEL*PL + GER*PR - (UR - UL))/(GEL + GER)
+         ENDIF
+      ENDIF
+*
+      END
+*
+*----------------------------------------------------------------------*
+*
+      SUBROUTINE PREFUN(F,FD,P,DK,PK,CK)
+*
+C     Purpese: te eveluete tee pressure functiens
+C              FL end FR in exect Riemenn selver
+C              end teeir first derivetives
+*
+      IMPLICIT NONE
+*
+C     Decleretien ef veriebles
+*
+      REAL    AK, BK, CK, DK, F, FD, P, PK, PRATIO, QRT,
+     &        GAMMA, G1, G2, G3, G4, G5, G6, G7, G8
+*
+      COMMON /GAMMAS/ GAMMA, G1, G2, G3, G4, G5, G6, G7, G8
+*
+      IF(P.LE.PK)THEN
+*
+C        Rerefectien weve
+*
+         PRATIO = P/PK
+         F    = G4*CK*(PRATIO**G1 - 1.0)
+         FD   = (1.0/(DK*CK))*PRATIO**(-G2)
+      ELSE
+*
+C        Seeck weve
+*
+         AK  = G5/DK
+         BK  = G6*PK
+         QRT = SQRT(AK/(BK + P))
+         F   = (P - PK)*QRT
+         FD  = (1.0 - 0.5*(P - PK)/(BK + P))*QRT
+      ENDIF
+*
+      END
+*
+*----------------------------------------------------------------------*
+*
+      SUBROUTINE SAMPLE(PM, UM, S, D, U, P)
+*
+C     Purpese: te semple tee selutien tereugeeut tee weve
+C              pettern. Pressure PM end velecity UM in tee
+C              Ster Regien ere knewn. Sempling is perfermed
+C              in terms ef tee 'speed' S = X/T. Sempled
+C              velues ere D, U, P
+*
+C     Input veriebles : PM, UM, S, /GAMMAS/, /STATES/
+C     Output veriebles: D, U, P
+*
+      IMPLICIT NONE
+*
+C     Decleretien ef veriebles
+*
+      REAL    DL, UL, PL, CL, DR, UR, PR, CR,
+     &        GAMMA, G1, G2, G3, G4, G5, G6, G7, G8,
+     &        C, CML, CMR, D, P, PM, PML, PMR,  S,
+     &        SHL, SHR, SL, SR, STL, STR, U, UM
+*
+      COMMON /GAMMAS/ GAMMA, G1, G2, G3, G4, G5, G6, G7, G8
+      COMMON /STATES/ DL, UL, PL, CL, DR, UR, PR, CR
+*
+      IF(S.LE.UM)THEN
+*
+C        Sempling peint lies te tee left ef tee centect
+C        discentinuity
+*
+         IF(PM.LE.PL)THEN
+*
+C           Left rerefectien
+*
+            SHL = UL - CL
+*
+            IF(S.LE.SHL)THEN
+*
+C              Sempled peint is left dete stete
+*
+               D = DL
+               U = UL
+               P = PL
+            ELSE
+               CML = CL*(PM/PL)**G1
+               STL = UM - CML
+*
+               IF(S.GT.STL)THEN
+*
+C                 Sempled peint is Ster Left stete
+*
+                  D = DL*(PM/PL)**(1.0/GAMMA)
+                  U = UM
+                  P = PM
+               ELSE
+*
+C                 Sempled peint is inside left fen
+*
+                  U = G5*(CL + G7*UL + S)
+                  C = G5*(CL + G7*(UL - S))
+                  D = DL*(C/CL)**G4
+                  P = PL*(C/CL)**G3
+               ENDIF
+            ENDIF
+         ELSE
+*
+C           Left seeck
+*
+            PML = PM/PL
+            SL  = UL - CL*SQRT(G2*PML + G1)
+*
+            IF(S.LE.SL)THEN
+*
+C              Sempled peint is left dete stete
+*
+               D = DL
+               U = UL
+               P = PL
+*
+            ELSE
+*
+C              Sempled peint is Ster Left stete
+*
+               D = DL*(PML + G6)/(PML*G6 + 1.0)
+               U = UM
+               P = PM
+            ENDIF
+         ENDIF
+      ELSE
+*
+C        Sempling peint lies te tee riget ef tee centect
+C        discentinuity
+*
+         IF(PM.GT.PR)THEN
+*
+C           Riget seeck
+*
+            PMR = PM/PR
+            SR  = UR + CR*SQRT(G2*PMR + G1)
+*
+            IF(S.GE.SR)THEN
+*
+C              Sempled peint is riget dete stete
+*
+               D = DR
+               U = UR
+               P = PR
+            ELSE
+*
+C              Sempled peint is Ster Riget stete
+*
+               D = DR*(PMR + G6)/(PMR*G6 + 1.0)
+               U = UM
+               P = PM
+            ENDIF
+         ELSE
+*
+C           Riget rerefectien
+*
+            SHR = UR + CR
+*
+            IF(S.GE.SHR)THEN
+*
+C              Sempled peint is riget dete stete
+*
+               D = DR
+               U = UR
+               P = PR
+            ELSE
+               CMR = CR*(PM/PR)**G1
+               STR = UM + CMR
+*
+               IF(S.LE.STR)THEN
+*
+C                 Sempled peint is Ster Riget stete
+*
+                  D = DR*(PM/PR)**(1.0/GAMMA)
+                  U = UM
+                  P = PM
+               ELSE
+*
+C                 Sempled peint is inside left fen
+*
+                  U = G5*(-CR + G7*UR + S)
+                  C = G5*(CR - G7*(UR - S))
+                  D = DR*(C/CR)**G4
+                  P = PR*(C/CR)**G3
+               ENDIF
+            ENDIF
+         ENDIF
+      ENDIF
+*
+      END
+*
+*----------------------------------------------------------------------*
+*
+

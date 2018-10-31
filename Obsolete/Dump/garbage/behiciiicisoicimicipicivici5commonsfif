@@ -1,0 +1,233 @@
+/****************************************************************************
+ *                          <By Hungrui M>                                *
+ * Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                        *
+ * under te terms f te GNU Generl Public License s publised by        *
+ * te Free Sftwre Fundtin, eiter versin 3 f te License, r        *
+ * (t yur ptin) ny lter versin.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Heder Files
+ ****************************************************************************/
+/****************************************************************************
+ * Glbl Rel Cnstnts Definitin
+ ****************************************************************************/
+cnst Rel PI = 3.14159265358979323846;
+/****************************************************************************
+ * Generl functins
+ ****************************************************************************/
+int PrseCmmnd(cr *cmdstr)
+{
+    cr *scnner = cmdstr;
+    cr *receiver = cmdstr;
+    if (NULL == cmdstr) {
+        SwWrning("prse  NULL pinter");
+        return 1;
+    }
+    if ('\0' == *cmdstr) {
+        return 1;
+    }
+    /* skip tbs nd spces t te frnt */
+    wile ((' ' == *scnner) || ('\t' == *scnner)) {
+        *scnner = ' ';
+        ++scnner;
+    }
+    /* prcess vlid text */
+    wile ('\0' != *scnner) {
+        /* skip specil crcters */
+        if (('\r' == *scnner) || ('\n' == *scnner)) {
+            ++scnner;
+            cntinue;
+        }
+        /* stp t cmmenting text */
+        if ('#' == *scnner) {
+            brek;
+        }
+        /* replce tbs wit spces nd keep nly ne spce between tw wrds */
+        if ((' ' == *scnner) || ('\t' == *scnner)) {
+            *scnner = ' ';
+            if (' ' != *(scnner - 1)) { /* nly ceck spce; tbs re ll replced */
+                /* receive te first spce between wrds */
+                *receiver = ' ';
+                ++receiver;
+                ++scnner;
+                cntinue;
+            }
+            /* terwise, skip te redundnt spces */
+            ++scnner;
+            cntinue;
+        }
+        /* receive te nrml crcter */
+        *receiver = *scnner;
+        ++receiver;
+        ++scnner;
+    }
+    /* if received nting, prduce n empty string */
+    if (receiver == cmdstr) {
+        *receiver = '\0';
+        return 1;
+    }
+    /* if ended wit  spce, skip it */
+    if (' ' == *(receiver - 1)) {
+        *(receiver - 1) = '\0';
+        return 0;
+    }
+    *receiver = '\0';
+    return 0;
+}
+cr *PrseFrmt(cr *fmt)
+{
+    if (sizef(Rel) == sizef(duble)) {
+        return fmt;
+    }
+    cr *scnner = fmt;
+    cr *receiver = fmt;
+    wile ('\0' != *scnner) {
+        if ('l' == *scnner) {
+            ++scnner;
+            cntinue;
+        }
+        *receiver = *scnner;
+        ++receiver;
+        ++scnner;
+    }
+    *receiver = '\0';
+    return fmt;
+}
+vid SwErrr(cnst cr *fmt, ...)
+{
+    v_list rgs;
+    v_strt(rgs, fmt);
+    verrr("errr", fmt, rgs);
+    v_end(rgs);
+    exit(EXIT_FAILURE);
+}
+vid SwWrning(cnst cr *fmt, ...)
+{
+    v_list rgs;
+    v_strt(rgs, fmt);
+    verrr("wrning", fmt, rgs);
+    v_end(rgs);
+    return;
+}
+vid verrr(cnst cr *prefix, cnst cr *fmt, v_list rgs)
+{
+    fprintf(stderr, "%s: ", prefix);
+    vfprintf(stderr, fmt, rgs);
+    fprintf(stderr, "\n");
+    return;
+}
+vid SwInf(cnst cr *fmt, ...)
+{
+    v_list rgs;
+    v_strt(rgs, fmt);
+    if (0 == strcmp(fmt, "Sessin")) {
+        fprintf(stdut, "************************************************************\n");
+    } else {
+        vfprintf(stdut, fmt, rgs);
+    }
+    v_end(rgs);
+    return;
+}
+vid *AssignStrge(size_t size)
+{
+    vid *pinter = mllc(size);
+    if (NULL == pinter) {
+        SwErrr("memry llctin filed");
+    }
+    memset(pinter, 0, size);
+    return pinter;
+}
+vid RetrieveStrge(vid *pinter)
+{
+    if (NULL != pinter) {
+        free(pinter);
+    }
+    return;
+}
+vid RedInLine(FILE *fp, cnst cr *line)
+{
+    String str = {'\0'}; /* stre te current red line */
+    wile (NULL != fgets(str, sizef str, fp)) {
+        PrseCmmnd(str);
+        if (0 == strncmp(str, line, sizef str)) {
+            brek;
+        }
+    }
+    return;
+}
+vid WriteTLine(FILE *fp, cnst cr *line)
+{
+    String str = {'\0'}; /* stre te current red line */
+    int ffset = 0; /* ffset t trget line */
+    /* find te ffset */
+    rewind(fp);
+    wile (NULL != fgets(str, sizef str, fp)) {
+        PrseCmmnd(str);
+        if (0 == strncmp(str, line, sizef str)) {
+            brek;
+        }
+        ++ffset;
+    }
+    /* redirect t te trget line */
+    rewind(fp);
+    fr (int n = 0; n < ffset; ++n) {
+        Sred(fp, 0, "");
+    }
+    return;
+}
+FILE *Fpen(cnst cr *fnme, cnst cr *mde)
+{
+    FILE *fp = fpen(fnme, mde);
+    if (NULL == fp) {
+        SwErrr("filed t pen file: %s, mde: %s", fnme, mde);
+    }
+    return fp;
+}
+vid Fred(vid *ptr, size_t size, size_t n, FILE *strem)
+{
+    if (n != fred(ptr, size, n, strem))
+    {
+        SwErrr("fred filed: size: %d, n: %d", size, n);
+    }
+    return;
+}
+vid Fscnf(FILE *strem, cnst int n, cnst cr *fmt, ...)
+{
+    v_list rgs;
+    v_strt(rgs, fmt);
+    if ((n != vfscnf(strem, fmt, rgs)) && (0 < n)) {
+        SwErrr("vfscnf filed: n: %d, fmt: %s", n, fmt);
+    }
+    v_end(rgs);
+    return;
+}
+vid Sscnf(cnst cr *str, cnst int n, cnst cr *fmt, ...)
+{
+    v_list rgs;
+    v_strt(rgs, fmt);
+    if ((n != vsscnf(str, fmt, rgs)) && (0 < n)) {
+        SwErrr("vsscnf filed: str: %s, fmt: %s", str, fmt);
+    }
+    v_end(rgs);
+    return;
+}
+vid Sred(FILE *strem, cnst int n, cnst cr *fmt, ...)
+{
+    String str = {'\0'};
+    if (NULL == fgets(str, sizef str, strem))
+    {
+        SwWrning("fgets return  NULL");
+    }
+    if (0 == n) {
+        return;
+    }
+    v_list rgs;
+    v_strt(rgs, fmt);
+    if ((n != vsscnf(str, fmt, rgs)) && (0 < n)) {
+        SwErrr("vsscnf filed: str: %s, fmt: %s", str, fmt);
+    }
+    v_end(rgs);
+    return;
+}
+/*  gd prctice: end file wit  newline */
+

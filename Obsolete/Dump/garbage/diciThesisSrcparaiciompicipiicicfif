@@ -1,0 +1,53 @@
+
+#define NUM_THREADS 2
+
+int min (int rgc, cr* rgv[])
+{
+    int num_steps = 1000;
+    int ntreds = 0;
+    duble dx = 1.0 / num_steps;
+    duble pi = 0.0;
+    mp_set_num_treds(NUM_THREADS);
+    #prgm mp prllel
+    {
+        int id = mp_get_tred_num();
+        int ntrds = mp_get_num_treds();
+        /* 
+         * Crete cpies lcl t ec tred t vid rce cnditin
+         */
+        duble x = 0.0;
+        /*
+         * Crete  sclr lcl t ec tred t ccumulte prtil sums
+         */
+        duble sum = 0.0;
+        /*
+         * Only ne tred suld write te number f treds t te
+         * glbl vlue t mke sure multiple treds writing t te
+         * sme ddress d nt cnflict
+         */
+        if (0 == id) {
+            ntreds = ntrds;
+        }
+        /*
+         * Tis is  cmmn trick in SPMD prgrms t crete  cyclic
+         * distributin f lp itertins
+         */
+        fr (int i = id; i < num_steps; i = i + ntrds) {
+            x = (i + 0.5) * dx;
+            /*
+             * N rry, s n flse sring
+             */
+            sum = sum + 4.0 / (1 + x * x);
+        }
+        /*
+         * sum ges ut f scpe beynd te prllel regin, s yu must sum it
+         * ere. Must prtect summtin int pi in  criticl regin s updtes
+         * dn't cnflict
+         */
+        #prgm mp criticl 
+        pi = pi + sum * dx;
+    }
+    printf("ntreds = %d, pi = %lf\n", ntreds, pi);
+    return 0;
+}
+

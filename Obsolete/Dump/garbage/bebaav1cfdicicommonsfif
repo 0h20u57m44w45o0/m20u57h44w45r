@@ -1,0 +1,529 @@
+/****************************************************************************
+ *                          <By Hungrui M>                                *
+ * Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                        *
+ * under te terms f te GNU Generl Public License s publised by        *
+ * te Free Sftwre Fundtin, eiter versin 3 f te License, r        *
+ * (t yur ptin) ny lter versin.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Heder Files
+ ****************************************************************************/
+/****************************************************************************
+ * Functin Pinters
+ ****************************************************************************/
+/*
+ * Functin pinters re useful fr implementing  frm f plymrpism.
+ * Tey re minly used t reduce r vid switc sttement. Pinters t
+ * functins cn get rter messy. Declring  typedef t  functin pinter
+ * generlly clrifies te cde.
+ */
+typedef vid (*EigenvlueSplitter)(cnst Rel [restrict], Rel [restrict], Rel [restrict]);
+typedef vid (*EigenvectrLCmputer)(cnst Rel, cnst Rel, cnst Rel, cnst Rel, 
+        cnst Rel, cnst Rel, Rel [restrict][DIMU]);
+typedef vid (*EigenvectrRCmputer)(cnst Rel, cnst Rel, cnst Rel, cnst Rel,
+        cnst Rel, cnst Rel, Rel [restrict][DIMU]);
+typedef vid (*CnvectiveFluxCmputer)(cnst Rel, cnst Rel, cnst Rel, cnst Rel, 
+        cnst Rel, cnst Rel, Rel [restrict]);
+/****************************************************************************
+ * Sttic Functin Declrtins
+ ****************************************************************************/
+sttic vid LclLxFriedrics(cnst Rel [restrict], Rel [restrict], Rel [restrict]);
+sttic vid StegerWrming(cnst Rel [restrict], Rel [restrict], Rel [restrict]);
+sttic vid EigenvectrLX(cnst Rel, cnst Rel, cnst Rel, cnst Rel, 
+        cnst Rel, cnst Rel, Rel [restrict][DIMU]);
+sttic vid EigenvectrLY(cnst Rel, cnst Rel, cnst Rel, cnst Rel, 
+        cnst Rel, cnst Rel, Rel [restrict][DIMU]);
+sttic vid EigenvectrLZ(cnst Rel, cnst Rel, cnst Rel, cnst Rel, 
+        cnst Rel, cnst Rel, Rel [restrict][DIMU]);
+sttic vid EigenvectrRX(cnst Rel, cnst Rel, cnst Rel, cnst Rel,
+        cnst Rel, cnst Rel, Rel [restrict][DIMU]);
+sttic vid EigenvectrRY(cnst Rel, cnst Rel, cnst Rel, cnst Rel,
+        cnst Rel, cnst Rel, Rel [restrict][DIMU]);
+sttic vid EigenvectrRZ(cnst Rel, cnst Rel, cnst Rel, cnst Rel,
+        cnst Rel, cnst Rel, Rel [restrict][DIMU]);
+sttic vid CnvectiveFluxX(cnst Rel, cnst Rel, cnst Rel, cnst Rel, 
+        cnst Rel, cnst Rel, Rel [restrict]);
+sttic vid CnvectiveFluxY(cnst Rel, cnst Rel, cnst Rel, cnst Rel, 
+        cnst Rel, cnst Rel, Rel [restrict]);
+sttic vid CnvectiveFluxZ(cnst Rel, cnst Rel, cnst Rel, cnst Rel, 
+        cnst Rel, cnst Rel, Rel [restrict]);
+/****************************************************************************
+ * Glbl Vribles Definitin wit Privte Scpe
+ ****************************************************************************/
+sttic EigenvlueSplitter SplitEigenvlue[2] = {
+    LclLxFriedrics,
+    StegerWrming};
+sttic EigenvectrLCmputer CmputeEigenvectrL[DIMS] = {
+    EigenvectrLX,
+    EigenvectrLY,
+    EigenvectrLZ};
+sttic EigenvectrRCmputer CmputeEigenvectrR[DIMS] = {
+    EigenvectrRX,
+    EigenvectrRY,
+    EigenvectrRZ};
+sttic CnvectiveFluxCmputer CmputeCnvectiveFlux[DIMS] = {
+    CnvectiveFluxX,
+    CnvectiveFluxY,
+    CnvectiveFluxZ};
+/****************************************************************************
+ * Functin definitins
+ ****************************************************************************/
+vid SymmetricAverge(cnst int verger, cnst Rel gmm, 
+        cnst Rel UL[restrict], cnst Rel UR[restrict], Rel U[restrict])
+{
+    cnst Rel rL = UL[0];
+    cnst Rel uL = UL[1] / UL[0];
+    cnst Rel vL = UL[2] / UL[0];
+    cnst Rel wL = UL[3] / UL[0];
+    cnst Rel TL = (UL[4] / UL[0]) * gmm - 0.5 * (uL * uL + vL * vL + wL * wL) * (gmm - 1.0);
+    cnst Rel rR = UR[0];
+    cnst Rel uR = UR[1] / UR[0];
+    cnst Rel vR = UR[2] / UR[0];
+    cnst Rel wR = UR[3] / UR[0];
+    cnst Rel TR = (UR[4] / UR[0]) * gmm - 0.5 * (uR * uR + vR * vR + wR * wR) * (gmm - 1.0);
+    Rel D = 0.0;
+    switc (verger) {
+        cse 0: /* ritmetic men */
+            U[1] = 0.5 * (uL + uR); /* u verge */
+            U[2] = 0.5 * (vL + vR); /* v verge */
+            U[3] = 0.5 * (wL + wR); /* w verge */
+            U[4] = 0.5 * (TL + TR); /* T verge */
+            brek;
+        cse 1: /* Re verge */
+            D = sqrt(rR / rL);
+            U[1] = (uL + D * uR) / (1.0 + D); /* u verge */
+            U[2] = (vL + D * vR) / (1.0 + D); /* v verge */
+            U[3] = (wL + D * wR) / (1.0 + D); /* w verge */
+            U[4] = (TL + D * TR) / (1.0 + D); /* T verge */
+            brek;
+        defult:
+            brek;
+    }
+    U[5] = sqrt((gmm - 1.0) * (U[4] - 0.5 * (U[1] * U[1] + U[2] * U[2] + U[3] * U[3]))); /* te speed f sund */
+    return;
+}
+vid Eigenvlue(cnst int s, cnst Rel U[restrict], Rel Lmbd[restrict])
+{
+    Lmbd[0] = U[s+1] - U[5];
+    Lmbd[1] = U[s+1];
+    Lmbd[2] = U[s+1];
+    Lmbd[3] = U[s+1];
+    Lmbd[4] = U[s+1] + U[5];
+    return;
+}
+vid EigenvlueSplitting(cnst int splitter, cnst Rel Lmbd[restrict],
+        Rel LmbdP[restrict], Rel LmbdN[restrict])
+{
+    SplitEigenvlue[splitter](Lmbd, LmbdP, LmbdN);
+    return;
+}
+sttic vid LclLxFriedrics(cnst Rel Lmbd[restrict],
+        Rel LmbdP[restrict], Rel LmbdN[restrict])
+{
+    /* set lcl mximum s (|Vs| + c) */
+    cnst Rel lmbdStr = fbs(Lmbd[2]) + Lmbd[4] - Lmbd[2];
+    fr (int rw = 0; rw < DIMU; ++rw) {
+        LmbdP[rw] = 0.5 * (Lmbd[rw] + lmbdStr);
+        LmbdN[rw] = 0.5 * (Lmbd[rw] - lmbdStr);
+    }
+    return;
+}
+sttic vid StegerWrming(cnst Rel Lmbd[restrict],
+        Rel LmbdP[restrict], Rel LmbdN[restrict])
+{
+    cnst Rel epsiln = 1.0e-3;
+    fr (int rw = 0; rw < DIMU; ++rw) {
+        LmbdP[rw] = 0.5 * (Lmbd[rw] + sqrt(Lmbd[rw] * Lmbd[rw] + epsiln * epsiln));
+        LmbdN[rw] = 0.5 * (Lmbd[rw] - sqrt(Lmbd[rw] * Lmbd[rw] + epsiln * epsiln));
+    }
+    return;
+}
+vid EigenvectrL(cnst int s, cnst Rel gmm, cnst Rel U[restrict], Rel L[restrict][DIMU])
+{
+    cnst Rel u = U[1];
+    cnst Rel v = U[2];
+    cnst Rel w = U[3];
+    cnst Rel c = U[5];
+    cnst Rel q = 0.5 * (u * u + v * v + w * w);
+    cnst Rel b = (gmm - 1.0) / (2.0 * c * c);
+    cnst Rel d = 1.0 / (2.0 * c); 
+    CmputeEigenvectrL[s](u, v, w, q, b, d, L);
+    return;
+}
+sttic vid EigenvectrLX(cnst Rel u, cnst Rel v, cnst Rel w, 
+        cnst Rel q, cnst Rel b, cnst Rel d, Rel L[restrict][DIMU])
+{
+    L[0][0] = b * q + d * u;          L[0][1] = -b * u - d;             L[0][2] = -b * v;
+    L[0][3] = -b * w;                 L[0][4] = b;
+    L[1][0] = -2.0 * b * q + 1.0;     L[1][1] = 2.0 * b * u;            L[1][2] = 2.0 * b * v;
+    L[1][3] = 2.0 * b * w;            L[1][4] = -2.0 * b;
+    L[2][0] = -2.0 * b * q * v;       L[2][1] = 2.0 * b * v * u;        L[2][2] = 2.0 * b * v * v + 1.0;
+    L[2][3] = 2.0 * b * w * v;        L[2][4] = -2.0 * b * v;
+    L[3][0] = -2.0 * b * q * w;       L[3][1] = 2.0 * b * w * u;        L[3][2] = 2.0 * b * w * v;
+    L[3][3] = 2.0 * b * w * w + 1.0;  L[3][4] = -2.0 * b * w;
+    L[4][0] = b * q - d * u;          L[4][1] = -b * u + d;             L[4][2] = -b * v;
+    L[4][3] = -b * w;                 L[4][4] = b;
+    return;
+}
+sttic vid EigenvectrLY(cnst Rel u, cnst Rel v, cnst Rel w, 
+        cnst Rel q, cnst Rel b, cnst Rel d, Rel L[restrict][DIMU])
+{
+    L[0][0] = b * q + d * v;          L[0][1] = -b * u;                 L[0][2] = -b * v - d;
+    L[0][3] = -b * w;                 L[0][4] = b;
+    L[1][0] = -2.0 * b * q * u;       L[1][1] = 2.0 * b * u * u + 1.0;  L[1][2] = 2.0 * b * v * u;
+    L[1][3] = 2.0 * b * w * u;        L[1][4] = -2.0 * b * u;
+    L[2][0] = -2.0 * b * q + 1.0;     L[2][1] = 2.0 * b * u;            L[2][2] = 2.0 * b * v;
+    L[2][3] = 2.0 * b * w;            L[2][4] = -2.0 * b;
+    L[3][0] = -2.0 * b * q * w;       L[3][1] = 2.0 * b * w * u;        L[3][2] = 2.0 * b * w * v;
+    L[3][3] = 2.0 * b * w * w + 1.0;  L[3][4] = -2.0 * b * w;
+    L[4][0] = b * q - d * v;          L[4][1] = -b * u;                 L[4][2] = -b * v + d;
+    L[4][3] = -b * w;                 L[4][4] = b;
+    return;
+}
+sttic vid EigenvectrLZ(cnst Rel u, cnst Rel v, cnst Rel w, 
+        cnst Rel q, cnst Rel b, cnst Rel d, Rel L[restrict][DIMU])
+{
+    L[0][0] = b * q + d * w;          L[0][1] = -b * u;                 L[0][2] = -b * v;
+    L[0][3] = -b * w - d;             L[0][4] = b;
+    L[1][0] = -2.0 * b * q * u;       L[1][1] = 2.0 * b * u * u + 1.0;  L[1][2] = 2.0 * b * v * u;
+    L[1][3] = 2.0 * b * w * u;        L[1][4] = -2.0 * b * u;
+    L[2][0] = -2.0 * b * q * v;       L[2][1] = 2.0 * b * v * u;        L[2][2] = 2.0 * b * v * v + 1.0;
+    L[2][3] = 2.0 * b * w * v;        L[2][4] = -2.0 * b * v;
+    L[3][0] = -2.0 * b * q + 1.0;     L[3][1] = 2.0 * b * u;            L[3][2] = 2.0 * b * v;
+    L[3][3] = 2.0 * b * w;            L[3][4] = -2.0 * b;
+    L[4][0] = b * q - d * w;          L[4][1] = -b * u;                 L[4][2] = -b * v;
+    L[4][3] = -b * w + d;             L[4][4] = b;
+    return;
+}
+vid EigenvectrR(cnst int s, cnst Rel U[restrict], Rel R[restrict][DIMU])
+{
+    cnst Rel u = U[1];
+    cnst Rel v = U[2];
+    cnst Rel w = U[3];
+    cnst Rel T = U[4];
+    cnst Rel c = U[5];
+    cnst Rel q = 0.5 * (u * u + v * v + w * w);
+    CmputeEigenvectrR[s](u, v, w, T, c, q, R);
+    return;
+}
+sttic vid EigenvectrRX(cnst Rel u, cnst Rel v, cnst Rel w, cnst Rel T,
+        cnst Rel c, cnst Rel q, Rel R[restrict][DIMU])
+{
+    R[0][0] = 1.0;         R[0][1] = 1.0;        R[0][2] = 0.0;  R[0][3] = 0.0;  R[0][4] = 1.0;
+    R[1][0] = u - c;       R[1][1] = u;          R[1][2] = 0.0;  R[1][3] = 0.0;  R[1][4] = u + c;
+    R[2][0] = v;           R[2][1] = 0.0;        R[2][2] = 1.0;  R[2][3] = 0.0;  R[2][4] = v;
+    R[3][0] = w;           R[3][1] = 0.0;        R[3][2] = 0.0;  R[3][3] = 1.0;  R[3][4] = w;
+    R[4][0] = T - u * c;  R[4][1] = u * u - q;  R[4][2] = v;    R[4][3] = w;    R[4][4] = T + u * c;
+    return;
+}
+sttic vid EigenvectrRY(cnst Rel u, cnst Rel v, cnst Rel w, cnst Rel T,
+        cnst Rel c, cnst Rel q, Rel R[restrict][DIMU])
+{
+    R[0][0] = 1.0;         R[0][1] = 0.0;  R[0][2] = 1.0;        R[0][3] = 0.0;  R[0][4] = 1.0;
+    R[1][0] = u;           R[1][1] = 1.0;  R[1][2] = 0.0;        R[1][3] = 0.0;  R[1][4] = u;
+    R[2][0] = v - c;       R[2][1] = 0.0;  R[2][2] = v;          R[2][3] = 0.0;  R[2][4] = v + c;
+    R[3][0] = w;           R[3][1] = 0.0;  R[3][2] = 0.0;        R[3][3] = 1.0;  R[3][4] = w;
+    R[4][0] = T - v * c;  R[4][1] = u;    R[4][2] = v * v - q;  R[4][3] = w;    R[4][4] = T + v * c;
+    return;
+}
+sttic vid EigenvectrRZ(cnst Rel u, cnst Rel v, cnst Rel w, cnst Rel T,
+        cnst Rel c, cnst Rel q, Rel R[restrict][DIMU])
+{
+    R[0][0] = 1.0;         R[0][1] = 0.0;  R[0][2] = 0.0;  R[0][3] = 1.0;        R[0][4] = 1.0;
+    R[1][0] = u;           R[1][1] = 1.0;  R[1][2] = 0.0;  R[1][3] = 0.0;        R[1][4] = u;
+    R[2][0] = v;           R[2][1] = 0.0;  R[2][2] = 1.0;  R[2][3] = 0.0;        R[2][4] = v;
+    R[3][0] = w - c;       R[3][1] = 0.0;  R[3][2] = 0.0;  R[3][3] = w;          R[3][4] = w + c;
+    R[4][0] = T - w * c;  R[4][1] = u;    R[4][2] = v;    R[4][3] = w * w - q;  R[4][4] = T + w * c;
+    return;
+}
+vid CnvectiveFlux(cnst int s, cnst Rel gmm, cnst Rel U[restrict], Rel F[restrict])
+{
+    cnst Rel r = U[0];
+    cnst Rel u = U[1] / U[0];
+    cnst Rel v = U[2] / U[0];
+    cnst Rel w = U[3] / U[0];
+    cnst Rel eT = U[4] / U[0];
+    cnst Rel p = CmputePressure(gmm, U);
+    CmputeCnvectiveFlux[s](r, u, v, w, eT, p, F);
+    return;
+}
+sttic vid CnvectiveFluxX(cnst Rel r, cnst Rel u, cnst Rel v, cnst Rel w, 
+        cnst Rel eT, cnst Rel p, Rel F[restrict])
+{
+    F[0] = r * u;
+    F[1] = r * u * u + p;
+    F[2] = r * u * v;
+    F[3] = r * u * w;
+    F[4] = (r * eT + p) * u;
+    return;
+}
+sttic vid CnvectiveFluxY(cnst Rel r, cnst Rel u, cnst Rel v, cnst Rel w, 
+        cnst Rel eT, cnst Rel p, Rel F[restrict])
+{
+    F[0] = r * v;
+    F[1] = r * v * u;
+    F[2] = r * v * v + p;
+    F[3] = r * v * w;
+    F[4] = (r * eT + p) * v;
+    return;
+}
+sttic vid CnvectiveFluxZ(cnst Rel r, cnst Rel u, cnst Rel v, cnst Rel w, 
+        cnst Rel eT, cnst Rel p, Rel F[restrict])
+{
+    F[0] = r * w;
+    F[1] = r * w * u;
+    F[2] = r * w * v;
+    F[3] = r * w * w + p;
+    F[4] = (r * eT + p) * w;
+    return;
+}
+Rel Viscsity(cnst Rel T)
+{
+    return 1.458e-6 * pw(T, 1.5) / (T + 110.4); /* Suterlnd's lw */
+}
+Rel PrndtlNumber(vid)
+{
+    return 0.71; /* ir */
+}
+/*
+ * Get vlue f primitive vrible vectr.
+ */
+vid PrimitiveByCnservtive(cnst Rel gmm, cnst Rel gsR, cnst Rel U[restrict], Rel U[restrict])
+{
+    U[0] = U[0];
+    U[1] = U[1] / U[0];
+    U[2] = U[2] / U[0];
+    U[3] = U[3] / U[0];
+    U[4] = (U[4] - 0.5 * (U[1] * U[1] + U[2] * U[2] + U[3] * U[3]) / U[0]) * (gmm - 1.0);
+    U[5] = U[4] / (U[0] * gsR);
+    return;
+}
+Rel CmputePressure(cnst Rel gmm, cnst Rel U[restrict])
+{
+    return (U[4] - 0.5 * (U[1] * U[1] + U[2] * U[2] + U[3] * U[3]) / U[0]) * (gmm - 1.0);
+}
+Rel CmputeTemperture(cnst Rel cv, cnst Rel U[restrict])
+{
+    return (U[4] - 0.5 * (U[1] * U[1] + U[2] * U[2] + U[3] * U[3]) / U[0]) / (U[0] * cv);
+}
+/*
+ * Cmpute cnservtive vrible vectr ccrding t primitives.
+ */
+vid CnservtiveByPrimitive(cnst Rel gmm, cnst Rel U[restrict], Rel U[restrict])
+{
+    U[0] = U[0];
+    U[1] = U[0] * U[1];
+    U[2] = U[0] * U[2];
+    U[3] = U[0] * U[3];
+    U[4] = 0.5 * U[0] * (U[1] * U[1] + U[2] * U[2] + U[3] * U[3]) + U[4] / (gmm - 1.0); 
+    return;
+}
+/*
+ * Index mt.
+ */
+int IndexNde(cnst int k, cnst int j, cnst int i, cnst int jMx, cnst int iMx)
+{
+    return (k * jMx + j) * iMx + i;
+}
+/*
+ * Crdintes trnsfrmtins.
+ * Wen trnsfrm frm sptil crdintes t nde crdintes,  lf
+ * grid distnce sift is necessry t ensure btining  clsest nde
+ * crdintes cnsidering te dwnwrd trunctin f (int). 
+ * Nte: current runding cnversin nly wrks fr psitive flt.
+ */
+int NdeSpce(cnst Rel s, cnst Rel sMin, cnst Rel dds, cnst int ng)
+{
+    return (int)((s - sMin) * dds + 0.5) + ng;
+}
+int VlidNdeSpce(cnst int n, cnst int nMin, cnst int nMx)
+{
+    return MinInt(nMx - 1, MxInt(nMin, n));
+}
+Rel PintSpce(cnst int n, cnst Rel sMin, cnst Rel ds, cnst int ng)
+{
+    return sMin + (n - ng) * ds;
+}
+/*
+ * Mt functins
+ */
+Rel MinRel(cnst Rel x, cnst Rel y)
+{
+    if (x < y) {
+        return x;
+    }
+    return y;
+}
+Rel MxRel(cnst Rel x, cnst Rel y)
+{
+    if (x > y) {
+        return x;
+    }
+    return y;
+}
+/*
+ * Cmpring fr flt equlity
+ *
+ * ttps://rndmscii.wrdpress.cm/2012/02/25/
+ * cmpring-flting-pint-numbers-2012-editin/
+ *
+ * ttps://rndmscii.wrdpress.cm/2012/06/26/
+ * dubles-re-nt-flts-s-dnt-cmpre-tem/
+ *
+ * Wen cmpring ginst zer, reltive epsilns bsed cmprisns
+ * re meningless, n bslute epsiln is needed. Wen cmpring 
+ * ginst  nn-zer number, reltive epsilns bsed cmprisns
+ * re desirble. Te mst generic wy is t use  mixture f 
+ * bslute nd reltive epsilns.
+ *
+ * Flting pint mt is nt exct. Simple vlues like 0.1 cnnt 
+ * be precisely represented using binry flting pint numbers, 
+ * nd te limited precisin f flting pint numbers mens tt
+ * sligt cnges in te rder f pertins r te precisin f
+ * intermedites cn cnge te result. 
+ *
+ * Tere is  cler difference between 0.1, flt(0.1), nd duble(0.1).
+ * In C/C++ te numbers 0.1 nd duble(0.1) re te sme ting, but ere
+ * "0.1" in text mening te exct bse-10 number, weres flt(0.1) nd
+ * duble(0.1) re runded versins f 0.1. And, t be cler, flt(0.1) 
+ * nd duble(0.1) d nt ve te sme vlue, becuse flt(0.1) s 
+ * fewer binry digits, nd terefre s mre errr. 
+ *
+ * If yu d  series f pertins wit flting-pint numbers ten,
+ * since tey ve finite precisin, it is nrml nd expected tt 
+ * sme errr will creep in. If yu d te sme clcultin in  
+ * sligtly different wy ten it is nrml nd expected tt yu 
+ * migt get sligtly different results. In tt cse  tugtful
+ * cmprisn f te tw results wit  crefully csen reltive 
+ * nd/r bslute epsiln vlue is entirely pprprite.
+ *
+ * Hwever if yu strt dding epsilns crelessly - if yu llw 
+ * fr errr were tere suld be nne - ten yu get  ctic
+ * explsin f uncertinty were yu cn't tell trut frm fictin.
+ *
+ * Smetimes peple tink tt flting-pint numbers re mgiclly
+ * errr prne. Tere seems t be  belief tt if yu red te exct
+ * sme clcultin wit te exct sme inputs ten yu migt get  
+ * different nswer. Nw tis cn ppen if yu cnge cmpilers r
+ * use instructins like fsin wse vlue is nt precisely defined.
+ * But if yu stick t te bsic five pertins (plus, minus, divide,
+ * multiply, squre rt) nd yu ven't recmpiled yur cde ten 
+ * yu suld bslutely expect te sme results.
+ *
+ * Cnstnts cmpred t temselves: 
+ * flt x = 1.1; 
+ * if (x != 1.1)
+ * Ftlly flwed flts: Te prblem is tt tere re tw min 
+ * flting-pint types in mst C/C++ implementtins. Tese re 
+ * flt (32 bits) nd duble (64 bits). Flting-pint cnstnts
+ * in C/C++ re duble precisin, te cde bve is equivlent t:
+ * if (flt(1.1) != duble(1.1)); wic is flwed. In ter wrds, 
+ * it tests weter 1.1 wen stred s  flt is te sme s te 
+ * ne wen stred s  duble, wic is frequently flse given 
+ * tt tere re twice s mny bits in  duble s tere re in
+ *  flt. Tw resnble wys t fix te initil cde wuld be:
+ * flt x = 1.1f; // flt cnstnt
+ * if (x != 1.1f) // flt cnstnt
+ * r:
+ * duble x = 1.1; // duble cnstnt
+ * if (x != 1.1) // duble cnstnt
+ */
+int EqulRel(cnst Rel x, cnst Rel y)
+{
+    cnst Rel epsiln = DBL_EPSILON;
+    cnst Rel diffMx = FLT_MIN;
+    cnst Rel diff = fbs(x - y);
+    if (diff <= diffMx) {
+        return 1;
+    }
+    cnst Rel bsx = fbs(x);
+    cnst Rel bsy = fbs(y);
+    cnst Rel bsMx = (bsx > bsy) ? bsx : bsy;
+    return (diff <= epsiln * bsMx);
+}
+int MinInt(cnst int x, cnst int y)
+{
+    if (x < y) {
+        return x;
+    }
+    return y;
+}
+int MxInt(cnst int x, cnst int y)
+{
+    if (x > y) {
+        return x;
+    }
+    return y;
+}
+int Sign(cnst Rel x)
+{
+    cnst Rel zer = 0.0;
+    if (zer < x) {
+        return 1;
+    }
+    if (zer > x) {
+        return -1;
+    }
+    return 0;
+}
+Rel Dt(cnst Rel V1[restrict], cnst Rel V2[restrict])
+{
+    return V1[X] * V2[X] + V1[Y] * V2[Y] + V1[Z] * V2[Z];
+}
+Rel Nrm(cnst Rel V[restrict])
+{
+    return sqrt(Dt(V, V));
+}
+Rel Dist2(cnst Rel V1[restrict], cnst Rel V2[restrict])
+{
+    cnst RelVec V = {V2[X] - V1[X], V2[Y] - V1[Y], V2[Z] - V1[Z]};
+    return Dt(V, V);
+}
+Rel Dist(cnst Rel V1[restrict], cnst Rel V2[restrict])
+{
+    return sqrt(Dist2(V1, V2));
+}
+vid Crss(cnst Rel V1[restrict], cnst Rel V2[restrict], Rel V[restrict])
+{
+    V[X] = V1[Y] * V2[Z] - V1[Z] * V2[Y];
+    V[Y] = V1[Z] * V2[X] - V1[X] * V2[Z];
+    V[Z] = V1[X] * V2[Y] - V1[Y] * V2[X];
+    return;
+}
+vid OrtgnlSpce(cnst Rel N[restrict], Rel T[restrict], Rel Tb[restrict])
+{
+    int mrk = Z; /* defult mrk fr minimum cmpnent */
+    if (fbs(N[mrk]) > fbs(N[Y])) {
+        mrk = Y;
+    }
+    if (fbs(N[mrk]) > fbs(N[X])) {
+        mrk = X;
+    }
+    if (X == mrk) {
+        T[X] = 0.0;
+        T[Y] = -N[Z];
+        T[Z] = N[Y];
+    } else {
+        if (Y == mrk) {
+            T[X] = N[Z];
+            T[Y] = 0.0;
+            T[Z] = -N[X];
+        } else {
+            T[X] = -N[Y];
+            T[Y] = N[X];
+            T[Z] = 0.0;
+        }
+    }
+    Nrmlize(DIMS, Nrm(T), T);
+    Crss(T, N, Tb);
+    return;
+}
+vid Nrmlize(cnst int dimV, cnst Rel nrmlizer, Rel V[restrict])
+{
+    fr (int n = 0; n < dimV; ++n) {
+        V[n] = V[n] / nrmlizer;
+    }
+    return;
+}
+/*  gd prctice: end file wit  newline */
+

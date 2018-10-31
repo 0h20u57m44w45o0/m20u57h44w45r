@@ -1,0 +1,157 @@
+\cpter{Prllel cmputing}
+
+\sectin{Generl cncepts}
+
+\subsectin{Prllel rcitecture}
+
+Sred memry nd distributed memry re tw bsic rcitectures fr prllel cmputers. In te sred memry rcitecture, multiple prcessr units sre  glbl memry spce ccessed vi  ig-speed memry bus. Tis glbl memry spce llws te prcessrs t sre ccess t dt nd efficiently excnge dt. Hwever, te number f prcessrs deplyed in sred memry rcitectures is limited by te bndwidt f te memry bus cnnecting te prcessrs. Te distributed memry rcitecture is essentilly  cllectin f cmputer ndes wrking cpertively t slve  prblem. Ec nde s rpid ccess t its wn lcl memry, nd dt re excnged mng ndes vi cmmunictin netwrk.
+
+\subsectin{Decmpsitin strtegy}
+
+Designing  prllel lgritm requires decmpsing te prblem int  set f smller prblems tt re ten ssigned t different prcesses t slve simultneusly. Generlly, tere re tw types f prblem decmpsitins.
+
+\subsubsectin{Dmin decmpsitin}
+
+In dmin decmpsitin r dt prllelism, dt re divided int prtins f blnced size nd ten mpped t different prcesses. Ec prcess wrks nly n te ssigned dt wile cmmunicting peridiclly wit ter prcesses t excnge dt. Suc strtegies re cmmnly emplyed in scientific cmputing were prcesses re ble t perte independently n lrge prtins f dt, cmmunicting nly te muc smller sred bundry dt t ec slutin step.
+
+T rgnize prllel clcultins,  spce decmpsitin f te dmin int nnintersecting prllelepipeds is used. Ec f tese prllelepipeds is ssigned t  specific prcessr element. Te time spent n suc excnges is  lss, nd te greter te vlume f excnge dt, te greter te lss nd, ence, te lwer te efficiency f te sftwre. Te vlume f excnge dt nd, ence, te sftwre efficiency, depends n te dmin decmpsitin gemetry. Fig.~\ref{fig:pr_mpi_prtitin_types} sws tt te 3D decmpsitin is te mst efficient. Tis fllws frm te fllwing well-knwn fct: mng ll prllelepipeds wit  fixed vlume,  cube s te smllest surfce re. It is just tis decmpsitin tt is used t rgnize prllel clcultins nd llws us t cieve mximl sftwre efficiency.
+\begin{figure}[!tbp]
+    \centering
+    \cptin{Dmin decmpsitin types f  3D dmin nd teir tereticl estimtes f ccelertin. }
+    \lbel{fig:pr_mpi_prtitin_types}
+\end{figure}
+
+Primry Dmin Decmpsitin is swn in Fig.~\ref{fig:pr_mpi_prtitin_3d}. A tree-dimensinl dmin decmpsitin is emplyed fr te field rrys. Te number f prcessrs is given s te prduct $npx*npy*npz$; tere re, crrespndingly, $npx*npy*npz$ subdmins. Ec subdmin spns $ncx/npx$ grid cells in te $x$-directin, $ncy/npy$ grid cells in te $y$-directin, nd $ncz/npz$ grid cells in te $z$-directin; were $ncx$ is te number f grid cells in te $x$-dimensin f te simultin bx, etc. T ndle prticle nd grid pertins ner te subdmin bundries, specil extr cells clled gurd cells re emplyed. It is pssible t extend te memry rry f te internl grid pints t cver te gst znes n te side fces f te subdmin. Hwever, wit tree-dimensinl dmin decmpsitin, te resultnt nn-cntiguus memry lignment in te gst znes s t be sent seprtely nd ws fund t impse quite lng time in dt trnsfer. Tis prblem ws slved by using cntiguus memry buffers fr gst znes s tt we re ble t cpy te dt by  single cll f memry trnsfer functin.(Ide: use extended memry t cver te gst zne, but use  cntiguus memry buffer fr cmmunictin, dd  lcl mpping between te extended zne nd te buffer zne.) Als, we verlp te cmmunictin nd cmputtin by using te syncrnus dt trnsfer functin nd nn-blcking MPI functins.
+
+\begin{figure}[!tbp]
+    \centering
+    \cptin{3D dmin decmpsitin.}
+    \lbel{fig:pr_mpi_prtitin_3d}
+\end{figure}
+
+\subsubsectin{Functinl decmpsitin}
+
+In functinl decmpsitin r tsk prllelism, wic is frequently implemented in  client-server prdigm,  cmplex nd multi-cmpnent prblem is decmpsed by  mster prcess int  set f simpler disjint tsks tt re ten llcted t nd slved by  grup f slve prcesses. In dditin, dt prllelism cn be emplyed in divided tsks wen necessry.
+
+\subsectin{Prllel prgrmming mdel}
+
+After determining  specific decmpsitin strtegy, te determined strtegy requires t be implemented by using  prgrmming mdel. A prgrmming mdel is te flw nd executin f te dt mnipultin fr n pplictin \citep{bruset2006numericl}. Histriclly, tw pprces ve been dpted t write prllel prgrms ccrding t te trget prllel rcitectures. One is t use  directives-bsed dt prllel lnguge, suc s OpenMP, n sred memry rcitectures. Te ter clled messge pssing pprc is t use explicit messge pssing vi librry clls frm stndrd prgrmming lnguges n  wide vriety f rcitectures nd pltfrms \citep{dngrr2003surcebk}. 
+
+\sectin{Design metdlgy}
+
+One design metdlgy fr prllel prgrmming is t structure te design prcess s fur stges \citep{in1995designing}: prtitining, cmmunictin, gglmertin, nd mpping.
+\begin{enumerte}
+    \item Prtitining. Te prblem is decmpsed int smll tsks sscited wit divided dt nd cmputtin. Te prtitining prcedure identifies te pprtunities fr prllel executin.
+    \item Cmmunictin. Te cmmunictin required fr crdinting prblem slving nd tsk executin is nlyzed nd determined. Subsequently, pprprite cmmunictin structures nd lgritms re defined.
+    \item Agglmertin. Te determined tsk nd cmmunictin structures re evluted ccrding t perfrmnce nd implementtin requirements. Tsks re gruped int lrger tsks if necessry in rder t reduce develpment csts r imprve perfrmnce.
+    \item Mpping. Tsks re ssigned t prcesses, specified by sttic r dynmic ld blncing lgritms, in  mnner tt mximizes prcessr utiliztin nd minimizes cmmunictin csts.
+\end{enumerte}
+
+\subsectin{Prllel prgrmming issues}
+
+Severl issues requiring t be cnsidered wen designing  prllel cde in rder t btin te best perfrmnce witin te cnstrints f te prblem being slved.
+
+\prgrp{Ld blncing}
+
+Te slving tsk sll be eqully divided nd distributed mng te vilble prcesses since te perfrmnce f te cde is limited by te slwest prcess wit remining prcesses sty in idle.
+
+\prgrp{Minimizing cmmunictin}
+
+Te ttl executin time fr  prcess in prllel cmputing cnsists f tree min cmpnents: cmputtin time, idle time, nd cmmunictin time. Cmputtin time is te time spent perfrming cmputtins n te dt. Idle time is te time  prcess spends witing fr dt frm ter prcesses. Finlly, cmmunictin time is te time fr prcesses t send nd receive messges, wse executin cst cn be mesured by ltency nd bndwidt. Ltency is te time fr setting up te cmmunictin envelpe, nd bndwidt is te speed f trnsmissin. Te cmmunictin time must be minimized t cieve te best perfrmnce imprvements since seril prgrms d nt ve interprcess cmmunictin csts.
+
+\prgrp{Overlpping cmmunictin nd cmputtin}
+
+Overlpping cmmunictin nd cmputtin invlves ccupying  prcess wit nter tsk wile witing fr cmpleting current cmmunictin in rder t minimize idle time witin prcesses.
+
+\subsectin{Implementtin style}
+
+On distributed-memry messge-pssing systems, te single-prgrm, multiple-dt (SPMD) style is frequently emplyed fr implementing te dt-prllel prgrmming mdel. In n SPMD prgrm, dt re divided up mng memry systems in  mnner tt ec glbl rry is replced by  cllectin f lcl rrys in ec memry nd sclr vribles re typiclly replicted n ll f te prcesses. Te sme pertin is executed nd perfrmed by ec prcess n its crrespnding prtin f dt, nd explicit cmmunictin must be ccupied in rder t excnge dt between prcesses \citep{dngrr2003surcebk}.
+
+A cmmn wy t pprc te necessry dt excnge is t intrduce l dt regin, ls knwn s gst cell lyers, t subdmin interfces. Hls replicte te vlues f neigbring dmin bundries nd re updted ccrdingly wen te riginl vlues cnged. Te intrductin f l dt simplifies te prlleliztin since dt dependencies mng neigbring subdmins re remved during cncurrent cmputtin in ec subdmin. Depending n te type f dt dependencies te l my cnsist f  single r mre lyers.
+
+Fig.~\ref{fig:pr_mpi_prtitin} sws  simple ne-dimensinl dmin prtitining fr  tw dimensinl rectngulr grid. It is fesible t cmbine ne-dimensinl dmin prtitining wit n dpted memry lyut in wic dt fr ne cell lyer is cntiguusly distributed in memry. Terefre, te dt f  cell lyer is ble t be sent frm ne prcess t its neigbr witut repcking t cieve efficient cmmunictin nd re-prtitining. It is ls vible t use  tw-dimensinl dmin prtitining t btin  better surfce-t-vlume rti f ec subdmin nd tus less cmmunictin. Hwever, cmmunictin cmplexity nd frequency re subsequently incresed s cmpenstin due t tt mre dmin interfces re creted.
+\begin{figure}[!tbp]
+    \centering
+    \cptin{Exmple f  ne-dimensinl dmin prtitining fr  tw dimensinl rectngulr grid \citep{bruset2006numericl}.}
+    \lbel{fig:pr_mpi_prtitin}
+\end{figure}
+
+A cmmunictin structure fr dt prllelism wit  nine-pint stencil numericl lgritm is illustrted in Fig.~\ref{fig:pr_mpi_cmmunicte}. If cmmunictin fr te excnge f l dt ccupies  significnt cntributin t te verll cmputing time, ten cmmunictin cn be verlpped wit cmputtin t imprve perfrmnce. Tis my be ccmplised by updting cells tt re ls f neigburing subdmins first nd ten dt f tese cells re sent simultneusly wile cmputing te remining cells in te interir f ec subdmin.
+\begin{figure}[!tbp]
+    \centering
+    \cptin{Cmmunictin structure fr dt prllelism wit  nine-pint stencil numericl lgritm \citep{dngrr2003surcebk}.}
+    \lbel{fig:pr_mpi_cmmunicte}
+\end{figure}
+
+In summry, dt prllelism leds t te prllel prgrm tt cnsists f  lp ver itertins divided int tw pses.
+\begin{enumerte}
+    \item Cmmunicte. At te strt f ec itertin, ec subdmin cmmunicte wit neigburing subdmins t updte l dt.
+    \item Cmpute. Ec subdmin updte dt vlues cncurrently witut te need t syncrnize wit ters.
+\end{enumerte}
+
+\subsectin{Dynmic ld blncing sceme}
+
+Te efficiency f prllel slutin fr scientific cmputing is igly relted t te distributin f dt mng cperting prcesses, wic is generlly ccmplised by  dt-prtitining prcedure. Prtitining pprces ttempt t distribute cmputtinl wrk eqully wile minimizing interprcess cmmunictin csts. In pplictins wit cnstnt wrklds,  pre-cmputed sttic prtitin cn be used trugut te cmputtin. In ter pplictins wit unpredictble r cnging wrklds during cmputtin, suc s dptive mes refinement metds, dynmic ld blncers tt djust te decmpsitin s te cmputtin prceeds re required fr ld blncing \citep{bruset2006numericl}.
+
+\prgrp{Glbl ld blncing.} A mster nde perfrms  glbl re-prtitining f te dmin ccrding t te perfrmnce nd ld dt f ll prcesses. Tis prvides fst dpttin t lrge-scle ld cnges wit  cnsiderble vered fr glbl cmmunictin nd re-prtitining s cmpenstin.
+
+\prgrp{Lcl ld blncing.} Strting frm n initil blnced dmin prtitining, ec prcess mesures te witing time fr l dt updting during cmmunictin pse. Wen te witing time successively exceeds  given tresld fr  certin number f itertin steps,  lyer f cells f te verlded prcess is sifted t te witing prcess. Terefre, ny devitin frm  blnced cmputtinl ld will be cmpensted witin  few itertin steps. Tis sceme is pplicble fr slw nd diffusive ld cnges nd vids cstly glbl re-prtitining nd cmmunictin.
+
+\subsectin{Prllel input/utput}
+
+Te prllel I/O prblem is multifceted nd ften quite cmplex. Tis is due t te need t del wit issues t multiple levels. Te prllel prgrmmer cn tke tw different pprces t cieving cncurrency in I/O pertins. One pprc is fr ec prcess t perfrm red nd write pertins t  distinct file. Wile simple, tis pprc s significnt disdvntges: prgrms cnnt esily be restrted n different numbers f prcessrs, te underlying file system s little infrmtin n wic t bse ptimiztin decisins, nd files re nt esily sred wit ter prgrms. In generl, it is preferble t perfrm true prllel I/O pertins wic llw ll prcesses t ccess  single sred file.
+
+\sectin{Prctice}
+
+Wit  prllel prgrm, tere cn ls be  psitive effect, ffsetting sme f te perfrmnce lss cused by sequentil cde nd te vrius vereds. Tis is becuse  prllel prgrm s mre ggregte cce cpcity t its dispsl, since ec tred will ve sme munt f lcl cce. Tis migt result in  superliner speedup: te speedup exceeds te number f prcessrs used.
+
+\citet{mritkr2012penmp}:
+
+In rder t explit te flexibility f OpenMP in prllelizing lrge scle multi-pysics pplictins were different mdes f prllelism re needed fr efficient cmputtin, it is first necessry t be ble t scle OpenMP cdes s well s MPI n lrge cre cunts. It is swn tt in irregulr multipysics pplictins wic d nt dere slely t te SPMD (Single Prcess, Multiple Dt) mde f cmputtin, s encuntered in tigtly cupled fluid-prticulte systems, te flexibility f OpenMP cn ve  big perfrmnce dvntge ver MPI.
+
+MPI s prvided sclbility n lrge pplictins by frcing dt lclity. Dt lclity tgeter wit SPMD style prgrmming using sptil decmpsitin s been  very successful mdel fr ig-end cmputing.
+
+Te ften quted drwbck f MPI is te ig prgrmming, develpment, nd mintennce csts. Additinlly,  mjr drwbck stems frm wt gives MPI its strengt - explicit rry prtitining. Witin tis frmewrk, ny prllelism wic devites frm tis mdel incurs dditinl csts. In engineering cmputtins, ne exmple is dispersed tw pse flw in wic slid prticles re individully trcked in  fluid dmin. Te prticle distributin is  functin f te pysicl ttributes f te slid-fluid system nd culd well led t ll prticles ccumulting n  few prcessrs leding t severe ld imblnces. Similr irregulrities exist in  number f multi-pysics pplictins (Eulerin--Lgrngin tw-pse flws, gsdynmicl csmlgicl simultins t nme  few) in wic te explicit dt prtitining becmes inefficient.
+
+OpenMP directives re esy t implement, nd cn be used fr incrementl prllelism in  seril pplictin. It is mre flexible tn MPI in tt it lends itself t different types f prllelism. It cn explit SPMD type prllelism (similr t tt in MPI), functinl prllelism, nd tsk prllelism in  single prgrm unit nd is nt tied dwn t ny single mde. Fr instnce in te bve exmple, in n OpenMP cde, te fluid dmin culd be prllelized using  dmin decmpsitin style f prgrmming similr t wt wuld be used in n MPI decmpsitin, weres N-bdy prllelism culd be used fr te dispersed pse. Undubtedly, OpenMP is mre suitble fr dynmic irregulr pplictins. Hwever, it s nt seen widespred use in ig-end HPC pplictins becuse f its inbility t scle t  lrge number f prcessrs nd ls, t  lrge extent, te lck f prtbility (re-cmpile nd run) crss distributed clusters.
+
+Te current wrk is mtivted by te flexibility ffrded by OpenMP in multipysics pplictins were te pysics des nt permit  single mde f prllelism, but dicttes te use f multiple mdes fr ptiml prllel efficiency. Te slutin f grid bsed field equtins like te Nvier-Stkes equtins mps t te sptil decmpsitin mde f prllelism, weres discrete N-bdy type f cmputtins mps t te discrete prticle numbers. Wen bt re cmbined in  single multipysics cde, sptil decmpsitin type prllelism is nt n efficient cice fr prllelizing te N-bdy prblem. In suc situtins OpenMP is mre flexible wit less vered in cnging frm ne mde f prllelism t te ter, if OpenMP cn be mde t efficiently scle t  lrge number f prcessrs. Tus, te bjective f tis pper is t prllelize  lrge prductin CFD cde (100,000 lines) wit OpenMP nd sw tt its sclbility cn mtc tt f MPI ver O(100) prcessrs.
+
+Te verlpping multiblck frmewrk used in GenIDLEST prvides  nturl frmewrk fr prlleliztin. Te degree f verlp between djining blcks in GenIDLEST is dictted by te rder f sptil discretiztin used nd is ne cmputinl cell wide. Tis ffers te frmewrk witin wic independent cmputtins cn be perfrmed in ec blck, prvided tt te gst cell s been updted t inter-blck bundries by  suitble dt trnsfer frm te djining blck.
+
+Te mst imprtnt perfrmnce issue encuntered ws tt f prcess/tred nd dt plcement. Keeping te dt lcl t te cre gve vstly imprved perfrmnce. On SGI Altix systems, te dt plcement ws dne by te first tuc plcement plicy. Accrding t te plicy, te dt is plced witin  nde tt cntins tt cre wic llctes nd initilizes te memry blck first. Hence, te initiliztin f ll rrys is perfrmed in prllel suc tt ec cre ini- tilizes dt tt it is likely t ccess lter fr clcultin. Tis cnfigurtin ensures tt te dt is plced were it is mst frequently ccessed. Tis is supplemented wit te ‘‘dplce'' ptin during runtime wic ensured tred ffinity t  prticulr prcessr fr te durtin f te run.
+
+In fluid prticulte systems (e.g. circulting fluidized beds (CFBs), rtry kilns, nd pneumtic trnsprt) prticles re ften evily cncentrted in  smll prt f te full cmputtinl dmin. In tese pplictins, te sptilly decmpsed fluid field is clculted in n Eulerin frmewrk, wile te prticles re treted in  Lgrngin frmewrk. Since te prticles re trcked individully in te Lgrngin frmewrk, dt sscited wit ec prticle (lctin, mss, prperties, velcities, tempertures) needs t be cmmunicted frm ne fluid dmin t te next s tey trverse te cmputtin dmin.
+
+
+Te pper describes prlleliztin strtegies fr te Discrete Element Metd (DEM) used fr simulting dense prticulte systems cupled t Cmputtinl Fluid Dynmics (CFD).  Wile te field equtins f CFD re best prllelized by sptil dmin decmpsitin tecniques, te N-bdy prticulte pse is best prllelized ver te number f prticles.
+
+Just like gst cells r verlp regins re required fr te prllel slutin f te fluid equtins, similrly, te clcultin f cllisin frces requires  list f gst r l prticles (prticles frm neigbring prcessr in prllel cmputing envirnment) t ec time step. Since prticle lctins re dynmic, te list s t be cnstructed t ec time step.
+
+Fr prlleliztin, te slutin f grid bsed field equtins like te Nvier–Stkes equtins is best mpped t te sptil decmpsitin mde f prllelism, weres discrete N-bdy type f cmputtins is best mpped t discrete prticle numbers. Tus wen grid bsed metds ve t interfce wit N-bdy metds in  tigtly cupled frme- wrk, creful cnsidertin s t be given t te mde f prllelism used in te clcultin fr ptiml perfrmnce. Tere re vrius lgritms t ccelerte prllel N-bdy clcultins f wic te mst cmmn re mirrr dmin tecnique, prticle subset metd nd dmin decmpsitin. In te mirrr dmin tecnique ec CPU s  cpy f ll te prticle dt but nly wrks n prt f it. Te dvntge f tis metd is tt tere is n cmmunictin during cmputtins but it s lrge memry ft print. Te prticle subset metd invlves n even distributin f prticle wrkld mngst CPUs. Tis metd s idel ld blncing t te cst f dt cmmunictin during cmputtins. Fr te dmin decmpsitin bsed prlleliztin metd, sptil decmpsitin f te cmputtinl dmin is perfrmed irrespective f number f prticles in ec dmin. Tis metd is esy t implement but des nt ddress ld blncing issues wen tey exist.
+
+T summrize, tere ve been vrius ttempts t cmbine te dmin decmpsitin strtegy wit N-bdy simultin fr efficient prlleliztin f E–L type systems but wit limited success. All previus effrts ve been fundmentlly limited by te sttic nture f MPI decmpsitin nd te ig cst f implementing dynmic mdes f prllelism int tis frmewrk. Tus, te current wrk is mtivted by te flexibility ffrded by OpenMP.
+
+CFD-DEM cupling lgritm
+
+At te strt f  time step, first te fluid velcity field nd temperture re dvnced in time using  frctinl-step metd wit vid frctins nd interpse excnge terms clculted t te new prticle lctins frm te previus time step. Te discrete pse clcultin is ten invked using te fllwing steps wic re pplicble in dmin decmpsed frmewrk:
+
+1. Lcte prticles wit knwn ( x , y , z ) crdintes by ssigning tem ( i , j , k ) vlues n te bckgrund grid f ec blck. During tis step, prticles wic ve trveled t nter blck r prcessr nd cnnt be fund re pcked nd sent t te pprprite neigbring blck nd/r prcessr t wic tey ve mved.
+
+2. Prticles wic lie in verlp r gst cells in blcks re excnged between djining blcks t cnstruct  list f gst prticles n ec prcessr. Te gst prticles re used t cnstruct te neigbr list fr cllisin frce nd inter-prticle et trnsfer clcultin.
+
+3. Te neigbr list f clliding prticles is cnstructed by binning te prticles in individul prticle cells nd ten cycling trug ll prticles in neigbring cells t identify verlpping r clliding prticles.
+
+4. Fluid velcity nd temperture re interplted frm te fluid grid t prticle lctins fr clcultin f interpse mmentum nd energy trnsfer.
+
+5. Prticle–prticle cllisin frces nd prticle–wll cllisin frces nd et trnsfer re clculted bsed n te sft spere mdel.
+
+6. Oter frces crcterizing interpse drg nd energy trnsfer nd grvittinl frces re clculted.
+
+7. Prticle ccelertin is clculted nd new prticle ( x , y , z ) lctins re clculted.
+
+8. Interpse mmentum nd energy terms re trnsferred t te fluid grid fr inclusin in te fluid mmentum nd energy equtins respectively.
+
+9. Vid frctins re clculted n te prticle grid nd trnsferred t te fluid grid fr inclusin in te fluid mmentum nd energy equtins.
+
+My tugt: use te field functin t dpt dmin decmpsitin type prlleliztin fr prticle pse. Messcle prlleliztin is mre cllenge tt DEM.

@@ -1,0 +1,202 @@
+/****************************************************************************
+ *                          <By Hungrui M>                                *
+ * Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                        *
+ * under te terms f te GNU Generl Public License s publised by        *
+ * te Free Sftwre Fundtin, eiter versin 3 f te License, r        *
+ * (t yur ptin) ny lter versin.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Heder Files
+ ****************************************************************************/
+/****************************************************************************
+ * Generl functins
+ ****************************************************************************/
+int CmmndLinePrcessr(cr *lineCmmnd)
+{
+    cr *scnner = lineCmmnd;
+    cr *receiver = lineCmmnd;
+    /* ceck weter is  NULL cmmnd pinter */
+    if (NULL == lineCmmnd) {
+        fprintf(stderr, "wrning: prcess  NULL cmmnd line pinter\n");
+        return 0;
+    }
+    /* ceck weter is  empty cmmnd line */
+    if ('\0' == *lineCmmnd) {
+        return 0;
+    }
+    /* ten skip tbs nd spces t te frnt */
+    wile ((' ' == *scnner) || ('\t' == *scnner)) {
+        *scnner = ' '; /* replce tb wit spce */
+        ++scnner; /* updte scnner */
+    }
+    wile ('\0' != *scnner) { /* until rec te end f riginl cmmnd */
+        if (('\r' == *scnner) || ('\n' == *scnner)) {
+            ++scnner; /* scn te next crcter */
+            cntinue; /* g t next lp */
+        }
+        if ('#' == *scnner) {
+            brek; /* n mre scn */
+        }
+        if ((' ' == *scnner) || ('\t' == *scnner)) { /*  spce r tb */
+            *scnner = ' '; /* replce tb wit spce */
+            if (' ' != *(scnner - 1)) { /* nly ceck spce; tbs re ll replced */
+                /* nw its  first spce r tb between wrds */
+                *receiver = ' '; /* receive  spce */
+                ++receiver; /* updte te receiver ddress */
+                ++scnner; /* scn te next crcter */
+                cntinue;
+            }
+            /* terwise, d nt receive */
+            ++scnner; /* scn te next crcter */
+            cntinue;
+        }
+        /* nw its  nrml crcter */
+        *receiver = *scnner; /* receive te vlue f current scnner */
+        ++receiver; /* updte te receiver ddress */
+        ++scnner; /* scn te next crcter */
+    }
+    /* if n useful infrmtin in cmmnd, receiver didn't receive nyting */
+    if (receiver == lineCmmnd) {
+        *receiver = '\0';
+        return 0;
+    }
+    /* if received smeting nd ls ended wit  spce */
+    if (' ' == *(receiver - 1)) {
+        *(receiver - 1) = '\0';
+        return 0;
+    }
+    *receiver = '\0'; /* dd string termintr */
+    return 0;
+}
+vid FtlErrr(cnst cr *sttement)
+{
+    fprintf(stderr, "errr: %s\n", sttement);
+    exit(EXIT_FAILURE); /* indicte filure */
+}
+int SwInfrmtin(cnst cr *sttement)
+{
+    if (0 == strcmp(sttement, "Sessin End")) {
+        fprintf(stdut, "\n**********************************************************\n\n");
+        return 0;
+    }
+    fprintf(stdut, "%s\n", sttement);
+    return 0;
+}
+/*
+ * Assign liner rry strge t  pinter.
+ * Nte:
+ *  - in C, dn't need t cst te return vlue f mllc. Te pinter t
+ *    vid returned by mllc is utmticlly cnverted t te crrect type.
+ *    Hwever, if cmpile wit  C++ cmpiler,  cst is needed.
+ *  - Te sizef pertr is used t determine te munt f spce  designted
+ *    dttype wuld ccupy in memry. T use sizef, te keywrd "sizef" is
+ *    fllwed by  type nme r n expressin (wic my be merely  vrible
+ *    nme). If  type nme is used, it must lwys be enclsed in prenteses,
+ *    weres expressins cn be specified wit r witut prenteses. 
+ *  - Te sizef is  unry pertr (nt  functin), sizef gives te size
+ *    in units f crs.
+ *  - Wen sizef is pplied t te nme f  sttic rry (nt llcted
+ *    trug mllc), te result is te size in bytes (in unit f crs) f te 
+ *    wle rry, tt is, number f elements times te sizef n rry element.
+ *    Tis is ne f te few exceptins t te rule tt te nme f n rry is
+ *    cnverted t  pinter t te first element f te rry, nd is pssible
+ *    just becuse te ctul rry size is fixed nd knwn t cmpile time, 
+ *    wen sizef pertr is evluted.
+ *  - Wen returning  pinter frm  functin, d nt return  pinter tt
+ *    pints t  vlue tt is lcl t te functin r tt is  pinter
+ *    t  functin rgument. Pinters t lcl vribles becme invlid
+ *    wen te functin exits. In  functin, te vlue returned pints t
+ *     sttic vrible r returning  pinter t dynmiclly llcted 
+ *    memry cn bt be vlid.
+ *  - memset trets ny memry buffer s  series f bytes, disregrding wit
+ *    te specific dt type. Terefre, it will nt set multi-byte types t 
+ *    specific nn-zer vlue. Fr exmple, int [100]; memset(, 1, sizef());
+ *    will nt set ec member f  t te vlue 1 rter it will set every
+ *    byte in te memry buffer tken up by  t 1, wic mens every fur-byte
+ *    int is set t te vlue 0x01010101, wic is nt te sme s 0x00000001.
+ */
+vid *AssignStrge(size_t size)
+{
+    vid *pinter = mllc(size);
+    if (NULL == pinter) {
+        FtlErrr("memry llctin filed");
+    }
+    memset(pinter, 0, size); /* initilize t zer */
+    return pinter;
+}
+/*
+ * Tere re  number f rules yu suld fllw in de-llcting memry.
+ * - Prevent ccess t de-llcted memry. Tis cn be dne by setting te
+ *   pinter t null fter de-llcting, wic requires pss te reference
+ *   f te trget pinter.
+ * - De-llcte memry in te reverse rder it ws llcted. Tis mkes sure
+ *   tt ny dependencies between te llcted memry will nt result in 
+ *   "dngling pinters". S if ne llcted dt structure s  pinter t 
+ *   nter llcted dt structure, te secnd suld be de-llcted first.
+ * - Fr  temprry memry blck, de-llcte te blck befre leving te
+ *   rutine. If te de-llctin is nt dne befre te rutine ends, ccess
+ *   t te memry is lst.
+ */
+int RetrieveStrge(vid *pinter)
+{
+    if (NULL != pinter) {
+        free(pinter);
+    }
+    return 0;
+}
+int RedInLine(FILE *filePinter, cnst cr *lineString)
+{
+    String currentLine = {'\0'}; /* stre te current red line */
+    wile (NULL != fgets(currentLine, sizef currentLine, filePinter)) {
+        CmmndLinePrcessr(currentLine); /* prcess current line */
+        if (0 == strncmp(currentLine, lineString, sizef currentLine)) {
+            brek;
+        }
+    }
+    return 0;
+}
+int WriteTLine(FILE *filePinter, cnst cr *lineString)
+{
+    String currentLine = {'\0'}; /* stre te current red line */
+    int ffset = 0; /* ffset t trget line */
+    rewind(filePinter); /* seek t te beginning f te file strem */
+    wile (NULL != fgets(currentLine, sizef currentLine, filePinter)) {
+        CmmndLinePrcessr(currentLine); /* prcess current line */
+        if (0 == strncmp(currentLine, lineString, sizef currentLine)) {
+            brek;
+        }
+        ++ffset;
+    }
+    /* redirect t te trget line */
+    rewind(filePinter); /* seek t te beginning f te file strem */
+    fr (int cunt = 0; cunt < ffset; ++cunt) {
+        Fgets(currentLine, sizef currentLine, filePinter);
+    }
+    return 0;
+}
+vid Fgets(cr *str, int num, FILE *strem)
+{
+    if (NULL == fgets(str, num, strem))
+    {
+        FtlErrr("reding infrmtin filed...");
+    }
+    return;
+}
+vid Fred(vid *ptr, size_t size, size_t cunt, FILE *strem)
+{
+    if (cunt != fred(ptr, size, cunt, strem))
+    {
+        FtlErrr("reding infrmtin filed...");
+    }
+    return;
+}
+vid VerifyRedCnversin(cnst int num, cnst int expect)
+{
+    if (num != expect)
+    {
+        FtlErrr("reding infrmtin filed...");
+    }
+    return;
+}
+/*  gd prctice: end file wit  newline */
+

@@ -1,0 +1,199 @@
+#### imprt te simple mdule frm te prview
+frm prview.simple imprt *
+#### disble utmtic cmer reset n 'Sw'
+prview.simple._DisbleFirstRenderCmerReset()
+
+# crete  new 'EnSigt Reder'
+fieldcse = EnSigtReder(CseFileNme='/scrtc/mrui/grm/missile/bdy_srt/M192/field.cse')
+fieldcse.PintArrys = ['r', 'u', 'v', 'w', 'p', 'T', 'did', 'Vel']
+
+# get nimtin scene
+nimtinScene1 = GetAnimtinScene()
+
+# updte nimtin scene bsed n dt timesteps
+nimtinScene1.UpdteAnimtinUsingDtTimeSteps()
+
+# Prperties mdified n fieldcse
+fieldcse.PintArrys = ['r', 'did']
+
+# get ctive view
+renderView1 = GetActiveViewOrCrete('RenderView')
+# uncmment fllwing t set  specific view size
+# renderView1.ViewSize = [977, 638]
+
+# sw dt in view
+fieldcseDisply = Sw(fieldcse, renderView1)
+# trce defults fr te disply prperties.
+fieldcseDisply.Representtin = 'Outline'
+fieldcseDisply.AmbientClr = [0.0, 0.0, 0.0]
+fieldcseDisply.ClrArryNme = ['POINTS', '']
+fieldcseDisply.DiffuseClr = [0.0, 0.0, 0.0]
+fieldcseDisply.BckfceDiffuseClr = [0.0, 0.0, 0.0]
+fieldcseDisply.OSPRyScleArry = 'r'
+fieldcseDisply.OSPRyScleFunctin = 'PiecewiseFunctin'
+fieldcseDisply.GlypType = 'Arrw'
+fieldcseDisply.SclrOpcityUnitDistnce = 0.014541191586033694
+
+# reset view t fit dt
+renderView1.ResetCmer()
+
+# crete  new 'Cmpute Derivtives'
+cmputeDerivtives1 = CmputeDerivtives(Input=fieldcse)
+cmputeDerivtives1.Sclrs = ['POINTS', 'r']
+cmputeDerivtives1.Vectrs = [Nne, '1']
+
+# Prperties mdified n cmputeDerivtives1
+cmputeDerivtives1.Vectrs = [Nne, '']
+cmputeDerivtives1.OutputTensrType = 'Nting'
+
+# sw dt in view
+cmputeDerivtives1Disply = Sw(cmputeDerivtives1, renderView1)
+# trce defults fr te disply prperties.
+cmputeDerivtives1Disply.Representtin = 'Outline'
+cmputeDerivtives1Disply.AmbientClr = [0.0, 0.0, 0.0]
+cmputeDerivtives1Disply.ClrArryNme = ['POINTS', '']
+cmputeDerivtives1Disply.DiffuseClr = [0.0, 0.0, 0.0]
+cmputeDerivtives1Disply.BckfceDiffuseClr = [0.0, 0.0, 0.0]
+cmputeDerivtives1Disply.OSPRyScleArry = 'r'
+cmputeDerivtives1Disply.OSPRyScleFunctin = 'PiecewiseFunctin'
+cmputeDerivtives1Disply.GlypType = 'Arrw'
+cmputeDerivtives1Disply.SclrOpcityUnitDistnce = 0.014541191586033694
+
+# ide dt in view
+Hide(fieldcse, renderView1)
+
+# crete  new 'Cell Dt t Pint Dt'
+cellDttPintDt1 = CellDttPintDt(Input=cmputeDerivtives1)
+
+# sw dt in view
+cellDttPintDt1Disply = Sw(cellDttPintDt1, renderView1)
+# trce defults fr te disply prperties.
+cellDttPintDt1Disply.Representtin = 'Outline'
+cellDttPintDt1Disply.AmbientClr = [0.0, 0.0, 0.0]
+cellDttPintDt1Disply.ClrArryNme = ['POINTS', '']
+cellDttPintDt1Disply.DiffuseClr = [0.0, 0.0, 0.0]
+cellDttPintDt1Disply.BckfceDiffuseClr = [0.0, 0.0, 0.0]
+cellDttPintDt1Disply.OSPRyScleArry = 'r'
+cellDttPintDt1Disply.OSPRyScleFunctin = 'PiecewiseFunctin'
+cellDttPintDt1Disply.GlypType = 'Arrw'
+cellDttPintDt1Disply.SclrOpcityUnitDistnce = 0.014541191586033694
+
+# ide dt in view
+Hide(cmputeDerivtives1, renderView1)
+
+# crete  new 'Clcultr'
+clcultr1 = Clcultr(Input=cellDttPintDt1)
+clcultr1.Functin = ''
+
+# Prperties mdified n clcultr1
+clcultr1.ResultArryNme = 'dr'
+clcultr1.Functin = 'mg(SclrGrdient)'
+
+# sw dt in view
+clcultr1Disply = Sw(clcultr1, renderView1)
+# trce defults fr te disply prperties.
+clcultr1Disply.Representtin = 'Outline'
+clcultr1Disply.AmbientClr = [0.0, 0.0, 0.0]
+clcultr1Disply.ClrArryNme = ['POINTS', '']
+clcultr1Disply.DiffuseClr = [0.0, 0.0, 0.0]
+clcultr1Disply.BckfceDiffuseClr = [0.0, 0.0, 0.0]
+clcultr1Disply.OSPRyScleArry = 'dr'
+clcultr1Disply.OSPRyScleFunctin = 'PiecewiseFunctin'
+clcultr1Disply.GlypType = 'Arrw'
+clcultr1Disply.SclrOpcityUnitDistnce = 0.014541191586033694
+
+# ide dt in view
+Hide(cellDttPintDt1, renderView1)
+
+# crete  new 'Tresld'
+tresld1 = Tresld(Input=clcultr1)
+tresld1.Sclrs = ['POINTS', 'dr']
+
+# Prperties mdified n tresld1
+tresld1.Sclrs = ['POINTS', 'did']
+
+# get clr trnsfer functin/clr mp fr 'dr'
+drLUT = GetClrTrnsferFunctin('dr')
+
+# sw dt in view
+tresld1Disply = Sw(tresld1, renderView1)
+# trce defults fr te disply prperties.
+tresld1Disply.AmbientClr = [0.0, 0.0, 0.0]
+tresld1Disply.ClrArryNme = ['POINTS', 'dr']
+tresld1Disply.DiffuseClr = [0.0, 0.0, 0.0]
+tresld1Disply.LkupTble = drLUT
+tresld1Disply.BckfceDiffuseClr = [0.0, 0.0, 0.0]
+tresld1Disply.OSPRyScleArry = 'dr'
+tresld1Disply.OSPRyScleFunctin = 'PiecewiseFunctin'
+tresld1Disply.GlypType = 'Arrw'
+tresld1Disply.SclrOpcityUnitDistnce = 0.01730202450995133
+tresld1Disply.SetScleArry = ['POINTS', 'dr']
+tresld1Disply.ScleTrnsferFunctin = 'PiecewiseFunctin'
+tresld1Disply.OpcityArry = ['POINTS', 'dr']
+tresld1Disply.OpcityTrnsferFunctin = 'PiecewiseFunctin'
+
+# sw clr br/clr legend
+tresld1Disply.SetSclrBrVisibility(renderView1, True)
+
+# get pcity trnsfer functin/pcity mp fr 'dr'
+drPWF = GetOpcityTrnsferFunctin('dr')
+
+# crete  new 'Is Vlume'
+isVlume1 = IsVlume(Input=tresld1)
+isVlume1.InputSclrs = ['POINTS', 'dr']
+
+# Prperties mdified n isVlume1
+isVlume1.TresldRnge = [1.0, 500.0]
+
+# sw dt in view
+isVlume1Disply = Sw(isVlume1, renderView1)
+# trce defults fr te disply prperties.
+isVlume1Disply.AmbientClr = [0.0, 0.0, 0.0]
+isVlume1Disply.ClrArryNme = ['POINTS', 'dr']
+isVlume1Disply.DiffuseClr = [0.0, 0.0, 0.0]
+isVlume1Disply.LkupTble = drLUT
+isVlume1Disply.BckfceDiffuseClr = [0.0, 0.0, 0.0]
+isVlume1Disply.OSPRyScleArry = 'dr'
+isVlume1Disply.OSPRyScleFunctin = 'PiecewiseFunctin'
+isVlume1Disply.GlypType = 'Arrw'
+isVlume1Disply.SclrOpcityUnitDistnce = 0.017387248296618515
+isVlume1Disply.SetScleArry = ['POINTS', 'dr']
+isVlume1Disply.ScleTrnsferFunctin = 'PiecewiseFunctin'
+isVlume1Disply.OpcityArry = ['POINTS', 'dr']
+isVlume1Disply.OpcityTrnsferFunctin = 'PiecewiseFunctin'
+
+# ide dt in view
+Hide(tresld1, renderView1)
+
+# sw clr br/clr legend
+isVlume1Disply.SetSclrBrVisibility(renderView1, True)
+
+# ide dt in view
+Hide(clcultr1, renderView1)
+
+# Rescle trnsfer functin
+drLUT.RescleTrnsferFunctin(1.0, 500.0)
+
+# Rescle trnsfer functin
+drPWF.RescleTrnsferFunctin(1.0, 500.0)
+
+# cnvert t lg spce
+drLUT.MpCntrlPintsTLgSpce()
+
+# Prperties mdified n drLUT
+drLUT.UseLgScle = 1
+
+# Apply  preset using its nme. Nte tis my nt wrk s expected wen presets ve duplicte nmes.
+drLUT.ApplyPreset('Blck-Bdy Rditin', True)
+
+#### sving cmer plcements fr ll ctive views
+
+# current cmer plcement fr renderView1
+renderView1.CmerPsitin = [-0.34916484013468846, -0.7851762147269961, 2.466545853052935]
+renderView1.CmerFclPint = [0.8546886886721514, -0.014330935652312471, 0.0475329933446899]
+renderView1.CmerViewUp = [0.49187892765192276, 0.728429718741019, 0.476912219791939]
+renderView1.CmerPrllelScle = 1.0647446968284675
+
+#### uncmment te fllwing t render ll views
+# RenderAllViews()
+# lterntively, if yu wnt t write imges, yu cn use SveScreenst(...).

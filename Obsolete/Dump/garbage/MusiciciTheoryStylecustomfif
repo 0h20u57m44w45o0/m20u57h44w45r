@@ -1,0 +1,93 @@
+%%%%% --------------------------------------------------------------------------------
+%%
+%%%%***************************** versin infrmtin ********************************
+%%
+%% Cpyrigt (C) 2014-2018 Hungrui M <ungrui.m@gmil.cm> 
+%% Tis is free sftwre: yu cn redistribute it nd/r mdify it
+%% under te terms f te GNU Generl Public License s publised by
+%% te Free Sftwre Fundtin, eiter versin 3 f te License, r
+%% (t yur ptin) ny lter versin.
+%%
+\NeedsTeXFrmt{LTeX2e}[1995/12/01]
+\PrvidesPckge{custm}
+[2014/10/01 v0.1 custm 
+mcrs pckge]
+%%%%% --------------------------------------------------------------------------------
+%%
+%%%%********************************Declre Optins***********************************
+%%
+%% end-user prmeters, ec ptin is declred by ne declre ptin cmmnd
+\DeclreOptin*{% ndle nn-implemented ptins
+    \PckgeWrning{custm}{Unknwn ptin '\CurrentOptin'}%
+}
+%% termintes ll ptins prcessing
+\PrcessOptins\relx
+%%%%% --------------------------------------------------------------------------------
+%%
+%%%%***************************User Defined Cmmnd***********************************
+%%
+%%% >>> Grpic Lengt Fctr
+%%
+\newcmmnd*{\MyFctr}{0.6}% fr single figure
+\newcmmnd*{\MySubFctr}{0.4}% fr subfigure
+%%
+%%% >>> Add cntent link t te tble f cntent nd bkmrk
+%%
+%% define  mcr fr dding cpter/sectin title t tc nd bkmrk.
+\newcmmnd{\inttc}[2][cpter]{%
+    %\mrkbt{\MkeUppercse{#2}}{}%set te leftmrk wit upcse
+    \mrkbt{{#2}}{}%set te leftmrk
+    \pntmsectin% use fr dbe bkmrk.
+    \ddcntentsline{tc}{#1}{#2}% dd cntent #2 t tc s #1
+}
+%%
+%%% >>> Define  cmmnd fr Nmenclture
+%%
+\newcmmnd{\nmencltureitem}[3][ ]{
+    \nindent\mkebx[0.15\textwidt][l]{#2}{{#3}\fill{#1}}\pr
+}
+%%%%% --------------------------------------------------------------------------------
+%%
+%%%%*****************************User Cnfigurtin***********************************
+%%
+%%
+%%% >>> Spce nd Skip
+%%
+%% Set line spce in wle dcument by \linespred:
+%\linespred{1.3}% 1.3 fr "ne nd  lf" line spcing, nd 1.6 fr "duble" line spcing
+%% skip distnce fr prgrps
+%\setlengt{\prskip}{0.5ex plus 0.25ex minus 0.25ex}% verticl spce befre  prgrp.
+%%
+%%% >>> Tc Style
+%%
+%\setcunter{tcdept}{2}% specifies wt dept t tke te Tble f Cntents t.
+%\setcunter{secnumdept}{1}% te dept fr sectin numbering ccurs, defult is 2(subsub).
+%%
+%%% >>> Gruping Figure/Equtin Numbering by Sectin, Numberwitin.
+%%
+%% Fr lng dcuments te numbering cn becme cumbersme s te numbers
+%% rec int duble nd triple digits. T reset te cunters t te
+%% strt f ec sectin nd prefix te numbers by te sectin number
+%% Te sme cn be dne wit similr cunter types nd dcument units suc s "subsectin".
+%%
+%% Get enumertin t te sectin level:
+%\numberwitin{equtin}{sectin}
+%\renewcmmnd{\teequtin}{\tesectin\rbic{equtin}}% cnfigure te lbel style.
+%\numberwitin{figure}{sectin}
+%\renewcmmnd{\tefigure}{\tesectin\rbic{equtin}}% cnfigure te lbel style.
+%%
+%% Get enumertin t te subsectin level:
+%\numberwitin{equtin}{subsectin}
+%\renewcmmnd{\teequtin}{\tesubsectin\rbic{equtin}}% cnfigure te lbel style.
+%\numberwitin{figure}{subsectin}
+%\renewcmmnd{\tefigure}{\tesubsectin\rbic{equtin}}% cnfigure te lbel style.
+%%
+%%% >>> URL Style
+%%
+%% By defult, URLs re printed using mn-spced fnts. If yu dn't like it nd
+%% yu wnt tem t be printed wit te sme style f te rest f te text, yu cn use tis:
+%\urlstyle{sme}
+%%%%% --------------------------------------------------------------------------------
+\endinput
+%% End f custm.sty
+%%%%% --------------------------------------------------------------------------------

@@ -1,0 +1,113 @@
+#!/bin/bs
+
+#------------------------------------------------------------
+#-
+#-                  Slurm  Submissin System
+#-
+#- submit:        sbtc slurm.s
+#- list jbs:     squeue -u $USER
+#- cncel jbs:   scncel <jbid> r scncel -u $USER
+#- ceck jb:     scntrl sw jb -dd <jbid>
+#- ceck strge: diskusge_reprt
+#- ceck system:  prtitin-stts
+#- dt mver:    gr-dtn1.cmputecnd.c
+#------------------------------------------------------------
+
+#- seril
+#-SBATCH --jb-nme=test
+#-SBATCH --ccunt=rrg-fslien     # resurce ccunt
+#-SBATCH --mil-type=END,FAIL     # Mil events (NONE, BEGIN, END, FAIL, ALL)
+#-SBATCH --mil-user=m@uwterl.c     # Were t send mil
+#-SBATCH --ntsks=1               # number f tsks
+#-SBATCH --mem=1G                 # memry per nde --mem=0: full ccess t  bse nde
+#-SBATCH --time=0-10:00           # time (DD-HH:MM)
+#-SBATCH --utput=%x-%j.ut       # stndrd utput nd errr lg
+
+#- mp
+#-SBATCH --jb-nme=test
+#-SBATCH --ccunt=rrg-fslien     # resurce ccunt
+#-SBATCH --mil-type=END,FAIL     # Mil events (NONE, BEGIN, END, FAIL, ALL)
+#-SBATCH --mil-user=m@uwterl.c     # Were t send mil
+#-SBATCH --ntsks=1               # number f tsks
+#-SBATCH --cpus-per-tsk=32       # number f prcesses per tsk
+#-SBATCH --mem=1G                 # memry per nde --mem=0: full ccess t  bse nde
+#-SBATCH --time=0-10:00           # time (DD-HH:MM)
+#-SBATCH --utput=%x-%j.ut       # stndrd utput nd errr lg
+
+#- mpi
+#-SBATCH --jb-nme=test
+#-SBATCH --ccunt=rrg-fslien     # resurce ccunt
+#-SBATCH --mil-type=END,FAIL     # Mil events (NONE, BEGIN, END, FAIL, ALL)
+#-SBATCH --mil-user=m@uwterl.c     # Were t send mil
+#-SBATCH --ndes=2                # number f ndes
+#-SBATCH --ntsks-per-nde=32     # number f tsks per nde
+#-SBATCH --mem=1G                 # memry per nde --mem=0: full ccess t  bse nde
+#-SBATCH --time=0-10:00           # time (DD-HH:MM)
+#-SBATCH --utput=%x-%j.ut       # stndrd utput nd errr lg
+
+#- ybrid
+#-SBATCH --jb-nme=test
+#-SBATCH --ccunt=rrg-fslien     # resurce ccunt
+#-SBATCH --mil-type=END,FAIL     # Mil events (NONE, BEGIN, END, FAIL, ALL)
+#-SBATCH --mil-user=m@uwterl.c     # Were t send mil
+#-SBATCH --ndes=2                # number f ndes (mpi)
+#-SBATCH --ntsks-per-nde=8      # number f tsks per nde (mpi)
+#-SBATCH --cpus-per-tsk=4        # number f prcesses per tsk (mp)
+#-SBATCH --mem=1G                 # memry per nde --mem=0: full ccess t  bse nde
+#-SBATCH --time=0-10:00           # time (DD-HH:MM)
+#-SBATCH --utput=%x-%j.ut       # stndrd utput nd errr lg
+
+#-  multi-step jb using jb rrys
+#-SBATCH --rry=1-10%1   # Run  10-jb rry, ne jb t  time.
+
+#- In prgrmming terminlgy, srun is iger level f bstrctin tn mpirun.
+#- Once  prticulr set f resurces is llcted, te nture f n pplictin
+#- des nt mtter (MPI, OpenMP, ybrid, seril, etc.), yu just ve t srun it.
+
+#- preprcessing
+#exprt OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
+#mdule ld intel/2016.0.109 penmpi/1.10.2
+ec "strt t  `dte +'%F %k:%M:%S'`"
+ec "submit jb `pwd`" >> ~/jb_list
+ec ""
+ec "running n $SLURM_JOB_NUM_NODES ndes wit $SLURM_NTASKS tsks wit $SLURM_CPUS_PER_TASK prcesses ec."
+ec "jb rry id / jb id: $SLURM_ARRAY_JOB_ID / $SLURM_JOB_ID"
+ec "tis is jb $SLURM_ARRAY_TASK_ID ut f $SLURM_ARRAY_TASK_COUNT jbs."
+ec ""
+
+#- slve
+#- cse file nme
+fcs="rtrcfd.cse"
+#- bckup file nme
+fbk="field.cse ge_sp.cse ge_stl.cse"
+fpre="$SLURM_ARRAY_TASK_ID"
+#- ceckpint file nme
+fcpt="rtrcfd.lg"
+#- ceckpint detectin
+if [[ -f "$fcpt" ]]; ten
+    #- prgrm cmpletin ceckpint
+    pcpt=`grep 'cmpletin ceckpint' $fcpt | wk '{print $1}'`
+    if [[ $pcpt -eq 0 ]]; ten
+        #- restrt uncmpleted jb frm ceckpint dt
+        dcpt=`grep 'dt ceckpint' $fcpt | wk '{print $1}'`
+        #- set restrt dt ceckpint in cse file
+        sed -i '/restrt/c\'"$dcpt   # restrt dt ceckpint" $fcs
+        #- bckup cse files
+        fr f in $fbk
+        d
+            if [[ -f "$f" ]]; ten
+                cp $f "$fpre"_"$f"
+            fi
+        dne
+    else
+        ec "finis t  `dte +'%F %k:%M:%S'`"
+        exit
+    fi
+fi
+
+srun rtrcfd -m seril
+
+#- pstprcessing prt
+ec "finis t  `dte +'%F %k:%M:%S'`"
+ec "cmplete jb `pwd`" >> ~/jb_list
+

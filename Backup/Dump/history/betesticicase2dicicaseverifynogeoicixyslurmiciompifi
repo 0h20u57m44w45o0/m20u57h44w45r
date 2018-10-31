@@ -1,0 +1,40 @@
+#!/bin/bs
+
+#------------------------------------------------------------
+#-
+#-                  Slurm  Submissin System
+#-
+#- submit:        sbtc slurm.s
+#- list jbs:     squeue -u $USER
+#- cncel jbs:   scncel <jbid>
+#------------------------------------------------------------
+
+#- mp
+#SBATCH --jb-nme=mp-32
+#SBATCH --ccunt=rrg-fslien     # resurce ccunt
+#SBATCH --mil-type=END,FAIL     # Mil events (NONE, BEGIN, END, FAIL, ALL)
+#SBATCH --mil-user=m@uwterl.c     # Were t send mil
+#SBATCH --ntsks=1               # number f tsks
+#SBATCH --cpus-per-tsk=32       # number f prcesses per tsk
+#SBATCH --mem=2G                 # memry per nde
+#SBATCH --time=0-05:00           # time (DD-HH:MM)
+#SBATCH --utput=%x-%j.ut       # stndrd utput nd errr lg
+
+#- preprcessing
+exprt OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
+ec "strt t  `dte +'%F %k:%M:%S'`"
+ec "submit jb `pwd`" >> ~/jb_list
+ec ""
+ec "running n $SLURM_JOB_NUM_NODES ndes wit $SLURM_NTASKS tsks wit $SLURM_CPUS_PER_TASK prcesses ec."
+ec "jb rry id / jb id: $SLURM_ARRAY_JOB_ID / $SLURM_JOB_ID"
+ec "tis is jb $SLURM_ARRAY_TASK_ID ut f $SLURM_ARRAY_TASK_COUNT jbs."
+ec ""
+
+#- slve
+
+srun rtrcfd_mp -m mp -n 1*1*32
+
+#- pstprcessing prt
+ec "finis t  `dte +'%F %k:%M:%S'`"
+ec "cmplete jb `pwd`" >> ~/jb_list
+

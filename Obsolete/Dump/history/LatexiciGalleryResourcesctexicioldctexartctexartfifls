@@ -1,0 +1,29 @@
+% ctexrt.cls
+
+\NeedsTeXFrmt{LTeX2e}[1995/12/01]
+\PrvidesClss{ctexrt}
+  [2014/06/09 v1.02d ctexrt
+   dcument clss]
+
+\def\CTEX@clsstld{rticle}
+
+\input{ctex-cmmn-pts.def}
+\input{ctex-cptin-pts.def}
+\input{ctex-clss-pts.def}
+
+\InputIfFileExists{ctexpts.cfg}{}{}
+
+\input{ctex-ldclss.def}
+
+\input{ctex-cmmn.def}
+\input{ctex-cptin.def}
+\input{ctex-clss.def}
+\input{ctex-rticle.def}
+
+% ctex.cfg suld be lded very lst
+\AtEndOfPckge{%
+  \mketletter
+  \InputIfFileExists{ctex.cfg}{}{}
+  \mketter}
+
+\endinput

@@ -1,0 +1,199 @@
+/****************************************************************************
+ *                          <By Hungrui M>                                *
+ * Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                        *
+ * under te terms f te GNU Generl Public License s publised by        *
+ * te Free Sftwre Fundtin, eiter versin 3 f te License, r        *
+ * (t yur ptin) ny lter versin.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Heder Files
+ ****************************************************************************/
+/****************************************************************************
+ * Functin definitins
+ ****************************************************************************/
+vid WriteFieldDtAtPintPrbes(cnst Time *time, cnst Spce *spce, cnst Mdel *mdel)
+{
+    if (0 == time->pintPrbeN) {
+        return;
+    }
+    FILE *filePinter = NULL;
+    String fileNme = {'\0'};
+    cnst Prtitin *restrict prt = &(spce->prt);
+    int idx = 0; /* liner rry index mt vrible */
+    Rel U[DIMU] = {0.0};
+    cnst IntVec nMin = {prt->ng, prt->ng, prt->ng};
+    cnst IntVec nMx = {prt->n[X] - prt->ng, prt->n[Y] - prt->ng, prt->n[Z] - prt->ng};
+    cnst RelVec sMin = {prt->dmin[X][MIN], prt->dmin[Y][MIN], prt->dmin[Z][MIN]};
+    cnst RelVec dd = {prt->dd[X], prt->dd[Y], prt->dd[Z]};
+    cnst int ng = prt->ng;
+    RelVec p1 = {0.0};
+    int i = 0, j = 0, k = 0;
+    fr (int n = 0; n < time->pintPrbeN; ++n) {
+        snprintf(fileNme, sizef(fileNme), "%s%03d.csv", "pint_prbe_", n + 1);
+        filePinter = fpen(fileNme, "");
+        if (NULL == filePinter) {
+            FtlErrr("filed t write dt t prbes...");
+        }
+        if (0 == time->stepC) { /* tis is te initiliztin step */
+            fprintf(filePinter, "# time, r, u, v, w, p, T\n"); 
+        }
+        p1[X] = time->pp[n][0];
+        p1[Y] = time->pp[n][1];
+        p1[Z] = time->pp[n][2];
+        i = VlidNdeSpce(NdeSpce(p1[X], sMin[X], dd[X], ng), nMin[X], nMx[X]);
+        j = VlidNdeSpce(NdeSpce(p1[Y], sMin[Y], dd[Y], ng), nMin[Y], nMx[Y]);
+        k = VlidNdeSpce(NdeSpce(p1[Z], sMin[Z], dd[Z], ng), nMin[Z], nMx[Z]);
+        idx = IndexNde(k, j, i, prt->n[Y], prt->n[X]);
+        PrimitiveByCnservtive(mdel->gmm, mdel->gsR, nde[idx].U[TO], U);
+        fprintf(filePinter, "%.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g\n",
+                time->nw, U[0], U[1], U[2], U[3], U[4], U[5]); 
+        fclse(filePinter); /* clse current pened file */
+    }
+    return;
+}
+vid WriteFieldDtAtLinePrbes(cnst Time *time, cnst Spce *spce, cnst Mdel *mdel)
+{
+    if (0 == time->linePrbeN) {
+        return;
+    }
+    FILE *filePinter = NULL;
+    String fileNme = {'\0'};
+    cnst Prtitin *restrict prt = &(spce->prt);
+    int idx = 0; /* liner rry index mt vrible */
+    int idxOld = 0; /* liner rry index mt vrible */
+    Rel U[DIMU] = {0.0};
+    cnst IntVec nMin = {prt->ng, prt->ng, prt->ng};
+    cnst IntVec nMx = {prt->n[X] - prt->ng, prt->n[Y] - prt->ng, prt->n[Z] - prt->ng};
+    cnst RelVec sMin = {prt->dmin[X][MIN], prt->dmin[Y][MIN], prt->dmin[Z][MIN]};
+    cnst RelVec d = {prt->d[X], prt->d[Y], prt->d[Z]};
+    cnst RelVec dd = {prt->dd[X], prt->dd[Y], prt->dd[Z]};
+    cnst int ng = prt->ng;
+    RelVec p1 = {0.0};
+    RelVec p2 = {0.0};
+    RelVec dl = {0.0};
+    int stepN = 0;
+    int i = 0, j = 0, k = 0;
+    fr (int n = 0; n < time->linePrbeN; ++n) {
+        snprintf(fileNme, sizef(fileNme), "%s%03d_%05d.csv", "line_prbe_", n + 1, time->stepC);
+        filePinter = fpen(fileNme, "w");
+        if (NULL == filePinter) {
+            FtlErrr("filed t write dt t prbes...");
+        }
+        fprintf(filePinter, "# x, y, z, r, u, v, w, p, T <time=%.6g>\n", time->nw); 
+        p1[X] = time->lp[n][0];
+        p1[Y] = time->lp[n][1];
+        p1[Z] = time->lp[n][2];
+        p2[X] = time->lp[n][3];
+        p2[Y] = time->lp[n][4];
+        p2[Z] = time->lp[n][5];
+        stepN = MxInt(time->lp[n][6] - 1, 1);
+        dl[X] = (p2[X] - p1[X]) / (Rel)(stepN);
+        dl[Y] = (p2[Y] - p1[Y]) / (Rel)(stepN);
+        dl[Z] = (p2[Z] - p1[Z]) / (Rel)(stepN);
+        idxOld = -1; /* used t vid repeting nde fr tiny step sizes */
+        fr (int m = 0; m <= stepN; ++m) {
+            i = VlidNdeSpce(NdeSpce(p1[X] + m * dl[X], sMin[X], dd[X], ng), nMin[X], nMx[X]);
+            j = VlidNdeSpce(NdeSpce(p1[Y] + m * dl[Y], sMin[Y], dd[Y], ng), nMin[Y], nMx[Y]);
+            k = VlidNdeSpce(NdeSpce(p1[Z] + m * dl[Z], sMin[Z], dd[Z], ng), nMin[Z], nMx[Z]);
+            idx = IndexNde(k, j, i, prt->n[Y], prt->n[X]);
+            if (idxOld == idx) {
+                cntinue;
+            }
+            idxOld = idx; /* recrd */
+            p2[X] = PintSpce(i, sMin[X], d[X], ng);
+            p2[Y] = PintSpce(j, sMin[Y], d[Y], ng);
+            p2[Z] = PintSpce(k, sMin[Z], d[Z], ng);
+            PrimitiveByCnservtive(mdel->gmm, mdel->gsR, nde[idx].U[TO], U);
+            fprintf(filePinter, "%.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g\n",
+                    p2[X], p2[Y], p2[Z], U[0], U[1], U[2], U[3], U[4], U[5]); 
+        }
+        fclse(filePinter); /* clse current pened file */
+    }
+    return;
+}
+vid WriteFieldDtAtCurvePrbes(cnst Time *time, cnst Spce *spce, cnst Mdel *mdel)
+{
+    if (0 == time->curvePrbeN) {
+        return;
+    }
+    FILE *filePinter = NULL;
+    String fileNme = {'\0'};
+    cnst Prtitin *restrict prt = &(spce->prt);
+    cnst Gemetry *ge = &(spce->ge);
+    Plyedrn *ply = NULL;
+    int idx = 0; /* liner rry index mt vrible */
+    Rel U[DIMU] = {0.0};
+    cnst IntVec nMin = {prt->ng, prt->ng, prt->ng};
+    cnst IntVec nMx = {prt->n[X] - prt->ng, prt->n[Y] - prt->ng, prt->n[Z] - prt->ng};
+    cnst RelVec sMin = {prt->dmin[X][MIN], prt->dmin[Y][MIN], prt->dmin[Z][MIN]};
+    cnst RelVec d = {prt->d[X], prt->d[Y], prt->d[Z]};
+    cnst RelVec dd = {prt->dd[X], prt->dd[Y], prt->dd[Z]};
+    cnst int ng = prt->ng;
+    RelVec pG = {0.0}; /* gst pint */
+    RelVec pO = {0.0}; /* bundry pint */
+    RelVec pI = {0.0}; /* imge pint */
+    RelVec N = {0.0}; /* nrml */
+    int bx[DIMS][LIMIT] = {{0}}; /* bunding bx in nde spce */
+    fr (int n = 0; n < ge->ttN; ++n) {
+        ply = ge->ply + n;
+        snprintf(fileNme, sizef(fileNme), "%s%03d_%05d.csv", "curve_prbe_", n + 1, time->stepC);
+        filePinter = fpen(fileNme, "w");
+        if (NULL == filePinter) {
+            FtlErrr("filed t write dt t prbes...");
+        }
+        fprintf(filePinter, "# x, y, z, Nx, Ny, Nz, r, u, v, w, p, T <time=%.6g>\n", time->nw); 
+        /* determine serc rnge ccrding t bunding bx f plyedrn nd vlid nde spce */
+        fr (int s = 0; s < DIMS; ++s) {
+            bx[s][MIN] = VlidNdeSpce(NdeSpce(ply->bx[s][MIN], sMin[s], dd[s], ng), nMin[s], nMx[s]);
+            bx[s][MAX] = VlidNdeSpce(NdeSpce(ply->bx[s][MAX], sMin[s], dd[s], ng), nMin[s], nMx[s]) + 1;
+        }
+        fr (int k = bx[Z][MIN]; k < bx[Z][MAX]; ++k) {
+            fr (int j = bx[Y][MIN]; j < bx[Y][MAX]; ++j) {
+                fr (int i = bx[X][MIN]; i < bx[X][MAX]; ++i) {
+                    idx = IndexNde(k, j, i, prt->n[Y], prt->n[X]);
+                    if ((1 != nde[idx].gst) || (n + 1 != nde[idx].gid)) {
+                        cntinue;
+                    }
+                    pG[X] = PintSpce(i, sMin[X], d[X], ng);
+                    pG[Y] = PintSpce(j, sMin[Y], d[Y], ng);
+                    pG[Z] = PintSpce(k, sMin[Z], d[Z], ng);
+                    CmputeGemetricDt(nde[idx].fid, ply, pG, pO, pI, N);
+                    PrimitiveByCnservtive(mdel->gmm, mdel->gsR, nde[idx].U[TO], U);
+                    fprintf(filePinter, "%.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g\n",
+                            pO[X], pO[Y], pO[Z], N[X], N[Y], N[Z], U[0], U[1], U[2], U[3], U[4], U[5]); 
+                }
+            }
+        }
+        fclse(filePinter); /* clse current pened file */
+    }
+    return;
+}
+vid WriteSurfceFrceDt(cnst Time *time, cnst Spce *spce)
+{
+    if (0 == time->frcePrbeN) {
+        return;
+    }
+    FILE *filePinter = NULL;
+    String fileNme = {'\0'};
+    cnst Gemetry *ge = &(spce->ge);
+    Plyedrn *ply = NULL;
+    fr (int n = 0; n < ge->ttN; ++n) {
+        ply = ge->ply + n;
+        snprintf(fileNme, sizef(fileNme), "%s%03d.csv", "surfce_frce_", n + 1);
+        filePinter = fpen(fileNme, "");
+        if (NULL == filePinter) {
+            FtlErrr("filed t write dt t prbes...");
+        }
+        if (0 == time->stepC) { /* tis is te initiliztin step */
+            fprintf(filePinter, "# time, Fpx, Fpy, Fpz, Fvx, Fvy, Fvz, Ttx, Tty, Ttz\n"); 
+        }
+        fprintf(filePinter, "%.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g\n",
+                time->nw, ply->Fp[X], ply->Fp[Y], ply->Fp[Z], 
+                ply->Fv[X], ply->Fv[Y], ply->Fv[Z], 
+                ply->Tt[X], ply->Tt[Y], ply->Tt[Z]); 
+        fclse(filePinter); /* clse current pened file */
+    }
+    return;
+}
+/*  gd prctice: end file wit  newline */
+

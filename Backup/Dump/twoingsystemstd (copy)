@@ -1,0 +1,45 @@
+import numpy as np
+import myLinAlg as myLinAlg
+reload(myLinAlg)
+
+
+#%% Create a random matrix.
+N = 30
+Mat = np.random.rand(N,N)
+f = np.random.rand(N)
+
+maxIter = 1000
+tol = 1.0e-6
+
+#%% strictly diagonally dominant A
+print("Solve diagonally dominant system:")
+rowsum = 50.0 * (np.sum(np.abs(Mat), axis=1) - np.abs(Mat)[range(N), range(N)])
+A = Mat
+A[range(N), range(N)] = rowsum
+u0 = f # initial guess
+ue = np.linalg.solve(A, f)
+print("\nusing Jocabi")
+uJ = myLinAlg.IterativeSolve(myLinAlg.JacobiStep, A, f, np.copy(u0), maxIter, tol)
+print("compare uJ and uexact")
+print((uJ - ue).round(6))
+print("\nusing GS")
+uGS = myLinAlg.IterativeSolve(myLinAlg.GSStep, A, f, np.copy(u0), maxIter, tol)
+print("compare uGS and uexact")
+print((uGS - ue).round(6))
+
+#%% SPD but not diagonally dominant A
+print("\n\nSolve SPD but not diagonally dominant system:")
+spd = np.dot(np.abs(Mat).T, np.abs(Mat))
+rowsum = 0.5 * (np.sum(spd, axis=1) - spd[range(N), range(N)])
+A = spd
+A[range(N), range(N)] = rowsum
+u0 = f # initial guess
+ue = np.linalg.solve(A, f)
+print("\nusing Jocabi")
+uJ = myLinAlg.IterativeSolve(myLinAlg.JacobiStep, A, f, np.copy(u0), maxIter, tol)
+print("compare uJ and uexact")
+print((uJ - ue).round(6))
+print("\nusing GS")
+uGS = myLinAlg.IterativeSolve(myLinAlg.GSStep, A, f, np.copy(u0), maxIter, tol)
+print("compare uGS and uexact")
+print((uGS - ue).round(6))

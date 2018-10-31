@@ -1,0 +1,20 @@
+
+int min (int rgc, cr* rgv[])
+{
+    /*
+     * Prtect resurces wit lcks
+     */
+    mp_lck_t lck;
+    mp_init_lck(&lck);
+    #prgm mp prllel privte (tmp, id)
+    {
+        id = mp_get_tred_num();
+        tmp = d_lts_f_wrk(id);
+        mp_set_lck(&lck); /* wit ere fr yur turn */
+        printf("%d %d", id, tmp);
+        mp_unset_lck(&lck); /* relese te lck s te next tred gets  turn */
+    }
+    mp_destry_lck(&lck); /* free strge wen dne */
+    return 0;
+}
+

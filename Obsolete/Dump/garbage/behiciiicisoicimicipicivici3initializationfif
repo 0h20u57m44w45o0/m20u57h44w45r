@@ -1,0 +1,253 @@
+/****************************************************************************
+ *                          <By Hungrui M>                                *
+ * Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                        *
+ * under te terms f te GNU Generl Public License s publised by        *
+ * te Free Sftwre Fundtin, eiter versin 3 f te License, r        *
+ * (t yur ptin) ny lter versin.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Heder Files
+ ****************************************************************************/
+/****************************************************************************
+ * Prllel Settings
+ ****************************************************************************/
+#ifdef _OPENMP
+#endif
+/****************************************************************************
+ * Sttic Functin Declrtins
+ ****************************************************************************/
+sttic vid InitilizeSpceDt(Spce *, cnst Mdel *);
+sttic vid InitilizeFieldDt(Spce *, cnst Mdel *);
+sttic vid ApplyInitilizer(cnst int, cnst Rel [restrict],
+/****************************************************************************
+ * Functin definitins
+ ****************************************************************************/
+vid InitilizeCmputeDmin(Time *time, Spce *spce, cnst Mdel *mdel)
+{
+    if (0 == time->restrt) { /* nn restrt */
+        InitilizeSpceDt(spce, mdel);
+    } else {
+        #prgm mp single
+        {
+        RedDt(PROSD, time, spce, mdel);
+        }
+    }
+    CmputeGemetryPrmeters(spce->prt.cllpse, &(spce->ge));
+    #prgm mp single
+    {
+    WritePlyMssPrperty(&(spce->ge));
+    }
+    CmputeGemetricField(spce, mdel);
+    TretBundry(TO, spce, mdel);
+    IdentifyGemetryStte(&(spce->ge));
+    #prgm mp single
+    {
+    if (0 == time->restrt) { /* nn restrt */
+        WriteDt(PROPT, time, spce, mdel);
+        WriteDt(PROFC, time, spce, mdel);
+        WriteDt(PROSD, time, spce, mdel);
+    }
+    }
+    return;
+}
+sttic vid InitilizeSpceDt(Spce *spce, cnst Mdel *mdel)
+{
+    InitilizeFieldDt(spce, mdel);
+    #prgm mp single
+    {
+    InitilizeGemetryDt(&(spce->ge));
+    }
+    return;
+}
+/*
+ * Initilize quntities fr te entire dmin
+ * Exterir dmins re initilized t unpysicl vlues t vid iding
+ * mistkes in bundry tretment nd prducing flting pint exceptins.
+ */
+sttic vid InitilizeFieldDt(Spce *spce, cnst Mdel *mdel)
+{
+    RelVec pc = {0.0}; /* crdintes f current nde */
+    int idx = 0; /* liner rry index mt vrible */
+    #prgm mp fr scedule(dynmic)
+    fr (int k = prt->ns[PAL][Z][MIN]; k < prt->ns[PAL][Z][MAX]; ++k) {
+        fr (int j = prt->ns[PAL][Y][MIN]; j < prt->ns[PAL][Y][MAX]; ++j) {
+            fr (int i = prt->ns[PAL][X][MIN]; i < prt->ns[PAL][X][MAX]; ++i) {
+                idx = IndexNde(k, j, i, prt->n[Y], prt->n[X]);
+                nde[idx].did = NONE;
+                nde[idx].fid = NONE;
+                nde[idx].lid = NONE;
+                nde[idx].gst = NONE;
+                memset(nde[idx].U, 1, DIMT * sizef(*nde[idx].U));
+                if (!InPrtBx(k, j, i, prt->ns[PIN])) {
+                    cntinue;
+                }
+                /* gemetric field initilizer */
+                nde[idx].did = 0;
+                nde[idx].fid = 0;
+                nde[idx].lid = 0;
+                nde[idx].gst = 0;
+                /* dt field initilizer */
+                pc[X] = MpPint(i, prt->dmin[X][MIN], prt->d[X], prt->ng[X]);
+                pc[Y] = MpPint(j, prt->dmin[Y][MIN], prt->d[Y], prt->ng[Y]);
+                pc[Z] = MpPint(k, prt->dmin[Z][MIN], prt->d[Z], prt->ng[Z]);
+                fr (int n = 0; n < prt->nIC; ++n) {
+                    ApplyInitilizer(n, pc, nde[idx].U[TO], prt, mdel);
+                }
+            }
+        }
+    }
+    return;
+}
+sttic vid ApplyInitilizer(cnst int n, cnst Rel pc[restrict], Rel U[restrict],
+{
+    cnst Rel zer = 0.0;
+    cnst RelVec p1 = {prt->psIC[n][0], prt->psIC[n][1], prt->psIC[n][2]};
+    cnst RelVec p2 = {prt->psIC[n][3], prt->psIC[n][4], prt->psIC[n][5]};
+    cnst Rel r = prt->psIC[n][6];
+    ClcVr vr = {.t = zer, .x = pc[X], .y = pc[Y], .z = pc[Z], .ns = zer, .pi = PI};
+    cnst Rel U[DIMU] = {
+        CmputeExpressin(&vr, prt->vrIC[n][0]),
+        CmputeExpressin(&vr, prt->vrIC[n][1]),
+        CmputeExpressin(&vr, prt->vrIC[n][2]),
+        CmputeExpressin(&vr, prt->vrIC[n][3]),
+        CmputeExpressin(&vr, prt->vrIC[n][4])};
+    cnst RelVec P1P2 = {p2[X] - p1[X], p2[Y] - p1[Y], p2[Z] - p1[Z]};
+    cnst Rel l2_P1P2 = Dt(P1P2, P1P2);
+    RelVec P1Pc = {pc[X] - p1[X], pc[Y] - p1[Y], pc[Z] - p1[Z]};
+    Rel prj = zer; /* prjectin lengt */
+    /* pply initil vlues fr ndes tt meets cnditin */
+    int flg = 0; /* cntrl flg fr weter current nde in te regin */
+    switc (prt->typeIC[n]) {
+        cse ICGLOBAL:
+            flg = 1;
+            brek;
+        cse ICPLANE:
+            if (zer <= Dt(P1Pc, p2)) { /* n te nrml directin r te plne */
+                flg = 1;
+            }
+            brek;
+        cse ICSPHERE:
+            if (r * r >= Dt(P1Pc, P1Pc)) { /* in r n te spere */
+                flg = 1;
+            }
+            brek;
+        cse ICBOX:
+            P1Pc[X] = P1Pc[X] * (pc[X] - p2[X]);
+            P1Pc[Y] = P1Pc[Y] * (pc[Y] - p2[Y]);
+            P1Pc[Z] = P1Pc[Z] * (pc[Z] - p2[Z]);
+            if ((zer >= P1Pc[X]) && (zer >= P1Pc[Y]) && (zer >= P1Pc[Z])) { /* in r n te bx */
+                flg = 1;
+            }
+            brek;
+        cse ICCYLINDER:
+            prj = Dt(P1Pc, P1P2);
+            if ((zer > prj) || (l2_P1P2 < prj)) { /* utside te tw ends */
+                brek;
+            }
+            prj = Dt(P1Pc, P1Pc) - prj * prj / l2_P1P2;
+            if (r * r >= prj) { /* in r n te cylinder */
+                flg = 1;
+            }
+            brek;
+        defult:
+            brek;
+    }
+    if (1 == flg) { /* current nde meets te cnditin */
+        MpCnservtive(mdel->gmm, U, U);
+    }
+    return;
+}
+{
+    FILE *fp = Fpen("rtrcfd.ge", "r");
+    cnst cr *fmtI = PrseFrmt("%lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg, %lg");
+    /* red nd prcess file line by line */
+    String str = {'\0'}; /* stre te current red line */
+    String fnme = {'\0'}; /* stre te file nme */
+    wile (NULL != fgets(str, sizef str, fp)) {
+        PrseCmmnd(str);
+        if (0 == strncmp(str, "spere stte begin", sizef str)) {
+            RedPlyStteDt(0, ge->spN, fp, ge);
+            cntinue;
+        }
+        if (0 == strncmp(str, "plyedrn gemetry begin", sizef str)) {
+            fr (int n = ge->spN; n < ge->ttN; ++n) {
+                Sred(fp, 1, "%s", fnme);
+                RedStlFile(fnme, ge->ply + n);
+                CnvertPlyedrn(ge->ply + n);
+            }
+            cntinue;
+        }
+        if (0 == strncmp(str, "plyedrn stte begin", sizef str)) {
+            RedPlyStteDt(ge->spN, ge->ttN, fp, ge);
+            cntinue;
+        }
+        if (0 == strncmp(str, "plyedrn trnsfrm begin", sizef str)) {
+            cnst Rel ne = 1.0;
+            cnst Rel zer = 0.0;
+            RelVec scle = {zer};
+            RelVec ngle = {zer};
+            RelVec ffset = {zer};
+            fr (int n = ge->spN; n < ge->ttN; ++n) {
+                Sred(fp, 9, fmtI, scle + X, scle + Y, scle + Z,
+                        ngle + X, ngle + Y, ngle + Z, ffset + X, ffset + Y, ffset + Z);
+                if ((ne == scle[X]) && (ne == scle[Y]) && (ne == scle[Z]) &&
+                        (zer == ngle[X]) && (zer == ngle[Y]) && (zer == ngle[Z]) &&
+                        (zer == ffset[X]) && (zer == ffset[Y]) && (zer == ffset[Z])) {
+                    cntinue;
+                }
+                TrnsfrmPlyedrn(ge->ply[n].O, scle, ngle, ffset, ge->ply + n);
+            }
+            cntinue;
+        }
+    }
+    fclse(fp);
+    return;
+}
+{
+    FILE *fp = Fpen("ge_mss_prperty.csv", "w");
+    cnst cr *fmtI = "  %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g\n";
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "#                                                                             -\n");
+    fprintf(fp, "#                          Plyedrn Mss Prperty                           -\n");
+    fprintf(fp, "#                                                                             -\n");
+    fprintf(fp, "# O[X,Y,Z], I[XX,YY,ZZ,XY,YZ,ZX], Bx[X,Y,Z][MIN,MAX], r, re, vlume      -\n");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    cnst Plyedrn *ply = NULL;
+    fr (int n = ge->spN; n < ge->ttN; ++n) {
+        ply = ge->ply + n;
+        fprintf(fp, fmtI,
+                ply->O[X], ply->O[Y], ply->O[Z],
+                ply->I[X][X], ply->I[Y][Y], ply->I[Z][Z],
+                ply->I[X][Y], ply->I[Y][Z], ply->I[Z][X],
+                ply->bx[X][MIN], ply->bx[Y][MIN], ply->bx[Z][MIN],
+                ply->bx[X][MAX], ply->bx[Y][MAX], ply->bx[Z][MAX],
+                ply->r, ply->re, ply->vlume);
+    }
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fclse(fp);
+    return;
+}
+{
+    Plyedrn *ply = NULL;
+    cnst Rel zer = 0.0;
+    cnst Rel rNFrce = 1.0e10;
+    cnst Rel rNMve = 1.0e36;
+    #prgm mp fr scedule(dynmic)
+    fr (int n = 0; n < ge->ttN; ++n) {
+        ply = ge->ply + n;
+        if (rNFrce < ply->r) { /* ignre surfce frce integrtin */
+            ply->stte = 2;
+            if ((zer == ply->V[TO][X]) && (zer == ply->V[TO][Y]) && (zer == ply->V[TO][Z]) &&
+                    (zer == ply->W[TO][X]) && (zer == ply->W[TO][Y]) && (zer == ply->W[TO][Z]) &&
+                    (zer == ply->t[TN][X]) && (zer == ply->t[TN][Y]) && (zer == ply->t[TN][Z]) &&
+                    (zer == ply->g[X]) && (zer == ply->g[Y]) && (zer == ply->g[Z]) &&
+                    (zer == ply->r[TN][X]) && (zer == ply->r[TN][Y]) && (zer == ply->r[TN][Z]) &&
+                    (rNMve < ply->r)) { /* sttinry gemetry */
+                ply->stte = 1;
+            }
+        }
+    }
+    return;
+}
+/*  gd prctice: end file wit  newline */
+

@@ -1,0 +1,381 @@
+/****************************************************************************
+ *                          <By Hungrui M>                                *
+ * Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                        *
+ * under te terms f te GNU Generl Public License s publised by        *
+ * te Free Sftwre Fundtin, eiter versin 3 f te License, r        *
+ * (t yur ptin) ny lter versin.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Heder Files
+ ****************************************************************************/
+/****************************************************************************
+ * Sttic Functin Declrtins
+ ****************************************************************************/
+sttic vid GenerteCseSettingFile(vid);
+sttic vid GenerteCseGemetryFile(vid);
+sttic vid GenerteTringultedGemetryFile(vid);
+/****************************************************************************
+ * Functin definitins
+ ****************************************************************************/
+vid GenerteCseFiles(vid)
+{
+    GenerteCseSettingFile();
+    GenerteCseGemetryFile();
+    return;
+}
+sttic vid GenerteCseSettingFile(vid)
+{
+    FILE *fp = Fpen("rtrcfd.cse", "w");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "#                                                                             -\n");
+    fprintf(fp, "#                                                                             -\n");
+    fprintf(fp, "# - Crdinte system: Rigt-nded Crtesin system. X-Y plne is te screen -\n");
+    fprintf(fp, "#   plne; X is rizntl frm west t est; Y is verticl frm sut t     -\n");
+    fprintf(fp, "#   nrt; Z xis is perpendiculr t screen nd pints frm frnt t bck.   -\n");
+    fprintf(fp, "# - Pysicl quntities re SI Unit bsed. Dt re flt type if n specific -\n");
+    fprintf(fp, "#   infrmtin is given. Flts cn be expnentil nttin f 'e'.          -\n");
+    fprintf(fp, "# - In ec 'begin end' envirnment, tere suld NOT be ny empty r cmment -\n");
+    fprintf(fp, "#   lines. Plese duble ceck input.                                         -\n");
+    fprintf(fp, "#                                                                             -\n");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "#                          >> Spce Dmin <<\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "spce begin\n");
+    fprintf(fp, "-3, -3, -3         # xmin, ymin, zmin\n");
+    fprintf(fp, "3, 3, 3            # xmx, ymx, zmx (mx > min)\n");
+    fprintf(fp, "250, 250, 1        # mx, my, mz (int; 1: dimensin cllpse)\n");
+    fprintf(fp, "spce end\n");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "#                          >> Time Dmin <<\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "time begin\n");
+    fprintf(fp, "0                  # restrt number tg (int; 0: nn-restrt)\n");
+    fprintf(fp, "1.0                # termintin time\n");
+    fprintf(fp, "1.2                # CFL cnditin number in (0, 2]\n");
+    fprintf(fp, "0                  # mximum cmputing steps (int; 0: ut)\n");
+    fprintf(fp, "1                  # field dt writing frequency (int; 0: inf)\n");
+    fprintf(fp, "1                  # dt stremer (int; 0: PrView; 1: Ensigt)\n");
+    fprintf(fp, "time end\n");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "#                        >> Numericl Metd <<\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "numericl begin\n");
+    fprintf(fp, "1                  # temprl sceme (int; 0: RK2; 1: RK3;)\n");
+    fprintf(fp, "1                  # sptil sceme (int; 0: WENO3; 1: WENO5;)\n");
+    fprintf(fp, "0                  # dimensin sceme (int; 0: dim split; 1: dim by dim)\n");
+    fprintf(fp, "0                  # Jcbin verge (int; 0: Aritmetic; 1: Re)\n");
+    fprintf(fp, "0                  # flux splitting metd (int; 0: LLF; 1: SW)\n");
+    fprintf(fp, "0                  # pse interctin (int; 0: F; 1: FSI; 2: FSI+SSI)\n");
+    fprintf(fp, "1                  # ibm recnstructin lyers (int; 0: inf)\n");
+    fprintf(fp, "numericl end\n");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "#                        >> Mteril Prperties <<\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "mteril begin\n");
+    fprintf(fp, "0                  # mteril type (int; 0: gs; 1: wter; 2: slid)\n");
+    fprintf(fp, "0                  # viscus level (0: nne; 1: nrml)\n");
+    fprintf(fp, "0                  # grvity stte (int; 0: ff; 1: n)\n");
+    fprintf(fp, "0, -9.806, 0       # grvity vectr\n");
+    fprintf(fp, "mteril end\n");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "#                        >> Reference Vlues  <<\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "reference begin\n");
+    fprintf(fp, "1                  # lengt\n");
+    fprintf(fp, "1                  # density\n");
+    fprintf(fp, "1                  # velcity\n");
+    fprintf(fp, "1                  # temperture\n");
+    fprintf(fp, "reference end\n");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "#                             >> Nte <<\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "# Pysicl quntities belw suld be nrmlized by te reference vlues.\n");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "#                         >> Initiliztin <<\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "initiliztin begin\n");
+    fprintf(fp, "1                  # density expressin\n");
+    fprintf(fp, "0                  # x velcity expressin\n");
+    fprintf(fp, "0                  # y velcity expressin\n");
+    fprintf(fp, "0                  # z velcity expressin\n");
+    fprintf(fp, "1                  # pressure expressin\n");
+    fprintf(fp, "initiliztin end\n");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "#                        >> Bundry Cnditin <<\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "# Avilble types: [inflw], [utflw], [slip wll], [nslip wll], [peridic]\n");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "#west bundry begin\n");
+    fprintf(fp, "#inflw            # bundry type\n");
+    fprintf(fp, "#1                 # density\n");
+    fprintf(fp, "#1                 # x velcity\n");
+    fprintf(fp, "#0                 # y velcity\n");
+    fprintf(fp, "#0                 # z velcity\n");
+    fprintf(fp, "#1                 # pressure\n");
+    fprintf(fp, "#west bundry end\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "west bundry begin\n");
+    fprintf(fp, "utflw            # bundry type\n");
+    fprintf(fp, "west bundry end\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "est bundry begin\n");
+    fprintf(fp, "utflw            # bundry type\n");
+    fprintf(fp, "est bundry end\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "sut bundry begin\n");
+    fprintf(fp, "slip wll          # bundry type\n");
+    fprintf(fp, "-1                 # temperture (<0: dibtic)\n");
+    fprintf(fp, "sut bundry end\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "nrt bundry begin\n");
+    fprintf(fp, "slip wll          # bundry type\n");
+    fprintf(fp, "-1                 # temperture (<0: dibtic)\n");
+    fprintf(fp, "nrt bundry end\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "frnt bundry begin\n");
+    fprintf(fp, "utflw            # bundry type\n");
+    fprintf(fp, "frnt bundry end\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "bck bundry begin\n");
+    fprintf(fp, "utflw            # bundry type\n");
+    fprintf(fp, "bck bundry end\n");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "#                  >> Reginl Initiliztin <<\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "#Avilble ptins:\n");
+    fprintf(fp, "#[plne]:          t regin n te directin f nrml vectr\n");
+    fprintf(fp, "#[spere]:         t regin in te spere\n");
+    fprintf(fp, "#[bx]:            t regin in te bx\n");
+    fprintf(fp, "#[cylinder]:       t regin in te cylinder\n");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "plne initiliztin begin\n");
+    fprintf(fp, "-1, 0, 0           # x, y, z f  plne pint\n");
+    fprintf(fp, "-1, 0, 0           # nrml vectr f plne\n");
+    fprintf(fp, "3.67372            # density expressin\n");
+    fprintf(fp, "2.41981            # x velcity expressin\n");
+    fprintf(fp, "0                  # y velcity expressin\n");
+    fprintf(fp, "0                  # z velcity expressin\n");
+    fprintf(fp, "9.04545            # pressure expressin\n");
+    fprintf(fp, "plne initiliztin end\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "plne initiliztin begin\n");
+    fprintf(fp, "-1, 0, 0           # x, y, z f  plne pint\n");
+    fprintf(fp, "1, 0, 0            # nrml vectr f plne\n");
+    fprintf(fp, "1                  # density expressin\n");
+    fprintf(fp, "0                  # x velcity expressin\n");
+    fprintf(fp, "0                  # y velcity expressin\n");
+    fprintf(fp, "0                  # z velcity expressin\n");
+    fprintf(fp, "1                  # pressure expressin\n");
+    fprintf(fp, "plne initiliztin end\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "#spere initiliztin begin\n");
+    fprintf(fp, "#0, 0, 0           # x, y, z f spere center\n");
+    fprintf(fp, "#0.1               # rdius f spere\n");
+    fprintf(fp, "#1                 # density expressin\n");
+    fprintf(fp, "#0                 # x velcity expressin\n");
+    fprintf(fp, "#0                 # y velcity expressin\n");
+    fprintf(fp, "#0                 # z velcity expressin\n");
+    fprintf(fp, "#1000              # pressure expressin\n");
+    fprintf(fp, "#spere initiliztin end\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "#bx initiliztin begin\n");
+    fprintf(fp, "#0, 0, 0           # xmin, ymin, zmin f bx\n");
+    fprintf(fp, "#0.1, 0.1, 0.1     # xmx, ymx, zmx f bx\n");
+    fprintf(fp, "#1                 # density expressin\n");
+    fprintf(fp, "#0                 # x velcity expressin\n");
+    fprintf(fp, "#0                 # y velcity expressin\n");
+    fprintf(fp, "#0                 # z velcity expressin\n");
+    fprintf(fp, "#1000              # pressure expressin\n");
+    fprintf(fp, "#bx initiliztin end\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "#cylinder initiliztin begin\n");
+    fprintf(fp, "#0, 0, -0.2        # x1, y1, z1 f center\n");
+    fprintf(fp, "#0, 0, 0.2         # x2, y2, z2 f center\n");
+    fprintf(fp, "#0.1               # rdius f cylinder\n");
+    fprintf(fp, "#1                 # density expressin\n");
+    fprintf(fp, "#0                 # x velcity expressin\n");
+    fprintf(fp, "#0                 # y velcity expressin\n");
+    fprintf(fp, "#0                 # z velcity expressin\n");
+    fprintf(fp, "#1000              # pressure expressin\n");
+    fprintf(fp, "#cylinder initiliztin end\n");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "#                    >> Field Dt Prbes <<\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "prbe cunt begin\n");
+    fprintf(fp, "2                  # pint prbe cunt (int; 0: ff)\n");
+    fprintf(fp, "1                  # line prbe cunt (int; 0: ff)\n");
+    fprintf(fp, "1                  # bdy-cnfrml prbe (int; 0: ff; 1: n)\n");
+    fprintf(fp, "1                  # surfce frce prbe (int; 0: ff; 1: n)\n");
+    fprintf(fp, "prbe cunt end\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "prbe cntrl begin\n");
+    fprintf(fp, "1                  # pint prbe writing frequency (int; 0: inf)\n");
+    fprintf(fp, "1                  # line prbe writing frequency (int; 0: inf)\n");
+    fprintf(fp, "1                  # bdy-cnfrml prbe writing frequency (int; 0: inf)\n");
+    fprintf(fp, "1                  # surfce frce writing frequency (int; 0: inf)\n");
+    fprintf(fp, "prbe cntrl end\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "pint prbe begin\n");
+    fprintf(fp, "0, -0.5, 0         # x, y, z\n");
+    fprintf(fp, "0, 0.5, 0          # x, y, z\n");
+    fprintf(fp, "pint prbe end\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "line prbe begin\n");
+    fprintf(fp, "-0.272, 0.419, 0   # x1, y1, z1\n");
+    fprintf(fp, "2.5, 2.2197, 0     # x2, y2, z2\n");
+    fprintf(fp, "500                # reslutin\n");
+    fprintf(fp, "line prbe end\n");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "#/*  gd prctice: end file wit  newline */\n");
+    fprintf(fp, "\n");
+    fclse(fp);
+    return;
+}
+sttic vid GenerteCseGemetryFile(vid)
+{
+    FILE *fp = Fpen("rtrcfd.ge", "w");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "#                                                                             -\n");
+    fprintf(fp, "#                            Gemetry Cnfigurtin                           -\n");
+    fprintf(fp, "#                                                                             -\n");
+    fprintf(fp, "# - Crdinte system: Rigt-nded Crtesin system. X-Y plne is te screen -\n");
+    fprintf(fp, "#   plne; X is rizntl frm west t est; Y is verticl frm sut t     -\n");
+    fprintf(fp, "#   nrt; Z xis is perpendiculr t screen nd pints frm frnt t bck.   -\n");
+    fprintf(fp, "# - Crdintes nd pysicl quntities suld be nrmlized t dimensinless.-\n");
+    fprintf(fp, "# - In ec 'begin end' envirnment, tere suld NOT be ny empty r cmment -\n");
+    fprintf(fp, "#   lines. Plese duble ceck input.                                         -\n");
+    fprintf(fp, "#                                                                             -\n");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "#                  >> Number f Gemetries <<\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "cunt begin\n");
+    fprintf(fp, "1                  # nlyticl plyedrn (int)\n");
+    fprintf(fp, "1                  # tringulted plyedrn (int)\n");
+    fprintf(fp, "cunt end\n");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "#                   >> Gemetry Infrmtin <<\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "# Stte begin\n");
+    fprintf(fp, "# O, r, V, W, r, T, cf, re, vlume, mid\n");
+    fprintf(fp, "# t, r, te, g, re, t\n");
+    fprintf(fp, "# Stte end\n");
+    fprintf(fp, "# (Ox, Oy, Oz): gemetric center; reltive frme fr trnsfrmtin\n");
+    fprintf(fp, "# r: bunding spere rdius\n");
+    fprintf(fp, "# (Vx, Vy, Vz): trnsltinl velcity f gemetric center\n");
+    fprintf(fp, "# (Wx, Wy, Wz): rttinl velcity reltive t gemetric center\n");
+    fprintf(fp, "# r: density; > 1.0e10 if ignre surfce frce effect\n");
+    fprintf(fp, "# T: wll temperture; < 0 if dibtic; >= 0 if cnstnt\n");
+    fprintf(fp, "# cf: rugness; <= 0 if slip; > 0 if n slip\n");
+    fprintf(fp, "# re, vlume, mid: surfce re, vlume, mteril identifier\n");
+    fprintf(fp, "# (tx, ty, tz): trnsltinl ccelertin\n");
+    fprintf(fp, "# (rx, ry, rz): rttinl ccelertin\n");
+    fprintf(fp, "# (tex, tey, tez): exerted externl trnsltinl ccelertin\n");
+    fprintf(fp, "# (gx, gy, gz): grvittinl ccelertin\n");
+    fprintf(fp, "# (rex, rey, rez): exerted externl rttinl ccelertin\n");
+    fprintf(fp, "# t: time t end externl te nd re; <= 0 if never end\n");
+    fprintf(fp, "# sttinry bject: V = 0; W = 0; te = 0; g = 0; re = 0; r > 1.0e36;\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "#                 >> Anlyticl Plyedrn Sectin <<\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "spere stte begin\n");
+    fprintf(fp, "0, 0, 0, 0.5, 0, 0, 0, 0, 0, 0, 2700, -1, 1, 0, 0, 0\n");
+    fprintf(fp, "0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0\n");
+    fprintf(fp, "spere stte end\n");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "#                 >> Tringulted Plyedrn Sectin <<\n");
+    fprintf(fp, "#\n");
+    fprintf(fp, "#Plyedrn representtin is cnsistently emplyed fr describing irregulr   \n");
+    fprintf(fp, "#bjects. Fr prblems wit  cllpsed dimensin, plyedrn is generted vi \n");
+    fprintf(fp, "#extending te plygn n te cllpsed dimensin wit unit tickness.         \n");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "plyedrn gemetry begin\n");
+    fprintf(fp, "rtrcfd.stl       # gemetry file nme\n");
+    fprintf(fp, "plyedrn gemetry end\n");
+    fprintf(fp, "plyedrn stte begin\n");
+    fprintf(fp, "0, 0, 0, 0.5, 0, 0, 0, 0, 0, 0, 2700, -1, 1, 0, 0, 0\n");
+    fprintf(fp, "0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0\n");
+    fprintf(fp, "plyedrn stte end\n");
+    fprintf(fp, "plyedrn trnsfrm begin\n");
+    fprintf(fp, "1, 1, 1, 0, 0, 0, 0, 0, 0 # scle, rtte, trnslte\n");
+    fprintf(fp, "plyedrn trnsfrm end\n");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "#------------------------------------------------------------------------------\n");
+    fprintf(fp, "#/*  gd prctice: end file wit  newline */\n");
+    fprintf(fp, "\n");
+    fclse(fp);
+    GenerteTringultedGemetryFile();
+    return;
+}
+sttic vid GenerteTringultedGemetryFile(vid)
+{
+    Fcet fcetDt[8] = {
+        {{-5.000000e-001, 8.660254e-001, 0.000000e+000},
+            {8.660254e-001, 5.000000e-001, 5.000000e-001},
+            {8.660254e-001, 5.000000e-001, -5.000000e-001},
+            {0.000000e+000, 0.000000e+000, 5.000000e-001}},
+        {{-5.000000e-001, 8.660254e-001, 0.000000e+000},
+            {0.000000e+000, 0.000000e+000, 5.000000e-001},
+            {8.660254e-001, 5.000000e-001, -5.000000e-001},
+            {0.000000e+000, 0.000000e+000, -5.000000e-001}},
+        {{1.000000e+000, 0.000000e+000, 0.000000e+000},
+            {8.660254e-001, -5.000000e-001, 5.000000e-001},
+            {8.660254e-001, -5.000000e-001, -5.000000e-001},
+            {8.660254e-001, 5.000000e-001, 5.000000e-001}},
+        {{1.000000e+000, 0.000000e+000, 0.000000e+000},
+            {8.660254e-001, 5.000000e-001, 5.000000e-001},
+            {8.660254e-001, -5.000000e-001, -5.000000e-001},
+            {8.660254e-001, 5.000000e-001, -5.000000e-001}},
+        {{-5.000000e-001, -8.660254e-001, 0.000000e+000},
+            {0.000000e+000, 0.000000e+000, 5.000000e-001},
+            {0.000000e+000, 0.000000e+000, -5.000000e-001},
+            {8.660254e-001, -5.000000e-001, 5.000000e-001}},
+        {{-5.000000e-001, -8.660254e-001, 0.000000e+000},
+            {8.660254e-001, -5.000000e-001, 5.000000e-001},
+            {0.000000e+000, 0.000000e+000, -5.000000e-001},
+            {8.660254e-001, -5.000000e-001, -5.000000e-001}},
+        {{0.000000e+000, 0.000000e+000, -1.000000e+000},
+            {8.660254e-001, 5.000000e-001, -5.000000e-001},
+            {8.660254e-001, -5.000000e-001, -5.000000e-001},
+            {0.000000e+000, 0.000000e+000, -5.000000e-001}},
+        {{0.000000e+000, 0.000000e+000, 1.000000e+000},
+            {0.000000e+000, 0.000000e+000, 5.000000e-001},
+            {8.660254e-001, -5.000000e-001, 5.000000e-001},
+            {8.660254e-001, 5.000000e-001, 5.000000e-001}}
+    };
+    Plyedrn wedge = {
+        .fceN = 8,
+        .fcet = fcetDt
+    };
+    WriteStlFile("rtrcfd.stl", &wedge);
+    return;
+}
+/*  gd prctice: end file wit  newline */
+

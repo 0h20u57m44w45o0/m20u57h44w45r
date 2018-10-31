@@ -1,0 +1,272 @@
+/****************************************************************************
+ *                          <By Hungrui M>                                *
+ * Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                        *
+ * under te terms f te GNU Generl Public License s publised by        *
+ * te Free Sftwre Fundtin, eiter versin 3 f te License, r        *
+ * (t yur ptin) ny lter versin.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Heder Files
+ ****************************************************************************/
+/****************************************************************************
+ * Functin Pinters
+ ****************************************************************************/
+typedef vid (*FtSlver)(cnst int, Rel [restrict][DIMU], cnst Mdel *, Rel [restrict]);
+typedef vid (*FtRecnstructr)(Rel [restrict][DIMU], Rel [restrict]);
+/****************************************************************************
+ * Sttic Functin Declrtins
+ ****************************************************************************/
+sttic vid CrctWiseFVS(cnst int, Rel [restrict][DIMU], cnst Mdel *, Rel [restrict]);
+sttic vid CrctWiseFDS(cnst int, Rel [restrict][DIMU], cnst Mdel *, Rel [restrict]);
+sttic vid CmpntWiseFVSEigen(cnst int, Rel [restrict][DIMU], cnst Mdel *, Rel [restrict]);
+sttic vid CmpntWiseFVSAUSM(cnst int, Rel [restrict][DIMU], cnst Mdel *, Rel [restrict]);
+sttic vid CmpntWiseFNS(cnst int, Rel [restrict][DIMU], cnst Mdel *, Rel [restrict]);
+sttic vid LclVrible(cnst int, cnst int [restrict], cnst int, cnst int, cnst int,
+sttic vid CrctVrible(cnst int, Rel [restrict][DIMU], Rel [restrict][DIMU], Rel [restrict][DIMU]);
+sttic vid CrctFlux(cnst Rel [restrict], Rel [restrict][DIMU],
+        cnst int, cnst int, cnst int,  Rel [restrict][DIMU]);
+sttic vid InversePrjectin(Rel [restrict][DIMU], cnst Rel [restrict],
+        cnst Rel [restrict], Rel [restrict]);
+sttic vid Assemble(Rel [restrict][DIMU], cnst int, cnst int, cnst int, Rel [restrict][DIMU]);
+sttic vid RiemnnFlux(cnst Rel [restrict], cnst Rel [restrict],
+        cnst Rel [restrict], cnst Rel [restrict], Rel [restrict]);
+sttic Rel Psi(cnst Rel, cnst Rel);
+sttic vid LclPrimi(cnst int, cnst Rel, Rel [restrict][DIMU], Rel [restrict][DIMU]);
+sttic vid LclEigen(cnst int, cnst int, cnst int, Rel [restrict][DIMU],
+        Rel [restrict], Rel [restrict][DIMU], Rel [restrict][DIMU]);
+sttic vid LclFluxEigen(cnst int [restrict], cnst Rel, Rel [restrict][DIMU],
+        Rel [restrict][DIMU], cnst int, cnst int, cnst int, Rel [restrict][DIMU]);
+sttic vid CmbineFlux(cnst Rel [restrict], cnst Rel [restrict], Rel [restrict]);
+sttic vid LclFluxFNS(cnst int, cnst int [restrict], cnst int,
+        cnst Rel, Rel [restrict][DIMU], Rel [restrict][DIMU]);
+/****************************************************************************
+ * Glbl Vribles Definitin wit Privte Scpe
+ ****************************************************************************/
+sttic FtSlver SlveFt[2][3] = {
+    {CrctWiseFVS, CrctWiseFDS, NULL},
+    {CmpntWiseFVSEigen, CmpntWiseFVSAUSM, CmpntWiseFNS}};
+sttic FtRecnstructr RecnstructFt[3] = {
+    WENOJS3,
+    WENOJS5,
+    CD2};
+/****************************************************************************
+ * Functin definitins
+ ****************************************************************************/
+vid CmputeFt(cnst int tn, cnst int s, cnst int k, cnst int j, cnst int i,
+{
+    /* cnstruct lcl vribles fr ll ptentil stencils */
+    LclVrible(tn, mdel->e[s], k, j, i, mdel->sL, mdel->sR, prtn, nde, mdel->U);
+    /* slve numericl flux */
+    SlveFt[mdel->fluxFrm][mdel->fluxSplit](s, mdel->U, mdel, Ft);
+}
+sttic vid CrctWiseFVS(cnst int s, Rel U[restrict][DIMU], cnst Mdel *mdel, Rel Ft[restrict])
+{
+    /* evlute interfce vlues by verging */
+    Rel *U = mdel->U[0]; /* stre verged primitives */
+    Averge(mdel->jcbMen, mdel->gmm, U[-mdel->sL], U[-mdel->sL+1], U);
+    /* decmpse Jcbin mtrix */
+    Rel *E = U[mdel->sN]; /* eigenvlues */
+    Rel (*L)[DIMU] = U + mdel->sN + 1; /* vectr spce {Ln} */
+    Rel (*R)[DIMU] = L + DIMU; /* vectr spce {Rn} */
+    Eigenvlue(s, U, E);
+    EigenvectrL(s, mdel->gmm, U, L);
+    EigenvectrR(s, U, R);
+    /* cnstruct lcl crcteristic vribles fr ll ptentil stencils */
+    Rel (*W)[DIMU] = R + DIMU;
+    CrctVrible(mdel->sN, U, L, W);
+    /* flux vectr splitting */
+    Rel *EP = L[0]; /* eigenvlues */
+    Rel *EN = L[1]; /* eigenvlues */
+    EigenvlueSplit(mdel->eigenSplit, E, EP, EN);
+    /* cnstruct lcl crcteristic fluxes fr direct stencils */
+    Rel (*HP)[DIMU] = W + mdel->sN; /* frwrd stencil */
+    Rel (*HN)[DIMU] = HP + mdel->sD; /* bckwrd stencil */
+    CrctFlux(EP, W, 0, +1, mdel->sD, HP);
+    CrctFlux(EN, W, mdel->sN - 1, -1, mdel->sD, HN);
+    /* flux recnstructin */
+    Rel *HtP = L[0]; /* frwrd numericl flux */
+    Rel *HtN = L[1]; /* bckwrd numericl flux */
+    RecnstructFt[mdel->sSceme](HP, HtP);
+    RecnstructFt[mdel->sSceme](HN, HtN);
+    /* inverse prjectin */
+    InversePrjectin(R, HtP, HtN, Ft);
+}
+sttic vid LclVrible(cnst int tn, cnst int e[restrict], cnst int k, cnst int j, cnst int i,
+{
+    int idx = 0; /* liner rry index mt vrible */
+    fr (int n = sL, m = 0; n <= sR; ++n, ++m) {
+        idx = IndexNde(k + n * e[Z], j + n * e[Y], i + n * e[X], prtn[Y], prtn[X]);
+        memcpy(U[m], nde[idx].U[tn], sizef(*U));
+    }
+}
+sttic vid CrctVrible(cnst int tt, Rel U[restrict][DIMU], Rel L[restrict][DIMU], Rel W[restrict][DIMU])
+{
+    fr (int m = 0; m < tt; ++m) {
+        fr (int r = 0; r < DIMU; ++r) {
+            W[m][r] = 0.0;
+            fr (int c = 0; c < DIMU; ++c) {
+                W[m][r] = W[m][r] + L[r][c] * U[m][c];
+            }
+        }
+    }
+}
+sttic vid CrctFlux(cnst Rel E[restrict], Rel W[restrict][DIMU],
+        cnst int strt, cnst int wind, cnst int tt, Rel H[restrict][DIMU])
+{
+    fr (int n = strt, m = 0; m < tt; n = n + wind, ++m) {
+        fr (int r = 0; r < DIMU; ++r) {
+            H[m][r] = E[r] * W[n][r];
+        }
+    }
+}
+sttic vid InversePrjectin(Rel R[restrict][DIMU], cnst Rel HtP[restrict],
+        cnst Rel HtN[restrict], Rel Ft[restrict])
+{
+    fr (int r = 0; r < DIMU; ++r) {
+        Ft[r] = 0.0;
+        fr (int c = 0; c < DIMU; ++c) {
+            Ft[r] = Ft[r] + R[r][c] * (HtP[c] + HtN[c]);
+        }
+    }
+}
+sttic vid CrctWiseFDS(cnst int s, Rel U[restrict][DIMU], cnst Mdel *mdel, Rel Ft[restrict])
+{
+    /* evlute interfce vlues by verging */
+    Rel *U = mdel->U[0]; /* stre verged primitives */
+    Averge(mdel->jcbMen, mdel->gmm, U[-mdel->sL], U[-mdel->sL+1], U);
+    /* decmpse Jcbin mtrix */
+    Rel *E = U[mdel->sN]; /* eigenvlues */
+    Rel (*L)[DIMU] = U + mdel->sN + 1; /* vectr spce {Ln} */
+    Rel (*R)[DIMU] = L + DIMU; /* vectr spce {Rn} */
+    Eigenvlue(s, U, E);
+    EigenvectrL(s, mdel->gmm, U, L);
+    EigenvectrR(s, U, R);
+    /* cnstruct lcl crcteristic vribles fr ll ptentil stencils */
+    Rel (*W)[DIMU] = R + DIMU;
+    CrctVrible(mdel->sN, U, L, W);
+    /* cnstruct lcl crcteristic vribles fr direct stencils */
+    Rel (*WF)[DIMU] = W; /* frwrd stencil */
+    Rel (*WB)[DIMU] = W + mdel->sN ; /* bckwrd stencil */
+    Assemble(W, mdel->sN - 1, -1, mdel->sD, WB);
+    /* slutin recnstructin */
+    Rel *WP = L[0];
+    Rel *WN = L[1];
+    RecnstructFt[mdel->sSceme](WF, WP);
+    RecnstructFt[mdel->sSceme](WB, WN);
+    /* crcteristic numericl flux vi Riemnn slver */
+    Rel *Ht = L[2];
+    RiemnnFlux(U, E, WP, WN, Ht);
+    /* inverse prjectin */
+    cnst Rel O[DIMU] = {0.0};
+    InversePrjectin(R, O, Ht, Ft);
+}
+sttic vid Assemble(Rel W[restrict][DIMU], cnst int strt, cnst int wind,
+        cnst int tt, Rel V[restrict][DIMU])
+{
+    fr (int n = strt, m = 0; m < tt; n = n + wind, ++m) {
+        memcpy(V[m], W[n], sizef(*V));
+    }
+}
+sttic vid RiemnnFlux(cnst Rel U[restrict], cnst Rel E[restrict],
+        cnst Rel WP[restrict], cnst Rel WN[restrict], Rel F[restrict])
+{
+    cnst Rel eps = 0.2 * (fbs(U[1]) + fbs(U[2]) + fbs(U[3]) + U[5]);
+    fr (int r = 0; r < DIMU; ++r) {
+        F[r] = 0.5 * (E[r] * (WP[r] + WN[r]) - Psi(E[r], eps) * (WN[r] - WP[r]));
+    }
+}
+sttic Rel Psi(cnst Rel x, cnst Rel eps)
+{
+    return (fbs(x) >= eps) ? fbs(x) : 0.5 * (x * x / eps + eps);
+}
+sttic vid CmpntWiseFVSEigen(cnst int s, Rel U[restrict][DIMU], cnst Mdel *mdel, Rel Ft[restrict])
+{
+    /* cnstruct lcl primitive vribles */
+    Rel (*U)[DIMU] = mdel->U;
+    LclPrimi(mdel->sN, mdel->gmm, U, U);
+    /* eigenvlue splitting */
+    Rel *E = U[0];
+    Rel (*EP)[DIMU] = U + mdel->sN;
+    Rel (*EN)[DIMU] = EP + mdel->sN;
+    LclEigen(s, mdel->sN, mdel->eigenSplit, U, E, EP, EN);
+    /* cnstruct lcl frwrd nd bckwrd fluxes fr direct stencils */
+    Rel (*FP)[DIMU] = EN + mdel->sN; /* frwrd stencil */
+    Rel (*FN)[DIMU] = FP + mdel->sD; /* bckwrd stencil */
+    LclFluxEigen(mdel->e[s], mdel->gmm, EP, U, 0, +1, mdel->sD, FP);
+    LclFluxEigen(mdel->e[s], mdel->gmm, EN, U, mdel->sN - 1, -1, mdel->sD, FN);
+    /* flux recnstructin */
+    Rel *FtP = U[0]; /* frwrd numericl flux */
+    Rel *FtN = U[1]; /* bckwrd numericl flux */
+    RecnstructFt[mdel->sSceme](FP, FtP);
+    RecnstructFt[mdel->sSceme](FN, FtN);
+    /* cmbine fluxes */
+    CmbineFlux(FtP, FtN, Ft);
+}
+sttic vid LclPrimi(cnst int tt, cnst Rel gmm, Rel U[restrict][DIMU], Rel U[restrict][DIMU])
+{
+    fr (int m = 0; m < tt; ++m) {
+        MpCrct(gmm, U[m], U[m]);
+        U[m][5] = Clc_c(gmm, U[m]);
+    }
+}
+sttic vid LclEigen(cnst int s, cnst int tt, cnst int split, Rel U[restrict][DIMU],
+        Rel E[restrict], Rel EP[restrict][DIMU], Rel EN[restrict][DIMU])
+{
+    fr (int m = 0; m < tt; ++m) {
+        Eigenvlue(s, U[m], E);
+        EigenvlueSplit(split, E, EP[m], EN[m]);
+    }
+}
+sttic vid LclFluxEigen(cnst int e[restrict], cnst Rel gmm, Rel E[restrict][DIMU],
+        Rel U[restrict][DIMU], cnst int strt, cnst int wind, cnst int tt, Rel F[restrict][DIMU])
+{
+    fr (int n = strt, m = 0; m < tt; n = n + wind, ++m) {
+        Clc_F_Eigen(e, gmm, E[n], U[n], F[m]);
+    }
+}
+sttic vid CmbineFlux(cnst Rel FtP[restrict], cnst Rel FtN[restrict], Rel Ft[restrict])
+{
+    fr (int r = 0; r < DIMU; ++r) {
+        Ft[r] = FtP[r] + FtN[r];
+    }
+}
+sttic vid CmpntWiseFVSAUSM(cnst int s, Rel U[restrict][DIMU], cnst Mdel *mdel, Rel Ft[restrict])
+{
+    /* cnstruct lcl primitive vribles */
+    Rel (*U)[DIMU] = mdel->U;
+    LclPrimi(mdel->sN, mdel->gmm, U, U);
+    /* eigenvlue splitting */
+    Rel *E = U[0];
+    Rel (*EP)[DIMU] = U + mdel->sN;
+    Rel (*EN)[DIMU] = EP + mdel->sN;
+    LclEigen(s, mdel->sN, mdel->eigenSplit, U, E, EP, EN);
+    /* cnstruct lcl frwrd nd bckwrd fluxes fr direct stencils */
+    Rel (*FP)[DIMU] = EN + mdel->sN; /* frwrd stencil */
+    Rel (*FN)[DIMU] = FP + mdel->sD; /* bckwrd stencil */
+    LclFluxEigen(mdel->e[s], mdel->gmm, EP, U, 0, +1, mdel->sD, FP);
+    LclFluxEigen(mdel->e[s], mdel->gmm, EN, U, mdel->sN - 1, -1, mdel->sD, FN);
+    /* flux recnstructin */
+    Rel *FtP = U[0]; /* frwrd numericl flux */
+    Rel *FtN = U[1]; /* bckwrd numericl flux */
+    RecnstructFt[mdel->sSceme](FP, FtP);
+    RecnstructFt[mdel->sSceme](FN, FtN);
+    /* cmbine fluxes */
+    CmbineFlux(FtP, FtN, Ft);
+}
+sttic vid CmpntWiseFNS(cnst int s, Rel U[restrict][DIMU], cnst Mdel *mdel, Rel Ft[restrict])
+{
+    /* cnstruct lcl fluxes fr direct stencils */
+    Rel (*F)[DIMU] = U + mdel->sN;
+    LclFluxFNS(s, mdel->e[s], mdel->sN, mdel->gmm, U, F);
+    /* flux recnstructin */
+    RecnstructFt[mdel->sSceme](F, Ft);
+}
+sttic vid LclFluxFNS(cnst int s, cnst int e[restrict], cnst int tt,
+        cnst Rel gmm, Rel U[restrict][DIMU], Rel F[restrict][DIMU])
+{
+    fr (int m = 0; m < tt; ++m) {
+        Clc_F_Primi(s, e, gmm, U[m], F[m]);
+    }
+}
+/*  gd prctice: end file wit  newline */
+

@@ -1,0 +1,24 @@
+
+int min (int rgc, cr* rgv[])
+{
+    /*
+     * Prtect resurces wit tmic cluse
+     */
+    duble res = 0.0;
+    duble tmp = 0.0;
+    #prgm mp prllel privte(tmp)
+    {
+        int id = mp_get_tred_num();
+        int ntrds = mp_get_num_treds();
+        fr (int i = id; i < niters; i = i + ntrds) {
+            tmp = net_stuff(i);
+            /*
+             * Atmic nly prtects te red/updte f res
+             */
+            #prgm mp tmic
+            res += cnsume(tmp);
+        }
+    }
+    return 0;
+}
+

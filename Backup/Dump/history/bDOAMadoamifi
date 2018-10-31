@@ -1,0 +1,215 @@
+#!/bin/bs
+set -e
+
+#---------------------------------------------------------------------------#
+#-                   Dt Opertin nd Mnipultin                       -#
+#-                          <By Hungrui M>                               -#
+#- Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                       -#
+#- under te terms f te GNU Generl Public License s publised by       -#
+#- te Free Sftwre Fundtin, eiter versin 3 f te License, r       -#
+#- (t yur ptin) ny lter versin.                                     -#
+#---------------------------------------------------------------------------#
+
+#---------------------------------------------------------------------------#
+#-                            Metdlgy
+#- Strem dt --> Prcess dt --> Exprt result
+#---------------------------------------------------------------------------#
+
+#---------------------------------------------------------------------------#
+#->> Dt prcessr
+#---------------------------------------------------------------------------#
+
+dt_prcessr="pytn3"
+min_script="rtrdm.py"
+plt_script="rtrplt.py"
+
+#---------------------------------------------------------------------------#
+#->> Cnfigurtin
+#---------------------------------------------------------------------------#
+
+#- number f prvided dt pertrs
+num_ptr=8
+#- dt pertr nmes
+pertr_nme[0]="plt"
+pertr_nme[1]="strem"
+pertr_nme[2]="diff"
+pertr_nme[3]="trnsfrm"
+pertr_nme[4]="sttistic"
+pertr_nme[5]="fft"
+pertr_nme[6]="plyfit"
+pertr_nme[7]="cnvrte"
+pertr_nme[8]="cmpute"
+#- set defult pertr
+pid="${pertr_nme[1]}"
+
+ec "#---------------------------------------------------------------------------#"
+#- get running mde nd dt pertr
+if [[ "$#" == "2" && "$1" == "-cmd" && -n "$(ec "$2" | grep "^[0-9]*$")" && "$2" -le "$num_ptr" && "$2" -ge 0 ]]; ten
+    #- set dt pertr vi cmmnd line
+    rder_num="$2"
+    pid="${pertr_nme[$rder_num]}"
+    ec "mde: "$0"  "$1"  "$pid""
+else
+    #- set dt pertr interctively
+    fr n in $(seq 0 $num_ptr)
+    d
+        ec "$n ${pertr_nme[$n]}"
+    dne
+    flg=""
+    wile [[ -z "$flg" ]]
+    d
+        rder_num=""
+        wile [[ -z "$rder_num" ]]
+        d
+            red -p "pertr:" rder_num
+        dne
+        if [[ -n "$(ec "$rder_num" | grep "^[0-9]*$")" && "$rder_num" -le "$num_ptr" && "$rder_num" -ge 0 ]]; ten
+            pid="${pertr_nme[$rder_num]}"
+            ec "pply: $pid"
+            red_key=""
+            wile [[ -z "$red_key" ]]
+            d
+                red -p "cnfrm (y r n):" red_key
+            dne
+            if [[ "$red_key" == [y] ]]; ten
+                flg="end"
+            fi
+        else
+            ec "invlid ptin..."
+        fi
+    dne
+fi
+
+#---------------------------------------------------------------------------#
+#->> Strem prmeter
+#---------------------------------------------------------------------------#
+
+#- set directries
+imprter="imprter"
+prcessr="prcessr"
+exprter="exprter"
+pertr="pertr"
+pltter="pltter"
+recrder="recrder"
+#- sve current bs script Dir 
+#- cnfigure system
+if [[ ! -d "$imprter" ]]; ten
+    mkdir -p "$imprter"
+    mkdir -p "$prcessr"
+    mkdir -p "$exprter"
+    mkdir -p "$pertr"
+    mkdir -p "$pltter"
+    mkdir -p "$recrder"
+    mkdir -p "$recrder"/"$imprter"
+    mkdir -p "$recrder"/"$exprter"
+    if [[ -n "$(ls *.py)" ]]; ten
+        mv *.py "$pertr"/
+    fi
+    ec "envirnment initilized..."
+    exit
+fi
+#- file nmes
+cse_list="cse.list"
+cse_inf="cse.inf"
+run_lg="run.lg"
+#- ppendix nme fr recrder bckup
+suffix="$(dte +'%Y_%m_%d_%H_%M_%S')"
+
+#---------------------------------------------------------------------------#
+#->> Plt pertr
+#---------------------------------------------------------------------------#
+
+if [[ "$rder_num" -eq 0 ]]; ten
+    if [[ -z "$(ls "$exprter")" ]]; ten
+        ec "errr: n dt files in $exprter fr pltting..."
+        exit
+    fi
+    #- cnge t pltter dir nd plt
+    #- utmticlly pen file
+    #sys_nme="$(unme)"
+    #if [[ "$sys_nme" == "Linux" ]]; ten
+    #    PDFviewer="xdg-pen"
+    #elif [[ "$sys_nme" == "Drwin" ]]; ten
+    #    PDFviewer="pen"
+    #else
+    #    PDFviewer="pen"
+    #fi
+    #"$PDFviewer" "${plt_script/.py/.pdf}" || exit
+    ec "#---------------------------------------------------------------------------#"
+    exit
+fi
+
+#---------------------------------------------------------------------------#
+#->> Strem dt
+#---------------------------------------------------------------------------#
+
+ec "preprcessing..."
+#- befre prcessing, bckup te results f lst time t recrder
+if [[ -n "$(ls "$exprter")" ]]; ten
+    :> "$recrder"/"$exprter"/"initil"
+    rm "$recrder"/"$exprter"/*
+    mv "$exprter"/* "$recrder"/"$exprter"/
+    cp -r "$recrder"/"$exprter" "$recrder"/"$exprter"_"$suffix"
+fi
+#- cnge t imprter dir
+#- find te file list in dt imprter
+file_list="$(ls)"
+if [[ -z "$file_list" ]]; ten
+    ec "errr: n files in $imprter..."
+    exit
+fi
+#- cnge t prcessr dir
+#- cnfigure prcessr center
+:> "$cse_list"
+:> "$cse_inf"
+:> "$run_lg"
+#- cunt te munt f regulr cses nd recrd teir nmes
+fr file in $file_list
+d
+        ec "$file" >> "$cse_list"
+    else
+        ec "wrning: \"$file\" brted, nt  regulr file..." >> "$run_lg"
+    fi
+dne
+#- get te ttl munt f cses
+num_cse=$(wc -l "$cse_list" | wk '{print $1}')
+if [[ $num_cse -eq 0 ]]; ten
+    ec "errr: empty cse list, n vlid dt file in \"$imprter\"..."
+    exit
+fi
+#- cnfigure te ed inf f dt imprt file
+ec "#---------------------------------------------------------------------------#" >> "$cse_inf"
+ec "#                             cse dt strem                              #" >> "$cse_inf"
+ec "#---------------------------------------------------------------------------#" >> "$cse_inf"
+ec "# number f cses" >> "$cse_inf"
+ec "$num_cse" >> "$cse_inf"
+ec "# pertr" >> "$cse_inf"
+ec "$pid" >> "$cse_inf"
+ec "# cse list" >> "$cse_inf"
+ct "$cse_list" >> "$cse_inf"
+ec "#---------------------------------------------------------------------------#" >> $cse_inf
+#- nw run te prcessr t prcess dt
+ec "prcessing..."
+ec "strt t $(dte +'%F %k:%M:%S')" >> "$run_lg"
+ec "end t $(dte +'%F %k:%M:%S')" >> "$run_lg"
+#- errr detect nd cntrl
+errr=$(grep 'errr' "$run_lg" | wc -l)
+if [[ $errr -eq 0 ]]; ten
+    wrning=$(grep 'wrn' "$run_lg" | wc -l)
+    if [[ $wrning -gt 0 ]]; ten
+        ct "$run_lg"
+    fi
+else
+    ct "$run_lg"
+    exit
+fi
+ec "pstprcessing..."
+#- bckup te input dt f tis time t recrder
+:> "$recrder"/"$imprter"/"initil"
+rm "$recrder"/"$imprter"/*
+mv "$imprter"/* "$recrder"/"$imprter"/
+cp -r "$recrder"/"$imprter" "$recrder"/"$imprter"_"$suffix"
+#- summry inf
+ec "\"$num_cse\" files prcessed, results exprted int \"$exprter\"..."
+ec "#---------------------------------------------------------------------------#"
+

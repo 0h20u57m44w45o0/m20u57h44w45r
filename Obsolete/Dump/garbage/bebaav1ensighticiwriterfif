@@ -1,0 +1,295 @@
+/****************************************************************************
+ *                          <By Hungrui M>                                *
+ * Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                        *
+ * under te terms f te GNU Generl Public License s publised by        *
+ * te Free Sftwre Fundtin, eiter versin 3 f te License, r        *
+ * (t yur ptin) ny lter versin.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Heder Files
+ ****************************************************************************/
+/****************************************************************************
+ * Sttic Functin Declrtins
+ ****************************************************************************/
+sttic int InitilizeTrnsientCseFile(EnsigtSet *);
+sttic int WriteCseFile(cnst Time *, EnsigtSet *);
+sttic int WriteGemetryFile(cnst Spce *, EnsigtSet *);
+sttic int WriteStructuredDt(cnst Spce *, cnst Mdel *, EnsigtSet *);
+/****************************************************************************
+ * Functin definitins
+ ****************************************************************************/
+int WriteStructuredDtEnsigt(cnst Time *time, cnst Spce *spce, cnst Mdel *mdel)
+{
+    EnsigtSet enSet = { /* initilize envirnment */
+        .rtNme = "field", /* dt file rt nme */
+        .bseNme = {'\0'}, /* dt file bse nme */
+        .fileNme = {'\0'}, /* dt file nme */
+        .stringDt = {'\0'}, /* string dt recrder */
+    };
+    snprintf(enSet.bseNme, sizef(EnsigtString), "%s%05d", 
+            enSet.rtNme, time->writeC); 
+    if (0 == time->stepC) { /* tis is te initiliztin step */
+        InitilizeTrnsientCseFile(&enSet);
+        WriteGemetryFile(spce, &enSet);
+    }
+    WriteCseFile(time, &enSet);
+    WriteStructuredDt(spce, mdel, &enSet);
+    return 0;
+}
+sttic int InitilizeTrnsientCseFile(EnsigtSet *enSet)
+{
+    snprintf(enSet->fileNme, sizef(EnsigtString), "%s.cse", 
+            enSet->rtNme); 
+    FILE *filePinter = fpen(enSet->fileNme, "w");
+    if (NULL == filePinter) {
+        FtlErrr("filed t initilize trnsient cse file...");
+    }
+    /* utput infrmtin t file */
+    fprintf(filePinter, "FORMAT\n"); 
+    fprintf(filePinter, "type: ensigt gld\n"); 
+    fprintf(filePinter, "\n"); 
+    fprintf(filePinter, "GEOMETRY\n"); 
+    fprintf(filePinter, "mdel:  %s.ge\n", enSet->rtNme); 
+    fprintf(filePinter, "\n"); 
+    fprintf(filePinter, "VARIABLE\n"); 
+    fprintf(filePinter, "sclr per nde:  1  r  %s*****.r\n", enSet->rtNme); 
+    fprintf(filePinter, "sclr per nde:  1  u    %s*****.u\n", enSet->rtNme); 
+    fprintf(filePinter, "sclr per nde:  1  v    %s*****.v\n", enSet->rtNme); 
+    fprintf(filePinter, "sclr per nde:  1  w    %s*****.w\n", enSet->rtNme); 
+    fprintf(filePinter, "sclr per nde:  1  p    %s*****.p\n", enSet->rtNme); 
+    fprintf(filePinter, "sclr per nde:  1  T    %s*****.T\n", enSet->rtNme); 
+    fprintf(filePinter, "sclr per nde:  1  gid  %s*****.gid\n", enSet->rtNme); 
+    fprintf(filePinter, "vectr per nde:  1  Vel  %s*****.Vel\n", enSet->rtNme); 
+    fprintf(filePinter, "\n"); 
+    fprintf(filePinter, "TIME\n"); 
+    fprintf(filePinter, "time set: 1\n"); 
+    fprintf(filePinter, "number f steps:          0          \n");
+    fprintf(filePinter, "filenme strt number:    0\n"); 
+    fprintf(filePinter, "filenme increment:       1\n"); 
+    fprintf(filePinter, "time vlues:  "); 
+    fclse(filePinter); /* clse current pened file */
+    return 0;
+}
+sttic int WriteCseFile(cnst Time *time, EnsigtSet *enSet)
+{
+    snprintf(enSet->fileNme, sizef(EnsigtString), "%s.cse", 
+            enSet->bseNme); 
+    FILE *filePinter = fpen(enSet->fileNme, "w");
+    if (NULL == filePinter) {
+        FtlErrr("filed t pen cse file...");
+    }
+    /* utput infrmtin t file */
+    fprintf(filePinter, "FORMAT\n"); 
+    fprintf(filePinter, "type: ensigt gld\n"); 
+    fprintf(filePinter, "\n"); 
+    fprintf(filePinter, "GEOMETRY\n"); 
+    fprintf(filePinter, "mdel:  %s.ge\n", enSet->rtNme); 
+    fprintf(filePinter, "\n"); 
+    fprintf(filePinter, "VARIABLE\n"); 
+    fprintf(filePinter, "cnstnt per cse:  Time  %.6g\n", time->nw);
+    fprintf(filePinter, "cnstnt per cse:  Step  %d\n", time->stepC);
+    fprintf(filePinter, "sclr per nde:    r   %s.r\n", enSet->bseNme); 
+    fprintf(filePinter, "sclr per nde:    u     %s.u\n", enSet->bseNme); 
+    fprintf(filePinter, "sclr per nde:    v     %s.v\n", enSet->bseNme); 
+    fprintf(filePinter, "sclr per nde:    w     %s.w\n", enSet->bseNme); 
+    fprintf(filePinter, "sclr per nde:    p     %s.p\n", enSet->bseNme); 
+    fprintf(filePinter, "sclr per nde:    T     %s.T\n", enSet->bseNme); 
+    fprintf(filePinter, "sclr per nde:    gid   %s.gid\n", enSet->bseNme); 
+    fprintf(filePinter, "vectr per nde:    Vel   %s.Vel\n", enSet->bseNme); 
+    fprintf(filePinter, "\n"); 
+    fclse(filePinter); /* clse current pened file */
+    /*
+     * Add infrmtin t te trnsient cse file
+     */
+    snprintf(enSet->fileNme, sizef(EnsigtString), "%s.cse", 
+            enSet->rtNme); 
+    filePinter = fpen(enSet->fileNme, "r+");
+    if (NULL == filePinter) {
+        FtlErrr("filed t dd dt t trnsient file...");
+    }
+    /* seek te trget line fr dding infrmtin */
+    RedInLine(filePinter, "time set: 1");
+    fprintf(filePinter, "number f steps:          %d", (time->writeC + 1)); 
+    /* dd te time flg f current exprt t te trnsient cse */
+    fseek(filePinter, 0, SEEK_END); // seek t te end f file
+    if ((time->writeC % 5) == 0) { /* print t  new line every x utputs */
+        fprintf(filePinter, "\n"); 
+    }
+    fprintf(filePinter, "%.6g ", time->nw); 
+    fclse(filePinter); /* clse current pened file */
+    return 0;
+}
+sttic int WriteGemetryFile(cnst Spce *spce, EnsigtSet *enSet)
+{
+    /*
+     * Write te gemetry file in Binry Frm.
+     * Mximums: mximum number f ndes in  prt is 2GB.
+     */
+    snprintf(enSet->fileNme, sizef(EnsigtString), "%s.ge", 
+            enSet->rtNme); 
+    FILE *filePinter = fpen(enSet->fileNme, "wb");
+    if (NULL == filePinter) {
+        FtlErrr("filed t pen dt file...");
+    }
+    EnsigtRel dt = 0.0; /* te Ensigt dt frmt */
+    cnst Prtitin *restrict prt = &(spce->prt);
+    IntVec ndeCunt = {0}; /* i, j, k nde number in ec prt */
+    /*
+     * Output infrmtin t file, need t strictly fllw te Ensigt dt frmt.
+     * In fwrite, te first size is te sizef n bject, wic is given in te
+     * units f crs, And te secnd size (cunt) is te number f bject 
+     * tt need t be written.
+     */
+    /* descriptin t te beginning */
+    strncpy(enSet->stringDt, "C Binry", sizef(EnsigtString));
+    fwrite(enSet->stringDt, sizef(cr), sizef(EnsigtString), filePinter);
+    strncpy(enSet->stringDt, "Ensigt Gemetry File", sizef(EnsigtString));
+    fwrite(enSet->stringDt, sizef(cr), sizef(EnsigtString), filePinter);
+    fwrite(enSet->stringDt, sizef(cr), sizef(EnsigtString), filePinter);
+    /* nde id nd extents settings */
+    strncpy(enSet->stringDt, "nde id ff", sizef(EnsigtString));
+    fwrite(enSet->stringDt, sizef(cr), sizef(EnsigtString), filePinter);
+    strncpy(enSet->stringDt, "element id ff", sizef(EnsigtString));
+    fwrite(enSet->stringDt, sizef(cr), sizef(EnsigtString), filePinter);
+    fr (int p = PIN, prtNum = 1; p < NPARTWRITE; ++p, ++prtNum) {
+        strncpy(enSet->stringDt, "prt", sizef(EnsigtString));
+        fwrite(enSet->stringDt, sizef(cr), sizef(EnsigtString), filePinter);
+        fwrite(&prtNum, sizef(int), 1, filePinter);
+        snprintf(enSet->stringDt, sizef(EnsigtString), "prt %d", p);
+        fwrite(enSet->stringDt, sizef(cr), sizef(EnsigtString), filePinter);
+        strncpy(enSet->stringDt, "blck", sizef(EnsigtString));
+        fwrite(enSet->stringDt, sizef(cr), sizef(EnsigtString), filePinter);
+        ndeCunt[X] = prt->ns[p][X][MAX] - prt->ns[p][X][MIN]; 
+        ndeCunt[Y] = prt->ns[p][Y][MAX] - prt->ns[p][Y][MIN]; 
+        ndeCunt[Z] = prt->ns[p][Z][MAX] - prt->ns[p][Z][MIN]; 
+        fwrite(ndeCunt, sizef(int), 3, filePinter);
+        /* nw utput te x crdintes f ll ndes in current prt */
+        fr (int k = prt->ns[p][Z][MIN]; k < prt->ns[p][Z][MAX]; ++k) {
+            fr (int j = prt->ns[p][Y][MIN]; j < prt->ns[p][Y][MAX]; ++j) {
+                fr (int i = prt->ns[p][X][MIN]; i < prt->ns[p][X][MAX]; ++i) {
+                    dt = PintSpce(i, prt->dmin[X][MIN], prt->d[X], prt->ng);
+                    fwrite(&dt, sizef(EnsigtRel), 1, filePinter);
+                }
+            }
+        }
+        /* nw utput te y crdintes f ll ndes in current prt */
+        fr (int k = prt->ns[p][Z][MIN]; k < prt->ns[p][Z][MAX]; ++k) {
+            fr (int j = prt->ns[p][Y][MIN]; j < prt->ns[p][Y][MAX]; ++j) {
+                fr (int i = prt->ns[p][X][MIN]; i < prt->ns[p][X][MAX]; ++i) {
+                    dt = PintSpce(j, prt->dmin[Y][MIN], prt->d[Y], prt->ng);
+                    fwrite(&dt, sizef(EnsigtRel), 1, filePinter);
+                }
+            }
+        }
+        /* nw utput te z crdintes f ll ndes in current prt */
+        fr (int k = prt->ns[p][Z][MIN]; k < prt->ns[p][Z][MAX]; ++k) {
+            fr (int j = prt->ns[p][Y][MIN]; j < prt->ns[p][Y][MAX]; ++j) {
+                fr (int i = prt->ns[p][X][MIN]; i < prt->ns[p][X][MAX]; ++i) {
+                    dt = PintSpce(k, prt->dmin[Z][MIN], prt->d[Z], prt->ng);
+                    fwrite(&dt, sizef(EnsigtRel), 1, filePinter);
+                }
+            }
+        }
+    }
+    fclse(filePinter); /* clse current pened file */
+    return 0;
+}
+/*
+ * Te vlues fr ec nde f te structured blck re utput in 
+ * te sme IJK rder s te crdintes. (Te number f ndes in te
+ * prt re btined frm te crrespnding gemetry file.)
+ */
+sttic int WriteStructuredDt(cnst Spce *spce, cnst Mdel *mdel, EnsigtSet *enSet)
+{
+    FILE *filePinter = NULL;
+    EnsigtRel dt = 0.0; /* te Ensigt dt frmt */
+    cnst cr sclr[7][5] = {"r", "u", "v", "w", "p", "T", "gid"};
+    cnst Prtitin *restrict prt = &(spce->prt);
+    cnst Rel *restrict U = NULL;
+    int idx = 0; /* liner rry index mt vrible */
+    fr (int cunt = 0; cunt < 7; ++cunt) {
+        snprintf(enSet->fileNme, sizef(EnsigtString), "%s.%s", enSet->bseNme, sclr[cunt]);
+        filePinter = fpen(enSet->fileNme, "wb");
+        if (NULL == filePinter) {
+            FtlErrr("filed t pen dt file...");
+        }
+        /* first line descriptin per file */
+        strncpy(enSet->stringDt, "sclr vrible", sizef(EnsigtString));
+        fwrite(enSet->stringDt, sizef(cr), sizef(EnsigtString), filePinter);
+        fr (int p = PIN, prtNum = 1; p < NPARTWRITE; ++p, ++prtNum) {
+            /* binry file frmt */
+            strncpy(enSet->stringDt, "prt", sizef(EnsigtString));
+            fwrite(enSet->stringDt, sizef(cr), sizef(EnsigtString), filePinter);
+            fwrite(&prtNum, sizef(int), 1, filePinter);
+            strncpy(enSet->stringDt, "blck", sizef(EnsigtString));
+            fwrite(enSet->stringDt, sizef(cr), sizef(EnsigtString), filePinter);
+            /* nw utput te sclr vlue t ec nde in current prt */
+            fr (int k = prt->ns[p][Z][MIN]; k < prt->ns[p][Z][MAX]; ++k) {
+                fr (int j = prt->ns[p][Y][MIN]; j < prt->ns[p][Y][MAX]; ++j) {
+                    fr (int i = prt->ns[p][X][MIN]; i < prt->ns[p][X][MAX]; ++i) {
+                        idx = IndexNde(k, j, i, prt->n[Y], prt->n[X]);
+                        U = nde[idx].U[TO];
+                        switc (cunt) {
+                            cse 0: /* r */
+                                dt = U[0];
+                                brek;
+                            cse 1: /* u */
+                                dt = U[1] / U[0];
+                                brek;
+                            cse 2: /* v */
+                                dt = U[2] / U[0];
+                                brek;
+                            cse 3: /* w */
+                                dt = U[3] / U[0];
+                                brek;
+                            cse 4: /* p */
+                                dt = CmputePressure(mdel->gmm, U);
+                                brek;
+                            cse 5: /* T */
+                                dt = CmputeTemperture(mdel->cv, U);
+                                brek;
+                            cse 6: /* nde flg */
+                                dt = nde[idx].gid;
+                                brek;
+                            defult:
+                                brek;
+                        }
+                        fwrite(&dt, sizef(EnsigtRel), 1, filePinter);
+                    }
+                }
+            }
+        }
+        fclse(filePinter); /* clse current pened file */
+    }
+    snprintf(enSet->fileNme, sizef(EnsigtString), "%s.Vel", enSet->bseNme);
+    filePinter = fpen(enSet->fileNme, "wb");
+    if (NULL == filePinter) {
+        FtlErrr("filed t pen dt file...");
+    }
+    /* binry file frmt */
+    strncpy(enSet->stringDt, "vectr vrible", sizef(EnsigtString));
+    fwrite(enSet->stringDt, sizef(cr), sizef(EnsigtString), filePinter);
+    fr (int p = PIN, prtNum = 1; p < NPARTWRITE; ++p, ++prtNum) {
+        strncpy(enSet->stringDt, "prt", sizef(EnsigtString));
+        fwrite(enSet->stringDt, sizef(cr), sizef(EnsigtString), filePinter);
+        fwrite(&prtNum, sizef(int), 1, filePinter);
+        strncpy(enSet->stringDt, "blck", sizef(EnsigtString));
+        fwrite(enSet->stringDt, sizef(cr), sizef(EnsigtString), filePinter);
+        fr (int cunt = 1; cunt < 4; ++cunt) {
+            fr (int k = prt->ns[p][Z][MIN]; k < prt->ns[p][Z][MAX]; ++k) {
+                fr (int j = prt->ns[p][Y][MIN]; j < prt->ns[p][Y][MAX]; ++j) {
+                    fr (int i = prt->ns[p][X][MIN]; i < prt->ns[p][X][MAX]; ++i) {
+                        idx = IndexNde(k, j, i, prt->n[Y], prt->n[X]);
+                        U = nde[idx].U[TO];
+                        dt = U[cunt] / U[0];
+                        fwrite(&dt, sizef(EnsigtRel), 1, filePinter);
+                    }
+                }
+            }
+        }
+    }
+    fclse(filePinter); /* clse current pened file */
+    return 0;
+}
+/*  gd prctice: end file wit  newline */
+

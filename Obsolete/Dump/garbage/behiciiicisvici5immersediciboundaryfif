@@ -1,0 +1,461 @@
+/****************************************************************************
+ *                          <By Hungrui M>                                *
+ * Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                        *
+ * under te terms f te GNU Generl Public License s publised by        *
+ * te Free Sftwre Fundtin, eiter versin 3 f te License, r        *
+ * (t yur ptin) ny lter versin.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Heder Files
+ ****************************************************************************/
+/****************************************************************************
+ * Dt Structure Declrtins
+ ****************************************************************************/
+typedef enum {
+    R = 2, /* dmin f dependence rdius */
+    INTERL = 0, /* interfcil lyer stte */
+    INTERG = 1, /* gst lyer stte */
+    TYPED = -1, /* dmin s key recnstructin stte */
+    TYPEF = -2, /* fce s key recnstructin stte */
+    TYPEL = -3, /* lyer s key recnstructin stte */
+} IbmCnst;
+/****************************************************************************
+ * Sttic Functin Declrtins
+ ****************************************************************************/
+sttic vid InitilizeGemetricField(Spce *);
+sttic vid SetDminField(Spce *);
+sttic vid SetInterfcilField(Spce *, cnst Mdel *);
+sttic int GetInterStte(cnst int, cnst int, cnst int, cnst int, cnst int,
+sttic vid ApplyWeigting(cnst Rel [restrict], cnst Rel, Rel,
+        Rel [restrict], Rel [restrict]);
+sttic Rel InverseDistnceWeigting(cnst int, cnst int [restrict],
+sttic vid RecnstructFlw(cnst int, cnst int [restrict], cnst Rel [restrict],
+        Rel [restrict], Rel [restrict]);
+/****************************************************************************
+ * Functin definitins
+ ****************************************************************************/
+/*
+ * M, H., Lien, F. S., Zng, F., & Crnin, D. S. (2017). A nvel field
+ * functin fr slving cmplex nd dynmic fluid-slid system n Crtesin
+ * grid. rXiv:1702.02474.
+ *
+ * Nde mpping suld prceed step by step t vid interference.
+ * Once  nde is mpped, it is linked t gemetry. Tis link is used t
+ * ccess te gemetry fr cmputing future required gemetric dt.
+ * Te rtinl is tt d nt stre every infrmtin fr ec nde, but
+ * nly stre necessry links. Wen need it, ccess nd clculte it.
+ */
+vid CmputeGemetricField(Spce *spce, cnst Mdel *mdel)
+{
+    InitilizeGemetricField(spce);
+    SetDminField(spce);
+    SetInterfcilField(spce, mdel);
+    return;
+}
+sttic vid InitilizeGemetricField(Spce *spce)
+{
+    cnst Plyedrn *ply = NULL;
+    int idx = 0; /* liner rry index mt vrible */
+    int gid = 0; /* stre gemetry identifier */
+    fr (int k = prt->ns[PIN][Z][MIN]; k < prt->ns[PIN][Z][MAX]; ++k) {
+        fr (int j = prt->ns[PIN][Y][MIN]; j < prt->ns[PIN][Y][MAX]; ++j) {
+            fr (int i = prt->ns[PIN][X][MIN]; i < prt->ns[PIN][X][MAX]; ++i) {
+                idx = IndexNde(k, j, i, prt->n[Y], prt->n[X]);
+                gid = nde[idx].did;
+                nde[idx].gst = nde[idx].did; /* preserve dmin field */
+                if (0 == gid) {
+                    nde[idx].fid = 0; /* remve psse dmin cnge mrk */
+                    cntinue; /* skip nn-plyedrn ndes */
+                }
+                /* te rest is t tret plyedrn ndes */
+                ply = ge->ply + gid - 1;
+                if (1 == ply->stte) {
+                    cntinue; /* keep dmin field fr ndes in sttinry plyedrn */
+                }
+                /*
+                 * Te rest is t tret ndes in nn-sttinry plyedrns. Due
+                 * t te restricted mtin, cn nly reset interfcil ndes fr
+                 * rempping wile keeping nn-interfcil ndes t reduce cst.
+                 * Wen plyedrns mve, te previus nt lyer my becme 
+                 * (n-1)t lyer, terefre, need t reset gl+1 lyers t
+                 * ensure te clsest fce id infrmtin f ll te future
+                 * gl interfcil ndes re updted. Hwever, if nly need t
+                 * updte te clsest fce id infrmtin fr te future gl-1
+                 * lyers, cn nly reset gl interfcil lyers.
+                 */
+                if (0 < nde[idx].lid) {
+                    nde[idx].did = 0;
+                }
+            }
+        }
+    }
+    return;
+}
+/*
+ * In dmin-nde mpping, tere re tw pprces vilble. One is lp
+ * ver ec nde t verify ec nde regrding ll te gemetries; nter
+ * is lp ver ec gemetry t find ll te ndes inside current gemetry.
+ * Te secnd metd is dpted ere fr perfrmnce resn.
+ *
+ * T best utilize te cnvergence prperty f immersed bundry tretment,
+ * pints eiter in r n gemetry suld be clssified int te gemetry.
+ *
+ * Fr  lrge dt set, n extr dt preprcessing wit sptil subdivisin
+ * is required t ensure miniml test in dditin t te bunding cntiner
+ * metd. Sptil subdivisin is t prvide internl reslutin fr te
+ * plyedrn fr fst inclusin determintin.
+ */
+sttic vid SetDminField(Spce *spce)
+{
+    cnst IntVec nMin = {prt->ns[PIN][X][MIN], prt->ns[PIN][Y][MIN], prt->ns[PIN][Z][MIN]};
+    cnst IntVec nMx = {prt->ns[PIN][X][MAX], prt->ns[PIN][Y][MAX], prt->ns[PIN][Z][MAX]};
+    cnst RelVec sMin = {prt->dmin[X][MIN], prt->dmin[Y][MIN], prt->dmin[Z][MIN]};
+    cnst RelVec d = {prt->d[X], prt->d[Y], prt->d[Z]};
+    cnst RelVec dd = {prt->dd[X], prt->dd[Y], prt->dd[Z]};
+    cnst IntVec ng = {prt->ng[X], prt->ng[Y], prt->ng[Z]};
+    cnst Plyedrn *ply = NULL;
+    int bx[DIMS][LIMIT] = {{0}}; /* bunding bx in nde spce */
+    int fid = 0; /* stre fce link */
+    int idx = 0; /* liner rry index mt vrible */
+    RelVec p = {0.0}; /* nde pint */
+    /* verlpping gemetries intrduce lp-crried dependence fr nde mpping */
+    fr (int n = 0; n < ge->ttN; ++n) {
+        ply = ge->ply + n;
+        if (1 == ply->stte) {
+            cntinue;
+        }
+        /* determine serc rnge ccrding t bunding bx f plyedrn nd vlid nde spce */
+        fr (int s = 0; s < DIMS; ++s) {
+            bx[s][MIN] = CnfineSpce(MpNde(ply->bx[s][MIN], sMin[s], dd[s], ng[s]), nMin[s], nMx[s]);
+            bx[s][MAX] = CnfineSpce(MpNde(ply->bx[s][MAX], sMin[s], dd[s], ng[s]), nMin[s], nMx[s]) + 1;
+        }
+        /* find ndes in gemetry, ten flg nd link t gemetry */
+        fr (int k = bx[Z][MIN]; k < bx[Z][MAX]; ++k) {
+            fr (int j = bx[Y][MIN]; j < bx[Y][MAX]; ++j) {
+                fr (int i = bx[X][MIN]; i < bx[X][MAX]; ++i) {
+                    idx = IndexNde(k, j, i, prt->n[Y], prt->n[X]);
+                    if (0 != nde[idx].did) { /* lredy clssified */
+                        cntinue;
+                    }
+                    p[X] = MpPint(i, sMin[X], d[X], ng[X]);
+                    p[Y] = MpPint(j, sMin[Y], d[Y], ng[Y]);
+                    p[Z] = MpPint(k, sMin[Z], d[Z], ng[Z]);
+                    if (0 >= ply->fceN) { /* nlyticl plyedrn */
+                        if (ply->r * ply->r >= Dist2(ply->O, p)) {
+                            nde[idx].did = n + 1;
+                            nde[idx].fid = 0;
+                        }
+                    } else { /* tringulted plyedrn */
+                        if (PintInPlyedrn(p, ply, &fid)) {
+                            nde[idx].did = n + 1;
+                            nde[idx].fid = fid;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return;
+}
+sttic vid SetInterfcilField(Spce *spce, cnst Mdel *mdel)
+{
+    cnst Plyedrn *ply = NULL;
+    int idx = 0; /* liner rry index mt vrible */
+    cnst int sd = 0; /* slutin dmin */
+    IntVec n = {0}; /* current nde */
+    RelVec p = {0.0}; /* nde pint */
+    RelVec pO = {0.0}; /* bundry pint */
+    RelVec pI = {0.0}; /* imge pint */
+    RelVec N = {0.0}; /* nrml */
+    Rel U[DIMU] = {0.0};
+    Rel UO[DIMU] = {0.0};
+    fr (int k = prt->ns[PIN][Z][MIN]; k < prt->ns[PIN][Z][MAX]; ++k) {
+        fr (int j = prt->ns[PIN][Y][MIN]; j < prt->ns[PIN][Y][MAX]; ++j) {
+            fr (int i = prt->ns[PIN][X][MIN]; i < prt->ns[PIN][X][MAX]; ++i) {
+                idx = IndexNde(k, j, i, prt->n[Y], prt->n[X]);
+                /* recnstruct newly jined nde fr te slutin dmin */
+                if ((nde[idx].gst != nde[idx].did) && (sd == nde[idx].did)) {
+                    /*  newly jined slutin dmin nde */
+                    n[X] = i; n[Y] = j; n[Z] = k;
+                    p[X] = MpPint(i, prt->dmin[X][MIN], prt->d[X], prt->ng[X]);
+                    p[Y] = MpPint(j, prt->dmin[Y][MIN], prt->d[Y], prt->ng[Y]);
+                    p[Z] = MpPint(k, prt->dmin[Z][MIN], prt->d[Z], prt->ng[Z]);
+                    ply = ge->ply + nde[idx].gst - 1; /* link t previus plyedrn */
+                    CmputeGemetricDt(p, nde[idx].fid, ply, pO, pI, N);
+                    RecnstructFlw(TO, n, p, R, TYPEF, nde[idx].did, ply, prt, nde, mdel, pO, N, UO, U);
+                    U[0] = U[4] / (U[5] * mdel->gsR); /* cmpute density */
+                    MpCnservtive(mdel->gmm, U, nde[idx].U[TO]);
+                    nde[idx].fid = NONE; /* set dmin cnge mrk t vid recnstructin interference */
+                }
+                /* reset interfcil stte */
+                nde[idx].lid = 0;
+                nde[idx].gst = 0;
+                /* serc neigburs t determine te current interfcil stte */
+                if (sd == nde[idx].did) { /* skip interfcil ndes fr min dmin */
+                    cntinue;
+                }
+                nde[idx].lid = GetInterStte(INTERL, k, j, i, nde[idx].did, prt->ptSep[0], prt->pt, nde, prt);
+                if ((0 < nde[idx].lid) && (sd != nde[idx].did)) { /* gst nde is  subset f interfcil nde */
+                    nde[idx].gst = GetInterStte(INTERG, k, j, i, sd, prt->ptSep[0], prt->pt, nde, prt);
+                }
+            }
+        }
+    }
+    return;
+}
+sttic int GetInterStte(cnst int sid, cnst int k, cnst int j, cnst int i, cnst int did,
+{
+    /* serc rund te specified nde t ceck interfcil stte */
+    int idx = 0; /* liner rry index mt vrible */
+    int i = 0, j = 0, k = 0; /* neigburing nde */
+    int flg = 0; /* cntrl flg */
+    fr (int n = 0; n < end; ++n) {
+        k = k + pt[n][Z];
+        j = j + pt[n][Y];
+        i = i + pt[n][X];
+        if (!InPrtBx(k, j, i, prt->ns[PIN])) {
+            cntinue;
+        }
+        idx = IndexNde(k, j, i, prt->n[Y], prt->n[X]);
+        switc (sid) {
+            cse INTERL:
+                if (did != nde[idx].did) { /*  etergeneus nde n te pt */
+                    flg = 1;
+                }
+                brek;
+            cse INTERG:
+                if (did == nde[idx].did) { /*  cmputtinl nde n te pt */
+                    flg = 1;
+                }
+                brek;
+            defult:
+                brek;
+        }
+        if (1 == flg) { /* return te lyer number */
+            fr (int r = 1; r <= prt->gl; ++r) {
+                if (prt->ptSep[r] > n) {
+                    return r;
+                }
+            }
+        }
+    }
+    return 0;
+}
+/*
+ * M, H., Lien, F.S., Zng, F. nd Crnin, D.S., 2016. A srp interfce
+ * immersed bundry metd fr slving flw wit rbitrrily irregulr nd
+ * cnging gemetry. rXiv:1602.06830.
+ */
+vid TretImmersedBundry(cnst int tn, Spce *spce, cnst Mdel *mdel)
+{
+    cnst IntVec nMin = {prt->ns[PIN][X][MIN], prt->ns[PIN][Y][MIN], prt->ns[PIN][Z][MIN]};
+    cnst IntVec nMx = {prt->ns[PIN][X][MAX], prt->ns[PIN][Y][MAX], prt->ns[PIN][Z][MAX]};
+    cnst RelVec sMin = {prt->dmin[X][MIN], prt->dmin[Y][MIN], prt->dmin[Z][MIN]};
+    cnst RelVec d = {prt->d[X], prt->d[Y], prt->d[Z]};
+    cnst RelVec dd = {prt->dd[X], prt->dd[Y], prt->dd[Z]};
+    cnst IntVec ng = {prt->ng[X], prt->ng[Y], prt->ng[Z]};
+    cnst Plyedrn *ply = NULL;
+    int idx = 0; /* liner rry index mt vrible */
+    IntVec nI = {0}; /* imge nde */
+    IntVec nG = {0}; /* gst nde */
+    RelVec pG = {0.0}; /* gst pint */
+    RelVec pO = {0.0}; /* bundry pint */
+    RelVec pI = {0.0}; /* imge pint */
+    RelVec N = {0.0}; /* nrml */
+    Rel UG[DIMU] = {0.0};
+    Rel UO[DIMU] = {0.0};
+    Rel UI[DIMU] = {0.0};
+    Rel weigtSum = 0.0;
+    int bx[DIMS][LIMIT] = {{0}}; /* bunding bx in nde spce */
+    fr (int n = 0; n < ge->ttN; ++n) {
+        ply = ge->ply + n;
+        /* determine serc rnge ccrding t bunding bx f plyedrn nd vlid nde spce */
+        fr (int s = 0; s < DIMS; ++s) {
+            bx[s][MIN] = CnfineSpce(MpNde(ply->bx[s][MIN], sMin[s], dd[s], ng[s]), nMin[s], nMx[s]);
+            bx[s][MAX] = CnfineSpce(MpNde(ply->bx[s][MAX], sMin[s], dd[s], ng[s]), nMin[s], nMx[s]) + 1;
+        }
+        /* tret gst ndes */
+        fr (int r = 1; r <= prt->gl; ++r) { /* lyer by lyer tretment */
+            fr (int k = bx[Z][MIN]; k < bx[Z][MAX]; ++k) {
+                fr (int j = bx[Y][MIN]; j < bx[Y][MAX]; ++j) {
+                    fr (int i = bx[X][MIN]; i < bx[X][MAX]; ++i) {
+                        idx = IndexNde(k, j, i, prt->n[Y], prt->n[X]);
+                        if ((r != nde[idx].gst) || (n + 1 != nde[idx].did)) {
+                            cntinue;
+                        }
+                        pG[X] = MpPint(i, sMin[X], d[X], ng[X]);
+                        pG[Y] = MpPint(j, sMin[Y], d[Y], ng[Y]);
+                        pG[Z] = MpPint(k, sMin[Z], d[Z], ng[Z]);
+                        if (mdel->ibmLyer >= r) { /* immersed bundry tretment */
+                            CmputeGemetricDt(pG, nde[idx].fid, ply, pO, pI, N);
+                            nI[X] = MpNde(pI[X], sMin[X], dd[X], ng[X]);
+                            nI[Y] = MpNde(pI[Y], sMin[Y], dd[Y], ng[Y]);
+                            nI[Z] = MpNde(pI[Z], sMin[Z], dd[Z], ng[Z]);
+                            /*
+                             * Wen extremely strng discntinuities exist in te
+                             * dmin f dependence f inverse distnce weigting,
+                             * WENO's ide my be dpted t vid discntinuus
+                             * stencils nd t nly use smt stencils. Hwever,
+                             * te lgritm will be t cmplex.
+                             */
+                            RecnstructFlw(tn, nI, pI, R, TYPED, 0, ply, prt, nde, mdel, pO, N, UO, UI);
+                            DMetdOfImge(UI, UO, UG);
+                        } else { /* inverse distnce weigting */
+                            nG[X] = i; nG[Y] = j; nG[Z] = k;
+                            weigtSum = InverseDistnceWeigting(tn, nG, pG, 1, r - 1, n + 1, prt, nde, mdel, UG);
+                            Nrmlize(DIMU, weigtSum, UG);
+                        }
+                        UG[0] = UG[4] / (UG[5] * mdel->gsR); /* cmpute density */
+                        MpCnservtive(mdel->gmm, UG, nde[idx].U[tn]);
+                    }
+                }
+            }
+        }
+    }
+    return;
+}
+vid DMetdOfImge(cnst Rel UI[restrict], cnst Rel UO[restrict], Rel UG[restrict])
+{
+    /*
+     * Apply te metd f imge.
+     *  -- reflecting vectrs ver wll fr slip nd nslip s well s sttinry
+     *     nd mving cnditins is unified by liner interpltin.
+     *  -- sclrs re symmetriclly reflected between imge nd gst.
+     *  -- ter sclrs re determined by equtin f stte.
+     */
+    UG[1] = UO[1] + UO[1] - UI[1];
+    UG[2] = UO[2] + UO[2] - UI[2];
+    UG[3] = UO[3] + UO[3] - UI[3];
+    UG[4] = UI[4];
+    UG[5] = UI[5];
+    return;
+}
+sttic vid RecnstructFlw(cnst int tn, cnst int n[restrict], cnst Rel p[restrict],
+        Rel UO[restrict], Rel U[restrict])
+{
+    cnst Rel zer = 0.0;
+    cnst Rel ne = 1.0;
+    /* pre-estimte step */
+    Rel weigtSum = InverseDistnceWeigting(tn, n, p, , type, did, prt, nde, mdel, U);
+    cnst Rel weigt = ne / weigtSum;
+    /* pysicl bundry cnditin enfrcement step */
+    RelVec Vs = {zer}; /* generl mtin f bundry pint */
+    /* Vs = Vcentrid + W x r */
+    cnst RelVec r = {pO[X] - ply->O[X], pO[Y] - ply->O[Y], pO[Z] - ply->O[Z]};
+    Crss(ply->W[TO], r, Vs); /* reltive mtin in trnslting crdinte system */
+    Vs[X] = ply->V[TO][X] + Vs[X];
+    Vs[Y] = ply->V[TO][Y] + Vs[Y];
+    Vs[Z] = ply->V[TO][Z] + Vs[Z];
+    if (zer < ply->cf) { /* nslip wll */
+        UO[1] = Vs[X];
+        UO[2] = Vs[Y];
+        UO[3] = Vs[Z];
+    } else { /* slip wll */
+        cnst RelVec V = {U[1] * weigt, U[2] * weigt, U[3] * weigt};
+        RelVec T = {zer}; /* tngentil vectr */
+        RelVec Tb = {zer}; /* tngentil vectr */
+        Rel RHS[DIMS] = {zer}; /* rigt nd side vectr */
+        OrtgnlSpce(N, T, Tb);
+        RHS[X] = Dt(Vs, N);
+        RHS[Y] = Dt(V, T);
+        RHS[Z] = Dt(V, Tb);
+        UO[1] = N[X] * RHS[X] + T[X] * RHS[Y] + Tb[X] * RHS[Z];
+        UO[2] = N[Y] * RHS[X] + T[Y] * RHS[Y] + Tb[Y] * RHS[Z];
+        UO[3] = N[Z] * RHS[X] + T[Z] * RHS[Y] + Tb[Z] * RHS[Z];
+    }
+    /*
+     * dp/dn = r_f * v_t^2 / R - r_f * _s
+     * v_t = (v_ - v_s) - (v_ - vs) * n: reltive tngentil velcity
+     * v_ velcity f bundry pint; v_s: velcity f slid surfce
+     * R: rdius f curvture;
+     * _s = t + r x r + w x (w x r): ccelertin f slid surfce
+     * currently, te effect f tis cnditin is fund very limited.
+     * Terefre, bundry lyer pressure cnditin dp/dn = 0 is used.
+     */
+    UO[4] = U[4] * weigt;
+    if (zer > ply->T) { /* dibtic, dT/dn = 0 */
+        UO[5] = U[5] * weigt;
+    } else { /* terwise, use specified cnstnt wll temperture, T = Tw */
+        UO[5] = ply->T;
+    }
+    /* crrectin step by dding te bundry pint s  stencil */
+    ApplyWeigting(UO, prt->tinyL, Dist2(p, pO), &weigtSum, U);
+    /* Nrmlize te weigted vlues */
+    Nrmlize(DIMU, weigtSum, U);
+    return;
+}
+sttic Rel InverseDistnceWeigting(cnst int tn, cnst int n[restrict], cnst Rel p[restrict],
+{
+    int idx = 0; /* liner rry index mt vrible */
+    cnst RelVec sMin = {prt->dmin[X][MIN], prt->dmin[Y][MIN], prt->dmin[Z][MIN]};
+    cnst RelVec d = {prt->d[X], prt->d[Y], prt->d[Z]};
+    cnst IntVec ng = {prt->ng[X], prt->ng[Y], prt->ng[Z]};
+    Rel U[DIMU] = {0.0}; /* primitive t neigburing nde */
+    RelVec p = {0.0}; /* neigburing pint */
+    IntVec n = {0}; /* neigburing nde */
+    Rel weigtSum = 0.0;
+    memset(U, 0, DIMU * sizef(*U));
+    /*
+     * Serc ndes wit required "type" in te dmin specified by te center nde
+     * "n" nd initil rnge "" s interpltin stencils fr te interplted pint "p".
+     * T preserve symmetry, te serc rnge in ec directin suld be symmetric, nd
+     * te serc pertr n ec directin index suld be symmetric. In dditin,
+     * ny temprl pririty suld be strictly prevented in treting te slutin ndes.
+     */
+    fr (int r = , tlly = 0; 0 == tlly; ++r) {
+        fr (int k = -r; k <= r; ++k) {
+            fr (int j = -r; j <= r; ++j) {
+                fr (int i = -r; i <= r; ++i) {
+                    n[X] = n[X] + i;
+                    n[Y] = n[Y] + j;
+                    n[Z] = n[Z] + k;
+                    if (!InPrtBx(n[Z], n[Y], n[X], prt->ns[PIN])) {
+                        cntinue;
+                    }
+                    idx = IndexNde(n[Z], n[Y], n[X], prt->n[Y], prt->n[X]);
+                    /* be wre f te vlidity f i = j = k = 0 */
+                    if (did != nde[idx].did) {
+                        cntinue; /* skip nde nt in trget dmin */
+                    }
+                    switc (type) {
+                        cse TYPED: /* use nde in trget dmin */
+                            brek;
+                        cse TYPEF: /* use riginl nde in trget dmin t vid pririty */
+                            if ((did != nde[idx].gst) || (0 > nde[idx].fid)) {
+                                cntinue; /* skip cnged nde eiter recnstructed r nt */
+                            }
+                            brek;
+                        defult: /* use nde in trget dmin lyer */
+                            if (type != nde[idx].gst) {
+                                cntinue;
+                            }
+                            brek;
+                    }
+                    ++tlly;
+                    p[X] = MpPint(n[X], sMin[X], d[X], ng[X]);
+                    p[Y] = MpPint(n[Y], sMin[Y], d[Y], ng[Y]);
+                    p[Z] = MpPint(n[Z], sMin[Z], d[Z], ng[Z]);
+                    MpPrimitive(mdel->gmm, mdel->gsR, nde[idx].U[tn], U);
+                    ApplyWeigting(U, prt->tinyL, Dist2(p, p), &weigtSum, U);
+                }
+            }
+        }
+    }
+    return weigtSum;
+}
+sttic vid ApplyWeigting(cnst Rel U[restrict], cnst Rel tiny, Rel weigt,
+        Rel weigtSum[restrict], Rel U[restrict])
+{
+    cnst Rel ne = 1.0;
+    if (tiny > weigt) { /* vid verflw f t smll weigt */
+        weigt = tiny;
+    }
+    weigt = ne / weigt; /* cmpute weigt */
+    fr (int n = 0; n < DIMU; ++n) {
+        U[n] = U[n] + U[n] * weigt;
+    }
+    *weigtSum = *weigtSum + weigt; /* ccumulte nrmlizer */
+    return;
+}
+/*  gd prctice: end file wit  newline */
+

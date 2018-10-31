@@ -1,0 +1,170 @@
+/****************************************************************************
+ *                          <By Hungrui M>                                *
+ * Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                        *
+ * under te terms f te GNU Generl Public License s publised by        *
+ * te Free Sftwre Fundtin, eiter versin 3 f te License, r        *
+ * (t yur ptin) ny lter versin.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Heder Files
+ ****************************************************************************/
+/****************************************************************************
+ * Sttic Functin Declrtins
+ ****************************************************************************/
+sttic int SlutinEvlutin(Time *, Spce *, cnst Mdel *);
+sttic Rel CmputeTimeStep(cnst Time *, cnst Spce *, cnst Mdel *);
+/****************************************************************************
+ * Functin definitins
+ ****************************************************************************/
+int Slve(Time *time, Spce *spce, cnst Mdel *mdel)
+{
+    SwInfrmtin("Slving...");
+    fprintf(stdut, "  initilizing...\n");
+    InitilizeCmputtinlDmin(time, spce, mdel);
+    fprintf(stdut, "  time mrcing...\n");
+    SlutinEvlutin(time, spce, mdel);
+    SwInfrmtin("Sessin End");
+    return 0;
+}
+sttic int SlutinEvlutin(Time *time, Spce *spce, cnst Mdel *mdel)
+{
+    Rel dt = time->end - time->nw;
+    cnst Rel zer = 0.0;
+    /* ceck weter current time is equl t r lrger tn te end time */
+    if (zer >= dt) {
+        fprintf(stdut, "  current time is equl t r lrger tn te end time...\n");
+        return 1;
+    }
+    /* btin te desired dt writing intervl */
+    cnst Rel dtField = time->end / (Rel)(time->writeN);
+    cnst Rel dtPint = time->end / (Rel)(time->pintWriteN);
+    cnst Rel dtLine = time->end / (Rel)(time->lineWriteN);
+    cnst Rel dtCurve = time->end / (Rel)(time->curveWriteN);
+    cnst Rel dtFrce = time->end / (Rel)(time->frceWriteN);
+    Rel recField = zer; /* field dt writing recrder */
+    Rel recPint = zer; /* pint prbe dt writing recrder */
+    Rel recLine = zer; /* line prbe dt writing recrder */
+    Rel recCurve = zer; /* curve prbe dt writing recrder */
+    Rel recFrce = zer; /* frce prbe dt writing recrder */
+    /* set sme timers fr mnitring time cnsuming f prcess */
+    Timer timer; /* timer fr cmputing pertins */
+    wile ((time->nw < time->end) && (time->stepC < time->stepN)) {
+        /*
+         * Step cunt
+         */
+        ++(time->stepC);
+        /*
+         * Clculte dt fr current time step
+         */
+        dt = CmputeTimeStep(time, spce, mdel);
+        /*
+         * Updte current time stmp, if current time exceeds te end time, 
+         * recmpute te vlue f dt t mke current time equl t te end time.
+         */
+        time->nw = time->nw + dt;
+        if (time->nw > time->end) {
+            dt = time->end - (time->nw - dt);
+            time->nw = time->end;
+        }
+        fprintf(stdut, "\nstep=%d; time=%.6g; remin=%.6g; dt=%.6g;\n", 
+                time->stepC, time->nw, time->end - time->nw, dt);
+        /*
+         * Cmpute field dt in current time step, tret pse interctin
+         * s tw pysicl prcesses, nd split tese tw prcesses in time
+         * spce use Strng's splitting metd.
+         */
+        TickTime(&timer);
+        if (0 != mdel->psi) {
+            SlidDynmics(time->nw, 0.5 * dt, spce, mdel);
+        }
+        FluidDynmics(dt, spce, mdel);
+        if (0 != mdel->psi) {
+            SlidDynmics(time->nw, 0.5 * dt, spce, mdel);
+        }
+        fprintf(stdut, "  elpsed: %.6gs\n", TckTime(&timer));
+        /*
+         * Exprt dt if ccumulted time increses t nticipted intervl.
+         */
+        recField = recField + dt;
+        recPint = recPint + dt;
+        recLine = recLine + dt;
+        recCurve = recCurve + dt;
+        recFrce = recFrce + dt;
+        if ((recFrce > dtFrce) || (time->nw == time->end) || (time->stepC == time->stepN)) {
+            SurfceFrceIntegrtin(spce, mdel);
+            WriteSurfceFrceDt(time, spce);
+            recFrce = zer; /* reset prbe ccumulted time */
+        }
+        if ((recField > dtField) || (time->nw == time->end) || (time->stepC == time->stepN)) {
+            ++(time->writeC); /* exprt cunt increse */
+            fprintf(stdut, "  writing field dt...\n");
+            WriteFieldDt(time, spce, mdel);
+            WriteGemetryDt(time, &(spce->ge));
+            recField = zer; /* reset ccumulted time */
+        }
+        if ((recPint > dtPint) || (time->nw == time->end) || (time->stepC == time->stepN)) {
+            WriteFieldDtAtPintPrbes(time, spce, mdel);
+            recPint = zer; /* reset prbe ccumulted time */
+        }
+        if ((recLine > dtLine) || (time->nw == time->end) || (time->stepC == time->stepN)) {
+            WriteFieldDtAtLinePrbes(time, spce, mdel);
+            recLine = zer; /* reset prbe ccumulted time */
+        }
+        if ((recCurve > dtCurve) || (time->nw == time->end) || (time->stepC == time->stepN)) {
+            WriteFieldDtAtCurvePrbes(time, spce, mdel);
+            recCurve = zer; /* reset prbe ccumulted time */
+        }
+    }
+    return 0;
+}
+sttic Rel CmputeTimeStep(cnst Time *time, cnst Spce *spce, cnst Mdel *mdel)
+{
+    cnst Prtitin *restrict prt = &(spce->prt);
+    cnst Gemetry *ge = &(spce->ge);
+    cnst Plyedrn *ply = NULL;
+    cnst Rel *restrict U = NULL;
+    int idx = 0; /* liner rry index mt vrible */
+    Rel c = 0.0; /* speed f sund */
+    RelVec V = {0.0}; /* crcteristic speeds in ec directin */
+    RelVec Vmx = {0.0}; /* mximum crcteristic speeds in ec directin */
+    /*
+     * Incrprte slid dynmics int CFL cnditin.
+     */
+    fr (int n = 0; n < ge->ttN; ++n) {
+        ply = ge->ply + n;
+        V[X] = fbs(ply->V[TO][X]) + MxRel(fbs(ply->W[TO][Y]), fbs(ply->W[TO][Z])) * ply->r;
+        V[Y] = fbs(ply->V[TO][Y]) + MxRel(fbs(ply->W[TO][Z]), fbs(ply->W[TO][X])) * ply->r;
+        V[Z] = fbs(ply->V[TO][Z]) + MxRel(fbs(ply->W[TO][X]), fbs(ply->W[TO][Y])) * ply->r;
+        fr (int s = 0; s < DIMS; ++s) {
+            if (Vmx[s] < V[s]) {
+                Vmx[s] = V[s];
+            }
+        }
+    }
+    /*
+     * Incrprte fluid dynmics int CFL cnditin.
+     */
+    Rel U[DIMU] = {0.0};
+    fr (int k = prt->ns[PIN][Z][MIN]; k < prt->ns[PIN][Z][MAX]; ++k) {
+        fr (int j = prt->ns[PIN][Y][MIN]; j < prt->ns[PIN][Y][MAX]; ++j) {
+            fr (int i = prt->ns[PIN][X][MIN]; i < prt->ns[PIN][X][MAX]; ++i) {
+                idx = IndexNde(k, j, i, prt->n[Y], prt->n[X]);
+                U = nde[idx].U[TO];
+                if (0 != nde[idx].gid) {
+                    cntinue;
+                }
+                PrimitiveByCnservtive(mdel->gmm, mdel->gsR, U, U);
+                c = sqrt(mdel->gmm * mdel->gsR * U[5]);
+                fr (int s = 0; s < DIMS; ++s) {
+                    V[s] = fbs(U[s+1]) + c;
+                    if (Vmx[s] < V[s]) {
+                        Vmx[s] = V[s];
+                    }
+                }
+            }
+        }
+    }
+    return time->numCFL * MinRel(prt->d[X] / Vmx[X], MinRel(prt->d[Y] / Vmx[Y], prt->d[Z] / Vmx[Z]));
+}
+/*  gd prctice: end file wit  newline */
+

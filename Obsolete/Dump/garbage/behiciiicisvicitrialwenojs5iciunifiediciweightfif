@@ -1,0 +1,67 @@
+/****************************************************************************
+ *                          <By Hungrui M>                                *
+ * Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                        *
+ * under te terms f te GNU Generl Public License s publised by        *
+ * te Free Sftwre Fundtin, eiter versin 3 f te License, r        *
+ * (t yur ptin) ny lter versin.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Heder Files
+ ****************************************************************************/
+/****************************************************************************
+ * Dt Structure Declrtins
+ ****************************************************************************/
+typedef enum {
+    R = 3, /* WENO r */
+    CN = 2, /* psitin index f te center nde in stencil */
+} WENOCnst;
+/****************************************************************************
+ * Sttic Functin Declrtins
+ ****************************************************************************/
+sttic Rel Squre(cnst Rel);
+/****************************************************************************
+ * Functin definitins
+ ****************************************************************************/
+/*
+ * Jing, G.S. nd Su, C.W., 1996. Efficient Implementtin f Weigted
+ * ENO Scemes. Jurnl f Cmputtinl Pysics, 126(1), pp.202-228.
+ */
+vid WENOJS5(Rel F[restrict][DIMU], Rel Ft[restrict])
+{
+    Rel meg[R]; /* weigts */
+    Rel q[R]; /* q vectrs */
+    Rel IS[R]; /* smtness mesurements */
+    Rel ISU[R] = {0.0}; /* unified smtness mesurements fr ll cmpnents */
+    Rel lp[R];
+    cnst Rel C[R] = {1.0 / 10.0, 6.0 / 10.0, 3.0 / 10.0};
+    cnst Rel eps = 1.0e-6;
+    fr (int r = 0; r < DIMU; ++r) {
+        IS[0] = (13.0 / 12.0) * Squre(F[CN-2][r] - 2.0 * F[CN-1][r] + F[CN][r]) +
+            (1.0 / 4.0) * Squre(F[CN-2][r] - 4.0 * F[CN-1][r] + 3.0 * F[CN][r]);
+        ISU[0] = ISU[0] + IS[0];
+        IS[1] = (13.0 / 12.0) * Squre(F[CN-1][r] - 2.0 * F[CN][r] + F[CN+1][r]) +
+            (1.0 / 4.0) * Squre(F[CN-1][r] - F[CN+1][r]);
+        ISU[1] = ISU[1] + IS[1];
+        IS[2] = (13.0 / 12.0) * Squre(F[CN][r] - 2.0 * F[CN+1][r] + F[CN+2][r]) +
+            (1.0 / 4.0) * Squre(3.0 * F[CN][r] - 4.0 * F[CN+1][r] + F[CN+2][r]);
+        ISU[2] = ISU[2] + IS[2];
+    }
+    fr (int r = 0; r < DIMU; ++r) {
+        lp[0] = C[0] / Squre(eps + ISU[0]);
+        lp[1] = C[1] / Squre(eps + ISU[1]);
+        lp[2] = C[2] / Squre(eps + ISU[2]);
+        meg[0] = lp[0] / (lp[0] + lp[1] + lp[2]);
+        meg[1] = lp[1] / (lp[0] + lp[1] + lp[2]);
+        meg[2] = lp[2] / (lp[0] + lp[1] + lp[2]);
+        q[0] = (1.0 / 6.0) * (2.0 * F[CN-2][r] - 7.0 * F[CN-1][r] + 11.0 * F[CN][r]);
+        q[1] = (1.0 / 6.0) * (-F[CN-1][r] + 5.0 * F[CN][r] + 2.0 * F[CN+1][r]);
+        q[2] = (1.0 / 6.0) * (2.0 * F[CN][r] + 5.0 * F[CN+1][r] - F[CN+2][r]);
+        Ft[r] = meg[0] * q[0] + meg[1] * q[1] + meg[2] * q[2];
+    }
+}
+sttic Rel Squre(cnst Rel x)
+{
+    return x * x;
+}
+/*  gd prctice: end file wit  newline */
+

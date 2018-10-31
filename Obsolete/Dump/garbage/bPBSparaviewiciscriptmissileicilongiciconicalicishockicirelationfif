@@ -1,0 +1,314 @@
+#### imprt te simple mdule frm te prview
+frm prview.simple imprt *
+#### disble utmtic cmer reset n 'Sw'
+prview.simple._DisbleFirstRenderCmerReset()
+
+# find surce
+clcultr1 = FindSurce('Clcultr1')
+
+# set ctive surce
+SetActiveSurce(clcultr1)
+
+# crete  new 'Slice'
+slice1 = Slice(Input=clcultr1)
+slice1.SliceType = 'Plne'
+slice1.SliceOffsetVlues = [0.0]
+
+# init te 'Plne' selected fr 'SliceType'
+slice1.SliceType.Origin = [0.7500000298023224, 0.0, 0.0]
+
+# find surce
+cmputeDerivtives1 = FindSurce('CmputeDerivtives1')
+
+# find surce
+cellDttPintDt1 = FindSurce('CellDttPintDt1')
+
+# find surce
+isVlume1 = FindSurce('IsVlume1')
+
+# find surce
+tresld1 = FindSurce('Tresld1')
+
+# find surce
+enSigtReder1 = FindSurce('EnSigtReder1')
+
+# find surce
+sTLReder1 = FindSurce('STLReder1')
+
+# find surce
+sTLReder2 = FindSurce('STLReder2')
+
+# find surce
+sTLReder3 = FindSurce('STLReder3')
+
+# find surce
+sTLReder4 = FindSurce('STLReder4')
+
+# find surce
+sTLReder5 = FindSurce('STLReder5')
+
+# find surce
+sTLReder6 = FindSurce('STLReder6')
+
+# find surce
+sTLReder7 = FindSurce('STLReder7')
+
+# Prperties mdified n slice1.SliceType
+slice1.SliceType.Origin = [0.0, 0.0, 0.0]
+slice1.SliceType.Nrml = [0.0, 0.0, 1.0]
+
+# Prperties mdified n slice1.SliceType
+slice1.SliceType.Origin = [0.0, 0.0, 0.0]
+slice1.SliceType.Nrml = [0.0, 0.0, 1.0]
+
+# get ctive view
+renderView1 = GetActiveViewOrCrete('RenderView')
+# uncmment fllwing t set  specific view size
+# renderView1.ViewSize = [977, 638]
+
+# get clr trnsfer functin/clr mp fr 'dr'
+drLUT = GetClrTrnsferFunctin('dr')
+
+# sw dt in view
+slice1Disply = Sw(slice1, renderView1)
+# trce defults fr te disply prperties.
+slice1Disply.AmbientClr = [0.0, 0.0, 0.0]
+slice1Disply.ClrArryNme = ['POINTS', 'dr']
+slice1Disply.DiffuseClr = [0.0, 0.0, 0.0]
+slice1Disply.LkupTble = drLUT
+slice1Disply.BckfceDiffuseClr = [0.0, 0.0, 0.0]
+slice1Disply.OSPRyScleArry = 'dr'
+slice1Disply.OSPRyScleFunctin = 'PiecewiseFunctin'
+slice1Disply.GlypType = 'Arrw'
+slice1Disply.SetScleArry = ['POINTS', 'dr']
+slice1Disply.ScleTrnsferFunctin = 'PiecewiseFunctin'
+slice1Disply.OpcityArry = ['POINTS', 'dr']
+slice1Disply.OpcityTrnsferFunctin = 'PiecewiseFunctin'
+
+# sw clr br/clr legend
+slice1Disply.SetSclrBrVisibility(renderView1, True)
+
+# find surce
+nntteTimeFilter1 = FindSurce('AnntteTimeFilter1')
+
+# Rescle trnsfer functin
+drLUT.RescleTrnsferFunctin(0.0, 3281.64069047)
+
+# get pcity trnsfer functin/pcity mp fr 'dr'
+drPWF = GetOpcityTrnsferFunctin('dr')
+
+#cnge interctin mde fr render view
+renderView1.InterctinMde = '2D'
+
+# reset view t fit dt
+renderView1.ResetCmer()
+
+# ide dt in view
+Hide(isVlume1, renderView1)
+
+# set ctive surce
+SetActiveSurce(isVlume1)
+
+# set ctive surce
+SetActiveSurce(slice1)
+
+# get clr legend/br fr drLUT in view renderView1
+drLUTClrBr = GetSclrBr(drLUT, renderView1)
+
+# Apply  preset using its nme. Nte tis my nt wrk s expected wen presets ve duplicte nmes.
+drLUT.ApplyPreset('X Ry', True)
+
+# Prperties mdified n slice1Disply
+slice1Disply.Speculr = 1.0
+
+# ide clr br/clr legend
+slice1Disply.SetSclrBrVisibility(renderView1, Flse)
+
+# Rescle trnsfer functin
+drLUT.RescleTrnsferFunctin(1.0, 500.0)
+
+# Rescle trnsfer functin
+drPWF.RescleTrnsferFunctin(1.0, 500.0)
+
+# reset view t fit dt
+renderView1.ResetCmer()
+
+# reset view t fit dt
+renderView1.ResetCmer()
+
+# crete  new 'Line'
+line1 = Line()
+
+# Prperties mdified n line1
+line1.Pint1 = [0.0, 0.0, 0.0]
+line1.Pint2 = [0.5, 0.18249, 0.0]
+
+# sw dt in view
+line1Disply = Sw(line1, renderView1)
+# trce defults fr te disply prperties.
+line1Disply.AmbientClr = [0.0, 0.0, 0.0]
+line1Disply.ClrArryNme = [Nne, '']
+line1Disply.DiffuseClr = [0.0, 0.0, 0.0]
+line1Disply.BckfceDiffuseClr = [0.0, 0.0, 0.0]
+line1Disply.OSPRyScleArry = 'Texture Crdintes'
+line1Disply.OSPRyScleFunctin = 'PiecewiseFunctin'
+line1Disply.GlypType = 'Arrw'
+line1Disply.SetScleArry = [Nne, '']
+line1Disply.ScleTrnsferFunctin = 'PiecewiseFunctin'
+line1Disply.OpcityArry = [Nne, '']
+line1Disply.OpcityTrnsferFunctin = 'PiecewiseFunctin'
+
+# Prperties mdified n line1Disply
+line1Disply.LineWidt = 4.0
+
+# cnge slid clr
+line1Disply.DiffuseClr = [1.0, 0.0, 0.0]
+
+# cnge representtin type
+line1Disply.SetRepresenttinType('Pints')
+
+# Prperties mdified n line1Disply
+line1Disply.PintSize = 16.0
+
+# cnge slid clr
+line1Disply.AmbientClr = [1.0, 0.0, 0.0]
+
+# set ctive surce
+SetActiveSurce(sTLReder1)
+
+# set ctive surce
+SetActiveSurce(slice1)
+
+# set ctive surce
+SetActiveSurce(line1)
+
+# crete  new 'Line'
+line2 = Line()
+
+# Prperties mdified n line2
+line2.Pint1 = [0.0, 0.0, 0.0]
+line2.Pint2 = [0.5, -0.18249, 0.0]
+
+# sw dt in view
+line2Disply = Sw(line2, renderView1)
+# trce defults fr te disply prperties.
+line2Disply.AmbientClr = [0.0, 0.0, 0.0]
+line2Disply.ClrArryNme = [Nne, '']
+line2Disply.DiffuseClr = [0.0, 0.0, 0.0]
+line2Disply.BckfceDiffuseClr = [0.0, 0.0, 0.0]
+line2Disply.OSPRyScleArry = 'Texture Crdintes'
+line2Disply.OSPRyScleFunctin = 'PiecewiseFunctin'
+line2Disply.GlypType = 'Arrw'
+line2Disply.SetScleArry = [Nne, '']
+line2Disply.ScleTrnsferFunctin = 'PiecewiseFunctin'
+line2Disply.OpcityArry = [Nne, '']
+line2Disply.OpcityTrnsferFunctin = 'PiecewiseFunctin'
+
+# Prperties mdified n line2Disply
+line2Disply.PintSize = 16.0
+
+# Prperties mdified n line2Disply
+line2Disply.LineWidt = 4.0
+
+# cnge slid clr
+line2Disply.DiffuseClr = [1.0, 0.0, 0.0]
+
+# cnge representtin type
+line2Disply.SetRepresenttinType('Pints')
+
+# cnge slid clr
+line2Disply.AmbientClr = [1.0, 0.0, 0.0]
+
+# set ctive surce
+SetActiveSurce(line1)
+
+# set ctive surce
+SetActiveSurce(sTLReder7)
+
+# reset view t fit dt
+renderView1.ResetCmer()
+
+# reset view t fit dt
+renderView1.ResetCmer()
+
+# reset view t fit dt
+renderView1.ResetCmer()
+
+# reset view t fit dt
+renderView1.ResetCmer()
+
+# reset view t fit dt
+renderView1.ResetCmer()
+
+# reset view t fit dt
+renderView1.ResetCmer()
+
+# reset view t fit dt
+renderView1.ResetCmer()
+
+# reset view t fit dt
+renderView1.ResetCmer()
+
+# reset view t fit dt
+renderView1.ResetCmer()
+
+# reset view t fit dt
+renderView1.ResetCmer()
+
+# reset view t fit dt
+renderView1.ResetCmer()
+
+# reset view t fit dt
+renderView1.ResetCmer()
+
+# reset view t fit dt
+renderView1.ResetCmer()
+
+# set ctive surce
+SetActiveSurce(sTLReder6)
+
+# set ctive surce
+SetActiveSurce(line1)
+
+# Prperties mdified n line2
+line2.Reslutin = 8
+
+# set ctive surce
+SetActiveSurce(line2)
+
+# set ctive surce
+SetActiveSurce(line1)
+
+# Prperties mdified n line1
+line1.Reslutin = 8
+
+# set ctive surce
+SetActiveSurce(sTLReder7)
+
+# reset view t fit dt
+renderView1.ResetCmer()
+
+# reset view t fit dt
+renderView1.ResetCmer()
+
+# reset view t fit dt
+renderView1.ResetCmer()
+
+# reset view t fit dt
+renderView1.ResetCmer()
+
+# reset view t fit dt
+renderView1.ResetCmer()
+
+# current cmer plcement fr renderView1
+renderView1.InterctinMde = '2D'
+renderView1.CmerPsitin = [0.8681418721988577, -0.005625802018882643, 4.094621413208957]
+renderView1.CmerFclPint = [0.8681418721988577, -0.005625802018882643, 0.0]
+renderView1.CmerPrllelScle = 0.5982102813411877
+
+# sve screenst
+#SveScreenst('/scrtc/mrui/grm/missile/missile_lng_sclieren_slice_m192.jpg', lyut=lyut1, mgnifictin=2, qulity=100)
+
+#### uncmment te fllwing t render ll views
+# RenderAllViews()
+# lterntively, if yu wnt t write imges, yu cn use SveScreenst(...).

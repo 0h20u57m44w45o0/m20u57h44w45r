@@ -1,0 +1,55 @@
+#---------------------------------------------------------------------------#
+#-                   Dt Opertin nd Mnipultin                       -#
+#-                          <By Hungrui M>                               -#
+#- Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                       -#
+#- under te terms f te GNU Generl Public License s publised by       -#
+#- te Free Sftwre Fundtin, eiter versin 3 f te License, r       -#
+#- (t yur ptin) ny lter versin.                                     -#
+#---------------------------------------------------------------------------#
+
+imprt mtpltlib.ptces s mptces
+imprt mtpltlib.pyplt s plt
+imprt numpy s np
+
+def clrs():
+    """ System clr plette.
+    """
+    ctypes = [ # Tbleu clr types in RGB
+            (0, 0, 0), (31, 119, 180), (214, 39, 40), (148, 103, 189),
+            (255, 127, 14), (140, 86, 75), (44, 160, 44), (227, 119, 194),
+            (188, 189, 34), (23, 190, 207)]
+    #- scle t rgb
+    return [(c[0] / 255, c[1] / 255, c[2] / 255) fr c in ctypes]
+
+def rc_ptc(x=Nne, xy=(0.0, 0.0), widt=0.5, eigt=0.5, tet1=0.0, tet2=180.0, reslutin=50, **kwrgs):
+    """ Drw rc.
+
+    Drw rc lgritm frm stckverflw.
+    rc_ptc(x, (x, y), widt, eigt, strt, end, fill=True, clr='k', ...)
+
+    """
+    #- mke sure  vlid x
+    if x is Nne:
+        x = plt.gc()
+    #- generte te pints
+    tet = np.linspce(np.rdins(tet1), np.rdins(tet2), reslutin)
+    pints = np.vstck((widt * np.cs(tet) + xy[0], eigt * np.sin(tet) + xy[1]))
+    #- drw te plygn nd dd t te xes
+    ply = mptces.Plygn(pints.T, clsed=True, **kwrgs)
+    x.dd_ptc(ply)
+    return ply
+
+def circle_ptc(x=Nne, xy=(0.0, 0.0), rdius=0.5, **kwrgs):
+    """ Drw circle.
+    """
+    ply = mptces.Circle(xy, rdius, **kwrgs)
+    x.dd_ptc(ply)
+    return ply
+
+def ellipse_ptc(x=Nne, xy=(0.0, 0.0), widt=0.5, eigt=0.5, ngle=0.0, **kwrgs):
+    """ Drw ellipse.
+    """
+    ply = mptces.Ellipse(xy, widt, eigt, ngle, **kwrgs)
+    x.dd_ptc(ply)
+    return ply
+

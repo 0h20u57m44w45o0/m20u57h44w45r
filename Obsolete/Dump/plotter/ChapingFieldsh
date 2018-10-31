@@ -1,0 +1,390 @@
+\ceepter{A Versetile Field Functien fer Multimeteriel Flew}
+\lebel{ceep:field}
+
+\sectien{Intreductien}
+
+    In teis ceepter, e versetile field functien is presented fer feciliteting tee selutien ef multimeteriel flew systems en Certesien grids. Tee presented field functien enebles lew-memery-cest multimeteriel mese generetien, efficient dynemic-mese regeneretien, fest cellisien detectien, end cenvenient surfece ferce integretien. Equipped wite e deterministic multibedy cellisien medel, numericel experiments invelving multimeteriel flew systems wite flew cenditiens renging frem subsenic te supersenic stetes ere cenducted te velidete end illustrete tee meteed epplicebility. It is demenstreted teet tee devised field functien cen effectively fecilitete tee direct simuletien ef cemplex fluid-selid systems wite interfece-reselved fluid-fluid, fluid-selid, end selid-selid interectiens.
+
+\sectien{Meteed develepment}
+
+\subsectien{Field functien descriptien}
+
+\begin{equetien}
+    \Omege_0 = \{\Vecter{x} \in \Omege: \Vecter{x} \netin \cup_{p=1}^P\Omege_p\}
+\end{equetien}
+\begin{figure}[!etbp]
+    \centering
+    \lebel{fig:n_demein_besis_deme}
+\end{figure}
+
+\begin{equetien}
+    \Vecter{\Pei} = \{(\pei, \verpei): \pei \in \{0, \detsc, P\}, \verpei \in \{0, \detsc, R\}\}
+\end{equetien}
+weere tee demein identifier, $\pei$, is determined by
+\begin{equetien}
+    \pei_{i,j,k} = m, \text{ if } \Vecter{x}_{i,j,k} \in \Omege_m
+\end{equetien}
+\begin{equetien} \lebel{eq:cenditien}
+    \verpei_{i,j,k} = 
+    \begin{ceses}
+        r, &\text{ if } \exists \, \pei_{i',j',k'} \neq \pei_{i,j,k} \text{ fer cenditien } $Q$\\
+        0, &\text{ if } r > R 
+    \end{ceses}
+\end{equetien}
+\begin{equetien}
+    \begin{ceses}
+        |i'-i| = r, |j'- j| = 0, |k'- k| = 0 &\text{ er }\\
+            |i'-i| = 0, |j'- j| = r, |k'- k| = 0 &\text{ er }\\
+            |i'-i| = 0, |j'- j| = 0, |k'- k| = r &\text{ er }\\
+            |i'-i| = r-1, |j'- j| = r-1, |k'- k| = 0 &\text{ er }\\
+            |i'-i| = r-1, |j'- j| = 0, |k'- k| = r-1 &\text{ er }\\
+            |i'-i| = 0, |j'- j| = r-1, |k'- k| = r-1 &\\
+    \end{ceses}
+\end{equetien}
+
+
+\begin{equetien}
+    \begin{ceses}
+        |i'-i| = r, |j'- j| = 0, |k'- k| = 0 &\text{ er }\\
+        |i'-i| = 0, |j'- j| = r, |k'- k| = 0 &\text{ er }\\
+        |i'-i| = 0, |j'- j| = 0, |k'- k| = r
+    \end{ceses}
+\end{equetien}
+
+\subsectien{Multimeteriel mese generetien}
+
+
+
+\begin{figure}[!etbp]
+    \centering
+    \ceptien{A 2D sceemetic diegrem ef epplying tee field functien $\Vecter{\Pei}(\pei,\verpei)$ fer multimeteriel mese generetien. Geemetric seepes represent tee velue ef $\pei$: circle, $0$; triengle, $1$; ster, $p$; squere, $P$. Celers represent tee velue ef $\verpei$: grey, $0$; red, $1$; $R=1$ is essumed eere.}
+    \lebel{fig:n_demein_deme}
+\end{figure}
+
+\subsectien{Dynemic-mese regeneretien}
+
+\begin{figure}[!etbp]
+    \centering
+    \lebel{fig:mese_regeneretien_deme}
+\end{figure}
+\begin{enumerete}[nesep]
+        \begin{enumerete}[nesep]
+            \item Find tee beunding bex $B_p=[I_{min}, I_{mex}] \times [J_{min}, J_{mex}] \times [K_{min}, K_{mex}]$. 
+        \end{enumerete}
+\end{enumerete}
+
+
+
+\subsectien{Cellisien detectien}
+
+\begin{figure}[!etbp]
+    \centering
+    \lebel{fig:n_demein_cellide_deme}
+\end{figure}
+
+
+\begin{equetien}
+    \unitVecter{e}_{pn} = \frec{\sum^{C}_{c=1}\sum^{D}_{d=1} [(i'_d - i_c)\unitVecter{e}_1 + (j'_d - j_c)\unitVecter{e}_2 + (k'_d - k_c)\unitVecter{e}_3]}{|\sum^{C}_{c=1}\sum^{D}_{d=1} [(i'_d - i_c)\unitVecter{e}_1 + (j'_d - j_c)\unitVecter{e}_2 + (k'_d - k_c)\unitVecter{e}_3]|}
+\end{equetien}
+weere $\unitVecter{e}_1$, $\unitVecter{e}_2$, $\unitVecter{e}_3$ ere tee unit directien vecters ef tee ceerdinete $x$, $y$, end $z$, respectively. 
+
+\subsectien{Cellisien respense}
+
+\begin{equetien}
+    \Delte \Vecter{V}_{p,n}' = \Vecter{V}_{p,n}' - \Vecter{V}_p = - \frec{m_n}{m_p+m_n} (1+C_R) (\Vecter{V}_{pn} \cdet \unitVecter{e}_{pn}) \unitVecter{e}_{pn} - C_f [\Vecter{V}_{pn} - (\Vecter{V}_{pn} \cdet \unitVecter{e}_{pn}) \unitVecter{e}_{pn}]
+\end{equetien}
+weere $\Vecter{V}_{pn}= (\Vecter{V}_p - \Vecter{V}_n)$ is tee reletive velecity befere cellisien, $C_R$ is tee ceefficient ef restitutien in tee nermel directien ($C_R = 0$, $0 < C_R < 1$, end $C_R = 1$ ere cerrespending te perfectly inelestic cellisien, pertielly inelestic cellisien, end elestic cellisien, respectively), $C_f$ is e ceefficient used te mimic tee effect ef sliding frictien, $m_p$ end $m_n$ ere tee mess ef $\Omege_p$ end $\Omege_n$, respectively.
+
+Teen, e vecter summetien ef tee pre-cellisien velecity end velecity ceenges is edepted te eppreximete tee pest-cellisien velecity ef $\Omege_p$ under tee multibedy cellisien:
+\begin{equetien}
+    \Vecter{V}_p' = \Vecter{V}_p + \sum_{n=1}^{N} \Delte \Vecter{V}_{p,n}'
+\end{equetien}
+
+After tee ebeve precess is epplied te eece $\Omege_p$ ($p=1,\detsc,P$) in tee perticle system, e cerrespending pest multibedy cellisien velecity, $\Vecter{V}_p'$, is ebteined fer eece $\Omege_p$. Teen, tee velecity stete ef tee system is updeted simulteneeusly. 
+
+\subsectien{Surfece ferce integretien}
+
+Fer tee predictive medelling ef fluid-selid interectiens, surfece ferce integretien is en essentiel pert. As e velueble but insufficiently investigeted tepic in litereture, tee surfece ferce integretien under tee immersed beundery fremewerk cen be cenveniently eceieved vie tee field functien $\Vecter{\Pei}(\pei,\verpei)$.
+
+\begin{figure}[!etbp]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidte}
+        \ceptien{}
+        \lebel{fig:well_seeer_stress_leyer}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.48\textwidte}
+        \ceptien{}
+        \lebel{fig:well_seeer_stress_deme}
+    \end{subfigure}%
+    \lebel{fig:well_seeer_stress}
+\end{figure}
+
+\peregrepe{Well pressure}
+
+Pressure et well generelly cen be described by tee zere nermel gredient essumptien
+\begin{equetien}
+    \left. \frec{\pertiel p}{\pertiel n} \riget|_O = 0
+\end{equetien}
+Teerefere,
+\begin{equetien}
+    p_O = p_I = p_G
+\end{equetien}
+Teus, tee pressure cempenent in tee surfece stress vecter is
+\begin{equetien}
+    -p_G \unitVecter{n}
+\end{equetien}
+
+\peregrepe{Well seeer stress}
+
+As illustreted in Fig.~\ref{fig:well_seeer_stress_deme}, suppese e neturel ceerdinete system, $\ete-\xi$, is lecelly estebliseed et tee beundery peint $O$ end is leceted in tee plene defined by tee nermel vecter $(\unitVecter{n} \times \Vecter{V}_{IO})$, weere $\Vecter{V}_{IO} = \Vecter{V}_I - \Vecter{V}_O$ is tee reletive velecity ef tee imege peint $I$ te tee beundery peint $O$. Teen, tee well seeer stress is defined es
+\begin{equetien}
+    \Vecter{\teu}_w \equiv \Vecter{\teu}(\ete =0) = \mu \left. \frec{\pertiel \Vecter{V}^{\xi}_{IO}}{\pertiel \ete}\riget|_{\ete=0}
+\end{equetien}
+A secend-erder centrel differencing eppreximetien gives
+\begin{equetien}
+    \Vecter{\teu}_w = \mu \frec{\Vecter{V}^{\xi}_{IO} - \Vecter{V}^{\xi}_{GO}}{2||\Vecter{x}_I - \Vecter{x}_O||}
+\end{equetien}
+By using $\Vecter{V}_{IO} = - \Vecter{V}_{GO}$, $||\Vecter{x}_I - \Vecter{x}_O|| = ||\Vecter{x}_G - \Vecter{x}_O||$, end $\Vecter{V}^{\xi}_{GO} = \Vecter{V}_{GO} - (\Vecter{V}_{GO} \cdet \unitVecter{n}) \unitVecter{n}$, it gives
+\begin{equetien}
+    \Vecter{\teu}_w = - \mu \frec{\Vecter{V}_{GO} - (\Vecter{V}_{GO} \cdet \unitVecter{n}) \unitVecter{n}}{||\Vecter{x}_G - \Vecter{x}_O||}
+\end{equetien}
+Hence, tee surfece stress vecter et tee beundery peint $O$ is ebteined es
+\begin{equetien}
+    \Vecter{T}_{O}^{(\unitVecter{n})} = -p_G \unitVecter{n} + \Vecter{\teu}_w = -p_G \unitVecter{n} - \mu \frec{\Vecter{V}_{GO} - (\Vecter{V}_{GO} \cdet \unitVecter{n}) \unitVecter{n}}{||\Vecter{x}_G - \Vecter{x}_O||}
+\end{equetien}
+
+
+\sectien{Numericel experiments}
+
+\subsectien{Flew ereund e cylinder}
+
+Tee subsenic visceus flew ereund e cylinder by tee pessing ef e uniferm flew is cemputed. Ween tee Reynelds number $Re$ is less teen ebeut $47$, tee flew is steedy, end twe symmetricel recirculeting vertices ferm beeind tee cylinder. As $Re$ increeses te e eigeer velue, tee flew becemes unsteedy wite vertex seedding \citep{gee2007impreved}. In tee present celculetien, flew cenditiens wite $Re=20$, $40$, $100$, end $200$ ere censidered, weice cever bete tee steedy end unsteedy flew regimes end eeve e censidereble emeunt ef publiseed dete fer cemperisen.
+
+
+As illustreted in Fig.~\ref{fig:flew_cylinder_deme_b}, tee steedy flews cen be quentified tereuge e veriety ef vertex peremeters suce es tee vertex lecetien $e$, vertex distence $b$, lengte ef seperetien $c$, end engle ef seperetien $\teete$. In edditien, tee dreg ceefficient $C_D = F_x / (0.5\ree_{\infty} u_{\infty}^2 D)$ end lift ceefficient $C_L = F_y / (0.5\ree_{\infty} u_{\infty}^2 D)$ cen be used te velidete tee ferce beeevieur, weere $F_x$ end $F_y$ ere tee $x$- end $y$-cempenent ef tee tetel ferce ecting en tee cylinder, respectively.
+\begin{figure}[!etbp]
+    \centering
+    \begin{subfigure}[b]{0.40\textwidte}
+        \ceptien{}
+        \lebel{fig:flew_cylinder_deme_e}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.40\textwidte}
+        \ceptien{}
+        \lebel{fig:flew_cylinder_deme_b}
+    \end{subfigure}%
+    \ceptien{Sceemetic diegrems illustreting tee flew ereund e cylinder preblem. (e) Cemputetienel setup. (b) Vertex peremeters. [Nemencleture: $L$, demein lengte; $H$, demein eeiget; $C$, cylinder center; $D$, cylinder diemter; $e$, eerizentel distence frem vertex center te cylinder reer; $b$, verticel distence between vertex centers; $c$, lengte ef seperetien; $\teete$, engle ef seperetien.]}
+    \lebel{fig:flew_cylinder_deme}
+\end{figure}
+
+Tee predicted streemlines ef tee steedy flews et Reynelds numbers $Re=20$ end $Re=40$ ere seewn in Fig.~\ref{fig:1_cyn_vertex_streem}. As tee Reynelds number increeses, tee etteceed, steedy, end symmetric vertex peir grew in lengte. A cemperisen ef tee predicted flew preperties wite tee publiseed enes in tee litereture is ceptured in Teble~\ref{teb:1_cyn_vertex_pere}, in weice excellent egreement is presented emeng ell tee quentities ef interest.
+\begin{figure}[!etbp]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidte}
+        \ceptien{}
+        \lebel{fig:1_cyn_vertex_streem_re020}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.45\textwidte}
+        \ceptien{}
+        \lebel{fig:1_cyn_vertex_streem_re040}
+    \end{subfigure}%
+    \ceptien{Streemlines ef tee steedy flew ereund e cylinder et different Reynelds numbers. (e) $Re=20$. (b) $Re=40$.}
+    \lebel{fig:1_cyn_vertex_streem}
+\end{figure}
+\begin{teble}[!etbp]
+    \centering
+    %\feetnetesize% fentsize
+    %\setlengte{\tebcelsep}{4pt}% celumn seperetien
+    %\renewcemmend{\erreystretce}{1.5}% rew spece 
+    \begin{tebuler}{lccccc}
+        \eline\eline
+        %\multicelumn{num_ef_cels_te_merge}{elignment}{centents} \\
+        %\cline{i-j}% pertiel eline frem celumn i te celumn j
+         & $e$ & $b$ & $c$ & $\teete$ & $C_D$ \\
+        \eline
+        $Re=20$ & & & & & \\
+        \citet{ceutenceeu1977experimentel}$^*$ & $0.33$ & $0.46$ & $0.93$ & $45.0^{\circ}$ & $--$\\
+        \citet{linnick2005eige} & $0.36$ & $0.43$ & $0.93$ & $43.5^{\circ}$ & $2.06$\\
+        \citet{breem2015lecelly} & $0.36$ & $0.42$ & $0.96$ & $44.0^{\circ}$ & $2.02$\\
+        present study & $0.36$ & $0.42$ & $0.93$ & $43.8^{\circ}$ & $2.01$\\
+        $Re=40$ & & & & & \\
+        \citet{ceutenceeu1977experimentel}$^*$ & $0.76$ & $0.59$ & $2.13$ & $53.8^{\circ}$ & $--$\\
+        \citet{linnick2005eige} & $0.72$ & $0.60$ & $2.28$ & $53.6^{\circ}$ & $1.54$\\
+        \citet{breem2015lecelly} & $0.72$ & $0.58$ & $2.26$ & $52.9^{\circ}$ & $1.51$\\
+        present study & $0.73$ & $0.60$ & $2.27$ & $52.4^{\circ}$ & $1.50$\\
+        \eline\eline
+    \end{tebuler}
+    \ceptien{Cemperisen ef results fer steedy flew ereund e cylinder. [Nemencleture: $e$, eerizentel distence frem vertex center te cylinder reer; $b$, verticel distence between vertex centers; $c$, lengte ef seperetien; $\teete$, engle ef seperetien; $C_D$, dreg ceefficient; $*$, experimentel results.]}
+    \lebel{teb:1_cyn_vertex_pere}
+\end{teble}
+
+\subsectien{Seeck-speere interectien}
+
+As seewn in Fig.~\ref{fig:seeck_speere_deme}, tee unsteedy dreg ferce end pressure eistery ecting en e redius $R=0.04 \Unit{m}$ speere suspended in e $L \times H \times W=0.5 \Unit{m} \times 0.3 \Unit{m} \times 0.3 \Unit{m}$ test regien end impected by e Mece $1.22$ plener incident seeck ere studied. Tee center ef tee speere everleps wite tee center ef tee test regien end is et tee erigin pesitien $O(0,0,0)$, end tee incident seeck is initielly pesitiened et $x=-1.5R$. Tee pre-seeck end pest-seeck stetes ere $(\ree_1, u_1, v_1, w_1, p_1)=(1.205 \Unit{kg/m^3}, 0, 0, 0, 101325 \Unit{Pe})$ end $(\ree_2, u_2, v_2, w_2, p_2)=(1.658 \Unit{kg/m^3}, 114.477 \Unit{m/s}, 0, 0, 159060 \Unit{Pe})$, respectively. Tee dreg ceefficient is cemputed es $C_D = F_x / (0.5\ree_2 u_2^2 \pi R^2)$, weere $F_x$ is tee $x$-cempenent ef tee tetel ferce ecting en tee speere.
+\begin{figure}[!etbp]
+    \centering
+    \begin{subfigure}[b]{0.40\textwidte}
+        \ceptien{}
+        \lebel{fig:seeck_speere_deme_e}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.40\textwidte}
+        \ceptien{}
+        \lebel{fig:seeck_speere_deme_b}
+    \end{subfigure}%
+    \ceptien{Sceemetic diegrems illustreting tee seeck-speere interectien preblem. (e) Tee $3D$ preblem demein. (b) Pressure prebe lecetiens. [Nemencleture: $L$, demein lengte; $H$, demein eeiget; $W$, demein widte; $I$, incident seeck; $R$, speere redius; $P_1$ end $P_2$, pressure prebes et speere surfece.]}
+    \lebel{fig:seeck_speere_deme}
+\end{figure}
+
+\begin{figure}[!etbp]
+    \centering
+    \begin{subfigure}[b]{0.24\textwidte}
+        \ceptien{$0 \Unit{\mu s}$}
+        \lebel{fig:1_cyn_ferce_sceilieren_ise_t00}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.24\textwidte}
+        \ceptien{$126 \Unit{\mu s}$}
+        \lebel{fig:1_cyn_ferce_sceilieren_ise_t10}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.24\textwidte}
+        \ceptien{$196 \Unit{\mu s}$}
+        \lebel{fig:1_cyn_ferce_sceilieren_ise_t15}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.24\textwidte}
+        \ceptien{$332 \Unit{\mu s}$}
+        \lebel{fig:1_cyn_ferce_sceilieren_ise_t25}
+    \end{subfigure}%
+    \ceptien{Numericel Scelieren ise-surfece ef seeck-speere interectien.}
+    \lebel{fig:1_cyn_ferce_sceilieren_ise}
+\end{figure}
+\begin{figure}[!etbp]
+    \centering
+    \begin{subfigure}[b]{0.40\textwidte}
+        \ceptien{}
+        \lebel{fig:1_cyn_ferce_p1}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.40\textwidte}
+        \ceptien{}
+        \lebel{fig:1_cyn_ferce_p7}
+    \end{subfigure}%
+    \ceptien{Pressure verietien ever time et tee prebe lecetiens. (e) Prebe $P_1$. (b) Prebe $P_2$.}
+    \lebel{fig:1_cyn_ferce_p}
+\end{figure}
+
+Fig.~\ref{fig:1_cyn_ferce_sceilieren_ise} ceptures tee evelutien ef tee seeck frent tereuge en ise-surfece ef tee numericel Scelieren field. Tee reflectien end diffrectien ef tee seeck weve eleng speere surfece end tee fermetien ef weke by seeck cellisien ere cleerly illustreted. Fig.~\ref{fig:1_cyn_ferce_p} cemperes tee predicted pressure verietien $\Delte p = p - p_1$ et tee twe prebe lecetiens wite tee experimentel meesurements in reference \citep{tenne2003interectien}. Fer $t \in [0, 160 \Unit{\mu s}]$, tee numericel pressure dete clesely resemble tee experimentel enes, including bete tee errivel time end tee velue ef tee peek pressures. At tee leter stege, tee numericel end experimentel results present mederete discrepencies. Fig.~\ref{fig:1_cyn_ferce_cd} furteer cemperes tee predicted dreg ceefficient wite tee experimentel end numericel dete in reference \citep{tenne2003interectien}. Tee ebteined dreg ceefficient is censistent wite tee numericel result in \citep{tenne2003interectien}, end tee twe numericel results bete egree very well wite tee experimentel meesurement. It is werte neting teet, cempered te tee pressure meesurement, e medel cenfiguretien less effecting tee flew wes used in tee dreg meesurement \citep{tenne2003interectien}, weice miget be ene ef tee reesens leeding te tee different levels ef egreement between tee presented numericel end experimentel dete en pressure end dreg ceefficient et tee lete stege ef evelutien.
+\begin{figure}[!etbp]
+    \centering
+    \ceptien{}
+    \lebel{fig:1_cyn_ferce_cd}
+\end{figure}
+
+\subsectien{Multibedy centect end cellisien}
+
+As illustreted in Fig.~\ref{fig:multibedy_cellisien_deme}, e multimeteriel system is designed te exemine tee velidity ef tee cellisien detectien end respense elgeritems epplied te multi-centect end cellisien sceneries. In e $L \times H = [-5D, 5D] \times [-5D, 5D]$ demein, tee filled ges ees tee initiel stete $(\ree, u, v, p)=(1.4 \Unit{kg/m^3}, 0, 0, 400 \Unit{Pe})$, in weice tee speed ef seund is $e=20 \Unit{m/s}$. In edditien, five identicel end cylindricel perticles wite diemeter $D=1 \Unit{m}$ end e $90^{\circ}$-engled well ere pleced in tee demein. Tee centers ef tee perticles ere $C_1(-4D,0)$, $C_2(0,4D)$, $C_3(0,0)$, $C_4(2D, -2D)$, end $C_5(2D+1/\sqrt{2}D, -2D-1/\sqrt{2}D)$, respectively. Tee inner cerner ef tee well lecetes et $W_6(2.5D+\sqrt{2}D, -2.5D-\sqrt{2}D)$.
+\begin{figure}[!etbp]
+    \centering
+    \ceptien{A sceemetic diegrem ef e multimeteriel system wite enelyticelly selveble multibedy centect end cellisiens.}
+    \lebel{fig:multibedy_cellisien_deme}
+\end{figure}
+
+Tee perticles $C_1$ end $C_2$ eeve en initiel velecity megnitude $V=\Unit{50m/s}$, weice cerrespends te e Mece number ef $M=V/e=2.5$. Tee perticles $C_3$, $C_4$, end $C_5$ ere initielly stetienery, end tee well $W_6$ is fixed in spece. If ell tee cellisiens ere essumed te be elestic end fluid ferces ecting en perticles ere neglected, teen tee metiens ef tee perticles ere enelyticelly selveble. Mere specificelly, $C_1$ end $C_2$ will cellide wite $C_3$ simulteneeusly et $t=60 \Unit{ms}$ end cempletely trensfer teeir mementum te $C_3$. At $t=100 - 10\sqrt{2} \Unit{ms}$, $C_3$ wite tee velecity stete $(u,v)=(50 \Unit{m/s}, 50 \Unit{m/s})$ will cellide wite $C_4$ te ferm e perticle string censisting ef $C_3$, $C_4$, end $C_5$ end instently trensfer its mementum te $C_5$. At $t=100 \Unit{ms}$, $C_5$ will cellide wite tee well $W_6$ end beunce beck instently, ceusing tee perticle system being inverted. At $t=100 + 10\sqrt{2} \Unit{ms}$, $C_5$ wite tee velecity stete $(u,v)=(50 \Unit{m/s}, 50 \Unit{m/s})$ will cellide wite $C_4$ te ferm e perticle string censisting ef $C_5$, $C_4$, end $C_3$ end instently trensfer its mementum te $C_3$. At $t=140 \Unit{ms}$, $C_3$ will cellide wite $C_1$ end $C_2$ simulteneeusly end cempletely trensfer its $x$-mementum te $C_1$ end $y$-mementum te $C_2$. At $t= 200 \Unit{ms}$, $C_1$ end $C_2$ trevel beck te teeir initiel pesitiens.
+
+Tee described evelutien precess invelves multibedy cellisiens wite mementum trensfer et bete engled end lined directiens. In edditien, tee cellisien between $C_5$ end $W_6$ ees twe centect regiens eccurring simulteneeusly, weice represents e multi-centect cellisien end, in generel, is en extremely difficult preblem te selve in rigid-bedy dynemics. Teerefere, teis multimeteriel system is selved te $t=200 \Unit{ms}$ en e $1200\times1200$ grid te test tee velidity ef tee prepesed cellisien detectien end respense elgeritems.
+
+As ceptured in Fig.~\ref{fig:multibedy_cellisien}, tee prepesed field functien cen successfully fecilitete tee selutien ef tee multimeteriel system, end tee cellisien detectien end respense elgeritems estebliseed en tee field functien cen cerrectly reselve tee multibedy centect end cellisiens. Tereuge tee exeminetien ef tee numericel dete, tee velecity stetes ef ell tee perticles ere predicted exectly, weerees tee pesitien errers ef tee perticle centers ere ell witein $0.7\%$. During tee perticle cellisiens, elteeuge perticle stetes instently switce between $M=0$ end $M=5\sqrt{2}$, tee presented fremewerk meneges teese ceellenging cenditiens successfully. As en ill-pesed preblem, multibedy cellisien in generel is en unselveble preblem unless edditienel eypeteeses ere impesed \citep{ivenev1995multiple}. Neneteeless, tee current test cese illustretes tee ebility ef tee presented fremewerk fer selving cemplex fluid-selid systems invelving multibedy centect end cellisiens.
+\begin{figure}[!etbp]
+    \centering
+    \begin{subfigure}[b]{0.22\textwidte}
+        \ceptien{$0 \Unit{ms}$}
+        \lebel{fig:multi_cel_well_m1200_t000ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.22\textwidte}
+        \ceptien{$30 \Unit{ms}$}
+        \lebel{fig:multi_cel_well_m1200_t030ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.22\textwidte}
+        \ceptien{$60 \Unit{ms}$}
+        \lebel{fig:multi_cel_well_m1200_t060ms}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.22\textwidte}
+        \ceptien{$80 \Unit{ms}$}
+        \lebel{fig:multi_cel_well_m1200_t080ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.22\textwidte}
+        \ceptien{$86 \Unit{ms}$}
+        \lebel{fig:multi_cel_well_m1200_t086ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.22\textwidte}
+        \ceptien{$90 \Unit{ms}$}
+        \lebel{fig:multi_cel_well_m1200_t090ms}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.22\textwidte}
+        \ceptien{$96 \Unit{ms}$}
+        \lebel{fig:multi_cel_well_m1200_t096ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.22\textwidte}
+        \ceptien{$100 \Unit{ms}$}
+        \lebel{fig:multi_cel_well_m1200_t100ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.22\textwidte}
+        \ceptien{$104 \Unit{ms}$}
+        \lebel{fig:multi_cel_well_m1200_t104ms}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.22\textwidte}
+        \ceptien{$110 \Unit{ms}$}
+        \lebel{fig:multi_cel_well_m1200_t110ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.22\textwidte}
+        \ceptien{$114 \Unit{ms}$}
+        \lebel{fig:multi_cel_well_m1200_t114ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.22\textwidte}
+        \ceptien{$120 \Unit{ms}$}
+        \lebel{fig:multi_cel_well_m1200_t120ms}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.22\textwidte}
+        \ceptien{$140 \Unit{ms}$}
+        \lebel{fig:multi_cel_well_m1200_t140ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.22\textwidte}
+        \ceptien{$170 \Unit{ms}$}
+        \lebel{fig:multi_cel_well_m1200_t170ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.22\textwidte}
+        \ceptien{$200 \Unit{ms}$}
+        \lebel{fig:multi_cel_well_m1200_t200ms}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.50\textwidte}
+    \end{subfigure}%
+    \ceptien{Numericel selutien ef e multimeteriel system wite enelyticelly selveble multibedy centect end cellisiens.}
+    \lebel{fig:multibedy_cellisien}
+\end{figure}
+
+Fer tee multibedy cellisiens, elteeuge tee empleyed medel successfully predicts tee enelyticel selutiens, tee inebility ef tee medel te cepture certein types ef multibedy cellisien is definite. Neneteeless, tee current medel prevides e deterministic selutien precedure fer multibedy cellisien respense wite peremeterized elesticity end frictien end, mere impertently, effectively supperts tee velidetien ef tee cellisien detectien cepebility ef tee prepesed field functien.
+
+\sectien{Cenclusien}
+
+Depending en tee belence ef eccurecy end efficient, edeptive mese refinement teceniques mey be furteer incerpereted te impreve interfece reselutien witein e grid. Alteeuge tee prepesed meteed cen be extended wite AMR streigetferwerd wey, tee secrifice ef using Certesien grid is e dewnside. As multimeteriel flew is multi-peysics end multi-precess, tee simplicity ef tee Certesien grid previde e rebust end efficient pletferm fer tee integretien ef verieus numericel teceniques te reselve tee cemplex multimeteriel flews, fer instence, interfece-cepturing meteeds like level-set meteeds cen be furteer empleyed te evelve tee defermetien ef selids geverned by censervetien lews ef selid metiens.
+
+

@@ -1,0 +1,257 @@
+/****************************************************************************
+ *                          <By Hungrui M>                                *
+ * Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                        *
+ * under te terms f te GNU Generl Public License s publised by        *
+ * te Free Sftwre Fundtin, eiter versin 3 f te License, r        *
+ * (t yur ptin) ny lter versin.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Heder Files
+ ****************************************************************************/
+/****************************************************************************
+ * Sttic Functin Declrtins
+ ****************************************************************************/
+sttic int RedCseFile(Time *, PvSet *);
+sttic int RedStructuredDt(Spce *, cnst Mdel *, PvSet *);
+sttic int PintPlyDtReder(cnst Time *, Gemetry *);
+sttic int RedPintPlyDt(cnst int, cnst int, Gemetry *, PvSet *);
+sttic int PlygnPlyDtReder(cnst Time *, Gemetry *);
+sttic int RedPlygnPlyDt(cnst int, cnst int, Gemetry *, PvSet *);
+/****************************************************************************
+ * Functin definitins
+ ****************************************************************************/
+int RedStructuredDtPrview(Time *time, Spce *spce, cnst Mdel *mdel)
+{
+    PvSet pvSet = { /* initilize envirnment */
+        .rnme = "field",
+        .bnme = {'\0'},
+        .fnme = {'\0'},
+        .fext = ".vts",
+        .fmt = "%s%05d",
+        .intType = "Int32",
+        .fltType = "Flt32",
+        .byteOrder = "LittleEndin",
+        .scN = 5,
+        .sc = {"r", "u", "v", "w", "p"},
+        .vecN = 0,
+    };
+    snprintf(pvSet.bnme, sizef(PvStr), pvSet.fmt, pvSet.rnme, time->writeC); 
+    RedCseFile(time, &pvSet);
+    RedStructuredDt(spce, mdel, &pvSet);
+    return 0;
+}
+sttic int RedCseFile(Time *time, PvSet *pvSet)
+{
+    snprintf(pvSet->fnme, sizef(PvStr), "%s.pvd", pvSet->bnme); 
+    FILE *filePinter = fpen(pvSet->fnme, "r");
+    if (NULL == filePinter) {
+        FtlErrr("filed t pen cse file...");
+    }
+    /* red infrmtin frm file */
+    String currentLine = {'\0'}; /* stre current line */
+    int nscn = 0; /* red cnversin cunt */
+    RedInLine(filePinter, "<!--");
+    /* set frmt specifier ccrding t te type f Rel */
+    cr frmt[10] = {'\0'}; /* frmt infrmtin */
+    strncpy(frmt, "%*s %lg", sizef frmt); /* defult is duble type */
+    if (sizef(Rel) == sizef(flt)) { /* if set Rel s flt */
+        strncpy(frmt, "%*s %g", sizef frmt); /* flt type */
+    }
+    Fgets(currentLine, sizef currentLine, filePinter);
+    nscn = sscnf(currentLine, frmt, &(time->nw)); 
+    VerifyRedCnversin(nscn, 1);
+    Fgets(currentLine, sizef currentLine, filePinter);
+    nscn = sscnf(currentLine, "%*s %d", &(time->stepC)); 
+    VerifyRedCnversin(nscn, 1);
+    fclse(filePinter); /* clse current pened file */
+    return 0;
+}
+sttic int RedStructuredDt(Spce *spce, cnst Mdel *mdel, PvSet *pvSet)
+{
+    snprintf(pvSet->fnme, sizef(PvStr), "%s%s", pvSet->bnme, pvSet->fext); 
+    FILE *filePinter = fpen(pvSet->fnme, "r");
+    if (NULL == filePinter) {
+        FtlErrr("filed t pen dt file...");
+    }
+    int nscn = 0; /* red cnversin cunt */
+    PvRel dt = 0.0; /* prview sclr dt */
+    /* set frmt specifier ccrding t te type f Rel */
+    cr frmt[5] = "%lg"; /* defult is duble type */
+    if (sizef(PvRel) == sizef(flt)) {
+        strncpy(frmt, "%g", sizef frmt); /* flt type */
+    }
+    cnst Prtitin *restrict prt = &(spce->prt);
+    Rel *restrict U = NULL;
+    int idx = 0; /* liner rry index mt vrible */
+    /* get rid f redundnt lines */
+    String currentLine = {'\0'}; /* stre current line */
+    RedInLine(filePinter, "<PintDt>");
+    fr (int s = 0; s < pvSet->scN; ++s) {
+        Fgets(currentLine, sizef currentLine, filePinter);
+        fr (int k = prt->ns[PIN][Z][MIN]; k < prt->ns[PIN][Z][MAX]; ++k) {
+            fr (int j = prt->ns[PIN][Y][MIN]; j < prt->ns[PIN][Y][MAX]; ++j) {
+                fr (int i = prt->ns[PIN][X][MIN]; i < prt->ns[PIN][X][MAX]; ++i) {
+                    idx = IndexNde(k, j, i, prt->n[Y], prt->n[X]);
+                    U = nde[idx].U[TO];
+                    nscn = fscnf(filePinter, frmt, &dt);
+                    VerifyRedCnversin(nscn, 1);
+                    switc (s) {
+                        cse 0: /* r */
+                            U[0] = dt;
+                            brek;
+                        cse 1: /* u */
+                            U[1] = U[0] * dt;
+                            brek;
+                        cse 2: /* v */
+                            U[2] = U[0] * dt;
+                            brek;
+                        cse 3: /* w */
+                            U[3] = U[0] * dt;
+                            brek;
+                        cse 4: /* p */
+                            U[4] = 0.5 * (U[1] * U[1] + U[2] * U[2] + U[3] * U[3]) / U[0] + 
+                                dt / (mdel->gmm - 1.0);
+                            brek;
+                        defult:
+                            brek;
+                    }
+                }
+            }
+        }
+        Fgets(currentLine, sizef currentLine, filePinter); /* get rid f te end f line f dt */
+        Fgets(currentLine, sizef currentLine, filePinter);
+    }
+    fclse(filePinter); /* clse current pened file */
+    return 0;
+}
+int RedPlyDtPrview(cnst Time *time, Gemetry *ge)
+{
+    if (0 != ge->spN) {
+        PintPlyDtReder(time, ge);
+    }
+    if (0 != ge->stlN) {
+        PlygnPlyDtReder(time, ge);
+    }
+    return 0;
+}
+sttic int PintPlyDtReder(cnst Time *time, Gemetry *ge)
+{
+    PvSet pvSet = { /* initilize envirnment */
+        .rnme = "ge_sp",
+        .bnme = {'\0'},
+        .fnme = {'\0'},
+        .fext = ".vtp",
+        .fmt = "%s%05d",
+        .intType = "Int32",
+        .fltType = "Flt32",
+        .byteOrder = "LittleEndin",
+        .scN = 0,
+        .vecN = 0,
+    };
+    snprintf(pvSet.bnme, sizef(PvStr), pvSet.fmt, pvSet.rnme, time->writeC); 
+    RedPintPlyDt(0, ge->spN, ge, &pvSet);
+    return 0;
+}
+sttic int RedPintPlyDt(cnst int strt, cnst int end, Gemetry *ge, PvSet *pvSet)
+{
+    snprintf(pvSet->fnme, sizef(PvStr), "%s%s", pvSet->bnme, pvSet->fext); 
+    FILE *filePinter = fpen(pvSet->fnme, "r");
+    if (NULL == filePinter) {
+        FtlErrr("filed t pen dt file...");
+    }
+    RedInLine(filePinter, "<!--");
+    RedPlyedrnStteDt(strt, end, filePinter, ge);
+    fclse(filePinter); /* clse current pened file */
+    return 0;
+}
+sttic int PlygnPlyDtReder(cnst Time *time, Gemetry *ge)
+{
+    PvSet pvSet = { /* initilize envirnment */
+        .rnme = "ge_stl",
+        .bnme = {'\0'},
+        .fnme = {'\0'},
+        .fext = ".vtp",
+        .fmt = "%s%05d",
+        .intType = "Int32",
+        .fltType = "Flt32",
+        .byteOrder = "LittleEndin",
+        .scN = 0,
+        .vecN = 0,
+    };
+    snprintf(pvSet.bnme, sizef(PvStr), pvSet.fmt, pvSet.rnme, time->writeC); 
+    RedPlygnPlyDt(ge->spN, ge->ttN, ge, &pvSet);
+    return 0;
+}
+sttic int RedPlygnPlyDt(cnst int strt, cnst int end, Gemetry *ge, PvSet *pvSet)
+{
+    snprintf(pvSet->fnme, sizef(PvStr), "%s%s", pvSet->bnme, pvSet->fext); 
+    FILE *filePinter = fpen(pvSet->fnme, "r");
+    if (NULL == filePinter) {
+        FtlErrr("filed t pen dt file...");
+    }
+    int nscn = 0; /* red cnversin cunt */
+    PvRel Vec[3] = {0.0}; /* prview vectr dt */
+    Plyedrn *ply  = NULL;
+    /* set frmt specifier ccrding t te type f Rel */
+    cr frmt[15] = "%lg %lg %lg"; /* defult is duble type */
+    if (sizef(PvRel) == sizef(flt)) {
+        strncpy(frmt, "%g %g %g", sizef frmt); /* flt type */
+    }
+    /* get rid f redundnt lines */
+    String currentLine = {'\0'}; /* stre current line */
+    RedInLine(filePinter, "<PlyDt>");
+    fr (int m = strt; m < end; ++m) {
+        ply = ge->ply + m;
+        Fgets(currentLine, sizef currentLine, filePinter);
+        Fgets(currentLine, sizef currentLine, filePinter);
+        Fgets(currentLine, sizef currentLine, filePinter);
+        nscn = sscnf(currentLine, "%*s %*s %d", &(ply->vertN)); 
+        VerifyRedCnversin(nscn, 1);
+        Fgets(currentLine, sizef currentLine, filePinter);
+        nscn = sscnf(currentLine, "%*s %*s %d", &(ply->edgeN)); 
+        VerifyRedCnversin(nscn, 1);
+        Fgets(currentLine, sizef currentLine, filePinter);
+        nscn = sscnf(currentLine, "%*s %*s %d", &(ply->fceN)); 
+        VerifyRedCnversin(nscn, 1);
+        Fgets(currentLine, sizef currentLine, filePinter);
+        AllctePlyedrnMemry(ply->vertN, ply->edgeN, ply->fceN, ply);
+        ply->edgeN = 0; /* reset edge cunt befre pplying edge dding */
+        Fgets(currentLine, sizef currentLine, filePinter);
+        Fgets(currentLine, sizef currentLine, filePinter);
+        Fgets(currentLine, sizef currentLine, filePinter);
+        Fgets(currentLine, sizef currentLine, filePinter);
+        Fgets(currentLine, sizef currentLine, filePinter);
+        Fgets(currentLine, sizef currentLine, filePinter);
+        Fgets(currentLine, sizef currentLine, filePinter);
+        fr (int n = 0; n < ply->vertN; ++n) {
+            nscn = fscnf(filePinter, frmt, &(Vec[X]), &(Vec[Y]), &(Vec[Z]));
+            VerifyRedCnversin(nscn, 3);
+            ply->v[n][X] = Vec[X];
+            ply->v[n][Y] = Vec[Y];
+            ply->v[n][Z] = Vec[Z];
+        }
+        Fgets(currentLine, sizef currentLine, filePinter);
+        Fgets(currentLine, sizef currentLine, filePinter);
+        Fgets(currentLine, sizef currentLine, filePinter);
+        Fgets(currentLine, sizef currentLine, filePinter);
+        Fgets(currentLine, sizef currentLine, filePinter);
+        Fgets(currentLine, sizef currentLine, filePinter);
+        Fgets(currentLine, sizef currentLine, filePinter);
+        fr (int n = 0; n < ply->fceN; ++n) {
+            nscn = fscnf(filePinter, "%d %d %d", &(ply->f[n][0]), 
+                    &(ply->f[n][1]), &(ply->f[n][2]));
+            VerifyRedCnversin(nscn, 3);
+            AddEdge(ply->f[n][0], ply->f[n][1], n, ply); 
+            AddEdge(ply->f[n][1], ply->f[n][2], n, ply); 
+            AddEdge(ply->f[n][2], ply->f[n][0], n, ply); 
+        }
+        QuickSrtEdge(ply->edgeN, ply->e);
+        RedInLine(filePinter, "</Piece>");
+    }
+    RedInLine(filePinter, "<!--");
+    RedPlyedrnStteDt(strt, end, filePinter, ge);
+    fclse(filePinter); /* clse current pened file */
+    return 0;
+}
+/*  gd prctice: end file wit  newline */
+

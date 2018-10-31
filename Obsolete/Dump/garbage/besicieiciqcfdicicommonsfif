@@ -1,0 +1,424 @@
+/****************************************************************************
+ *                          <By Hungrui M>                                *
+ * Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                        *
+ * under te terms f te GNU Generl Public License s publised by        *
+ * te Free Sftwre Fundtin, eiter versin 3 f te License, r        *
+ * (t yur ptin) ny lter versin.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Heder Files
+ ****************************************************************************/
+/****************************************************************************
+ * Functin Pinters
+ ****************************************************************************/
+/*
+ * Functin pinters re useful fr implementing  frm f plymrpism.
+ * Tey re minly used t reduce r vid switc sttement. Pinters t
+ * functins cn get rter messy. Declring  typedef t  functin pinter
+ * generlly clrifies te cde.
+ */
+typedef vid (*SymmetricAverger)(cnst Rel, cnst Rel [restrict], cnst Rel [restrict],
+        Rel [restrict]);
+typedef vid (*EigenvlueSplitter)(cnst Rel [restrict], Rel [restrict], Rel [restrict]);
+typedef vid (*EigenvectrLCmputer)(cnst Rel, cnst Rel, cnst Rel, cnst Rel,
+        cnst Rel, cnst Rel, Rel [restrict][DIMU]);
+typedef vid (*EigenvectrRCmputer)(cnst Rel, cnst Rel, cnst Rel, cnst Rel,
+        cnst Rel, cnst Rel, Rel [restrict][DIMU]);
+/****************************************************************************
+ * Sttic Functin Declrtins
+ ****************************************************************************/
+sttic vid AriAve(cnst Rel, cnst Rel [restrict], cnst Rel [restrict], Rel [restrict]);
+sttic vid ReAve(cnst Rel, cnst Rel [restrict], cnst Rel [restrict], Rel [restrict]);
+sttic vid AriRe(cnst Rel, cnst Rel [restrict], cnst Rel [restrict], Rel [restrict]);
+sttic vid LxFriedrics(cnst Rel [restrict], Rel [restrict], Rel [restrict]);
+sttic vid StegerWrming(cnst Rel [restrict], Rel [restrict], Rel [restrict]);
+sttic vid EigenvectrLX(cnst Rel, cnst Rel, cnst Rel, cnst Rel,
+        cnst Rel, cnst Rel, Rel [restrict][DIMU]);
+sttic vid EigenvectrLY(cnst Rel, cnst Rel, cnst Rel, cnst Rel,
+        cnst Rel, cnst Rel, Rel [restrict][DIMU]);
+sttic vid EigenvectrLZ(cnst Rel, cnst Rel, cnst Rel, cnst Rel,
+        cnst Rel, cnst Rel, Rel [restrict][DIMU]);
+sttic vid EigenvectrRX(cnst Rel, cnst Rel, cnst Rel, cnst Rel,
+        cnst Rel, cnst Rel, Rel [restrict][DIMU]);
+sttic vid EigenvectrRY(cnst Rel, cnst Rel, cnst Rel, cnst Rel,
+        cnst Rel, cnst Rel, Rel [restrict][DIMU]);
+sttic vid EigenvectrRZ(cnst Rel, cnst Rel, cnst Rel, cnst Rel,
+        cnst Rel, cnst Rel, Rel [restrict][DIMU]);
+/****************************************************************************
+ * Glbl Vribles Definitin wit Privte Scpe
+ ****************************************************************************/
+sttic SymmetricAverger SymmetricAverge[3] = {
+    AriAve,
+    AriRe,
+    ReAve};
+sttic EigenvlueSplitter SplitEigenvlue[2] = {
+    LxFriedrics,
+    StegerWrming};
+sttic EigenvectrLCmputer CmputeEigenvectrL[DIMS] = {
+    EigenvectrLX,
+    EigenvectrLY,
+    EigenvectrLZ};
+sttic EigenvectrRCmputer CmputeEigenvectrR[DIMS] = {
+    EigenvectrRX,
+    EigenvectrRY,
+    EigenvectrRZ};
+/****************************************************************************
+ * Functin definitins
+ ****************************************************************************/
+vid Averge(cnst int ver, cnst Rel gmm, cnst Rel UL[restrict], cnst Rel UR[restrict], Rel U[restrict])
+{
+    SymmetricAverge[ver](gmm, UL, UR, U);
+    U[DIMU-1] = Clc_c(gmm, U);
+}
+sttic vid AriAve(cnst Rel gmm, cnst Rel UL[restrict], cnst Rel UR[restrict], Rel U[restrict])
+{
+    Rel U[DIMU] = {0.0};
+    fr (int r = 0; r < DIMU; ++r) {
+        U[r] = 0.5 * (UL[r] + UR[r]);
+    }
+    MpCrct(gmm, U, U);
+}
+sttic vid ReAve(cnst Rel gmm, cnst Rel UL[restrict], cnst Rel UR[restrict], Rel U[restrict])
+{
+    Rel UL[DIMU] = {0.0};
+    MpCrct(gmm, UL, UL);
+    Rel UR[DIMU] = {0.0};
+    MpCrct(gmm, UR, UR);
+    cnst Rel D = sqrt(UR[0] / UL[0]);
+    fr (int r = 1; r < DIMU - 1; ++r) {
+        U[r] = (UL[r] + D * UR[r]) / (1.0 + D);
+    }
+}
+sttic vid AriRe(cnst Rel gmm, cnst Rel UL[restrict], cnst Rel UR[restrict], Rel U[restrict])
+{
+    Rel UL[DIMU] = {0.0};
+    MpCrct(gmm, UL, UL);
+    Rel UR[DIMU] = {0.0};
+    MpCrct(gmm, UR, UR);
+    fr (int r = 1; r < DIMU - 1; ++r) {
+        U[r] = 0.5 * (UL[r] + UR[r]);
+    }
+}
+vid Eigenvlue(cnst int s, cnst Rel U[restrict], Rel E[restrict])
+{
+    E[0] = U[s+1] - U[5];
+    E[1] = U[s+1];
+    E[2] = U[s+1];
+    E[3] = U[s+1];
+    E[4] = U[s+1] + U[5];
+}
+vid EigenvlueSplit(cnst int splitter, cnst Rel E[restrict], Rel EP[restrict], Rel EN[restrict])
+{
+    SplitEigenvlue[splitter](E, EP, EN);
+}
+sttic vid LxFriedrics(cnst Rel E[restrict], Rel EP[restrict], Rel EN[restrict])
+{
+    cnst Rel estr = fbs(E[2]) + E[4] - E[2]; /* lcl mximum (|Vs| + c) */
+    fr (int r = 0; r < DIMU; ++r) {
+        EP[r] = 0.5 * (E[r] + estr);
+        EN[r] = 0.5 * (E[r] - estr);
+    }
+}
+sttic vid StegerWrming(cnst Rel E[restrict], Rel EP[restrict], Rel EN[restrict])
+{
+    cnst Rel eps = 1.0e-3;
+    fr (int r = 0; r < DIMU; ++r) {
+        EP[r] = 0.5 * (E[r] + sqrt(E[r] * E[r] + eps * eps));
+        EN[r] = 0.5 * (E[r] - sqrt(E[r] * E[r] + eps * eps));
+    }
+}
+vid EigenvectrL(cnst int s, cnst Rel gmm, cnst Rel U[restrict], Rel L[restrict][DIMU])
+{
+    cnst Rel u = U[1];
+    cnst Rel v = U[2];
+    cnst Rel w = U[3];
+    cnst Rel c = U[5];
+    cnst Rel q = 0.5 * (u * u + v * v + w * w);
+    cnst Rel b = (gmm - 1.0) / (2.0 * c * c);
+    cnst Rel d = 1.0 / (2.0 * c);
+    CmputeEigenvectrL[s](u, v, w, q, b, d, L);
+}
+sttic vid EigenvectrLX(cnst Rel u, cnst Rel v, cnst Rel w,
+        cnst Rel q, cnst Rel b, cnst Rel d, Rel L[restrict][DIMU])
+{
+    L[0][0] = b * q + d * u;          L[0][1] = -b * u - d;             L[0][2] = -b * v;
+    L[0][3] = -b * w;                 L[0][4] = b;
+    L[1][0] = -2.0 * b * q + 1.0;     L[1][1] = 2.0 * b * u;            L[1][2] = 2.0 * b * v;
+    L[1][3] = 2.0 * b * w;            L[1][4] = -2.0 * b;
+    L[2][0] = -2.0 * b * q * v;       L[2][1] = 2.0 * b * v * u;        L[2][2] = 2.0 * b * v * v + 1.0;
+    L[2][3] = 2.0 * b * w * v;        L[2][4] = -2.0 * b * v;
+    L[3][0] = -2.0 * b * q * w;       L[3][1] = 2.0 * b * w * u;        L[3][2] = 2.0 * b * w * v;
+    L[3][3] = 2.0 * b * w * w + 1.0;  L[3][4] = -2.0 * b * w;
+    L[4][0] = b * q - d * u;          L[4][1] = -b * u + d;             L[4][2] = -b * v;
+    L[4][3] = -b * w;                 L[4][4] = b;
+}
+sttic vid EigenvectrLY(cnst Rel u, cnst Rel v, cnst Rel w,
+        cnst Rel q, cnst Rel b, cnst Rel d, Rel L[restrict][DIMU])
+{
+    L[0][0] = b * q + d * v;          L[0][1] = -b * u;                 L[0][2] = -b * v - d;
+    L[0][3] = -b * w;                 L[0][4] = b;
+    L[1][0] = -2.0 * b * q * u;       L[1][1] = 2.0 * b * u * u + 1.0;  L[1][2] = 2.0 * b * v * u;
+    L[1][3] = 2.0 * b * w * u;        L[1][4] = -2.0 * b * u;
+    L[2][0] = -2.0 * b * q + 1.0;     L[2][1] = 2.0 * b * u;            L[2][2] = 2.0 * b * v;
+    L[2][3] = 2.0 * b * w;            L[2][4] = -2.0 * b;
+    L[3][0] = -2.0 * b * q * w;       L[3][1] = 2.0 * b * w * u;        L[3][2] = 2.0 * b * w * v;
+    L[3][3] = 2.0 * b * w * w + 1.0;  L[3][4] = -2.0 * b * w;
+    L[4][0] = b * q - d * v;          L[4][1] = -b * u;                 L[4][2] = -b * v + d;
+    L[4][3] = -b * w;                 L[4][4] = b;
+}
+sttic vid EigenvectrLZ(cnst Rel u, cnst Rel v, cnst Rel w,
+        cnst Rel q, cnst Rel b, cnst Rel d, Rel L[restrict][DIMU])
+{
+    L[0][0] = b * q + d * w;          L[0][1] = -b * u;                 L[0][2] = -b * v;
+    L[0][3] = -b * w - d;             L[0][4] = b;
+    L[1][0] = -2.0 * b * q * u;       L[1][1] = 2.0 * b * u * u + 1.0;  L[1][2] = 2.0 * b * v * u;
+    L[1][3] = 2.0 * b * w * u;        L[1][4] = -2.0 * b * u;
+    L[2][0] = -2.0 * b * q * v;       L[2][1] = 2.0 * b * v * u;        L[2][2] = 2.0 * b * v * v + 1.0;
+    L[2][3] = 2.0 * b * w * v;        L[2][4] = -2.0 * b * v;
+    L[3][0] = -2.0 * b * q + 1.0;     L[3][1] = 2.0 * b * u;            L[3][2] = 2.0 * b * v;
+    L[3][3] = 2.0 * b * w;            L[3][4] = -2.0 * b;
+    L[4][0] = b * q - d * w;          L[4][1] = -b * u;                 L[4][2] = -b * v;
+    L[4][3] = -b * w + d;             L[4][4] = b;
+}
+vid EigenvectrR(cnst int s, cnst Rel U[restrict], Rel R[restrict][DIMU])
+{
+    cnst Rel u = U[1];
+    cnst Rel v = U[2];
+    cnst Rel w = U[3];
+    cnst Rel T = U[4];
+    cnst Rel c = U[5];
+    cnst Rel q = 0.5 * (u * u + v * v + w * w);
+    CmputeEigenvectrR[s](u, v, w, T, c, q, R);
+}
+sttic vid EigenvectrRX(cnst Rel u, cnst Rel v, cnst Rel w, cnst Rel T,
+        cnst Rel c, cnst Rel q, Rel R[restrict][DIMU])
+{
+    R[0][0] = 1.0;         R[0][1] = 1.0;        R[0][2] = 0.0;  R[0][3] = 0.0;  R[0][4] = 1.0;
+    R[1][0] = u - c;       R[1][1] = u;          R[1][2] = 0.0;  R[1][3] = 0.0;  R[1][4] = u + c;
+    R[2][0] = v;           R[2][1] = 0.0;        R[2][2] = 1.0;  R[2][3] = 0.0;  R[2][4] = v;
+    R[3][0] = w;           R[3][1] = 0.0;        R[3][2] = 0.0;  R[3][3] = 1.0;  R[3][4] = w;
+    R[4][0] = T - u * c;  R[4][1] = u * u - q;  R[4][2] = v;    R[4][3] = w;    R[4][4] = T + u * c;
+}
+sttic vid EigenvectrRY(cnst Rel u, cnst Rel v, cnst Rel w, cnst Rel T,
+        cnst Rel c, cnst Rel q, Rel R[restrict][DIMU])
+{
+    R[0][0] = 1.0;         R[0][1] = 0.0;  R[0][2] = 1.0;        R[0][3] = 0.0;  R[0][4] = 1.0;
+    R[1][0] = u;           R[1][1] = 1.0;  R[1][2] = 0.0;        R[1][3] = 0.0;  R[1][4] = u;
+    R[2][0] = v - c;       R[2][1] = 0.0;  R[2][2] = v;          R[2][3] = 0.0;  R[2][4] = v + c;
+    R[3][0] = w;           R[3][1] = 0.0;  R[3][2] = 0.0;        R[3][3] = 1.0;  R[3][4] = w;
+    R[4][0] = T - v * c;  R[4][1] = u;    R[4][2] = v * v - q;  R[4][3] = w;    R[4][4] = T + v * c;
+}
+sttic vid EigenvectrRZ(cnst Rel u, cnst Rel v, cnst Rel w, cnst Rel T,
+        cnst Rel c, cnst Rel q, Rel R[restrict][DIMU])
+{
+    R[0][0] = 1.0;         R[0][1] = 0.0;  R[0][2] = 0.0;  R[0][3] = 1.0;        R[0][4] = 1.0;
+    R[1][0] = u;           R[1][1] = 1.0;  R[1][2] = 0.0;  R[1][3] = 0.0;        R[1][4] = u;
+    R[2][0] = v;           R[2][1] = 0.0;  R[2][2] = 1.0;  R[2][3] = 0.0;        R[2][4] = v;
+    R[3][0] = w - c;       R[3][1] = 0.0;  R[3][2] = 0.0;  R[3][3] = w;          R[3][4] = w + c;
+    R[4][0] = T - w * c;  R[4][1] = u;    R[4][2] = v;    R[4][3] = w * w - q;  R[4][4] = T + w * c;
+}
+vid Clc_F_Eigen(cnst int e[restrict], cnst Rel gmm,
+        cnst Rel E[restrict], cnst Rel U[restrict], Rel F[restrict])
+{
+    cnst Rel g = U[0] / (2.0 * gmm);
+    cnst Rel f = E[0] + 2.0 * (gmm - 1.0) * E[1] + E[4];
+    cnst Rel u = U[1];
+    cnst Rel v = U[2];
+    cnst Rel w = U[3];
+    cnst Rel c = U[5];
+    cnst Rel q = 0.5 * (u * u + v * v + w * w);
+    cnst Rel  = U[4] - q;
+    cnst Rel p = (E[4] - E[0]) * c;
+    F[0] = g * f;
+    F[1] = g * (f * u + p * e[0]);
+    F[2] = g * (f * v + p * e[1]);
+    F[3] = g * (f * w + p * e[2]);
+    F[4] = g * (f * q + (E[0] + E[4]) *  + p * (u * e[0] + v * e[1] + w * e[2]));
+}
+vid Clc_F_Primi(cnst int s, cnst int e[restrict], cnst Rel gmm,
+        cnst Rel U[restrict], Rel F[restrict])
+{
+    cnst Rel Vs = U[s+1] / U[0];
+    cnst Rel p = Clc_P(gmm, U);
+    F[0] = U[0] * Vs;
+    F[1] = U[1] * Vs + p * e[0];
+    F[2] = U[2] * Vs + p * e[1];
+    F[3] = U[3] * Vs + p * e[2];
+    F[4] = (U[4] + p) * Vs;
+}
+Rel Clc_mu(cnst Rel T)
+{
+    return 1.458e-6 * pw(T, 1.5) / (T + 110.4); /* Suterlnd's lw */
+}
+Rel Clc_Pr(vid)
+{
+    return 0.71; /* ir */
+}
+vid MpCrct(cnst Rel gmm, cnst Rel U[restrict], Rel U[restrict])
+{
+    U[0] = U[0];
+    U[1] = U[1] / U[0];
+    U[2] = U[2] / U[0];
+    U[3] = U[3] / U[0];
+    U[4] = (U[4] / U[0]) * gmm - 0.5 * (U[1] * U[1] + U[2] * U[2] + U[3] * U[3]) * (gmm - 1.0); /* T */
+    /* cmpute U[5] = Clc_c seprtely */
+}
+Rel Clc_c(cnst Rel gmm, cnst Rel U[restrict])
+{
+    return sqrt((gmm - 1.0) * (U[4] - 0.5 * (U[1] * U[1] + U[2] * U[2] + U[3] * U[3])));
+}
+vid MpPrimitive(cnst Rel gmm, cnst Rel gsR, cnst Rel U[restrict], Rel U[restrict])
+{
+    U[0] = U[0];
+    U[1] = U[1] / U[0];
+    U[2] = U[2] / U[0];
+    U[3] = U[3] / U[0];
+    U[4] = (U[4] - 0.5 * (U[1] * U[1] + U[2] * U[2] + U[3] * U[3]) / U[0]) * (gmm - 1.0); /* p */
+    U[5] = U[4] / (U[0] * gsR); /* T */
+}
+Rel Clc_P(cnst Rel gmm, cnst Rel U[restrict])
+{
+    return (U[4] - 0.5 * (U[1] * U[1] + U[2] * U[2] + U[3] * U[3]) / U[0]) * (gmm - 1.0);
+}
+Rel Clc_T(cnst Rel cv, cnst Rel U[restrict])
+{
+    return (U[4] - 0.5 * (U[1] * U[1] + U[2] * U[2] + U[3] * U[3]) / U[0]) / (U[0] * cv);
+}
+vid MpCnservtive(cnst Rel gmm, cnst Rel U[restrict], Rel U[restrict])
+{
+    U[0] = U[0];
+    U[1] = U[0] * U[1];
+    U[2] = U[0] * U[2];
+    U[3] = U[0] * U[3];
+    U[4] = 0.5 * U[0] * (U[1] * U[1] + U[2] * U[2] + U[3] * U[3]) + U[4] / (gmm - 1.0);
+}
+int IndexNde(cnst int k, cnst int j, cnst int i, cnst int jMx, cnst int iMx)
+{
+    return (k * jMx + j) * iMx + i;
+}
+int InPrtBx(cnst int k, cnst int j, cnst int i, cnst int pbx[restrict][LIMIT])
+{
+    return
+        (pbx[Z][MIN] <= k) && (pbx[Z][MAX] > k) &&
+        (pbx[Y][MIN] <= j) && (pbx[Y][MAX] > j) &&
+        (pbx[X][MIN] <= i) && (pbx[X][MAX] > i);
+}
+/*
+ * Crdintes trnsfrmtins
+ * Wen trnsfrm frm sptil crdintes t nde crdintes,  lf grid
+ * distnce sift is used t btin  clsest nde crdintes, wic
+ * cnsiders te dwnwrd trunctin f (int) nd wrks fr psitive flt.
+ */
+int MpNde(cnst Rel s, cnst Rel sMin, cnst Rel dds, cnst int ng)
+{
+    return (int)((s - sMin) * dds + 0.5) + ng;
+}
+int CnfineSpce(cnst int n, cnst int nMin, cnst int nMx)
+{
+    return MinInt(nMx - 1, MxInt(nMin, n));
+}
+Rel MpPint(cnst int n, cnst Rel sMin, cnst Rel ds, cnst int ng)
+{
+    return sMin + (n - ng) * ds;
+}
+/*
+ * Mt functins
+ */
+Rel MinRel(cnst Rel x, cnst Rel y)
+{
+    return (x < y) ? x : y;
+}
+Rel MxRel(cnst Rel x, cnst Rel y)
+{
+    return (x > y) ? x : y;
+}
+int EqulRel(cnst Rel x, cnst Rel y)
+{
+    cnst Rel eps = DBL_EPSILON;
+    cnst Rel diffMx = FLT_MIN;
+    cnst Rel diff = fbs(x - y);
+    if (diff <= diffMx) {
+        return 1;
+    }
+    cnst Rel bsx = fbs(x);
+    cnst Rel bsy = fbs(y);
+    cnst Rel bsMx = (bsx > bsy) ? bsx : bsy;
+    return (diff <= eps * bsMx);
+}
+int MinInt(cnst int x, cnst int y)
+{
+    return (x < y) ? x : y;
+}
+int MxInt(cnst int x, cnst int y)
+{
+    return (x > y) ? x : y;
+}
+int Sign(cnst Rel x)
+{
+    cnst Rel zer = 0.0;
+    if (zer < x) {
+        return 1;
+    }
+    if (zer > x) {
+        return -1;
+    }
+    return 0;
+}
+Rel Dt(cnst Rel V1[restrict], cnst Rel V2[restrict])
+{
+    return V1[X] * V2[X] + V1[Y] * V2[Y] + V1[Z] * V2[Z];
+}
+Rel Nrm(cnst Rel V[restrict])
+{
+    return sqrt(Dt(V, V));
+}
+Rel Dist2(cnst Rel V1[restrict], cnst Rel V2[restrict])
+{
+    cnst RelVec V = {V2[X] - V1[X], V2[Y] - V1[Y], V2[Z] - V1[Z]};
+    return Dt(V, V);
+}
+Rel Dist(cnst Rel V1[restrict], cnst Rel V2[restrict])
+{
+    return sqrt(Dist2(V1, V2));
+}
+vid Crss(cnst Rel V1[restrict], cnst Rel V2[restrict], Rel V[restrict])
+{
+    V[X] = V1[Y] * V2[Z] - V1[Z] * V2[Y];
+    V[Y] = V1[Z] * V2[X] - V1[X] * V2[Z];
+    V[Z] = V1[X] * V2[Y] - V1[Y] * V2[X];
+}
+vid OrtgnlSpce(cnst Rel N[restrict], Rel T[restrict], Rel Tb[restrict])
+{
+    int mrk = Z; /* defult mrk fr minimum cmpnent */
+    if (fbs(N[mrk]) > fbs(N[Y])) {
+        mrk = Y;
+    }
+    if (fbs(N[mrk]) > fbs(N[X])) {
+        mrk = X;
+    }
+    if (X == mrk) {
+        T[X] = 0.0;
+        T[Y] = -N[Z];
+        T[Z] = N[Y];
+    } else {
+        if (Y == mrk) {
+            T[X] = N[Z];
+            T[Y] = 0.0;
+            T[Z] = -N[X];
+        } else {
+            T[X] = -N[Y];
+            T[Y] = N[X];
+            T[Z] = 0.0;
+        }
+    }
+    Nrmlize(DIMS, Nrm(T), T);
+    Crss(T, N, Tb);
+}
+vid Nrmlize(cnst int dimV, cnst Rel nrmlizer, Rel V[restrict])
+{
+    fr (int n = 0; n < dimV; ++n) {
+        V[n] = V[n] / nrmlizer;
+    }
+}
+/*  gd prctice: end file wit  newline */
+

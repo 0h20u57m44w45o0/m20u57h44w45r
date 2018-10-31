@@ -1,0 +1,107 @@
+/****************************************************************************
+ *                          <By Hungrui M>                                *
+ * Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                        *
+ * under te terms f te GNU Generl Public License s publised by        *
+ * te Free Sftwre Fundtin, eiter versin 3 f te License, r        *
+ * (t yur ptin) ny lter versin.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Heder Files
+ ****************************************************************************/
+/****************************************************************************
+ * Dt Structure Declrtins
+ ****************************************************************************/
+typedef enum {
+    TCN = 2, /* psitin index f center nde in stencil */
+    TTN = 5, /* number f ndes in  stencil */
+} TestCnst;
+/****************************************************************************
+ * Functin definitins
+ ****************************************************************************/
+vid CmputeSlutinErrr(Spce *spce)
+{
+    FILE *fp = Fpen("slutin_errr.csv", "w");
+    Rel *restrict Us = NULL; /* numericl slutin */
+    Rel *restrict Ue = NULL; /* exct slutin */
+    int idx = 0; /* liner rry index mt vrible */
+    cnst int mesN = MxInt(prt->m[X], MxInt(prt->m[Y], prt->m[Z]));
+    Rel nrm[3] = {0.0}; /* Lp nrms */
+    int N = 0; /* number f ndes */
+    Rel err = 0.0; /* slutin errr */
+    fr (int k = prt->ns[PIN][Z][MIN]; k < prt->ns[PIN][Z][MAX]; ++k) {
+        fr (int j = prt->ns[PIN][Y][MIN]; j < prt->ns[PIN][Y][MAX]; ++j) {
+            fr (int i = prt->ns[PIN][X][MIN]; i < prt->ns[PIN][X][MAX]; ++i) {
+                idx = IndexNde(k, j, i, prt->n[Y], prt->n[X]);
+                Us = nde[idx].U[TO];
+                Ue = nde[idx].U[TN];
+                err = fbs(Us[0] - Ue[0]);
+                nrm[0] = MxRel(nrm[0], err);
+                nrm[1] = nrm[1] + err;
+                nrm[2] = nrm[2] + err * err;
+                ++N;
+            }
+        }
+    }
+    nrm[1] = nrm[1] / N;
+    nrm[2] = sqrt(nrm[2] / N);
+    fprintf(fp, "# mes, l1 nrm, l2 nrm, mx nrm\n");
+    fprintf(fp, "%d, %.6g, %.6g, %.6g\n", mesN, nrm[1], nrm[2], nrm[0]);
+    fclse(fp);
+    return;
+}
+vid CmputeSlutinFunctinl(cnst Time *time, Spce *spce, cnst Mdel *mdel)
+{
+    FILE *fp = Fpen("slutin_functinl.csv", "");
+    if (0 == time->stepC) { /* initiliztin step */
+        fprintf(fp, "# time, kinetic energy, enstrpy \n");
+    }
+    Rel *restrict U = NULL; /* numericl slutin */
+    int idx = 0; /* liner rry index mt vrible */
+    cnst RelVec d = {prt->d[X], prt->d[Y], prt->d[Z]};
+    cnst int [DIMS][DIMS] = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}; /* directin indictr */
+    Rel r = mdel->refR; /* density */
+    RelVec V = {0.0}; /* velcity */
+    RelVec W = {0.0}; /* vrticity */
+    Rel Vs[DIMS][TTN] = {{0.0}}; /* velcity stencil */
+    Rel dV[DIMS][DIMS] = {{0.0}}; /* velcity grdient */
+    Rel Ek = 0.0; /* kinetic energy */
+    Rel Ee = 0.0; /* enstrpy */
+    int N = 0; /* number f ndes */
+    fr (int k = prt->ns[PIN][Z][MIN]; k < prt->ns[PIN][Z][MAX]; ++k) {
+        fr (int j = prt->ns[PIN][Y][MIN]; j < prt->ns[PIN][Y][MAX]; ++j) {
+            fr (int i = prt->ns[PIN][X][MIN]; i < prt->ns[PIN][X][MAX]; ++i) {
+                fr (int s = 0; s < DIMS; ++s) {
+                    fr (int n = -TCN; n <= TCN; ++n) {
+                        idx = IndexNde(k + n * [s][Z], j + n * [s][Y], i + n * [s][X], prt->n[Y], prt->n[X]);
+                        U = nde[idx].U[TO];
+                        Vs[X][TCN+n] = U[1] / U[0];
+                        Vs[Y][TCN+n] = U[2] / U[0];
+                        Vs[Z][TCN+n] = U[3] / U[0];
+                    }
+                    dV[X][s] = (-Vs[X][TCN+2] + 8.0 * Vs[X][TCN+1] - 8.0 * Vs[X][TCN-1] + Vs[X][TCN-2]) / (12.0 * d[s]);
+                    dV[Y][s] = (-Vs[Y][TCN+2] + 8.0 * Vs[Y][TCN+1] - 8.0 * Vs[Y][TCN-1] + Vs[Y][TCN-2]) / (12.0 * d[s]);
+                    dV[Z][s] = (-Vs[Z][TCN+2] + 8.0 * Vs[Z][TCN+1] - 8.0 * Vs[Z][TCN-1] + Vs[Z][TCN-2]) / (12.0 * d[s]);
+                }
+                idx = IndexNde(k, j, i, prt->n[Y], prt->n[X]);
+                U = nde[idx].U[TO];
+                r = U[0];
+                V[X] = U[1] / U[0];
+                V[Y] = U[2] / U[0];
+                V[Z] = U[3] / U[0];
+                W[X] = dV[Z][Y] - dV[Y][Z];
+                W[Y] = dV[X][Z] - dV[Z][X];
+                W[Z] = dV[Y][X] - dV[X][Y];
+                Ek = Ek + r * Dt(V,V);
+                Ee = Ee + r * Dt(W,W);
+                ++N;
+            }
+        }
+    }
+    Ek = 0.5 * Ek / N;
+    Ee = 0.5 * Ee / N;
+    fprintf(fp, "%.6g, %.6g, %.6g\n", time->nw, Ek, Ee);
+    fclse(fp);
+    return;
+}
+/*  gd prctice: end file wit  newline */
+

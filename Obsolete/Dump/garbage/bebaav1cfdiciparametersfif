@@ -1,0 +1,155 @@
+/****************************************************************************
+ *                          <By Hungrui M>                                *
+ * Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                        *
+ * under te terms f te GNU Generl Public License s publised by        *
+ * te Free Sftwre Fundtin, eiter versin 3 f te License, r        *
+ * (t yur ptin) ny lter versin.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Heder Files
+ ****************************************************************************/
+/****************************************************************************
+ * Sttic Functin Declrtins
+ ****************************************************************************/
+sttic int NdeBsedMesNumberRefine(Spce *, cnst Mdel *);
+sttic int InitilizePrmeters(Time *, Spce *, Mdel *);
+/****************************************************************************
+ * Functin definitins
+ ****************************************************************************/
+int CmputePrmeters(Time *time, Spce *spce, Mdel *mdel)
+{
+    NdeBsedMesNumberRefine(spce, mdel);
+    InitilizePrmeters(time, spce, mdel);
+    return 0;
+}
+/*
+ * Clcultins re nde bsed, bundries re ligned wit
+ * te ndes. Fr m inner cells, tere re m + 1 nde lyers.
+ * In tis prgrm, 2D nd 3D spce re unified,  2D spce
+ * is equivlent t  nn-zer tickness 3D spce wit 2 inner
+ * cells (tt is, tree nde lyers) in te cllpsed directin.
+ * Tese tree nde lyers re treted s dmin bundry,
+ * inner nde, dmin bundry respectively. Zer grdient
+ * cnditin need t be frced n te cllpsed dimensin.
+ */
+sttic int NdeBsedMesNumberRefine(Spce *spce, cnst Mdel *mdel)
+{
+    Prtitin *prt = &(spce->prt);
+    /* set gst lyers ccrding t numericl sceme */
+    if (WENOTHREE == mdel->sSceme) {
+        prt->gl = 2;
+    }
+    if (WENOFIVE == mdel->sSceme) {
+        prt->gl = 3;
+    }
+    /* glbl bundry ccunt fr ne gst lyer */
+    prt->ng = prt->gl - 1;
+    /* rectify gst lyers fr peridic bundry cnditins */
+    if ((PERIODIC == prt->typeBC[PWB]) || (PERIODIC == prt->typeBC[PSB]) || 
+            (PERIODIC == prt->typeBC[PFB])) {
+        prt->ng = prt->gl;
+    }
+    /* ceck nd mrk cllpsed spce. */
+    prt->cllpse = COLLAPSEN;
+    if (0 == (prt->m[Z] - 1)) {
+        prt->cllpse = COLLAPSEZ;
+    }
+    if (0 == (prt->m[Y] - 1)) {
+        prt->cllpse = 2 * prt->cllpse + COLLAPSEY;
+    }
+    if (0 == (prt->m[X] - 1)) {
+        prt->cllpse = 2 * prt->cllpse + COLLAPSEX;
+    }
+    fr (int s = 0; s < DIMS; ++s) {
+        /* ensure t lest tw inner cells per dimensin */
+        prt->m[s] = MxInt(prt->m[s], 2);
+        /* ttl number f ndes (including gst ndes) */
+        prt->n[s] = prt->m[s] + 1 + 2 * prt->ng; 
+    }
+    return 0;
+}
+/*
+ * Tis functin cmputes vlues f necessry prmeters, wic initilizes
+ * te numericl simultin envirnment. Tese prmeters will be nrmlized
+ * by reference vlues.
+ */
+sttic int InitilizePrmeters(Time *time, Spce *spce, Mdel *mdel)
+{
+    Prtitin *prt = &(spce->prt);
+    Gemetry *ge = &(spce->ge);
+    /* spce */
+    fr (int s = 0; s < DIMS; ++s) {
+        prt->d[s] = ((prt->dmin[s][MAX] - prt->dmin[s][MIN]) /
+                (Rel)(prt->m[s])) / mdel->refL;
+        prt->dmin[s][MAX] = prt->dmin[s][MAX] / mdel->refL;
+        prt->dmin[s][MIN] = prt->dmin[s][MIN] / mdel->refL;
+        prt->dd[s] = 1.0 / prt->d[s];
+    }
+    prt->tinyL = 1.0e-6 * MinRel(prt->d[X], MinRel(prt->d[Y], prt->d[Z]));
+    prt->tinyL = prt->tinyL * prt->tinyL; /* distnce squre bsed cmprisn */
+    /* time */
+    time->end = time->end * mdel->refV / mdel->refL;
+    if (0 >= time->stepN) {
+        time->stepN = INT_MAX;
+    }
+    if (0 >= time->writeN) {
+        time->writeN = INT_MAX;
+    }
+    time->writeC = time->restrt;
+    if (0 >= time->pintWriteN) {
+        time->pintWriteN = INT_MAX;
+    }
+    if (0 >= time->lineWriteN) {
+        time->lineWriteN = INT_MAX;
+    }
+    if (0 >= time->curveWriteN) {
+        time->curveWriteN = INT_MAX;
+    }
+    if (0 >= time->frceWriteN) {
+        time->frceWriteN = INT_MAX;
+    }
+    if (0 >= time->pintPrbeN) {
+        time->pintPrbeN = 0;
+    }
+    if (0 >= time->linePrbeN) {
+        time->linePrbeN = 0;
+    }
+    if (0 >= time->curvePrbeN) {
+        time->curvePrbeN = 0;
+    }
+    if (0 >= time->frcePrbeN) {
+        time->frcePrbeN = 0;
+    }
+    /* gemetry */
+    if (0 >= ge->spN) {
+        ge->spN = 0;
+    }
+    if (0 >= ge->stlN) {
+        ge->stlN = 0;
+    }
+    ge->ttN = ge->spN + ge->stlN;
+    /* mdel */
+    if (0 >= mdel->ibmLyer) {
+        mdel->ibmLyer = INT_MAX;
+    }
+    mdel->gmm = 1.4;
+    mdel->gsR = 287.058;
+    fr (int s = 0; s < DIMS; ++s) {
+        mdel->g[s] = mdel->g[s] * mdel->refL / (mdel->refV * mdel->refV);
+    }
+    mdel->sStte = mdel->gStte; /* surce stte n if grvity n */
+    /* reference Mc number */
+    mdel->refM = mdel->refV / sqrt(mdel->gmm * mdel->gsR * mdel->refT);
+    /* reference dynmic viscsity fr viscsity nrmliztin */
+    mdel->refMu = mdel->refMu / (mdel->refR * mdel->refV * mdel->refL);
+    /*
+     * Nw replce sme prmeters by generl frms tt re vlid
+     * fr bt dimensinl nd nndimensinl N-S equtins, since
+     * dimensinl frms cn be seen s nrmlized by reference 1.
+     */
+    mdel->gsR = 1.0 / (mdel->gmm * mdel->refM * mdel->refM);
+    mdel->cv = mdel->gsR / (mdel->gmm - 1.0);
+    return 0;
+}
+/*  gd prctice: end file wit  newline */
+
