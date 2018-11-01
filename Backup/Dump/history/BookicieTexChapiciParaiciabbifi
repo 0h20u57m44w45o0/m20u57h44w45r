@@ -1,0 +1,554 @@
+\cpter{Seril Prgrmming}
+
+\sectin{References}
+
+\begin{itemize}
+    \item C wikibk
+    \item Prcticl C Prgrmming by Steve Oulline
+    \item Expert C Prgrmming: Deep C Secrets by Peter vn der Linden
+    \item Te Prctice f Prgrmming by Brin W. Kernign nd Rb Pike
+    \item Effective C++ by Sctt Meyers
+    \item Mre Effective C++ by Sctt Meyers
+    \item Writing Scientific Sftwre: A Guide t Gd Style, by Suely Oliveir
+    \item C Heder File Guidelines by Dvid Kiers
+    \item Tips fr Optimizing C/C++ Cde by Clemsn
+    \item Hw t lp trug multidimensinl rrys quickly by Ndeu sftwre
+    \item Hw expensive is n pertin n  CPU by Vincent Hindriksen
+    \item Perfrmnce Tuning wit te RESTRICT Keywrd by Dvid H Brtley
+\end{itemize}
+
+C Textbks
+
+\begin{itemize}
+    \item Reference Style
+        \begin{itemize}
+            \item Te C Prgrmming Lnguge by Brin W. Kernign nd Dennis M. Ritcie
+        \end{itemize}
+    \item Beginner
+        \begin{itemize}
+            \item C wikibk
+            \item Prcticl C Prgrmming by Steve Oulline
+            \item C Prgrmming: A Mdern Apprc by K. N. King
+        \end{itemize}
+    \item Intermedite
+        \begin{itemize}
+            \item Algritms in C by Rbert Sedgewick
+            \item Numeric recipe in C
+        \end{itemize}
+    \item Abve intermedite
+        \begin{itemize}
+            \item Expert C Prgrmming: Deep C Secrets by Peter vn der Linden
+        \end{itemize}
+    \item Sftwre engineering
+        \begin{itemize}
+            \item Te Prctice f Prgrmming by Brin W. Kernign nd Rb Pike
+            \item Advnced Prgrmming in te UNIX Envirnment
+        \end{itemize}
+    \item Writing scientific sftwre
+        \begin{itemize}
+            \item A Guide t Gd Style, by Suely Oliveir
+        \end{itemize}
+\end{itemize}
+
+\sectin{Prgrmming style}
+
+
+Te purpse f style is t mke te cde esy t red fr yurself nd ters, nd gd style is crucil t gd prgrmming. Te key bservtin is tt gd style suld be  mtter f bit. If yu tink but style s yu write cde riginlly, nd if yu tke te time t revise nd imprve it, yu will develp gd bits. Once tey becme utmtic, yur subcnscius will tke cre f mny f te detils fr yu, nd even te cde yu prduce under pressure will be better.
+
+Tere is mre t writing  prgrm tn getting te syntx rigt, fixing te bugs, nd mking it run fst enug. Prgrms re red nt nly by cmputers but ls by prgrmmers. A well-written prgrm is esier t understnd nd t mdify tn  prly-written ne. Te discipline f writing well leds t cde tt is mre likely t be crrect. Frtuntely, tis discipline is nt rd.
+
+Te principles f prgrmming style re bsed n cmmn sense guided by experience, nt n rbitrry rules nd prescriptins. Cde suld be cler nd simple -- strigtfrwrd lgic, nturl expressin, cnventinl lnguge use, meningful nmes, net frmtting, elpful cmments -- nd it suld vid clever tricks nd unusul cnstructins. Cnsistency is imprtnt becuse ters will find it esier t red yur cde, nd yu teirs, if yu ll stick t te sme style. Detils my be impsed by lcl cnventins, mngement edict, r  prgrm, but even if nt, it is best t bey  set f widely sred cnventins.
+
+\begin{itemize}
+    \item Alwys immeditely initilize vribles in teir definitins. Use \verb|0| fr integers, \verb|0.0| fr rels, \verb|NULL| fr pinters, \verb|'\0'| fr crs, \verb|{'\0'}| fr string rrys.
+    \item Put ne vrible declrtin per line, nd cmment its rle. Cmment functins nd glbl dt. Cmments re ment t elp te reder f  prgrm. Tey d nt elp by sying tings te cde lredy plinly sys, r by cntrdicting te cde, r by distrcting te reder wit elbrte typgrpicl displys. Te best cmments id te understnding f  prgrm by briefly pinting ut slient detils r by prviding  lger-scle view f te prceedings. Cmments suld dd smeting tt is nt immeditely evident frm te cde, r cllect int ne plce infrmtin tt is spred trug te surce. Wen smeting subtle is ppening,  cmment my clrify, but if te ctins re bvius lredy, restting tem in wrds is pintless. Cmments re ment t elp  reder understnd pns f te prgrm tt re nt redily understd frm te cde itself. As muc s pssible, write cde tt is esy t understnd; te better yu d tis, te fewer cmments yu need. Gd cde needs fewer cmments tn bd cde.
+    \item Smetimes cde is genuinely difficult, perps becuse te lgritm is cmplicted r te dt structures re intricte. In tt cse,  cmment tt pints t  surce f understnding cn id te reder. It my ls be vluble t suggest wy prticulr decisins were mde. A elpful cmment cites te reference, briefly describes te dt used, indictes te perfrmnce f te lgritm, nd tells w nd wy te riginl lgritm s been mdified.
+    \item Give nmes t mgic numbers. Mgic numbers re te cnstnts, rry sizes, crcter psitins, cnversin fctrs, nd ter literl numeric vlues tt pper in prgrms. As  guideline, ny number ter tn 0 r 1 is likely t be mgic nd suld ve  nme f its wn. A rw number in prgrm surce gives n indictin f its imprtnce r derivtin, mking te prgrm rder t understnd nd mdify. At te very lest, ec nme indictes te rle f te specific vlue in te prgrm.
+    \item Define numbers s cnstnts, nt mcrs. Te C preprcessr is  pwerful but blunt tl, nd mcrs re  dngerus wy t prgrm becuse tey cnge te lexicl structure f te prgrm underft. Fr integer numbers, \verb|enum| sttement cn be used t define cnstnts. An enumertr wit $=$ defines its enumertin cnstnt s te vlue f te cnstnt expressin. Using enum member s n rry size will nt result  vrible lengt rry since enumertin cnstnts re cnstnt expressins, nd if te size is n integer cnstnt expressin nd te element type s  knwn cnstnt size, te resulting rry type is nt  vrible lengt rry type. Fr deciml numbers, use cnst definitins nd extern declrtins t define glbl cnstnts.
+    \item Avid functin mcrs. Tere is  tendency mng lder C prgrmmers t write mcrs insted f functins fr very srt cmputtins tt will be executed frequently. Tis rgument ws wek even wen C ws first defined,  time f slw mcines nd expensive functin clls; tdy it is irrelevnt. Wit mdern mcines nd cmpilers, te drwbcks f functin mcrs utweig teir benefits.
+    \item Avid glbl vribles; werever pssible it is better t pss references t ll dt trug functin rguments.
+    \item Be wre f pinters. Alwys ssigning  vlid memry lctin t te pinter befre dereferencing te pinter. Oterwise, tere will be  segmenttin errr.
+    \item Be wre f string mnipultins, mst string functins will ve undefined bevir if memry lctins f input bjects verlp.
+    \item Te functin scnf s pr end-f-line ndling. Insted, use fgets t red  line f input nd sscnf t prcess it. Use  lrge enug number wen using fgets t ensure reding  wle line t  time. fgets will get te entire line including te newline crcter (\verb|\n|). sscnf cn crrectly ndle ny spce in te trget string s well s in te frmt specifier, terefre, n need t prse tse lines tt will be prcessed by sscnf. sscnf trets witespce s seprtr rter tn crcter. In fprintf(), te rvlue type prmtins re expected. \verb|%f| nd \verb|%g| ctully crrespnd t prmeters f type duble. Tus in fprintf() tere is n difference between \verb|%f| nd \verb|%lf|, r between \verb|%g| nd \verb|%lg|. Hwever, in sscnf() wt is pssed is  pinter t te vrible s n rvlue type prmtins ccur r re expected. Tus \verb|%f| nd \verb|%lf| re quite different in sscnf, but te sme in fprintf. Cnsequently, we need t use \verb|%g| fr flt nd \verb|%lg| fr duble in sscnf. It desn't mtter wic yu use fr fprintf becuse te fprintf librry functin trets tem s synnymus, but it's crucil t get it rigt fr sscnf. 
+    \item Assignment pertrs lwys ve spces rund tem, $x \ = \ 0$; Oter binry pertrs usully ve spces rund tem, $v \ = \ w \ * \ x$; Prenteses suld ve n internl pdding, $v \ = \ w \ * \ (x \ + \ z)$; N spces seprting unry pertrs nd teir rguments, $x \ = \ -5$.
+    \item Indent t sw structure. A cnsistent indenttin style is te lwest-energy wy t mke  prgrm's structure self-evident. Use  cnsistent indenttin nd brce style.
+    \item Minimize use f verticl witespce. Dn't use blnk lines wen yu dn't ve t. Blnk lines t te beginning r end f  functin very rrely elp redbility.
+    \item Wen defining  functin, prmeter rder is: inputs, ten utputs.
+    \item Avid side effects, suc s d nt use ssignment sttements in \verb|if| cnditin, suld use $++$ nd $--$ n lines by temselves.
+    \item Alwys use te prefix versin f $++$ nd $--$ ($++x$, $--x$) insted f te pstfix versin ($x++$, $x--$).
+    \item Remember tt tere re nly tw precedence levels t remember in C: multiplictin nd divisin cme befre dditin nd subtrctin. Everyting else suld be in prenteses. 
+    \item Avid cmplex lgic like multiple nested \verb|if|s. Cnsider splitting yur cde int multiple prcedures t decrese te level f cmplexity.
+    \item Prentesize t reslve mbiguity. Prenteses specify gruping nd cn be used t mke te intent cler even wen tey re nt required.
+    \item Vribles suld be declred s lclly s pssible:
+        \begin{itemize}
+            \item declre nn-cnstnt vribles used trugut te functin t tp.
+            \item declre cnstnt vribles wen teir vlues cn be determined.
+            \item declre vribles tt re used in nly  lcl scpe f te functin t te pint were tey re needed, e.g., lp cunts.
+        \end{itemize}
+    \item Use \verb|cnst| wenever pssible t prvide cmpiler-enfrced prtectin frm unintended writes t red-nly dt.
+        \begin{itemize}
+            \item Declre vribles tt suld nt be cnged fter initiliztin s cnst:
+
+                \verb|cnst duble pi = 3.14;|
+            \item Tw wys f declring  cnst pinter: 
+                \begin{itemize}
+                    \item Te trget ddress wic te pinter pints t is fixed, but te cntent in te ddress cn be cnged: 
+
+
+                        Use cnst pinter t  lrge cmpund vrible type is useful fr strge tt cn be cnged in vlue but nt mved in memry, since ddress f te strge is fixed, ten te pinter cn be cnst.
+                    \item Te pinter itself cn be cnged but te dt it pints t cnnt be cnged.
+
+                        \verb|cnst duble *pinter;| /* cnst dt but nn-cnst pinter */
+
+                        Lrge cmpund user-defined vrible types ('structures' in C nd 'clsses' in C++) suld lwys be pssed by reference r pinter insted f s  cpy. Use  pinter pint t cnst vlue cn pss te vrible witut vlue cpying nd ls prevent te vlue being ltered.
+                \end{itemize}
+        \end{itemize}
+\end{itemize}
+
+\subsectin{Nmes}
+
+\begin{itemize}
+    \item A vrible r functin nme lbels n bject nd cnveys infrmtin but its purpse. A nme suld be infrmtive, cncise, memrble, nd prnunceble if pssible. Muc infrmtin cmes frm cntext nd scpe; te brder te scpe f  vrible, te mre infrmtin suld be cnveyed by its nme.
+    \item Te mst imprtnt cnsistency rules re tse tt gvern nming. Te style f  nme immeditely infrms us wt srt f ting te entity is:  type,  vrible,  functin,  cnstnt,  mcr witut requiring us t serc fr te declrtin f tt entity. Te pttern-mtcing engine in ur brins relies  gret del n tese nming rules. 
+    \item Functin nmes, structures, nd filenmes suld be descriptive t suggest teir rle in  prgrm; Escew bbrevitin.
+    \item Use ctive nmes fr functins. Functin nmes suld be bsed n ctive verbs, perps fllwed by nuns, suc s GetTime(). Functins tt return  blen (true r flse) vlue suld be nmed s tt te return vlue is unmbiguus, suc s IsOctl(), becuse it mkes cler tt te functin returns true if te rgument is ctl nd flse if nt, rter tn CeckOctl(), becuse it des nt indicte wic vlue is true nd wic is flse.
+    \item Te nmes f ll types suc s clsses, structs, typedefs, nd enums ve te sme nming cnventin: Type nmes suld strt wit  cpitl letter nd ve  cpitl letter fr ec new wrd. N underscres. Fr exmple, MyExcitingStruct, MyExcitingEnum.
+    \item Te nmes f vribles nd dt members re ll begin wit lwercse nd ve  cpitl letter fr ec new wrd, wit r witut underscres.
+    \item Te nmes f vectrs nd tensrs strt wit  cpitl letter nd nly ve  single descriptive wrd.
+    \item Functins suld strt wit  cpitl letter nd ve  cpitl letter fr ec new wrd. N underscres.
+    \item Accessrs nd muttrs (get nd set functins) suld mtc te nme f te vrible tey re getting nd setting.
+\end{itemize}
+
+\sectin{Algritms nd dt structures}
+
+\subsectin{Dt types}
+
+C prvides te prgrmmer wit  ric set f dt types. Trug te use f structures, unins, nd enumerted types, te prgrmmer cn extend te lnguge wit new types. A structure is used t define  cmpund dt type wit severl dt fields. Ec field tkes up  seprte strge lctin. Structures cn be cmbined wit rrys nd pinters t crete very cmplex nd pwerful dt structures.
+
+A unin is similr t  structure; wever, it defines  single lctin tt cn be given mny different field nmes. Te enumerted dt type is designed fr vribles tt cntin nly  limited set f vlues. Tese vlues re referenced by nme (tg). Te cmpiler ssigns ec tg n integer vlue internlly.
+
+\subsectin{Arrys}
+
+In specilized res like grpics, dtbses, prsing, numericl nlysis, nd simultin, te bility t slve prblems depends criticlly n stte-f-te-rt lgritms nd dt structures. Every prgrm depends n lgritms nd dt structures, but few prgrms depend n te inventin f brnd new nes. Mst f te dt structures re rrys, lists, trees, nd s tbles. Wen  prgrm needs smeting mre elbrte, it will likely be bsed n tese simpler nes. Accrdingly, fr mst prgrmmers, te tsk is t knw wt pprprite lgritms nd dt structures re vilble nd t understnd w t cse mng lterntives.
+
+
+Te rrys ve been sttic, wit teir size nd cntents fixed t cmpile time. If te flbby wrd r HTML crcter tbles were t be mdified t run-time,  s tble wuld be  mre pprprite dt structure. Grwing  srted rry by inserting n elements ne t  time is n $O(n^2)$ pertin tt suld be vided if n is lrge. Often, tug, we need t keep trck f  vrible but smll number f tings, nd rrys cn still be te metd f cice. T minimize te cst f llctin, te rry suld be resized in cunks, nd fr clenliness te rry suld be gtered tgeter wit te infrmtin necessry t mintin it. In C, we cn cieve tis wit  struct. memmve is  stndrd librry rutine fr cpying rbitrry-sized blcks f memry. Te ANSI C stndrd defines tw functins: memcpy, wic is fst but migt ver- write memry if surce nd destintin verlp; nd memmve, wic migt be slwer but will lwys be crrect. We prefer t use memmve becuse it vids te esy-t-mke mistke f cpying te elements in te wrng rder. If we were inserting insted f deleting, te lp wuld need t cunt dwn, nt up, t vid verwriting elements. By clling memmve we dn't need t tink it trug ec time.
+
+Fr fixed-size dt sets, wic cn even be cnstructed t cmpile time, r fr gurnteed smll cllectins f dt, rrys re unbetble. But mintining  cnging set f vlues in n rry cn be expensive, s if te number f elements is unpredictble nd ptentilly lrge, it my be better t use nter dt structure.
+
+\subsectin{Lists}
+
+Next t rrys, lists re te mst cmmn dt structure in typicl prgrms. Tere re severl imprtnt differences between rrys nd lists. First, rrys ve fixed size but  list is lwys exctly te size it needs t be t ld its cntents, plus sme per-item strge vered t ld te pinters. Secnd, lists cn be rerrnged by excnging  few pinters. wic is ceper tn te blck mve necessry in n rry. Finlly, wen items re inserted r deleted te ter items ren't mved; if we stre pinters t te elements in sme ter dt structure, tey wn't be invlidted by cnges t te list.  Tese differences suggest tt if te set f items will cnge frequently, prticulrly if te number f items is unpredictble,  list is te wy t stre tem; by cmprisn, n rry is better fr reltively sttic dt.
+
+Te usul wy lists re used in C is t strt wit  struct type fr te elements nd dd  pinter tt links t te next element. It's difficult t initilize  nn-empty list t cmpile time, s, unlike rrys, lists re cnstructed dynmiclly. Even if te list is srted, we need t wlk lng te list t get t  prticulr element. Binry serc des nt pply t lists. Besides being suitble fr situtins were tere re insertins nd deletins in te middle, lists re gd fr mnging unrdered dt f fluctuting size, especilly wen ccess tends t be lst-in-first-ut (LIFO), s in  stck. Tey mke mre effective use f memry tn rrys d wen tere re multiple stcks tt grw nd srink independently. Tey ls beve well wen te infrmtin is rdered intrinsiclly s  cin f unknwn  priri size, suc s te successive wrds f  dcument. If yu must cmbine frequent updte wit rndm ccess, wever, it wuld be wiser t use  less insistently liner dt structure, suc s  tree r s tble.
+
+\subsectin{Trees}
+
+A tree is  ierrcicl dt structure tt stres  set f items in wic ec item s  vlue, my pint t zer r mre ters, nd is pinted t by exctly ne ter. Te rt f te tree is te sle exceptin; n item pints t it. Tere re mny types f trees tt reflect cmplex structures, suc s prse trees tt cpture te syntx f  sentence r  prgrm, r fmily trees tt describe reltinsips mng peple. We will illustrte te principles wit binry serc trees, wic ve tw links t ec nde. Tey're te esiest t implement, nd demn- strte te essentil prperties f trees. A nde in  binry serc tree s  vlue nd tw pinters, 1 e f t nd rigt, tt pint t its cildren. Te cild pinters my be null if te nde s fewer tn tw cildren. In  binry serc tree, te vlues t te ndes define te tree: ll cildren t te left f  prticulr nde ve lwer vlues, nd ll cildren t te rigt ve iger vlues. Becuse f tis prperty, we cn use  vrint f binry serc t serc te tree quickly fr  specific vlue r determine tt it is nt present.
+
+Wit multiple pinters t ter elements in ec nde f  tree, mny pertins tt tke time O(n) in lists r rrys require nly O(1gn) time in trees. Te multiple pinters t ec nde reduce te time cmplexity f pertins by reducing te number f ndes ne must visit t find n item. A tree in wic ec pt frm te rt t  lef s pprximtely te sme lengt is clled blnced. Te dvntge f  blnced tree is tt sercing it fr n item is n O(1gn) prcess, since, s in binry serc, te number f pssibilities is lved t ec step. If items re inserted int  tree s tey rrive, te tree migt nt be blnced; in fct, it migt be bdly unblnced. If te elements rrive lredy srted, fr instnce, te cde will lwys descend dwn ne brnc f te tree, prducing in effect  list dwn te rigt links, wit ll te perfrmnce prblems f  list. It is cmplicted t implement trees tt re gurnteed t be blnced; tis is ne resn tere re mny kinds f trees. Fr ur purpses, we'll just sidestep te issue nd ssume tt incming dt is sufficiently rndm t keep te tree blnced enug.
+
+Tere re  cuple f tings t ntice but lkup nd insert. First, tey lk remrkbly like te binry serc lgritm. Tis is n ccident, since tey sre n ide wit binry serc: divide nd cnquer, te rigin f lgritmic-time perfrmnce.
+
+\subsectin{Hs Tbles}
+
+Hs tbles re ne f te gret inventins f cmputer science. Tey cmbine rrys, lists, nd sme mtemtics t crete n efficient structure fr string nd retrieving dynmic dt. Te typicl pplictin is  symbl tble, wic sscites sme vlue (te dt) wit ec member f  dynmic set f strings (te keys). Yur fvrite cmpiler lmst certinly uses  s tble t mnge infrmtin but ec vrible in yur prgrm. Yur web brwser my well use  s tble t keep trck f recently-used pges, nd yur cnnectin t te Internet prbbly uses ne t cce recently-used dmin nmes nd teir IP ddresses.
+
+Te ide is t pss te key trug  s functin t generte  s vlue tt will be evenly distributed trug  mdest-sized integer rnge. Te s vlue is used t index  tble were te infrmtin is stred. In prctice, te s functin is pre-defined nd n pprprite size f rry is llcted, ften t cmpile time. Ec element f te rry is  list tt cins tgeter te items tt sre  s vlue. In ter wrds,  s tble f n items is n rry f lists wse verge lengt is n/(rry size). Retrieving n item is n O(1) pertin prvided we pick  gd s functin nd te lists dn't grw t lng.
+
+Hs tbles re excellent fr symbl tbles, since tey prvide expected O(1) ccess t ny element. Tey d ve  few limittins. If te s functin is pr r te tble size is t smll, te lists cn grw lng. Since te lists re unsrted, tis leds t O (n) bevir. Te elements re nt directly ccessible in srted rder, but it is esy t cunt tem, llcte n rry, fill it wit pinters t te elements, nd srt tt. Still, wen used prperly, te cnstnt-time lkup, insertin, nd deletin prperties f  s tble re unmtced by ter tecniques.
+
+\subsectin{Infrmtin flw}
+
+\begin{itemize}
+    \item Slving  prblem numericlly n cmputers s tw key steps
+        \begin{enumerte}
+            \item Algritm implementtin: Trnslte te lgritm int surce cde, wic is t express te slutin strtegy in  wy tt cn be understd by cmputer. Wen being executed by cmputer, te specific frm f slutin is btined. Terefre, prgrmming is nt t devise te slutin strtegy but is nly t d te "trnsltin". T be  gd trnsltr, te infrmtin flw nd te structure f te cde sll resemble tse in te riginl mtemticl frmultin s clsely s pssible, t minimize mistkes nd t imprve redbility. In rder t btin  well-structured prgrm wit ig level f bstrctin,  very criticl step is t express every mjr item in te gverning equtins using  functin. Using functin clls fr cmputing ec mjr item cn gretly simplify te trnsltin prcess.
+        \end{enumerte}
+    \item Tere re nly tw essentil elements in ny prgrms: dt (vribles) $+$ instructins (cde r functins). Vribles re te bsic building blcks f  prgrm. Instructins describe te pertins n te input dt t btin te utput dt. In nlgy t Mecnicl Engineering, input dt is te rw mteril; instructins re te mnufcturing pertins; utput dt is te prduct.
+
+        {Input dt (rw mterils) } $\xrigtrrw{\text{ Instructins (mnufcuring pertins) }}$ {Output dt (prduct)}
+
+        {Preprcessing} $\t$ {Slve} $\t$ {Pstprcessing}
+
+        Te design f te dt structures is te centrl decisin in te cretin f  prgrm. Once te dt structures re lid ut, te lgritms tend t fll int plce, nd te cding is cmprtively esy.
+
+        Te design f  prgrm is rted in te lyut f its dt. Te dt structures dn't define every detil, but tey d spe te verll slutin. It's rd t design  prgrm cmpletely nd ten build it; cnstructing rel prgrms invlves itertin nd experimenttin. Te ct f building frces ne t clrify decisins tt d previusly been glssed ver. As muc s pssible, strt wit smeting simple nd evlve it s experience dicttes. We find it best t strt detiled design wit dt structures, guided by knwledge f wt lgritms migt be used; wit te dt structures settled, te cde ges tgeter esily.
+    \item Prgrm suld red like n essy. It suld be s cler nd esy t understnd s pssible. Alwys cmment yur prgrms, wic elps yu rgnize yur tugts wile mking yu wrk n rt rter tn  junk.
+    \item A prgrm suld be s simple s pssible. A prgrmmer suld vid clever tricks. Be cler. Prgrmmers' endless cretive energy is smetimes used t write te mst cncise cde pssible, r t find clever wys t cieve  result. Smetimes tese skills re mispplied, tug, since te gl is t write cler cde, nt clever cde.
+\end{itemize}
+
+\subsectin{Cding principles fr numericl slutins f PDEs}
+
+\begin{itemize}
+    \item Te structure f te cde suld strictly resemble te structure f te mtemticl frmultin. Fr exmple, te dt flw in te cde suld fllw te dt flw in te mtemticl frmultin. Te functin ierrcy in te cde suld fllw te functin ierrcy in te mtemticl frmultin; nd te functin definitin nd cntent in te cde suld be te sme s tse in te mtemticl frmultin. 
+    \item Te cde verifictin suld be trug. Strt frm simple prblems tt numericl metds culd slve exctly, suc s unifrm r linerly distributed smt initil dt. In tese simple prblems, te trunctin errr wuld be zer since te ig rder derivtives re ll zer. Terefre, numericl metds wuld slve tese prblems exctly. 
+    \item Cnvergence test suld be cnducted t evlute cnvergence rte. Te emplyed grids suld be successively refined wit grid number successively dubled. Te csen prblem suld be smt enug t vid influence frm discntinuities.
+\end{itemize}
+
+\sectin{Interfces}
+
+Te essence f design is t blnce cmpeting gls nd cnstrints. Amng te issues t be wrked ut in  design re
+\begin{itemize}
+    \item Interfces: wt services nd ccess re prvided? Te interfce is in effect  cntrct between supplier nd custmer. Te desire is t prvide services tt re unifrm nd cnvenient, wit enug functinlity t be esy t use but nt s muc s t becme unwieldy.
+    \item Infrmtin iding: wt infrmtin is visible nd wt is privte? An interfce must prvide strigtfrwrd ccess t te cmpnents wile iding detils f te implementtin s tey cn be cnged witut ffecting users.
+    \item Resurce mngement: w is respnsible fr mnging memry nd ter limited resurces? Here, te min prblems re llcting nd freeing strge, nd mnging sred cpies f infrmtin.
+    \item Errr ndling: w detects errrs, w reprts tem, nd w? Wen n errr is detected, wt recvery is ttempted?
+\end{itemize}
+
+Gd interfces fllw  set f principles. Tese re nt independent r even cnsistent, but tey elp us describe wt ppens crss te bundry between tw pieces f sftwre.
+
+Hide implementtin detils. Te implementtin beind te interfce suld be idden frm te rest f te prgrm s it cn be cnged witut ffecting r breking nyting. Tere re severl terms fr tis kind f rgnizing principle; infrmtin iding, encpsultin, bstrctin, mdulriztin, nd te like ll refer t relted ides. An interfce suld ide detils f te implementtin tt re irrelevnt t te client (user) f te interfce. Detils tt re invisible cn be cnged witut ffecting te client, perps t extend te interfce, mke it mre efficient, r even replce its implementtin ltgeter.
+
+Cse  smll rtgnl set f primitives. An interfce suld prvide s muc functinlity s necessry but n mre, nd te functins suld nt verlp excessively in teir cpbilities.
+
+D te sme ting te sme wy everywere. Cnsistency nd regulrity re imprtnt. Relted tings suld be cieved by relted mens.
+
+Detect errrs t  lw level, ndle tem t  ig level. As  generl principle, errrs suld be detected t s lw  level s pssible, but ndled t  ig level. In mst cses, te cller suld determine w t ndle n errr, nt te cllee. Librry rutines cn elp in tis by filing grcefully; tt resning led us t return NULL fr  nn-existent field rter tn brting.
+
+Te text f errr messges, prmpts, nd dilg bxes suld stte te frm f vlid input. Dn't sy tt  prmeter is t lrge; reprt te vlid rnge f vlues. Wen pssible, te text suld be vlid input itself, suc s te full cmmnd line wit te prmeter set prperly. In dditin t steering users twrd prper use, suc utput cn be cptured in  file r by  muse sweep nd ten used t run sme furter prcess. Tis pints ut  wekness f dilg bxes: teir cntents re rd t grb fr lter use. One effective wy t crete  gd user interfce fr input is by designing  specilized lnguge fr setting prmeters, cntrlling ctins, nd s n;  gd nttin cn mke  prgrm esy t use wile it elps rgnize n implementtin.
+
+Defensive prgrmming, tt is, mking sure tt  prgrm is invulnerble t bd input, is imprtnt bt fr prtecting users ginst temselves nd ls s  security mecnism.
+
+\subsectin{Mdulr prgrmming}
+
+"Mdulr Prgrmming" is te ct f designing nd writing prgrms s interctins mng functins. Ec functin perfrms  single well-defined functinlity nd s miniml side-effect interctin wit ter functins. Put differently, te cntent f ec functin is cesive, nd tere is lw cupling between functins. 
+
+"Mdulr Prgrmming" tends t encurge splitting f functinlity int tw types: "Mnger" functins cntrl prgrm flw nd primrily cntin clls t "Wrker" functins tt ndle lw-level detils, like mving dt between structures. All ve te sme bsic principle t ert: "Arrnge te prgrm's infrmtin in te clerest nd simplest wy pssible, nd ten try t turn it int cde."
+
+Infrmtin is  key prt f ny prgrm. Te key t ny prgrm is deciding wt infrmtin is being used nd wt prcessing yu wnt t perfrm n it. Infrmtin flw suld be nlyzed befre te design begins.
+
+Infrmtin iding is key t gd prgrmming. A mdule suld mke public nly te minimum number f functins nd dt needed t d te jb. Te smller te interfce, te simpler te interfce. Te simpler te interfce te esier it is t use. Als,  simple interfce is less risky nd less errr prne tn  cmplex ne. Smll, simple interfces re ls esier t design, test, nd mintin. Dt iding nd gd interfce design re key t mking gd mdules.
+
+Mdulr prgrmming uses structured prgrmming in  divide nd cnquer wy: yu divide te prgrm int mdules, ten divide te mdules int submdules, ten divide te sub-mdules int subsubmdules, nd s n. 
+\begin{itemize}
+    \item Tp-dwn prgrmming: strt t te tp (min) nd wrk yur wy dwn. Te min functin cts s te tpmst utline.
+    \item Bttm-up prgrmming: write te lwest-level functin first, testing it nd ten building n tt wrking set. Bttm-up tecniques is very useful wen wrking wit  new nd unfmilir functin.
+\end{itemize}
+
+Generl mdule design guidelines
+\begin{itemize}
+    \item Structure te cde by mdules.
+    \item A mdule is  cllectin f dt nd functins tt perfrm relted tsks.
+    \item Ec mdule wit its . nd .c file suld crrespnd t  cler piece f functinlity.
+    \item Mdules suld be designed t minimize te munt f infrmtin tt s t pss between tem.
+    \item Te number f public functins in  mdule suld be smll.
+    \item Te infrmtin pssed between mdules suld be limited.
+    \item All te functins in  mdule suld perfrm relted jbs.
+    \item Mdules re divided int tw prts: public (eder file) nd privte (surce file).
+    \item All f te declrtins needed t use  mdule must pper in its eder file, nd tis file is lwys used t ccess te mdule. Te eder suld cntin ll te public infrmtin, suc s: 
+        \begin{itemize}
+            \item A cmment sectin describing clerly wt te mdule des nd wt is vilble t te user.
+            \item Cmmn structure definitins.
+            \item Prttypes f ll te public functins.
+            \item extern declrtins fr public vribles.
+        \end{itemize}
+    \item Anyting tt is internl t te mdule is privte, suc s ll te implementtins (functins nd dt) f te mdule. 
+    \item Everyting tt is nt directly usble by te utside wrld suld be kept privte.
+    \item Privte infrmtin suld be put in te surce file f te mdule.
+    \item Privte functins tt will nt be clled frm utside te mdule suld be declred sttic. Privte externl vribles (vribles declred utside f ll functins) tt re nt used utside te mdule suld be sttic.
+    \item Obviusly, te prttypes fr sttic functins suld nt be put in te mdule's eder file.
+\end{itemize}
+
+\sectin{C puzzles}
+
+\begin{itemize}
+    \item Definitin VS Declrtin: Declrtin f  vrible/functin declres tt te vrible/functin exists smewere in te prgrm. N memry will be llcted by  declrtin. Declrtin cn ccur multiple times nd describes te type f n bject; It is used t refer t bjects defined, since  declrtin f  vrible/functin is lwys needed t be given befre nyting tt wnts t ccess tem. Declrtins re subject t scpe rule. Definitin f  vrible/functin, prt frm te rle f declrtin, it ls llctes memry fr tt vrible/functin. It is used t crete new bjects, exmple: \verb|int my_rry[100]|; A vrible/functin cn nly be defined nce witin its scpe.
+
+    \item extern keywrd: Here, n bject is  vrible r  functin. In te C lnguge, n externl (glbl) bject is n bject defined utside ny functin blck (externl t ll functins). A lcl bject is  bject defined inside  functin blck. Externl bjects re llcted nd initilized wen te prgrm strts, nd te memry is nly relesed wen te prgrm ends. Externl bjects re glblly ccessible nd remin in existence permnently, terefre, tey cn be used t cmmunicte dt glblly between functins.
+
+        A declrtin f n bject must be specified befre nyting t ccess it. An externl bject is directly ccessible t ll te functins in te sme mdule were te externl bject is defined, since definitin ls serves s declrtin. Fr functins in ter mdule files t ccess te bject,  declrtin is needed t refer t te bject, wic is dne by te extern keywrd.
+
+        Te extern keywrd mens "declre witut defining". It is  wy t explicitly declre n bject witut  definitin. Since ll externl bjects re glblly ccessible in defult, teir scpe is glbl nd ence tey must be defined exctly nce in ne f te mdules f te prgrm. Fr mdules tt d nt define te externl bject t ccess it,  declrtin is needed t cnnect te ccurrences f te bject, wic is gretly fcilitted by eder files t ensure tt ll te declrtins used re cnsistent wit ec ter nd wit te definitin. 
+
+
+
+
+        \verb|<PROJECT>_<PATH>_<FILE>_H_|
+
+        \lstinputlisting[lnguge=C]{seri_eder_exp.}
+        \begin{itemize}
+
+
+
+
+
+                \begin{enumerte}
+                    \item Relted eder "f." f te "f.c" file
+                    \item C librry
+                    \item C++ librry
+                    \item Oter librries' .
+                    \item Yur prject's .
+                \end{enumerte}
+        \end{itemize}
+
+    \item sttic s tw menings:
+        \begin{itemize}
+            \item Fr functin r glbl vrible, sttic mens "privte t tis file." If declre  functin r glbl vrible s sttic, it becmes internl. Tt is, tey re glbl t nly te C file tey exist in, nt utside. Yu cnnt ccess te functin r vrible trug te extern keywrd frm ter files in yur prject. Nte: extern keywrd is defult fr ny functins declred witut te keywrd "sttic".
+            \item Fr dt defined inside  functin, it mens "vrible is llcted frm sttic memry (insted f temprry stck)." Wen yu declre  lcl vrible s sttic, it is creted just like ny ter vrible. Hwever, wen te vrible ges ut f scpe (i.e. te blck it ws lcl t is finised) te vrible stys in memry, retining its vlue. Te vrible stys in memry until te prgrm ends. Wile tis beviur resembles tt f glbl vribles, sttic vribles still bey scpe rules nd terefre cnnt be ccessed utside f teir scpe. Hence, yu need t pss its ddress ut if ccess is needed utside its lcl scpe.
+        \end{itemize}
+
+    \item C uses vid fr tw purpses: In  functin declrtin, vid indictes tt te functin returns n vlue r tkes n rguments. In  pinter declrtin, vid defines  generic pinter.
+
+    \item In C single qutes identify  single crcter, wile duble qutes crete  string literl. '' is  single  crcter literl, wile "" is  string literl cntining n '' nd  null termintr (tt is  2 cr rry). Nte tt in C, te type f  crcter literl is int, nd nt cr, tt is sizef '' is 4 in n rcitecture were ints re 32bit (nd \verb|CHAR_BIT| is 8), wile sizef(cr) is 1 everywere.
+
+    \item Stck vs ep
+
+        Te stck is te memry set side s scrtc spce fr  tred f executin. Wen  functin is clled,  blck is reserved n te tp f te stck fr lcl vribles nd sme bkkeeping dt. Wen tt functin returns, te blck becmes unused nd cn be used te next time  functin is clled. Te stck is lwys reserved in  LIFO (lst in first ut) rder; te mst recently reserved blck is lwys te next blck t be freed. Tis mkes it relly simple t keep trck f te stck; freeing  blck frm te stck is nting mre tn djusting ne pinter.
+
+        Te ep is memry set side fr dynmic llctin. Unlike te stck, tere's n enfrced pttern t te llctin nd dellctin f blcks frm te ep; yu cn llcte  blck t ny time nd free it t ny time. Tis mkes it muc mre cmplex t keep trck f wic prts f te ep re llcted r free t ny given time; tere re mny custm ep llctrs vilble t tune ep perfrmnce fr different usge ptterns.
+
+        Ec tred gets  stck, wile tere's typiclly nly ne ep fr te pplictin (ltug it isn't uncmmn t ve multiple eps fr different types f llctin). Te stck is ttced t  tred, s wen te tred exits te stck is reclimed. Te ep is typiclly llcted t pplictin strtup by te runtime, nd is reclimed wen te pplictin (tecniclly prcess) exits. Te size f te stck is set wen  tred is creted. Te size f te ep is set n pplictin strtup, but cn grw s spce is needed (te llctr requests mre memry frm te perting system).
+
+        Te stck is fster becuse te ccess pttern mkes it trivil t llcte nd dellcte memry frm it ( pinter/integer is simply incremented r decremented), wile te ep s muc mre cmplex bkkeeping invlved in n llctin r dellctin. Als, ec byte in te stck tends t be reused very frequently wic mens it tends t be mpped t te prcessr's cce, mking it very fst. Anter perfrmnce it fr te ep is tt te ep, being mstly  glbl resurce, typiclly s t be multi-treding sfe, i.e. ec llctin nd dellctin needs t be - typiclly - syncrnized wit "ll" ter ep ccesses in te prgrm.
+
+        Te size f te cll stck depends n mny fctrs, including te prgrmming lnguge, mcine rcitecture, multi-treding, nd munt f vilble memry. Wen  prgrm ttempts t use mre spce tn is vilble n te cll stck (tt is, wen it ttempts t ccess memry beynd te cll stck's bunds, wic is essentilly  buffer verflw), te stck is sid t verflw, typiclly resulting in  prgrm crs.
+
+        Te mst cmmn cuse f stck verflw is excessively deep r infinite recursin, in wic  functin clls itself s mny times tt te spce needed t stre te vribles nd infrmtin sscited wit ec cll is mre tn cn fit n te stck. Hwever, sme cmpilers implement til-cll ptimiztin, llwing infinite recursin f  specific srt—til recursin—t ccur witut stck verflw. Tis wrks becuse til-recursin clls d nt tke up dditinl stck spce. Sme C cmpiler ptins will effectively enble til-cll ptimiztin; fr exmple, cmpiling te bve simple prgrm using gcc wit -O1 will result in  segmenttin fult, but nt wen using -O2 r -O3, since tese ptimiztin levels imply te -fptimize-sibling-clls cmpiler ptin.
+
+        Te ter mjr cuse f  stck verflw results frm n ttempt t llcte mre memry n te stck tn will fit, fr exmple by creting lcl rry vribles tt re t lrge. Fr tis resn it is recmmended tt rrys lrger tn  few kilbytes suld be llcted dynmiclly insted f s  lcl vrible.
+
+        Stck verflws re mde wrse by nyting tt reduces te effective stck size f  given prgrm. Fr exmple, te sme prgrm being run witut multiple treds migt wrk fine, but s sn s multi-treding is enbled te prgrm will crs. Tis is becuse mst prgrms wit treds ve less stck spce per tred tn  prgrm wit n treding supprt. Becuse kernels re generlly multi-treded, peple new t kernel develpment re usully discurged frm using recursive lgritms r lrge stck buffers.
+
+    \item Memry llctin nd dellctin.
+        \begin{itemize}
+            \item In C, dn't need t cst te return vlue f mllc. Te pinter t vid returned by mllc is utmticlly cnverted t te crrect type. Hwever, if cmpile wit  C++ cmpiler,  cst is needed. We cse t cst becuse it mkes te prgrm legl in bt C nd C++; te price is less errr-cecking frm te C cmpiler, but tt is ffset by te extr cecking vilble frm using tw cmpilers.
+            \item Use te lnguge t clculte te size f n bject. Dn't use n explicit size fr ny dt type; use sizef(int) insted f 2 r 4, fr instnce. Fr similr resns, sizef(rry[O]) my be better tn sizef(int) becuse it's ne less ting t cnge if te type f te rry cnges.
+            \item Te sizef pertr is used t determine te munt f spce  designted dttype wuld ccupy in memry. T use sizef, te keywrd "sizef" is fllwed by  type nme r n expressin (wic my be merely  vrible nme). If  type nme is used, it must lwys be enclsed in prenteses, weres expressins cn be specified wit r witut prenteses. 
+            \item Te sizef is  unry pertr (nt  functin), sizef gives te size in units f crs. Wen sizef is pplied t te nme f  sttic rry (nt llcted trug mllc), te result is te size in bytes (in unit f crs) f te wle rry, tt is, number f elements times te sizef n rry element. Tis is ne f te few exceptins t te rule tt te nme f n rry is cnverted t  pinter t te first element f te rry, nd is pssible just becuse te ctul rry size is fixed nd knwn t cmpile time, wen sizef pertr is evluted. Fr n rry (nt  pinter) wse declrtin is visible, tis cmputes te number f elements in te rry: sizef(rry)/sizef(rry[0]).
+            \item Wen returning  pinter frm  functin, d nt return  pinter tt pints t  vlue tt is lcl t te functin r tt is  pinter t  functin rgument. Pinters t lcl vribles becme invlid wen te functin exits. In  functin, te vlue returned pints t  sttic vrible r returning  pinter t dynmiclly llcted memry cn bt be vlid.
+            \item memset trets ny memry buffer s  series f bytes, disregrding wit te specific dt type. Terefre, it will nt set multi-byte types t  specific nn-zer vlue. Fr exmple, int [100]; memset(, 1, sizef()); will nt set ec member f  t te vlue 1 rter it will set every byte in te memry buffer tken up by  t 1, wic mens every fur-byte int is set t te vlue 0x01010101, wic is nt te sme s 0x00000001.
+            \item Dellcte memry in te reverse rder it ws llcted. Tis mkes sure tt ny dependencies between te llcted memry will nt result in "dngling pinters". S if ne llcted dt structure s  pinter t nter llcted dt structure, te secnd suld be dellcted first.
+            \item Fr  temprry memry blck, dellcte te blck befre leving te rutine. If te dellctin is nt dne befre te rutine ends, ccess t te memry is lst.
+            \item Prevent ccess t dellcted memry. Tis cn be dne by setting te pinter t null fter dellcting. Dn't free pinter f strge tt nt llcted by dynmic llctin. Te riginl pinter becmes t be  wild pinter fter being freed. It's  better prctice t set pinter bck t NULL fter clling free.
+        \end{itemize}
+    \item Vrible-lengt rgument lists. Functins wit vrible-lengt rgument lists re functins tt cn tke  vrying number f rguments. An exmple in te C stndrd librry is te printf functin, wic cn tke ny number f rguments depending n w te prgrmmer wnts t use it.
+
+        C prgrmmers rrely find te need t write new functins wit vrible-lengt rguments. If tey wnt t pss  bunc f tings t  functin, tey typiclly define  structure t ld nd pck ll tse tings -- perps  linked list, r n rry -- nd pss te reference t tt structure s te rgument f te functin. As  results, dding nd deleting dt vribles nly need t mdify te structure witut ffecting te functin definitin.
+
+
+Fr exmple, te fllwing functin declrtin is fr  functin tt returns te verge f  list f numbers:
+\lstinputlisting[lnguge=C]{seri_vr_rg.c}
+
+Nte tt becuse f te wy vrible-lengt rguments wrk, we must smew, in te rguments, specify te number f elements in te vrible-lengt prt f te rguments. In te verge functin ere, it's dne trug n rgument clled \verb|n_rgs|. In te printf functin, it's dne wit te frmt cdes tt yu specify in tt first string in te rguments yu prvide.
+
+C supprts vrible numbers f rguments. But tere is n lnguge prvided wy fr finding ut ttl number f rguments pssed. User s t ndle tis in ne f te fllwing wys:
+1) By pssing first rgument s cunt f rguments.
+2) By pssing lst rgument s NULL (r 0).
+3) Using sme printf (r scnf) like mecnism were first rgument s plcelders fr rest f te rguments.
+
+Nw tt te functin s been declred s using vrible-lengt rguments, we must next write te cde tt des te ctul wrk in te functin. T ccess te numbers stred in te vrible-lengt rgument list fr ur verge functin, we must first declre  vrible fr te list itself: \verb|v_list myList|;
+
+Te \verb|v_list| type is  type declred in te stdrg. eder tt bsiclly llws yu t keep trck f yur list. T strt ctully using myList, wever, we must first ssign it  vlue. After ll, simply declring it by itself wuldn't d nyting. T d tis, we must cll \verb|v_strt|, wic is ctully  mcr defined in stdrg.. In te rguments t \verb|v_strt|, yu must prvide te \verb|v_list| vrible yu pln n using, s well s te nme f te lst vrible ppering befre te ellipsis in yur functin declrtin:
+
+Nw tt myList s been prepped fr usge, we cn finlly strt ccessing te vribles stred in it. T d s, use te \verb|v_rg| mcr, wic pps ff te next rgument n te list. In te rguments t \verb|v_rg|, prvide te \verb|v_list| vrible yu're using, s well s te primitive dt type (e.g. int, cr) tt te vrible yu're ccessing suld be:
+
+By ppping \verb|n_rgs| integers ff f te vrible-lengt rgument list, we cn mnge t find te verge f te numbers.
+
+vfprintf: 
+
+\verb|int vfprintf ( FILE * strem, cnst cr * frmt, v_list rg );|
+
+Write frmtted dt frm vrible rgument list t strem. Writes te C string pinted by frmt t te strem, replcing ny frmt specifier in te sme wy s printf des, but using te elements in te vrible rgument list identified by rg insted f dditinl functin rguments.
+
+Internlly, te functin retrieves rguments frm te list identified by rg s if \verb|v_rg| ws used n it, nd tus te stte f rg is likely ltered by te cll.
+
+In ny cse, rg suld ve been initilized by \verb|v_strt| t sme pint befre te cll, nd it is expected t be relesed by \verb|v_end| t sme pint fter te cll.
+
+fprintf() nd friends re fr nrml use. vfprintf() nd friends re fr wen yu wnt t write yur wn fprintf()-like functin. Yu'll ntice tt yu cn't pss rgs t fprintf(), since fprintf() tkes mny rguments, rter tn ne \verb|v_list| rgument. Te vfprintf() functins, wever, d tke  \verb|v_list| rgument insted f  vrible number f rguments
+
+    \item Keywrds suc s cnst re very useful fr ptimizing cmpilers t prduce efficient cde. Tis is prticulrly true wen used in cmbintin wit te restrict keywrd frm te C99 stndrd. Te cnst keywrd mens tt te indicted vrible cnnt be ssigned t. Tis is prticulrly imprtnt fr pinters nd rrys: t pss n rry s tt it cnnt be cnged by  rutine. Hwever, te cnst keywrd cnnt prevent cnges due t lising. Tt is, te sme memry lctin cn be referred t trug different pinters. Tis s n effect n ptimiztin f te cde: since te cmpiler cnnt be sure tt weter te cnst vrible will be cnged fter lising, it s t ssume tt it cn be cnged, wic prevents te desired ptimiztins.
+
+    \item Te strict lising nd restrict keywrd re intrduced t te C99 stndrd t ddress te lising prblem. Tey re declrtins f intent given by te prgrmmer t te cmpiler.
+        \begin{itemize}
+            \item Strict lising mens tt tw bjects f incmptible types cnnt refer t te sme lctin in memry, wic is enbled by pssing \verb|-fstrict-lising| flg t te cmpiler. Be sure tt ll cde cn sfely run wit tis rule enbled.
+            \item Te restrict keywrd sys tt fr te lifetime f te pinter, nly te pinter itself r  vlue directly derived frm it (suc s pinter $+$ 1) will be used t ccess te bject t wic it pints. Tis limits te effects f pinter lising, tt is, ec memry blck pinted by  restrict pinter is nly ccessed by te current pinter. 
+            \item Since te strict lising rules pribit lising mng incmptible types, nd different restrict pinters f cmptible types lwys pint t different lctins, updting ne pinter will nt ffect te ter pinters, iding better ptimiztins. Weter lising des r des nt ccur is te respnsibility f te prgrmmer.
+        \end{itemize}
+\end{itemize}
+
+\sectin{Best prctices fr scientific prgrmming}
+
+\begin{itemize}
+    \item Use revisin cntrl system. Extremely useful fr cmpring, recvering, mintennce, etc. Avilble ptins: CVS, Subversin, Bitbucket, Gitub.
+    \item C nd C++ prgrms nrmlly tke te frm f  cllectin f seprtely cmpiled mdules. Tnks t te seprte cmpiltin cncept, s  big prject is develped, n new executble cn be built rpidly if nly te cnged mdules need t be recmpiled.
+
+
+        A well rgnized C prgrm s  gd cice f mdules, nd prperly cnstructed eder files tt mke it esy t understnd nd ccess te functinlity in  mdule. Tey ls elp ensure tt te prgrm is using te sme declrtins nd definitins f ll f te prgrm cmpnents. Tis is imprtnt becuse cmpilers nd linkers need elp in enfrcing te One Definitin Rule.
+
+
+    \item Cmpile wit mke fr utmtic build prcedures
+
+        Te mke utility utmticlly determines wic pieces f  lrge prgrm need t be recmpiled, nd issues cmmnds t recmpile tem. T prepre t use mke, yu must write  file clled te mkefile tt describes te reltinsips mng files in yur prgrm nd prvides cmmnds fr updting ec file. Mst ften, te mkefile tells mke w t cmpile nd link  prgrm. In  prgrm, typiclly, te executble file is updted frm bject files, wic re in turn mde by cmpiling surce files. Once  suitble mkefile exists, ec time yu cnge sme surce files, tis simple sell cmmnd: mke suffices t perfrm ll necessry recmpiltins. Te mke prgrm uses te mkefile dt bse nd te lst-mdifictin times f te files t decide wic f te files need t be updted. Fr ec f tse files, it issues te recipes recrded in te dt bse. 
+
+        A simple mkefile cnsists f "rules" wit te fllwing spe:
+        \lstinputlisting[lnguge=C]{mkefile_exp}
+
+        A trget is usully te nme f  file tt is generted by  prgrm; exmples f trgets re executble r bject files. A trget cn ls be te nme f n ctin t crry ut, suc s 'clen' (see Pny Trgets).
+
+        A prerequisite is  file tt is used s input t crete te trget. A trget ften depends n severl files.
+
+        A recipe is n ctin tt mke crries ut. A recipe my ve mre tn ne cmmnd, eiter n te sme line r ec n its wn line. Plese nte: yu need t put  tb crcter t te beginning f every recipe line! Tis is n bscurity tt ctces te unwry.
+
+        Usully  recipe is in  rule wit prerequisites nd serves t crete  trget file if ny f te prerequisites cnge. Hwever, te rule tt specifies  recipe fr te trget d nt need t lwys ve prerequisites. Fr exmple, te rule cntining te delete cmmnd sscited wit te trget 'clen' des nt ve prerequisites. Sme rules nt nly re nt  prerequisite, tey ls d nt ve ny prerequisites, s te nly purpse f tese rules is t run te specified recipe. Trgets tt d nt refer t files but re just ctins re clled pny trgets.
+
+        A rule, ten, explins w nd wen t remke certin files wic re te trgets f te prticulr rule. mke crries ut te recipe n te prerequisites t crete r updte te trget. A rule cn ls explin w nd wen t crry ut n ctin. 
+
+        Wen  trget is  file, it needs t be recmpiled r relinked if ny f its prerequisites cnge. In dditin, ny prerequisites tt re temselves utmticlly generted suld be updted first. It is nt necessry t spell ut te recipes fr cmpiling te individul C surce files, becuse mke cn figure tem ut: it s n implicit rule fr updting  '.' file frm  crrespndingly nmed '.c' file using  'cc -c' cmmnd. Fr exmple, it will use te recipe 'cc -c min.c - min.' t cmpile min.c int min.. We cn terefre mit te recipes frm te rules fr te bject files. Wen  '.c' file is used utmticlly in tis wy, it is ls utmticlly dded t te list f prerequisites. We cn terefre mit te '.c' files frm te prerequisites, prvided we mit te recipe.
+
+        By defult, mke strts wit te first trget (nt trgets wse nmes strt wit '.'). Tis is clled te defult gl. Gls re te trgets tt mke strives ultimtely t updte. mke reds te mkefile in te current directry nd begins by prcessing te first rule. In te exmple, tis rule is fr building te executble file; but befre mke cn fully prcess tis rule, it must prcess te rules fr te files tt te executble depends n, wic in tis cse re te bject files. Ec f tese files is prcessed ccrding t its wn rule. Tese rules sy t updte ec '.' file by cmpiling its surce file. Te recmpiltin must be dne if te surce file, r ny f te eder files nmed s prerequisites, is mre recent tn te bject file, r if te bject file des nt exist. Te ter rules re utmticlly prcessed if teir trgets pper s prerequisites f te gl. If sme ter rule is nt depended n by te gl (r nyting it depends n, etc.), tt rule is nt prcessed, unless yu tell mke t d s (wit  cmmnd suc s mke clen). 
+
+        Befre recmpiling n bject file, mke cnsiders updting its prerequisites, te surce file nd eder files. Tis mkefile des nt specify nyting t be dne fr tem -- te '.c' nd '.' files re nt te trgets f ny rules -- s mke des nting fr tese files. After recmpiling wicever bject files, mke decides weter t relink executble. Tis must be dne if te executble file des nt exist, r if ny f te bject files re newer tn it. If n bject file ws just recmpiled, it is nw newer tn executble, s te executble is relinked. 
+
+        \begin{itemize}
+            \item ttp://www.gnu.rg/sftwre/mke/mnul/mke.tml
+            \item Use mke prgrm t cmpile nd link prgrms.
+            \item Turn n ll te wrning flgs, ten mke yur prgrm wrning free.
+            \item Wen recmpiles te prgrm, ec cnged C surce file must be recmpiled.
+            \item Ec cmpiltin prduces n bject file crrespnding t te surce file.
+            \item Finlly, if ny surce file s been recmpiled, ll te bject files weter newly mde r sved frm previus cmpiltins, must be linked tgeter t prduce te new executble prgrm.
+        \end{itemize}
+    \item Use  rbust nd exustive test suite. Verify te functinlity f te sftwre wenever mdified. Suld be cupled t te build infrstructure wit every relese.
+\end{itemize}
+
+\sectin{Cde Perfrmnce nd Optimiztin}
+
+\begin{itemize}
+    \item Rule f tumb, let te cmpiler d te jb. Cde suld be cmpiled wit cmpiler ptimiztins. ICC des te best fr ptimiztin.
+
+    \item Hig perfrmnce cding requires understnding mdern cmputer rdwre. Te mst crucil cncept is tt f  memry ierrcy. Cmpilers knw mre but te trget rcitecture tn mst prgrmmers, s we suld write cde tt te cmpiler cn mke best use f.
+
+    \item keep yur cde generl insted f bsessively ptimizing yur cde wit wkwrd cde structure. Hnd ptimiztins cn crete dd lking cde tt is rder fr  cmpiler t mtc up t n ptimiztin templte. It is ften better t resist te tempttin t ptimize te cde. 
+
+    \item Cde perfrmnce is nt nly relted t lgritms but ls CPU time nd memry reding. T get clse t CPU pek, cdes suld be designed t mke best use f rdwre, especilly memry cces. An ptiml usge f cce memry trug imprving dt lclity nd rgnizing dt ccesses t minimize cce misses is crucil t cde perfrmnce.
+
+    \item Nte tt it is usully nt imprtnt t mke every rutine ptiml. Often nly  smll frctin f te cde in  lrge system s  significnt impct n efficiency. Tis is smetimes expressed by te slgn tt $95\%$ f te time is spent in $5\%$ f te cde. Te tsk is t first identify te $5\%$ cde tt relly mtters. If tere is  bttleneck in yur cde, ve  clse lk t it. Ask yurself: culd better lgritms be used? Culd it be implemented mre efficiently? Suld  iger level f cmpiler ptimiztin be used? Suld te dt structures be re-designed? Repet te prcess until te system is perfrming s expected.
+
+    \item Ggle gperftls cn d prgrm perfrmnce cecking including ep-cecker, ep-prfiler nd cpu-prfiler. Vlgrind cn be used fr memry lek ceck nd cce ceck. Ccegrind simultes w  prgrm intercts wit  mcine's cce ierrcy nd (ptinlly) brnc predictr. It simultes  mcine wit independent first-level instructin (I1) nd first-level dt (D1) cces, lst-level instructin (LLi)  nd lst-level dt (LLd) cces, bcked by  unified lst-level cce (LL). Ccegrind nly simultes te first-level (L1) nd lst-level (LL) cces. Te resn fr tis cice is tt te lst-level cce s te mst influence n runtime, s it msks ccesses t min memry, nd te first-level cces ften ve lw sscitivity, s simulting tem cn detect cses were te cde intercts bdly wit tis cce.
+
+        Terefre, Ccegrind lwys refers t te I1, D1 nd LL (lst-level) cces. Ccegrind gters te fllwing sttistics (bbrevitins used fr ec sttistic is given in prenteses):
+        
+        I cce reds (Ir, wic equls te number f instructins executed), I1 cce red misses (I1mr) nd LL cce instructin red misses (ILmr).
+        
+        D cce reds (Dr, wic equls te number f memry reds), D1 cce red misses (D1mr), nd LL cce dt red misses (DLmr).
+        
+        D cce writes (Dw, wic equls te number f memry writes), D1 cce write misses (D1mw), nd LL cce dt write misses (DLmw). 
+
+        Nte tt D1 ttl ccesses is given by D1mr + D1mw, nd tt LL ttl ccesses is given by ILmr + DLmr + DLmw. 
+
+        On  mdern mcine, n L1 miss will typiclly cst rund 10 cycles, n LL miss cn cst s muc s 200 cycles, nd  mispredicted brnc csts in te regin f 10 t 30 cycles. Detiled cce nd brnc prfiling cn be very useful fr understnding w yur prgrm intercts wit te mcine nd tus w t mke it fster. Als, since ne instructin cce red is perfrmed per instructin executed, yu cn find ut w mny instructins re executed per line, wic cn be useful fr trditinl prfiling. First ff, s fr nrml Vlgrind use, yu prbbly wnt t cmpile wit debugging inf (te -g ptin). But by cntrst wit nrml Vlgrind use, yu prbbly d wnt t turn ptimistin n, since yu suld prfile yur prgrm s it will be nrmlly run. Ten, yu need t run Ccegrind itself t gter te prfiling infrmtin, nd ten run \verb|cg_nntte| t get  detiled presenttin f tt infrmtin, nd differencing prfiles wit \verb|cg_diff|. Te prgrm will execute (slwly). Upn cmpletin, summry sttistics tt lk like tis will be printed:
+
+        Cce ccesses fr instructin fetces re summrised first, giving te number f fetces mde (tis is te number f instructins executed, wic cn be useful t knw in its wn rigt), te number f I1 misses, nd te number f LL instructin (LLi) misses.
+
+        Cce ccesses fr dt fllw. Te infrmtin is similr t tt f te instructin fetces, except tt te vlues re ls swn split between reds nd writes (nte ec rw's rd nd wr vlues dd up t te rw's ttl).
+
+        Cmbined instructin nd dt figures fr te LL cce fllw tt. Nte tt te LL miss rte is cmputed reltive t te ttl number f memry ccesses, nt te number f L1 misses. I.e. it is (ILmr + DLmr + DLmw) / (Ir + Dr + Dw) nt (ILmr + DLmr + DLmw) / (I1mr + D1mr + D1mw) 
+
+        Instructin vs dt cce usge: tere re instructins tt dn't ccess te dt cce, but it's impssible t ccess te dt cce witut using n instructin, s by definitin te instructin cce is used mre ften. Instructin nd dt cce misses will igly depend n te number nd rrngement f functins nd pertins nd will be igly prgrm specific. A tigt lp tt ccesses  gigbyte f memry will ve zer instructin misses nd  tn f dt misses. A lrge prgrm cnsisting entirely f register pertins will ve  tn f instructin misses nd n dt misses.
+
+    \item Premture ptimiztin is te rt f ll evil. By using mdern cmpilers, yu d NOT need t cncern but:
+        \begin{itemize}
+            \item Register llctin. Assign cmmnly used vribles t registers fr rpid ccess.
+            \item Cmmn sub-expressin elimintin. If n expressin ppers severl times, evlute it nce nd stre te result.
+        \end{itemize}
+    \item But, tere re tings tt yu suld ptimize t  lw level:
+        \begin{itemize}
+            \item Sptil lclity: Define structures fr pcking cmpund dt used t nerby clcultins. Fr instnce, wen we need t stre  set f different field vribles t ec nde $(k,j,i)$,  nde dt structure cn be defined t pck dt fr ec nde nd t cieve ig lclity f dt mngement.
+
+                T reduce pdding required fr dt lignment f structures, rrnging members f  structure in incresing rder by size is desirble. In dditin, fields sll be srted by teir frequency r by memry ccess pttern. Put frequently ccessed elements t smll ffsets, nd if tw elements re used t te sme time, put tem clsely t reduce cce misses per structure.
+
+                Dt Structure Declrtins: Dt structures wit etergeneus elements (i.e., elements f different types) cn be defined s struct in C. Cmbining dt used fr  cmmn purpse int  single dt structure cn prvide sme level f bstrctin wic cn simplify interfces nd ter rutines. Use struct t pss  bunc f dt t  time, it's simple nd elegnt. Hwever, mke sure but tese:
+                \begin{itemize}
+                    \item Alwys pss structures by reference. Tt is, use pinters t structures s functin rguments even wen nting in te struct will be mdified in te functin (t tis circumstnce, cnst mdifier suld be used). Suld never d vlue pssing t vid cpying te cmplete cntents f te structure nt te stck.
+                    \item Mke sure ssigning  vlid memry lctin t te pinter befre dereferencing  pinter.
+                \end{itemize}
+
+            \item Temprl lclity: Nerby memry ccesses in time suld be t nerby lctins in memry. Accessing fr-prt memry lctins mens tt ec time  new memry lctin is ccessed, memry witin te CPU s t be filled wit vlues t nd rund tt memry lctin. C stres its rrys in rw-mjr rder. Tt is, fr rry $[j][i]$, cnsecutive memry lctins ld $[0][0]$, $[0][1]$, $[0][2]$, $\dtsc$ T keep ur memry references clse tgeter, we suld mke: te lter psitin te index in te rry, te inner psitin te index in te lp. Tt is, $i$ is te inner lp fr $[j][i]$.
+
+            \item Lineriztin f multidimensinl rrys: 
+
+                Using ig rder pinters fr multidimensinl rrys wstes spce nd te mllc clls re expensive, nd it is ls very time-cnsuming fr nested lps becuse f cusing lts f cce misses.
+
+                Mintining  multidimensinl rry witin  single liner rry is  cmmn perfrmnce tecnique. Hig-perfrmnce cde insted implements  multidimensinl rry s  single liner rry wit nd-utred rry indexing mt t keep trck f wt vlues re were:
+                \lstinputlisting[lnguge=C]{seri_index_mt.c}
+
+                Since te linerised rry is  single cntiguus cunk f memry, sweeping trug it cretes  regulr ccess pttern tt prcessr prefetcers cn esily recgnize, wic enbles tem t ld cces in te bckgrund. Te result is fewer cce misses nd muc better perfrmnce. In dditin, tis liner rry cn be pssed freely between functins witut knwing te size f te rry t cmpile time, nd its dimensins cn be implicitly embedded in its crrespnding index mt functin.
+
+            \item Memry usge: Try t re-use dynmiclly llcted memry. Tis is nt nly elpful fr viding memry leks, but ls vids time llcting nd freeing memry.
+            \item Wen tere is  need t cpy dt rund in memry, try t figure ut  wy f nt cpying dt rund, suc s swpping pinters rter tn te dt itself. A gret cmpiler, like ICC, cn ptimize lps t ve cmprble perfrmnce.
+            \item Using te cnst nd restrict keywrd werever pssible. Retrfit ld cde s sn s pssible. Only use restricted lef pinters. Use f prent pinters my brek te restrict cntrct.
+            \item Keep lds nd stres seprted frm clcultins. Tis results in better sceduling in cmpilers, nd mkes te reltinsip between te utput ssembly nd te riginl surce clerer.
+            \item Dn't stre wt yu cn esily recmpute. Cnges like tese re minr, wever; tey re nlgus t cde tuning. Mjr imprvements re mre likely t cme frm better dt structures, perps cupled wit lgritm cnges. Fr exmple,  mtrix cntins integer vlues, mst f wic were zer, Tis immeditely suggested  representtin in wic nly te nn-zer elements f te mtrix were stred, nd ec mtrix ccess like m[i][j] wuld be replced by  functin cll m(i,j). Tere re severl wys t stre te dt; te esiest is prbbly n rry f pinters, ne fr ec rw, ec f wic pints t  cmpct rry f clumn numbers nd crrespnding vlues. Tis s iger spce vered per nn-zer item but requires muc less spce verll.
+
+                Vritins n tis teme re frequent, nd s re specific representtins, but ll sre te sme bsic ide: stre te cmmn vlue r vlues implicitly r in  cmpct frm, nd spend mre time nd spce n te remining vlues. If te mst cmmn vlues re relly cmmn, tis is  win.
+
+                Te prgrm suld be rgnized s tt te specific dt representtin f cmplex types is idden in  clss r set f functins perting n  privte dt type.Tis precutin ensures tt te rest f te prgrm will nt be ffected if te representtin cnges.
+            \item Te inline specifier is  int t te cmpiler tt it suld ttempt t generte cde fr  cll f fc() inline rter tn lying dwn te cde fr te functin nce nd ten clling trug te usul functin cll mecnism. Te inline instructs te cmpiler t ttempt t embed te functin cntent int te clling cde insted f executing n ctul cll, s te functin cntent smetimes is ctully significntly less tn te cde te cmpiler needs t put t perfrm te cll. Fr smll functins tt re clled frequently tt cn mke  big perfrmnce difference fr skipping te ctul functin cll nd return. Mst cmpilers will try t "inline" even wen te keywrd is nt used, s prt f te ptimiztins, were its pssible. Fr  cmpiler, te inliner clssifies rutines s smll, medium, r lrge. A size bundry between wt te inliner cnsiders t be medium nd lrge-size rutines is specified in te inliner. Te inliner prefers t inline smll rutines. It s  preference ginst inlining lrge rutines. S, ny lrge rutine is igly unlikely t be inlined. Inlining lrge functins leds t lrger executbles, wic significntly impirs perfrmnce regrdless f te fster executin tt results frm te clling vered. Abut perfrmnce, te wise pprc is (s lwys) t prfile te pplictin, ten eventully inline  set f functins representing  bttleneck.
+        \end{itemize}
+\end{itemize}
+
+\sectin{Issues relted t numericl cmputing}
+
+\begin{itemize}
+    \item Rise te cncern but numericl ccurcy nd relibility wenever cnduct n lgritm r even n pertin. Be wre f ctstrpic cncelltin in pertins, numericl stbility f te lgritms.
+    \item Recmmend duble rter tn flt type fr flting pint vribles. 
+    \item Dn't subtrct nerly equl quntities nd ten divide by smeting smll. Tis ften results in ctstrpic cncelltin nd ll digits f ccurcy re lst. In generl, if yu subtrct numbers were te first k digits re equl, yu lse k digits f ccurcy.
+    \item Avid using flting pint numbers s lp cunters if exct lp bevirs re required. Rund ff errrs re unrelible.
+    \item Pririties in writing scientific sftwre suld be
+        \begin{itemize}
+            \item crrectness,
+            \item numericl stbility,
+            \item ccurte discretiztin (including estimting ccurcy),
+            \item flexibility,
+            \item efficiency (speed nd memry).
+        \end{itemize}
+    \item Wt Every Cmputer Scientist Suld Knw Abut Flting-Pint Aritmetic: ssign  vlue wic is beynd te mximum vlue f tt dt type cmpiler will ssign \verb|+INF| if number is psitive nd \verb|-INF| if number is negtive. If ssign  vlue witc is less tn minimum vlue f tt dt type ten cmplier will ssign  grbge vlue r zer.
+    \item Flting-pint exceptin ndling. Wen cde genertes n verflw, underflw, r divide-by-zer errr, te result will simply be n infinite (\verb|inf|) r nt--number (\verb|NN|) vlue. If undefined vlues re used in ter pertins, new undefined vlues re generted. Ten te prgrm gives inf r NN s  result. One cn use te flting pint exceptin fcilities prvided by C in fenv. t determine nd trck  flting-pint exceptinl cnditin wen it first ccurred. Tese illegl events cn be used t trigger exceptins, wic will stp te cde rigt t te pint it ppens; ten if yu run te cde trug  debugger, yu cn find te line were it ppens.
+    \item Cmpring fr flt equlity:
+
+        Wen cmpring ginst zer, reltive epsilns bsed cmprisns re meningless, n bslute epsiln is needed. Wen cmpring ginst  nn-zer number, reltive epsilns bsed cmprisns re desirble. Te mst generic wy is t use  mixture f bslute nd reltive epsilns.
+
+        Flting pint mt is nt exct. Simple vlues like 0.1 cnnt be precisely represented using binry flting pint numbers, nd te limited precisin f flting pint numbers mens tt sligt cnges in te rder f pertins r te precisin f intermedites cn cnge te result. 
+
+        Tere is  cler difference between 0.1, flt(0.1), nd duble(0.1).  In C/C++ te numbers 0.1 nd duble(0.1) re te sme ting, but ere "0.1" in text mening te exct bse-10 number, weres flt(0.1) nd duble(0.1) re runded versins f 0.1. And, t be cler, flt(0.1) nd duble(0.1) d nt ve te sme vlue, becuse flt(0.1) s fewer binry digits, nd terefre s mre errr. 
+
+        If yu d  series f pertins wit flting-pint numbers ten, since tey ve finite precisin, it is nrml nd expected tt sme errr will creep in. If yu d te sme clcultin in  sligtly different wy ten it is nrml nd expected tt yu migt get sligtly different results. In tt cse  tugtful cmprisn f te tw results wit  crefully csen reltive nd/r bslute epsiln vlue is entirely pprprite.
+
+        Hwever if yu strt dding epsilns crelessly - if yu llw fr errr were tere suld be nne - ten yu get  ctic explsin f uncertinty were yu cn't tell trut frm fictin.
+
+        Smetimes peple tink tt flting-pint numbers re mgiclly errr prne. Tere seems t be  belief tt if yu red te exct sme clcultin wit te exct sme inputs ten yu migt get  different nswer. Nw tis cn ppen if yu cnge cmpilers r use instructins like fsin wse vlue is nt precisely defined. But if yu stick t te bsic five pertins (plus, minus, divide, multiply, squre rt) nd yu ven't recmpiled yur cde ten yu suld bslutely expect te sme results.
+
+        Cnstnts cmpred t temselves: flt x = 1.1; if (x != 1.1) \{Ftlly flwed flts\}
+
+        Te prblem is tt tere re tw min flting-pint types in mst C/C++ implementtins. Tese re flt (32 bits) nd duble (64 bits). Flting-pint cnstnts in C/C++ re duble precisin, te cde bve is equivlent t: if (flt(1.1) != duble(1.1)); wic is flwed. In ter wrds, it tests weter 1.1 wen stred s  flt is te sme s te ne wen stred s  duble, wic is frequently flse given tt tere re twice s mny bits in  duble s tere re in  flt. Tw resnble wys t fix te initil cde wuld be: flt x = 1.1f; (flt cnstnt) if (x != 1.1f) r: duble x = 1.1; (duble cnstnt) if (x != 1.1).
+
+    \item As  persnl cice, we tend nt t use debuggers beynd getting  stck trce r te vlue f  vrible r tw. One resn is tt it is esy t get lst in detils f cmplicted dt structures nd cntrl flw; we find stepping trug  prgrm less prductive tn tinking rder nd dding utput sttements nd self-cecking cde t criticl plces. Clicking ver sttements tkes lnger tn scnning te utput f judiciusly-plced displys. It tkes less time t decide were t put print sttements tn t single-step t te criticl sectin f cde, even ssuming we knw were tt is. Mre imprtnt, debugging sttements sty wit te prgrm; debugger sessins re trnsient.
+
+        Blind prbing wit  debugger is nt likely t be prductive. It is mre elpful t use te debugger t discver te stte f te prgrm wen it fils, ten tink but w te filure culd ve ppened. Frtuntely, mst bugs re simple nd cn be fund wit simple tecniques.  Exmine te evidence in te errneus utput nd try t infer w it culd ve been prduced. Lk t ny debugging utput befre te crs; if pssible get  stck trce frm  debugger. Nw yu knw smeting f wt ppened, nd were. Puse t reflect. Hw culd tt ppen? Resn bck frm te stte f te crsed prgrm t determine wt culd ve cused tis.
+
+        Debugging invlves bckwrds resning, like slving murder mysteries. Smeting impssible ccurred, nd te nly slid infrmtin is tt it relly did ccur. S we must tink bckwrds frm te result t discver te resns. Once we ve  full explntin, we'll knw wt t fix nd, lng te wy, likely discver  few ter tings we dn't expected.
+
+        Mke te bug reprducible. Te first step is t mke sure yu cn mke te bug pper n demnd.
+
+        Divide nd cnquer. Cn te input tt cuses te prgrm t fil be mde smller r mre fcused? Nrrw dwn te pssibilities by creting te smllest input were te bug still sws up. Wt cnges mke te errr g wy? Try t find crucil test cses tt fcus n te errr. Ec test cse suld im t  definitive utcme tt cnfirms r denies  specific yptesis but wt is wrng. All f tese re instnces f  generl strtegy, divide nd cnquer, wic is s effective in debugging s it is in plitics nd wr.
+
+        Prceed by binry serc. Trw wy lf te input nd see if te utput is still wrng; if nt, g bck t te previus stte nd discrd te ter lf f te input. Te sme binry serc prcess cn be used n te prgrm text itself: eliminte sme prt f te prgrm tt suld ve n reltinsip t te bug nd see if te bug is still tere.
+
+        Disply utput t lclize yur serc. If yu dn't understnd wt te prgrm is ding, dding sttements t disply mre infrmtin cn be te esiest, mst cst-effective wy t find ut. Put tem in t verify yur understnding r refine yur ides f wt's wrng.
+
+        Write  lg file. Anter tctic is t write  lg file cntining  fixed-frmt strem f debugging utput. Wen  crs ccurs, te lg recrds wt ppened just befre te crs.
+
+        Get  stck trce. Altug debuggers cn prbe running prgrms, ne f teir mst cmmn uses is t exmine te stte f  prgrm fter det. Te surce line number f te filure, ften prt f  stck trce, is te mst useful single piece f debugging infrmtin; imprbble vlues f rguments re ls  big clue (zer pinters, integers tt re uge wen tey suld be smll, r negtive wen tey suld be psitive, crcter strings tt ren't lpbetic). A debugger cn ls be used t disply vlues f lcl r glbl vribles tt will give dditinl infrmtin but wt went wrng.
+
+        Red befre typing. One effective but under-pprecited debugging tecnique is t red te cde very crefully nd tink but it fr  wile witut mking cnges. Tere's  pwerful urge t get t te keybrd nd strt mdifying te prgrm t see if te bug ges wy. But cnces re tt yu dn't knw wt's relly brken nd will cnge te wrng ting, perps breking smeting else. Tke  brek fr  wile; smetimes wt yu see in te surce cde is wt yu ment rter tn wt yu wrte, nd n intervl wy frm it cn sften yur miscnceptins nd elp te cde spek fr itself wen yu return. Resist te urge t strt typing; tinking is  wrtwile lterntive.
+
+        Explin yur cde t smene else. Anter effective tecnique is t explin yur cde t smene else. Tis will ften cuse yu t explin te bug t yurself. Smetimes it tkes n mre tn  few sentences, fllwed by n embrrssed "Never mind, I see wt's wrng. Srry t bter yu." Tis wrks remrkbly well; yu cn even use nn-prgrmmers s listeners. One university cmputer center kept  teddy ber ner te elp desk. Students wit mysterius bugs were required t explin tem t te ber befre tey culd spek t  umn cunselr.
+
+        Test cde t its bundries. One tecnique is bundry cnditin testing: s ec smll piece f cde is written- lp r  cnditinl sttement, fr exmple, ceck rigt ten tt te cnditin brnces te rigt wy r tt te lp ges trug te prper number f times. Tis prcess is clled bundry cnditin testing becuse yu re prbing t te nturl bundries witin te prgrm nd dt, suc s nn-existent r empty input,  single input item, n exctly full rry, nd s  n. Te ide is tt mst bugs ccur t bundries. If  piece f cde is ging t fil, it will likely fil t  bundry. Cnversely, if it wrks t its bundries, it's likely t wrk elsewere t.
+\end{itemize}
+
+\sectin{Perfrmnce Tuning}
+
+Yu cnnt imprve wt yu cnnt mesure. Perfrmnce tuning is n itertive prcess between running n instrumented versin f yur cde, getting dt n perfrmnce trugut te cde, nd ttempting t mke cnces t te cde tt will mke it run mre efficiently.
+
+Tere re tree min wys f instrumenting  cde t find its perfrmnce. Te first is mnully dding timers rund imprtnt prts f te cde t find ut w muc time is spent in ec prt. Tis is wrt tinking but ding wen putting tgeter  new cde, s it mens tt yu'll ve  very rbust wy f finding ut w well te different prts f te cde perfrm n different pltfrms nd wit different cmpiler ptins, etc.. Te results re, wever, necessrily very crse-grined; tey re very useful fr cmpring perfrmnce under different situtins, but give very little infrmtin but weter r nt tere re perfrmnce prblems r wt tey migt be. Te secnd tecnique is smpling, smetimes clled `prgrm cunter smpling' r `sttisticl smpling'. A relted metd is te use f rdwre cunters --- cunters witin te CPU itself wic keep trck f perfrmnce-relted infrmtin, suc s te number f cce misses r brnc mis-predictins witin yur cde. Using tis infrmtin, eiter regulrly trugut te cde r nce fr te entire cde run cn give very specific infrmtin but perfrmnce prblems.

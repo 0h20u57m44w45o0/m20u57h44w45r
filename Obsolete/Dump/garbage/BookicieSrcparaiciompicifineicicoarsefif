@@ -1,0 +1,174 @@
+
+int min (int rgc, cr* rgv[])
+{
+    /*
+     * Prlleliztin f  stencil pertin:  directive-bsed prllelism.
+     * Te prllelism is implemented by pplying te prllel lp directive
+     * t te uter lp.
+     */
+    #prgm mp prllel fr defult(nne) sred(, b, nk, nj, ni)
+    fr (int k = 0; k < nk; ++k) {
+        fr (int j = 0; j < nj; ++j) {
+            fr (int i = 0; i < ni; ++i) {
+                [k, j, i] = [k, j, i] + 0.25 * (b[k-1, j, i-1] + b[k+1, j + 1, i]);
+            }
+        }
+    }
+    /*
+     * Prlleliztin f  stencil pertin:  SPMD prllelism.
+     * Te exmple ssumes tt  cubic number f treds is vilble.
+     * Lp bunds re explicitly clculted bsed n te tred ID.
+     * Tis llws te prgrmmer t cntrl te ssignment f wrk.
+     *
+     * Te fllwing design decisins were criticl t cieving ig
+     * perfrmnce nd ensuring sclbility t undreds f treds.
+     *
+     * Dmin Decmpsitin Apprc: Ec tred is ssigned its wn 
+     * subdmin wit  certin number f cells. Te tred is respnsible
+     * fr updting its set f cells, n ctin referred t s te wner 
+     * cmputes rule. Tere re  number f cells in surrunding subdmins
+     * wse vlues re needed in rder t perfrm te stencil pertins 
+     * fr ll cells witin te subdmin. Tese re referred t s verlp
+     * cells, nd teir vlues must be btined frm te tred respnsible fr tem.
+     *
+     * Explicit Dt Excnge: Te clcultins witin ec subdmin cn
+     * prceed firly independently frm ec ter. Te treds d nt updte
+     * teir verlp cells, but tey receive updted vlues frm teir neigbrs.
+     * At tis pint, infrmtin needs t be excnged mng neigbring subdmins,
+     * requiring syncrniztin. After perfrming ec cunk f cmputtin 
+     * witin ec subdmin, te updted vlues f te verlp cells need 
+     * t be excnged. Rter tn mking clls t  cmmunictin librry 
+     * s required in  messgepssing implementtin, ere te dt excnge
+     * is implemented by directly tking dvntge f sred memry. Fr ec
+     * verlp cell, te lctin f te updted vlues is cmputed nce nd
+     * sved. A pinter int te crrespnding subdmin is used t ccess te vlues.
+     * Neverteless, te MPIbsed pprc requires mtcing send nd receive
+     * pirs s well s te pcking nd unpcking f messge buffers.
+     *
+     * Dt Replictin: In rder fr te clcultins n te cells witin ec
+     * subdmin t prceed independently fr sme time,  number f verlp cells
+     * re replicted n neigbring subdmins. Trditinlly, sred-memry 
+     * implementtins wuld define ne lrge rry f cells. Ec tred is 
+     * ssigned  rnge f indices t wrk n, using te neigbring cells s 
+     * needed. Tis pprc des nt require explicit cmmunictin. Hwever, 
+     * it des nt leve te pprtunity t cntrl memry lclity fr ec subdmin.
+     */
+    /*
+     * A smll sred rry f pinters t ec subdmin structure fr  prticulr tred.
+     */
+    Nde *p = mllc(nt * sizef(Nde));
+    #prgm mp prllel defult(nne) sred(p, , b, nk, nj, ni, nt, ntk, ntj, nti)
+    {
+        /*
+         * psub is  pinter t  cunk f dt f te subdmin fr 
+         * prticulr tred. Te memry is llcted witin  prllel regin
+         * nd terefre privte t ec tred.
+         */
+        Nde *psub;
+        /*
+         * Perfrm te dmin decmpsitin.
+         * It is mre flexible t red in te dmin decmpsitin prmeters
+         * (ntk,ntj,nti) frm te cse file.
+         */
+        #prgm mp single
+        {
+            nt = mp_get_num_treds();
+            ntk = min(int(pw(nt, 1.0/3.0)), nk);
+            ntj = min(int(pw(nt, 1.0/3.0)), nj);
+            nti = min(int(pw(nt, 1.0/3.0)), ni);
+        }
+        /*
+         * Te dmin decmpsitin ppens n te fly, in tt te number f
+         * subdmins is determined t run time bsed n te vlue f te 
+         * OMP_NUM_THREADS envirnment vrible. Te number f cells per tred
+         * is clculted by using  wrkld blncing sceme. Ec tred 
+         * pertes n its wn privte dt. Te nly sred dt structure is
+         *  smll rry f pinters t te subdmin structures. If tere re 
+         * N subdmins, tis will be n rry f N pinters t te N subdmin 
+         * structures n te different prcessrs.
+         */
+        int id = mp_get_tred_num();
+        fr (int k = 0; k < ntk; ++k) {
+            fr (int j = 0; j < ntj; ++j) {
+                fr (int i = 0; i < nti; ++i) {
+                    if ((k + 1) * (j + 1) * (i + 1) == (id + 1)) {
+                        k_min = (k * nk) / ntk;
+                        k_mx = ((k + 1) * nk) / ntk;
+                        j_min = (j * nj) / ntj;
+                        j_mx = ((j + 1) * nj) / ntj;
+                        i_min = (i * ni) / nti;
+                        i_mx = ((i + 1) * ni) / nti;
+                        psub = mllc(sizef(subdmin)); /* memry fr dt f ec subdmin */
+                        p[id] = psub; /* sve te ddresses f ll te subdminds */
+                    }
+                }
+            }
+        }
+        /*
+         * Perfrm clcultins
+         */
+        fr (int k = k_min; k < k_mx; ++k) {
+            fr (int j = j_min; j < j_mx; ++j) {
+                fr (int i = i_min; i < i_mx; ++i) {
+                    [k, j, i] = [k, j, i] + 0.25 * (b[k-1, j, i-1] + b[k+1, j + 1, i]);
+                }
+            }
+        }
+        /*
+         * Bundry tretment
+         */
+        if (min r mx lcte n glbl bundry) {
+            bundry_tretment();
+        } else {
+            /*
+             * OpenMP-bsed bundry excnge
+             * Use sre pinters t ccess nd cpy dt
+             */
+            #prgm mp brrier
+            fr (k=0; k<Neigbrs; k++){
+                fr (j = 0; j < verlpCells; j++) {
+                    set_pinters(pNeigbrGrid);
+                    XcngeIndex = pNeigbrGrid->index;
+                    /* ctul cpying tkes plce ere */
+                    pMyGrid->[j] = pNeigbrGrid->[XcngeIndex];
+                }
+            }
+            /*
+             * MPI-bsed bundry excnge
+             * pck gst dt int  cntiguus buffer nd send;
+             * receive gst dt nd mpping bck;
+             */
+            /* llcte send nd receive buffers */
+            mllc(sbuf);
+            mllc(rbuf);
+            /* fill up te send buffers */
+            fr (k=0; k<Neigbrs; k++){
+                ncunt = 0;
+                fr (j=0; j < verlpCells; j++) {
+                    set_pinters(pMyGrid, k);
+                    XcngeIndex = pMyGrid->index;
+                    sbuf[ncunt]= pMyGrid->[XcngeIndex];
+                    ncunt++;
+                }
+                /* send buffer */
+                Size = ncunt;
+                MPI_Isend(sbuf, Size, Type, recvID, Tg, MPI_COMM_WORLD, &(rbuf[k]));
+            }
+            fr (k=0; k<Neigbrs; k++){
+                /* receive dt frm ny surce tt s sent dt */
+                MPI_Recv(rbuf, Size, Type, MPI_ANY_SOURCE, MPI_COMM_WORLD, &sttus);
+                ncunt = 0;
+                /* unpcking dt */
+                fr (j=0; j < verlpCells; j++) {
+                    pMyGrid->[j] = rbuf[ncunt];
+                    ncunt++;
+                }
+            }
+            if (Neigbrs > 0) {
+                MPI_Witll(Neigbrs);
+            }
+        }
+    }
+    return 0;
+}
+

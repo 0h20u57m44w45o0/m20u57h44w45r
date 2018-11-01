@@ -1,12 +1,9 @@
-\cpter{Reserc Design nd Metdlgy}
-\lbel{c:metd}
-
-
-\sectin{Slver develpment}
+\cpter{Multipse flws}
+\lbel{c:multipse_flws}
 
 In reslving te multiscle nd multipse interctins in explsively dispersed grnulr mterils trug direct simultin, te principl cllenges re sscited wit fluid-slid interctin, ig-rder temp-sptil discretiztin, dynmic pse interfce, mes genertin nd regenertin, multibdy cntct nd cllisin, cmplex interfcil cnditin, nd cmputtinl efficiency nd rbustness. Mrever, te presence f ig-pressure sck wves furter reinfrces tse cllenges. Terefre, in dditin t integrting existing numericl tecniques, t cieve  cpble numericl slver ls requires develping new mtemticl mdels nd cmputtinl metds t bridge te gp between te vilble tls nd remining prblems.
 
-\subsectin{Fluid-slid cupling}
+\sectin{Fluid-slid cupling}
 
 A fully cupled fluid-slid interctin lgritm usully invlves implicit discretiztin f gverning equtins nd slves lrge mtrix systems by itertin. Altug being ble t cieve  generl slver fr ll te prblem dmins, it impses stringent cnditins n te slutin prcess. In cntrst,  prtitined lgritm decuples pysicl prcesses in te time dmin. Adpting numericl tecniques ptimized fr ec prblem dmin nd pysicl prcess, te prtitined pprc s dvntges in flexibility nd efficiency \citep{gldmn1996n}. 
 
@@ -16,8 +13,6 @@ A prtitined fluid-slid interctin lgritm wit secnd-rder temprl ccurcy, wic is bti
 \end{equtin}
 were $\Vectr{U}^{n}$ nd $\Vectr{U}^{n+1}$ dente te slutin vectrs f pysicl quntities t time $t^n$ nd $t^{n+1}$, respectively; $\Sptr_{\Des{s}}$ nd $\Sptr_{\Des{f}}$ represent te slutin pertrs f slid dynmics nd fluid dynmics, respectively.
 
-Trditinlly, t reduce te cmputtinl ld resulting frm  symmetric splitting, te grup prperty f te slutin pertr, $\Sptr(\Delt t_1)\Sptr(\Delt t_2) = \Sptr(\Delt t_1 +\Delt t_2)$, is pplied t cnctente cnsecutive pertrs f te sme type \citep{strng1968cnstructin, gldmn1996n}. Cnsequently, it breks te unifrmity t te strt nd end steps f te cmputtin cycle. By bserving tt te vlue rnge f te CFL number cn be dubled, te ungruped frm preserves unifrmity wile cieving equivlent verll efficiency fr temprl integrtin r iger efficiency wen mre tn tw pertrs present.
-
 \subsectin{Gverning equtins nd discretiztin}
 
 \subsubsectin{Fluid dynmics}
@@ -26,62 +21,6 @@ Te mtin f fluids is described by te cnservtive frm f te Nvier--Stkes equtins in 
 \begin{equtin}
     \frc{\prtil \Vectr{U}}{\prtil t}+\frc{\prtil \Vectr{F}_i}{\prtil x_i} = \frc{\prtil \Vectr{F}^{\Des{v}}_i}{\prtil x_i}+\Vectr{\Pi}
 \end{equtin}
-
-Te vectrs f cnservtive vribles $\Vectr{U}$, cnvective fluxes $\Vectr{F}_i$, diffusive fluxes $\Vectr{F}^{\Des{v}}_i$, nd surce terms $\Vectr{\Pi}$ re s fllws:
-\begin{equtin}
-    \Vectr{U} =
-    \begin{pmtrix}
-        \r\\
-        \r V_j\\
-        \r e_{\Des{T}}
-    \end{pmtrix}
-    ,\,\,
-    \Vectr{F}_i =
-    \begin{pmtrix}
-        \r V_i\\
-        \r V_i V_j + p \delt_{ij}\\
-        (\r e_{\Des{T}}+p) V_i
-    \end{pmtrix}
-    ,\,\,
-    \Vectr{F}^{\Des{v}}_i =
-    \begin{pmtrix}
-        0\\
-        \tu_{ij}\\
-        k \frc{\prtil T}{\prtil x_i} + \tu_{il} V_l
-    \end{pmtrix}
-    ,\,\,
-    \Vectr{\Pi} =
-    \begin{pmtrix}
-        0\\
-        f^{\Des{b}}_j\\
-        f^{\Des{b}}_l V_l
-    \end{pmtrix}
-\end{equtin}
-were $\r$ is te density, $\Vectr{V}$ is te velcity, $e_{\Des{T}} = e +\Vectr{V}\cdt\Vectr{V}/2$ is te specific ttl energy, $e$ is te specific internl energy, $p$ is te termdynmic pressure, $\Tensr{\tu}$ is te viscus stress tensr, $T$ is te temperture, $k$ is te terml cnductivity, $\Vectr{f}^{\Des{b}}$ represents externl bdy frces suc s grvity, $i$ is  free index, $j$ is n enumertr, $l$ is  dummy index. 
-
-Currently, te clsure f te system is trug supplying te Newtnin fluid reltin wit te Stkes yptesis
-\begin{equtin}
-    \tu_{ij} = \mu\left(\frc{\prtil V_i}{\prtil x_j} + \frc{\prtil V_j}{\prtil x_i} - \frc{2}{3}(\nbl\cdt\Vectr{V}) \delt_{ij}\rigt)
-\end{equtin}
-nd te perfect gs lw
-\begin{equtin}
-    \begin{gtered}
-        p = \r R T \\
-        e = C_v T
-    \end{gtered}
-\end{equtin}
-were $\mu$ is te dynmic viscsity nd is determined by te Suterlnd viscsity lw, $R$ is te specific gs cnstnt, nd $C_v$ is te specific et cpcity t cnstnt vlume.
-
-Te temprl integrtin is cieved vi te secnd-rder r tird-rder strng stbility-preserving (SSP) Runge--Kutt metd \citep{su1988efficient, gttlieb2001strng}. Fr instnce, te tird-rder ne cn be described s te fllwing: 
-\begin{equtin}
-    \begin{ligned}
-        &\Vectr{U}^{(1)} = \Tptr\Vectr{U}^n\\
-        &\Vectr{U}^{(2)} = 3/4\Vectr{U}^n+1/4\Tptr\Vectr{U}^{(1)}\\
-        &\Vectr{U}^{n+1} = 1/3\Vectr{U}^n+2/3\Tptr\Vectr{U}^{(2)}\\
-        &\Tptr = (\Mtrix{I} + \Delt t \Lptr)
-    \end{ligned}
-\end{equtin}
-were $\Mtrix{I}$ is te identity mtrix, pertr $\Lptr = \Lptr_x + \Lptr_y + \Lptr_z$, $\Lptr_x$, $\Lptr_y$, nd $\Lptr_z$ represent te sptil pertrs f $x$, $y$, nd $z$ dimensin, respectively.
 
 Fr te system f cnservtin lws in multidimensinl spce, te discretiztin f sptil pertrs cn be cnducted using dimensin-by-dimensin \citep{su1988efficient} r dimensinl-splitting \citep{strng1968cnstructin} pprximtin. Wile te frmer preserves temprl ccurcy, te ltter s  muc less severe stbility cnstrint. T gurntee discrete mss cnservtin, cnservtive discretiztin is pplied fr ll te sptil derivtives. Using te $x$ dimensin s n exmple, te flux derivtive t  nde $i$ is pprximted s
 \begin{equtin}
@@ -101,52 +40,8 @@ Since bt te frwrd flux nd bckwrd flux re discretized in cnservtive frm, te discr
 \end{equtin}
 
 Te tird-rder r fift-rder weigted essentilly nnscilltry (WENO) sceme \citep{jing1996efficient} is ten pplied fr te recnstructin f numericl fluxes. Since te numericl flux $\t{f}_{i+{1}/{2}}^+$ nd $\t{f}_{i-{1}/{2}}^-$ re symmetric wit respect t $x_i$, nly te recnstructin f te frmer is described erein. Te ltter cn be btined vi replcing ll $+$ nd $-$ signs in te superscript nd subscript f ec vrible in te equtins by te crrespnding ppsite signs $-$ nd $+$, respectively. Fr te fift-rder WENO sceme, te numericl flux $\t{f}_{i+{1}/{2}}^+$ s te fllwing frm:
-\begin{equtin}
-    \t{f}_{i+\frc{1}{2}}^{+} = \sum_{n=0}^{N} \meg_{n}^+ q_{n}^+(f_{i+n-N}^+, \dtsc, f_{i+n}^+), \,\, N=(r-1)=2
-\end{equtin}
-were
-\begin{equtin}
-    \begin{gtered}
-        q_0^+(f_{i-2}^+, \dtsc, f_{i}^+) = (2f_{i-2}^+ - 7f_{i-1}^+ + 11f_{i}^+) / 6\\
-        q_1^+(f_{i-1}^+, \dtsc, f_{i+1}^+) = (-f_{i-1}^+ + 5f_{i}^+ + 2f_{i+1}^+) / 6\\
-        q_2^+(f_{i}^+, \dtsc, f_{i+2}^+) = (2f_{i}^+ + 5f_{i+1}^+ - f_{i+2}^+) / 6\\
-        \meg_{n}^+ = \frc{\lp_n^+}{\lp_0^+ + \dtsb + \lp_N^+}, \,\, \lp_n^+ = \frc{C_n}{(\vrepsiln + IS_n^+)^2}, \,\, \vrepsiln = 10^{-6}\\
-        C_0 = \frc{1}{10}, \,\, C_1 = \frc{6}{10}, \,\, C_2 = \frc{3}{10}\\
-        IS_{0}^+ = \frc{13}{12}(f_{i-2}^+ - 2f_{i-1}^+ + f_{i}^+)^2 + \frc{1}{4}(f_{i-2}^+ - 4f_{i-1}^+ + 3f_{i}^+)^2\\
-        IS_{1}^+ = \frc{13}{12}(f_{i-1}^+ - 2f_{i}^+ + f_{i+1}^+)^2 + \frc{1}{4}(f_{i-1}^+ - f_{i+1}^+)^2\\
-        IS_{2}^+ = \frc{13}{12}(f_{i}^+ - 2f_{i+1}^+ + f_{i+2}^+)^2 + \frc{1}{4}(3f_{i}^+ - 4f_{i+1}^+ + f_{i+2}^+)^2
-    \end{gtered}
-\end{equtin}
-were $r$ is te number f cndidte stencils, $q_n$ re te $r$-t rder pprximtins f $\t{f}_{i+1/2}$ n te cndidte stencils $S_n=(x_{i+n-N},\dtsc,x_{i+n})$, $\meg_{n}$ re te ctul weigts f $q_n$, wic re determined by te smtness f slutin in te cndidte stencils $S_n$, s mesured by $IS_n$, nd $C_n$ re ptiml weigts t ensure tt te cnvex cmbintin f $q_n$ cnverges t  $(2r-1)$-t rder pprximtin f $\t{f}_{i+1/2}$ n te undivided stencil $S=(x_{i-N},\dtsc,x_{i+N})$ in smt regins.
-\begin{figure}[!tbp]
-    \centering
-    \cptin{A scemtic digrm illustrting interfcil diffusive flux recnstructin.}
-    \lbel{fig:diffusive_flux_discretize}
-\end{figure}
 
 Te secnd-rder centrl difference discretiztin is emplyed fr diffusive fluxes. A cnservtive discretiztin f te diffusive fluxes invlves cnsecutive differentitin, wic my led t n even-dd decupling issue \citep{pirzzli2011numericl, brem2015lclly}. Terefre, te recnstructin functin suld be crefully devised. In tis wrk, te interfcil flux $\t{\Vectr{F}}^{\Des{v}}_{i+{1}/{2}}$ is recnstructed n te discretized spce $[i, i+1] \times [j-1, j+1] \times [k-1, k+1]$, s illustrted in Fig.~\ref{fig:diffusive_flux_discretize}. Let $\pi$ dente  pysicl quntity in $\Vectr{F}^{\Des{v}}$, in rder t vid even-dd decupling resulting frm pplying cnsecutive derivtive discretiztin, te fllwing recnstructins cn be dpted:
-\begin{equtin}
-    \begin{ligned}
-        \pi_{i+\frc{1}{2}, j, k} &= \frc{\pi_{i, j, k} + \pi_{i+1, j, k}}{2} \\
-        \left.\frc{\prtil \pi}{\prtil x}\rigt|_{i+\frc{1}{2}, j, k} &= \frc{\pi_{i+1, j, k} - \pi_{i, j, k}}{\Delt x} \\
-        \left.\frc{\prtil \pi}{\prtil y}\rigt|_{i+\frc{1}{2}, j, k} &= \frc{\pi_{i, j+1, k} + \pi_{i+1, j+1, k} - \pi_{i, j-1, k} - \pi_{i+1, j-1, k}}{4\Delt y} \\
-        \left.\frc{\prtil \pi}{\prtil z}\rigt|_{i+\frc{1}{2}, j, k} &= \frc{\pi_{i, j, k+1} + \pi_{i+1, j, k+1} - \pi_{i, j, k-1} - \pi_{i+1, j, k-1}}{4\Delt z}
-    \end{ligned}
-\end{equtin}
-
-\prgrp{Cmputtin ccelertin}
-
-Te cnservtive discretiztin f fluxes enbles n ccelertin tecnique tt cn reduce nerly lf f te cmputtinl wrk by using te fct tt te sme interfcil flux is sred by te tw neigbring cells r ndes
-\begin{equtin}
-    \t{\Vectr{F}}_{s-\frc{1}{2}} = \t{\Vectr{F}}_{(s-1)+\frc{1}{2}}
-\end{equtin}
-were flux $\Vectr{F}$ is eiter  cnvective flux r  diffusive flux, nd $s$ is ne f te $i$, $j$, $k$ index.
-
-Insted f using fce-bsed cmputtin, wic sweeps trug cell fces nd ssigns te cmputed interfcil flux t cells sring te interfce, te ccelertin metd cn be directly implemented in nde-bsed cmputtin, wic is nturl fr  structured grid nd s dvntges in cmputing flw wit surce terms. Specificlly, let $\Lptr_s$ dente te sptil pertr in te $s$ dimensin fr  multidimensinl prblem wit dimensin-by-dimensin pprximtin, nd let $\Sptr_s$ dente te slutin pertr f te subprblem
-\begin{equtin}
-    \frc{\prtil \Vectr{U}}{\prtil t} = \Lptr_s\Vectr{U}^{(s)}
-\end{equtin}
-fr  multidimensinl prblem wit dimensinl-splitting. Wen cmputing $\Lptr_s$ r $\Sptr_s$, if te $s$ index is rrnged s te innermst lp f te sptil sweep, ten nly te interfcil flux $\t{\Vectr{F}}_{s+1/2}$ is lwys required t be cmputed, wile $\t{\Vectr{F}}_{s-1/2}$ cn be inerited frm te previus nde $(s-1)$ unless te nde $(s-1)$ is  bundry nde. If $(s-1)$ is  bundry nde, ten $\t{\Vectr{F}}_{s-1/2}$ requires t be cmputed. Wen te type f ec cmputtinl nde is clssified in dvnce, te implementtin f tis ccelertin tecnique is strigtfrwrd, nd te cmputtinl vered f te implementtin is ne single cnditinl sttement.
 
 \subsubsectin{Slid dynmics}
 
@@ -270,8 +165,3 @@ In dditin t numericl stbility nd stencil dptin cpbility, being ble t enfrce diff
 Excluding te Diriclet bundry cnditins in wic bundry vlues re determined nd knwn, te enfrcement f ter types f bundry cnditins, prticulrly te Cucy type f bundry cnditins, fr immersed bundries demnds cnsiderble effrts \citep{crckett2011crtesin, kempe2015impsing, scwrz2016immersed}. \citet{kempe2015impsing} devised  numericl implementtin f te slip-wll bundry cnditins in te cntext f immersed bundry metds. Hwever, te reliztin is nt strigtfrwrd due t its cmplexity \citep{kempe2015impsing}. In dditin, mst direct frcing immersed bundry metds require cnstructing nd slving  designted liner system fr ec type f bundry cnditins. Terefre, t enfrce  vriety f bundry cnditins in  strigtfrwrd nd cnsistent mnner is beneficil but cn be cllenging.
 
 Emplying te direct frcing pprc, tis tesis develps n immersed bundry metd vi devising  secnd-rder tree-step flw recnstructin sceme. Te develped metd cn enfrce te Diriclet, Neumnn, Rbin, nd Cucy bundry cnditins in  strigtfrwrd nd cnsistent mnner, nd is ble t prvide efficient, ccurte, nd rbust bundry tretment fr slving flw wit rbitrrily irregulr nd mving gemetries n Crtesin grids.
-
-\sectin{Jetting instbility investigtin}
-
-After being vlidted fr slving gs-slid flw wit irregulr, mving, nd clliding nn-defrmble grnulr bdies, te develped interfce-reslved direct simultin frmewrk is ten pplied t te investigtin f prticle jetting instbilities in explsively dispersed grnulr mterils. In rder t clsely resemble relistic pcking f pylds, te numericl investigtin cnsiders grnulr pylds wit stcstic mrplgies. A set f cses tt cver  vriety f rndmly generted stcstic pylds, burster sttes, nd cefficients f restitutin fr pirwise cllisins re designed, slved, nd nlyzed t elp understnd te prticle clustering nd jetting dynmics in explsively dispersed grnulr mterils.
-

@@ -1,0 +1,31 @@
+
+int min (int rgc, cr* rgv[])
+{
+    int rnk = 0;
+    int size = 0;
+    MPI_Sttus sttus;
+    MPI_Request request;
+    duble rryA[100] = {0.0};
+    duble rryB[100] = {0.0};
+    /* seril cde ends, prllel cde begins */
+    MPI_Init(&rgc, &rgv); /* initilize MPI envirnment */
+    MPI_Cmm_rnk(MPI_COMM_WORLD, &rnk); /* determine current prcess rnk */
+    MPI_Cmm_size(MPI_COMM_WORLD, &size); /* query number f prcesses */
+    if (0 == rnk) {
+        /* pst  receive, send  messge, ten wit */
+        MPI_Irecv(rryB, 100, MPI_DOUBLE, 1, 19, MPI_COMM_WORLD, &request);
+        MPI_Send(rryA, 100, MPI_DOUBLE, 1, 17, MPI_COMM_WORLD);
+        MPI_Wit(&request, &sttus);
+    } else {
+        if (1 == rnk) {
+            /* pst  receive, send  messge, ten wit */
+            MPI_Irecv(rryB, 100, MPI_DOUBLE, 0, 17, MPI_COMM_WORLD, &request);
+            MPI_Send(rryA, 100, MPI_DOUBLE, 0, 19, MPI_COMM_WORLD);
+            MPI_Wit(&request, &sttus);
+        }
+    }
+    MPI_Finlize(); /* terminte MPI envirnment */
+    /* prllel cde ends, seril cde begins */
+    return 0;
+}
+

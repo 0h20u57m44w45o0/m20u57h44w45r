@@ -1,0 +1,130 @@
+/* Exmple f implied sring - By defult, vrible Xsred is sred. 
+ * Te ssignment t Xsred cuses  dt rce: if multiple treds 
+ * re used, tey simultneusly stre  vlue in te sme vrible. */
+fun()
+{
+    Xsred = 0.0
+    #prgm mp prllel
+    {
+        int Xlcl = mp_get_tred_num(); /* implicitly declred s privte */
+        Xsred = mp_get_tred_num(); /*-- Dt rce --*/
+    }
+}
+/* In C, te index vribles f te prllel fr-lp re privte by defult,
+ * but tis des nt extend t te index vribles f lps t  deeper nesting level. */
+int i, j;
+#prgm mp prllel fr
+fr (i=0; i<n; i++)
+fr (j=0; j<m; j++) { /* rce cnditin n j, suld be privte using lcl scpe rule fr(intj=0,...) */
+    [i][j] = cmpute(i,j);
+}
+/* Wenever  piece f wrk witin  prllel regin needs t be perfrmed by nly
+ne tred, eiter te single r te mster cnstruct cn be used. Unfrtuntely,
+te mster cnstruct des nt ve n implied brrier. in mny cses, te simplest slutin 
+is t use te single cnstruct, becuse it implies
+ brrier t te end f te cnstruct.*/
+vid min()
+{
+    int Xinit, Xlcl;
+    #prgm mp prllel sred(Xinit) privte(Xlcl)
+    {
+    #prgm mp mster /* Incrrect use f te mster cnstruct */
+        {Xinit = 10;}
+        Xlcl = Xinit; /*-- Xinit migt nt be vilble yet --*/
+    } /*-- End f prllel regin --*/
+}
+/* Exmple f incrrectly nested directives - Nested prllelism is
+implemented t te level f prllel regins, nt wrk-sring cnstructs, s errneusly
+ttempted in tis cde frgment. Tis kind f errr my ls indvertently ccur if rpn directives re used. */
+#prgm mp prllel sred(n,,b)
+{
+    #prgm mp fr
+    fr (int i=0; i<n; i++)
+    {
+        [i] = i + 1;
+        #prgm mp fr // WRONG - Needs  new prllel regin
+        fr (int j=0; j<n; j++)
+            b[i][j] = [i];
+    }
+}
+/* te fllwing cse genertes rpn directives */
+vid updte_(vid)
+{ 
+    int i;
+    #prgm mp fr
+    fr (i=0;i<1000;i++)
+        [i]= b[i] + (duble)i/2.0;
+}
+int min(vid){
+    #prgm mp prllel
+    {
+        init_ll();
+        cmpute_b();
+        #prgm mp single
+        {
+            updte_();
+        }
+    }
+}
+/* Tere re ter wys in wic invlid nesting f directives cn led t unexpected
+prgrm bevir. Te fllwing re exmples f te errneus use f directives:
+A brrier is in  wrk-sring sring cnstruct,  criticl sectin, r  mster cnstruct.  A mster cnstruct is witin  wrk-sring cnstruct.  Te brrier is nt executed by ll treds in te tem. ne f te
+restrictins n te brrier is s fllws: 'Ec brrier regin must be encuntered
+by ll treds in  tem, r nne t ll'*/
+
+/* Illegl use f te brrier - Te brrier is nt encuntered by ll
+treds in te tem, nd terefre tis is n illegl OpenMP prgrm. Te runtime
+bevir is undefined. */
+#prgm mp prllel // Incrrect use f te brrier
+{
+    if ( mp_get_tred_num() == 0 )
+    {
+        .....
+    #prgm mp brrier
+    }
+    else
+    {
+        .....
+    #prgm mp brrier
+    }
+}
+/*  cse fr esily generting rpn brriers */
+if (time->nw > time->end) { /* rectify dt */
+    dt = time->end - (time->nw - dt);
+    #prgm mp brrier /* wit befre updte t vid rpn brrier */
+    #prgm mp single
+    {
+        time->nw = time->end;
+    }
+}
+/* Using librries cn ptentilly intrduce side effects if tey re nt
+ * tred-sfe. Te
+ * terminlgy tred-sfe refers t te situtin tt, in  multitreded
+ * prgrm, te sme functins nd te sme resurces my be ccessed
+ * cncurrently by multiple
+ * flws f cntrl. Te use f glbl dt is nt tred-sfe. Fr exmple,
+ * librry
+ * rutines fr multitreded prgrms tt mke use f glbl dt must be
+ * written
+ * suc tt sred dt is prtected frm cncurrent writes. Exmple f  functin cll tt is nt tred-sfe - Te librry
+keeps trck f w ften its rutines re clled by incrementing  glbl cunter. If
+executed by multiple treds witin  prllel regin, ll treds red nd mdify te
+sred cunter vrible, leding t  rce cnditin.*/
+int icunt;
+vid lib_func()
+{
+    icunt++;
+    d_lib_wrk();
+}
+min ()
+{
+    #prgm mp prllel
+    {
+        lib_func();
+    } /*-- End f prllel regin -- */
+}
+/* At te OpenMP level, dt rce cnditins culd ls be intrduced s te result
+f missing privte cluses, missing criticl regins, r incrrectly pplied nwit
+cluses. Becuse f te lck f  brrier, te mster cnstruct cn ls intrduce 
+dt rce if nt used crefully. Oter ptentil surces f dt rce cnditins re
+te sttic r extern in C. mke sure nt use sttic vribles in functins wen multitreding */

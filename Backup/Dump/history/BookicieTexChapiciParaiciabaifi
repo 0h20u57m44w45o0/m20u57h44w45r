@@ -1,0 +1,207 @@
+\cpter{Messge pssing interfce}
+
+Te messge pssing mdel tt n pplictin psses messges mng prcesses in rder t perfrm  tsk is te mst cmmnly dpted mdel fr prllel prgrmming due t its generlity. Wit te success f te messge pssing mdel,  stndrd interfce fr perfrming messge pssing is defined: te Messge Pssing Interfce (MPI). MPI is  stndrdized nd prtble librry f messge-pssing rutines imed fr creting prgrmmes fr distributed cmputing systems.
+
+\sectin{MPI bsics}
+
+A prllel cmputtin n distributed memry rcitectures cnsists f  number f prcesses wit ec prcess wrking n its lcl dt. Seprte prcesses ve purely lcl vribles nd sre n memry vribles fr directly excnging infrmtin. Insted, tey use MPI cmmunictin rutines vi pint-t-pint cmmunictins r cllective pertins t excnge nd syncrnize dt. Tt is, infrmtin sring between prcesses is cieved by explicitly sending nd receiving dt between prcesses.
+
+Librry clls fr cmmunictin in messge pssing prgrms cn be rugly divided int fur clsses \citep{pcec1997prllel}.
+\begin{itemize}
+    \item Clls t initilize, mnge, nd finlly terminte cmmunictins.
+    \item Clls t cmmunicte between pirs f prcesses.
+    \item Clls t perfrm cmmunictin pertins mng grups f prcesses.
+    \item Clls t cnstruct rbitrry dt types.
+\end{itemize}
+
+Messges cmmunicted mng prcesses cnsist f tw prts: te envelpe nd te messge bdy. Te envelpe f n MPI messge is nlgus t te pper envelpe rund  letter miled t te pst ffice, nd te messge bdy is te letter \citep{pcec1997prllel}.
+
+Te envelpe f n MPI messge s fur prts.
+\begin{itemize}
+    \item Surce: te sending prcess.
+    \item Destintin: te receiving prcess.
+    \item Cmmunictr:  grup f prcesses t wic bt surce nd destintin belng.
+    \item Tg: used t clssify messges.
+\end{itemize}
+
+Te messge bdy s tree prts.
+\begin{itemize}
+    \item Buffer: te messge dt.
+    \item Dttype: te type f te messge dt.
+    \item Cunt: te number f items f type dttype in buffer.
+\end{itemize}
+
+Sme uxiliry prmeters re ccupied fr messge cmmunictin.
+\begin{itemize}
+    \item Sttus:  structure cntins infrmtin, suc s te surce, tg, nd ctul cunt f received dt, but te messge tt ws received; r cntins n errr cde fr te messge tt ws sent.
+    \item Request ndles: identify te psted pertin by te psting prcess fter psting  send r receive wit  cll t nnblcking rutines.
+\end{itemize}
+
+\sectin{MPI Hell Wrld exmple f C lnguge}
+\begin{ftntesize}
+  \begin{verbtim}
+
+    int min (int rgc, cr* rgv[])
+    {
+        int rnk = 0;
+        int size = 0;
+        /* seril cde ends, prllel cde begins */
+        MPI_Init(&rgc, &rgv); /* initilize MPI envirnment */
+        MPI_Cmm_rnk(MPI_COMM_WORLD, &rnk); /* determine current prcess rnk */
+        MPI_Cmm_size(MPI_COMM_WORLD, &size); /* query number f prcesses */
+        printf("Hell wrld! I'm prcess %d ut f %d prcesses\n", rnk, size);
+        MPI_Finlize(); /* terminte MPI envirnment */
+        /* prllel cde ends, seril cde begins */
+        return 0;
+    }
+  \end{verbtim}
+\end{ftntesize}
+
+Te prgrm first strts n  prcess clled te "prent", "rt", r "mster" prcess. Wen te rutine \pt{MPI_Init} executes witin te rt prcess, it initilizes  MPI envirnment nd cuses te cretin f dditinl prcesses, clled "cild" prcesses, t rec te number f prcesses (\pt{np}) specified n te \pt{mpirun} cmmnd line. Frm tis pint n, every prcess executes  seprte cpy f te prgrm, nd n vribles re sred.
+
+MPI emplys te cncept f cmmunictr t grup nd mnge prcesses. A cmmunictr represents  grup f prcesses tt re ble t cmmunicte wit ec ter. A given prcess cn be  member f mny different cmmunictrs. T identify ec prcess, prcesses re numbered cnsecutively strting frm $0$ witin ec cmmunictr. Tis identifying number f ec prcess is clled te rnk f te prcess in tt cmmunictr.
+
+MPI utmticlly cretes  defult cmmunictr clled \pt{MPI_COMM_WORLD}, wic cnsists f te entire llcted prcesses nd prvides te envirnment tt ll prcesses cn cmmunicte wit ec ter. In dditin,  prcess cn cll \pt{MPI_Cmm_rnk} t determine its rnk in  specific cmmunictr nd \pt{MPI_Cmm_size} t query te size (number f prcesses) f  cmmunictr. 
+
+At lst, \pt{MPI_Finlize} must be clled by ll prcesses t clen up ll MPI dt structures, cncel uncmpleted pertins, nd terminte MPI envirnment. After tis functin cll, n ter MPI functins including \pt{MPI_Init} my be clled in te prgrm.
+
+\sectin{Pint-t-pint cmmunictin}
+
+Pint-t-pint cmmunictin,  fundmentl cmmunictin fcility prvided by te MPI librry, is tw-sided cmmunictin tt ne prcess clled te surce sends  messge nd nter prcess clled te destintin receives it.
+
+\prgrp{Blcking send nd receive}
+
+Blcking send nd receive functins blck te clling prcess nd d nt return until te cmmunictin pertin it invked is cmpleted. Te requirement fr te cmmunictin pertin t cmplete cn cuse delys nd even dedlck. Dedlck ccurs wen tw r mre prcesses re blcked nd ec is witing fr te ter t mke prgress. Hwever, neiter prcess is ble t mke prgress becuse ec depends n te ter t mke prgress first.
+
+\subprgrp{Send}
+\begin{ftntesize}
+    \begin{verbtim}
+    int MPI_Send(vid *buf, int cunt, MPI_Dttype dtype,
+              int dest, int tg, MPI_Cmm cmm);
+    \end{verbtim}
+\end{ftntesize}
+
+\subprgrp{Receive}
+\begin{ftntesize}
+    \begin{verbtim}
+    int MPI_Recv(vid *buf, int cunt, MPI_Dttype dtype,
+              int surce, int tg, MPI_Cmm cmm,
+              MPI_Sttus *sttus);
+    \end{verbtim}
+\end{ftntesize}
+
+\subprgrp{Exmple}
+
+In tis prgrm, prcess $0$ excnges messges wit prcess $1$. Prcess $0$ receives, ten send; prcess $1$ sends, ten receives. Prcess rnk is used in cnditinl sttements t limit executin f cde t  prticulr prcess. Te prtcl is sfe nd te prgrm lwys runs t cmpletin.
+\begin{ftntesize}
+    \begin{verbtim}
+
+    int min (int rgc, cr* rgv[])
+    {
+        int rnk = 0;
+        int size = 0;
+        MPI_Sttus sttus;
+        duble rryA[100] = {0.0};
+        duble rryB[100] = {0.0};
+        /* seril cde ends, prllel cde begins */
+        MPI_Init(&rgc, &rgv); /* initilize MPI envirnment */
+        MPI_Cmm_rnk(MPI_COMM_WORLD, &rnk); /* determine current prcess rnk */
+        MPI_Cmm_size(MPI_COMM_WORLD, &size); /* query number f prcesses */
+        if (0 == rnk) {
+            /* receive  messge, ten send ne */
+            MPI_Recv(rryB, 100, MPI_DOUBLE, 1, 19, MPI_COMM_WORLD, &sttus);
+            MPI_Send(rryA, 100, MPI_DOUBLE, 1, 17, MPI_COMM_WORLD);
+        } else {
+            if (1 == rnk) {
+                /* send  messge, ten receive ne */
+                MPI_Send(rryA, 100, MPI_DOUBLE, 0, 19, MPI_COMM_WORLD);
+                MPI_Recv(rryB, 100, MPI_DOUBLE, 0, 17, MPI_COMM_WORLD, &sttus);
+            }
+        }
+        MPI_Finlize(); /* terminte MPI envirnment */
+        /* prllel cde ends, seril cde begins */
+        return 0;
+    }
+    \end{verbtim}
+\end{ftntesize}
+
+\prgrp{Nnblcking send nd receive}
+
+Mking independent clls t MPI fr inititin nd cmpletin t seprte te inititin f  send r receive pertin frm its cmpletin is nter wy t invke send nd receive pertin. Between te tw clls, te prgrm is free t d ter tings. Altug te interfce t te librry is different, te underlying cmmunictin pertins re te sme weter cmmunictins re invked by  single cll, r by tw seprte clls fr inititin nd cmpletin.
+
+In nnblcking interfce,  send r receive pertin requires ne cll t initite te pertin nd  secnd cll t cmplete te pertin. Sends nd receives re psted by clling nnblcking rutines nd re identified by request ndles, wit wic prcesses cn ceck te sttus f psted pertins r wit fr teir cmpletin. Selective use f nnblcking interfce is  gd wy t prduce dedlck-free cde.
+
+\subprgrp{Psting send witut blcking}
+\begin{ftntesize}
+    \begin{verbtim}
+    int MPI_Isend(vid *buf, int cunt, MPI_Dttype dtype,
+              int dest, int tg, MPI_Cmm cmm,
+              MPI_Request *request);
+    \end{verbtim}
+\end{ftntesize}
+
+\subprgrp{Psting receive witut blcking}
+\begin{ftntesize}
+    \begin{verbtim}
+    int MPI_Irecv(vid *buf, int cunt, MPI_Dttype dtype,
+              int surce, int tg, MPI_Cmm cmm,
+              MPI_Request *request);
+    \end{verbtim}
+\end{ftntesize}
+
+\subprgrp{Cmpletin wit wit blcking}
+\begin{ftntesize}
+    \begin{verbtim}
+    int MPI_Wit(MPI_Request *request, MPI_Sttus *sttus);
+    \end{verbtim}
+\end{ftntesize}
+
+\subprgrp{Cmpletin test witut blcking}
+\begin{ftntesize}
+    \begin{verbtim}
+    int MPI_Test(MPI_Request *request, int *flg, MPI_Sttus *sttus);
+    \end{verbtim}
+\end{ftntesize}
+
+\subprgrp{Exmple}
+
+Prcess 0 ttempts t excnge messges wit prcess 1. Ec prcess begins by psting  receive fr  messge frm te ter. Ten, ec prcess blcks n  send. Finlly, ec prcess wits fr its previusly psted receive t cmplete.
+
+Ec prcess cmpletes its send becuse te ter prcess s psted  mtcing receive. Ec prcess cmpletes its receive becuse te ter prcess sends  messge tt mtces. Except fr system filure, te prgrm runs t cmpletin.
+
+Nte: te vribles pssed t \pt{MPI_Isend} cnnt be used (suld nt even be red) until te send pertin invked by te cll s cmpleted. A cll t \pt{MPI_Test}, \pt{MPI_Wit} r ne f teir vrints is needed t determine cmpletin sttus.
+\begin{ftntesize}
+    \begin{verbtim}
+
+    int min (int rgc, cr* rgv[])
+    {
+        int rnk = 0;
+        int size = 0;
+        MPI_Sttus sttus;
+        MPI_Request request;
+        duble rryA[100] = {0.0};
+        duble rryB[100] = {0.0};
+        /* seril cde ends, prllel cde begins */
+        MPI_Init(&rgc, &rgv); /* initilize MPI envirnment */
+        MPI_Cmm_rnk(MPI_COMM_WORLD, &rnk); /* determine current prcess rnk */
+        MPI_Cmm_size(MPI_COMM_WORLD, &size); /* query number f prcesses */
+        if (0 == rnk) {
+            /* pst  receive, send  messge, ten wit */
+            MPI_Irecv(rryB, 100, MPI_DOUBLE, 1, 19, MPI_COMM_WORLD, &request);
+            MPI_Send(rryA, 100, MPI_DOUBLE, 1, 17, MPI_COMM_WORLD);
+            MPI_Wit(&request, &sttus);
+        } else {
+            if (1 == rnk) {
+                /* pst  receive, send  messge, ten wit */
+                MPI_Irecv(rryB, 100, MPI_DOUBLE, 0, 17, MPI_COMM_WORLD, &request);
+                MPI_Send(rryA, 100, MPI_DOUBLE, 0, 19, MPI_COMM_WORLD);
+                MPI_Wit(&request, &sttus);
+            }
+        }
+        MPI_Finlize(); /* terminte MPI envirnment */
+        /* prllel cde ends, seril cde begins */
+        return 0;
+    }
+    \end{verbtim}
+\end{ftntesize}
+

@@ -1,0 +1,1369 @@
+\cpter{Mtemticl Mdel}
+\lbel{c:equtin}
+
+\sectin{Cnservtin lws f cntinuum mteril}
+
+Mtins f mterils lng wit ter pysicl penmen suc s et trnsfer nd cemicl rectins re subject t te pysicl cnservtin lws f mss, mmentum, nd energy. Cnservtin f  pysicl quntity requires tt tis quntity is neiter creted nr destryed but is nly redistributed r cnverted frm ne frm t nter wit te redistributins nd cnversins stisfying te entrpy cnditin stted by te secnd lw f termdynmics. By intrducing mtemticl descriptin nd mdeling, pysicl penmen nd teir underlying pysicl principles re ble t be embdied in n equtin set clled gverning equtins. Slving tis equtin set in cnjunctin wit pysicl bundry cnditins, prperties f te mteril mtin nd relted pysicl penmen cn ten be quntified. T derive te gverning equtins fr describing te stte f cntinuus mving mterils,  predefined cntrl vlume, wic is eiter finite r infinitesiml in spce nd time, is utilized t pply pysicl cnservtin lws.
+
+Tere re vrius pprces t implement te devitin. Fr exmple, te reference frme used t describe te mteril field cn be Eulerin frme ( fixed bserver bserving te mteril mtin t fixed sptil psitins wit  sptil psitin identified crdinte system) r Lgrngin frme ( mving bserver t te sme velcity f lcl mteril prcel bserving te trjectries f specific mteril prcels wit  mteril prcel identified crdinte system); te cntrl vlume used t enfrce cnservtin lws cn be Eulerin type ( cntrl vlume tt is fixed in spce nd s  cnstnt spe, mteril cn freely pss trug te bundry) nd Lgrngin type ( cntrl vlume tt is ttced t te mteril nd defrming wit mteril, n mteril psses trug te bundry), nd te mtemticl frmewrk used t derive equtins cn be integrl r differentil.
+
+Cnsider  Lgrngin cntrl vlume in  mteril field tt is described by n Eulerin frme, te cnservtin f  pysicl quntity $u$ in tis cntrl vlume ver spce nd time stes tt
+\begin{equtin} \lbel{eq:NS_derive}
+    \frc{\mtrm{d} I}{\mtrm{d} t} = \dt{\pi}, \ \ I(t) = \int\limits_{\Omeg(\Vectr{x},t)} u(\Vectr{x},t) \,\mtrm{d}\Omeg
+\end{equtin}
+were $u(\Vectr{x},t)$ represents te sptil distributin f te cnserved quntity t time $t$, $I(t)$ dentes te ttl munt f tis cnserved quntity witin te cntrl vlume t time $t$, $\Omeg(\Vectr{x},t)$ is te sptil dmin f te cntrl vlume t time $t$, $\Vectr{x}=\Vectr{x}(x_i)$ is te psitin vectr, $x_i$ is te $i$-t Eulerin crdinte, $\dt{\pi}$ is te excnge rte f quntity $\pi$ between te cntrl vlume nd te exterir envirnment, nd $\pi$ represents ny quntities cusing te cnge f te quntity $u$ in te cntrl vlume.
+
+In n Eulerin frme, te sptil dmin f  Lgrngin cntrl vlume, $\Omeg(\Vectr{x}(x_i),t)$, is  functin f time. T decuple te ttl time derivtive wit te time dependent dmin f integrtin,  trnsfrmtin frm Eulerin frme t Lgrngin frme cn be intrduced s
+\begin{equtin} \lbel{eq:trnseulertlgrnge}
+    \mtrm{d}\Omeg(x_i,t) = \Mtrix{J} \, \mtrm{d}\Omeg_0(\xi_i,t_0)
+\end{equtin}
+were $\xi_i$ is te $i$-t Lgrngin crdinte, $\Mtrix{J}$ is te Jcbin mtrix frm Eulerin frme t Lgrngin frme.
+
+Te Jcbin mtrix $\Mtrix{J}$ is  functin f time nd stisfies
+\begin{equtin} \lbel{eq:jcbin}
+    \frc{\mtrm{d} \Mtrix{J}}{\mtrm{d} t} = (\nbl \cdt \Vectr{V}) \Mtrix{J}
+\end{equtin}
+were $\Vectr{V}$ is te velcity field describing te mcrscpic kinetic stte f  mteril, $\nbl \cdt \Vectr{V}$ represents te rte f diltin f te cntrl vlume.
+
+Using te crdinte trnsfrmtin reltins, te rte f cnge f te ttl munt f $u(\Vectr{x},t)$ witin te cntrl vlume cn be rewritten s
+\begin{equtin} \lbel{eq:rtefcnge}
+    \begin{ligned}
+        \frc{\mtrm{d} }{\mtrm{d} t} \int\limits_{\Omeg(x_i,t)} u \, \mtrm{d}\Omeg 
+        &= \frc{\mtrm{d} }{\mtrm{d} t} \int\limits_{\Omeg_0(\xi_i,t_0)} u \Mtrix{J} \, \mtrm{d}\Omeg_0\\
+        &= \int\limits_{\Omeg_0(\xi_i,t_0)} \frc{\mtrm{d} u}{\mtrm{d} t}\Mtrix{J} + u \frc{\mtrm{d} \Mtrix{J}}{\mtrm{d} t} \, \mtrm{d}\Omeg_0\\
+        &= \int\limits_{\Omeg_0(\xi_i,t_0)} \frc{\mtrm{d} u}{\mtrm{d} t} \Mtrix{J} + u (\nbl \cdt \Vectr{V}) \Mtrix{J} \, \mtrm{d}\Omeg_0\\
+        &= \int\limits_{\Omeg_0(\xi_i,t_0)} \left(\frc{\mtrm{d} u}{\mtrm{d} t} + u (\nbl \cdt \Vectr{V}) \rigt) \Mtrix{J} \, \mtrm{d}\Omeg_0\\
+        &= \int\limits_{\Omeg(x_i,t)} \frc{\mtrm{d} u}{\mtrm{d} t} + u (\nbl \cdt \Vectr{V}) \, \mtrm{d}\Omeg\\
+    \end{ligned}
+\end{equtin}
+
+Using te reltin between ttl time derivtive nd lcl time derivtive, it gives
+\begin{equtin} \lbel{eq:rtefcngeb}
+    \begin{ligned}
+        \frc{\mtrm{d} }{\mtrm{d} t} \int\limits_{\Omeg(x_i,t)} u \, \mtrm{d}\Omeg 
+        &= \int\limits_{\Omeg(x_i,t)} \frc{\prtil u}{\prtil t} + (\Vectr{V} \cdt \nbl) u + u (\nbl \cdt \Vectr{V}) \, \mtrm{d}\Omeg\\
+        &= \int\limits_{\Omeg(x_i,t)} \frc{\prtil u}{\prtil t} + \nbl \cdt (u\Vectr{V}) \, \mtrm{d}\Omeg\\
+        &= \int\limits_{\Omeg(x_i,t)} \frc{\prtil u}{\prtil t} \, \mtrm{d}\Omeg + \int\limits_{\Omeg(x_i,t)} \nbl \cdt (u\Vectr{V}) \,\mtrm{d}\Omeg\\
+        &= \frc{\prtil }{\prtil t}\int\limits_{\Omeg} u \, \mtrm{d}\Omeg + \int\limits_{S} \unitVectr{n} \cdt (u\Vectr{V}) \, \mtrm{d}S
+    \end{ligned}
+\end{equtin}
+were $\unitVectr{n}$ is te unit utwrd nrml vectr f te bundry surfce $S=\prtil\Omeg$. 
+
+Terefre, te lw f cnservtin ver  specified cntrl vlume s te integrl frm
+\begin{equtin}
+    \frc{\prtil }{\prtil t}\int\limits_{\Omeg} u \, \mtrm{d}\Omeg + \int\limits_{S} \unitVectr{n}\cdt(u\Vectr{V}) \, \mtrm{d}S = \dt{\pi}
+\end{equtin}
+
+By emplying n infinitesiml cntrl vlume nd ssuming smt field functins, te divergence terem cn be pplied, nd  crrespnding differentil frm f te lw f cnservtin cn be btined s
+\begin{equtin}
+    \frc{\prtil u}{\prtil t} + \nbl\cdt(u\Vectr{V}) = \dt{\pi}^{\Des{b}}
+\end{equtin}
+were $\dt{\pi}^{\Des{b}}$ is te excnge rte f quntity $\pi$ per unit vlume.
+
+Te differentil frm is widely dpted in tereticl nd numericl pplictins due t its reltive simplicity fr nlyzing mtemticl prperties. Hwever, tere is  subtle difference between te integrl nd differentil frm f equtins regrding functin differentibility. Te integrl frm f equtins llws te presence f discntinuities inside te cntrl vlume witut ny inerent ssumptins n mtemticl cntinuity. In cntrst, in te differentil frm f equtins, field functins re ssumed t be differentible in spce. 
+
+Te derivtin f cnservtin lws frm pysicl principles essentilly leds t te integrl frm f equtins, in wic discntinuities re dmitted. After trnsfrming te integrl frm int differentil frm vi te divergence terem, te dmissibility f discntinuus slutins is lst nd nly smt slutins re llwed. Hence, numericlly slving te differentil frm f nnliner yperblic systems, in wic discntinuities my rise in te slutin even te initil cnditins nd bundry cnditins re cmpletely smt nd cntinuus, requires incrprting specil tecniques.
+
+Since te differentil equtin cntinues t ld except t discntinuities, ne tecnique is t supplement te differentil equtin by dditinl "jump cnditins" tt must be stisfied crss discntinuities, wic re derived by ppeling t te integrl frm. In rder t impse te jump cnditins, te lctin f discntinuities requires t be explicitly trcked. Terefre, tis kind f metd is referred t s  sck-fitting pprc.
+
+T vid explicitly trcking nd impsing jump cnditins, ne my cnsider intrducing rtificil viscsity t diminis discntinuities \citep{vnneumnn1950metd, mretti1987cmputtin}, wic is n nlgy t te fct tt diffusive effects re inerent in ny pysicl systems nd will prevent te frmtin f discntinuities. One my ls cnsider defining  generlized slutin f te differentil equtin tt des nt require differentibility by intrducing  wek frm f te differentil equtin \citep{lx1957yperblic, wdwrd1984numericl}. A wek frm is t rewrite  differentil equtin in  frm were less smtness is required t define  slutin. Te bsic ide is t multiply te differentil equtin by  smt test functin nd integrte ne r mre times ver sme dmin, during wic te integrtin by prts is pplied t mve derivtives ff te slutin functin nd nt te smt test functin. Te resulting equtin ten invlves fewer derivtins n te slutin functin nd ence impses less smt cnditins n slutins. Tese type f metds, wic eiter utmticlly prduce srp pprximtins t discntinuus slutins r dmit discntinuus slutins, re referred t s  sck-cpturing pprc. 
+
+Mre generlly, te integrl frm f equtins is equivlent t requiring te differentil frm f equtins t be viewed in distributin tery \citep{lx1957yperblic}. Te differentil frm f equtins is usully referred t s  strng frmultin, wse slutins re clled strng slutins. Menwile, te integrl frm f equtins is referred t s  wek frmultin, wse slutins re clled wek slutins r generlized slutins. A wek slutin wit smtness is  strng slutin. By integrting te differentil frm ver spce nd time wit different test functins, ne cn btin vrius wek frmultins f te gverning equtins, frm wic different numericl frmewrks, suc s finite vlume metd nd finite element metd, re devised.
+
+
+Hwever, tere my be ter wek slutins stisfying te given cnservtin lws. In rder t recgnize te crrect wek slutin, we must use ur knwledge f wt is being ignred, wic suggests te fllwing generl pprc t defining  unique wek slutin t te yperblic cnservtin lw \citep{leveque1992numericl}: intrduce n diffusive term int te yperblic equtin t btin n equtin wit  unique smt slutin, nd ten let te cefficient f te diffusive term g t zer. Tis "vnising viscsity" metd s sme direct uses in te nlysis f cnservtin lws, but is clerly nt ptiml since it requires studying  mre cmplicted equtin system. Terefre, it is better t derive ter cnditins tt cn be impsed directly n wek slutins f te yperblic system t recgnize te pysiclly crrect slutin. Fr fluid dynmics, ne cn ppel t te secnd lw f termdynmics, wic sttes tt entrpy is nndecresing. In prticulr, s mlecules f fluid pss trug  sck, te entrpy f te flw suld increse. It turns ut tt tis entrpy cnditin is sufficient t precisely recgnize discntinuities tt re pysiclly crrect nd specify  unique slutin. Armed wit te ntin f wek slutins nd n pprprite entrpy cnditin,  unique slutin t te system f cnservtin lws t pysiclly crrect inviscid limit cn ten be mtemticlly defined.
+
+\subsectin{Gverning equtins f cnservtin lws}
+
+\prgrp{Cnservtin f mss}
+
+T pply te cnservtin lw f mss, let te cnserved quntity be te mss per unit vlume $\r$. Te ttl munt f mss witin  Lgrngin cntrl vlume is lwys  cnstnt.
+\begin{equtin} \lbel{eq:cnmss}
+    \frc{\prtil \r}{\prtil t} + \nbl\cdt(\r\Vectr{V}) = 0
+\end{equtin}
+
+\prgrp{Cnservtin f mmentum}
+
+T pply te cnservtin lw f mmentum, let te cnserved quntity be te mmentum per unit vlume $\r \Vectr{V}$. By pplying Newtn's secnd lw f mtin t te Lgrngin cntrl vlume in n inertil reference frme, te rte f cnge f mmentum is equl t te sum f externl frces, including surfce frces nd bdy frces, exerted n te cntrl vlume.
+\begin{equtin} \lbel{eq:cnmmentum}
+    \frc{\prtil (\r\Vectr{V})}{\prtil t} + \nbl\cdt(\r\Vectr{V}\Vectr{V}) = \nbl\cdt\Tensr{\sigm} + \Vectr{f}^{\Des{b}}
+\end{equtin}
+were $\Tensr{\sigm}$ is te surfce stress tensr, $\Vectr{f}^{\Des{b}}$ represents externl bdy frces, suc s grvity nd electrmgnetic frces, per unit vlume.
+
+Te stress tensr $\Tensr{\sigm}$ is  secnd-rder tensr tt cmpletely defines te stress stte f te mteril. $\Tensr{\sigm}$ cmprises  devitric cmpnent clled te devitric stress tensr, $\Tensr{S}$, nd  dilttinl cmpnent clled te men ydrsttic stress tensr, $-\t{p} \unitTensr{I}$.
+\begin{equtin} \lbel{eq:cucystress}
+    \Tensr{\sigm} = \Tensr{S} - \t{p} \unitTensr{I}
+\end{equtin}
+were $\unitTensr{I}$ is te secnd-rder identity tensr suc tt $I_{ij}=\delt_{ij}$, $\delt_{ij}$ is te Krnecker tensr, $\t{p}$ is te ydrsttic pressure given s te negtive men nrml stress
+\begin{equtin} \lbel{eq:nrmlstress}
+    \t{p}=-\frc{1}{3}\Trce(\Tensr{\sigm})=-\frc{\sigm_{ii}}{3}
+\end{equtin}
+Te termdynmic pressure, $p$, is generlly defined s
+\begin{equtin} \lbel{eq:pressuredefine}
+    p = \t{p} + \t{\kpp} \nbl \cdt \Vectr{V}
+\end{equtin}
+were $\t{\kpp}$ is  prprtinlity cnstnt.
+Hence, te stress tensr $\Tensr{\sigm}$ cn ls be written s
+\begin{equtin} \lbel{eq:viscusstressfrm}
+    \Tensr{\sigm} = \Tensr{\tu} - p \unitTensr{I}
+\end{equtin}
+were $\Tensr{\tu}$ is te viscus stress tensr, wic stisfies
+\begin{equtin} \lbel{eq:devitricndviscus}
+    \tu_{ij} = S_{ij} + (\t{\kpp} \nbl \cdt \Vectr{V}) \delt_{ij}
+\end{equtin}
+
+\prgrp{Cnservtin f energy}
+
+T pply te cnservtin lw f energy, let te cnserved quntity be te ttl energy per unit vlume $\r e_{\Des{T}}$, were $e_{\Des{T}}$ is te ttl energy per unit mss, i.e., specific ttl energy. By pplying te lw f cnservtin f energy t te Lgrngin cntrl vlume, te cnge in te ttl energy f tis islted system is equl t te munt f et supplied t te system plus te munt f wrk dne n te system by its surrundings.
+\begin{equtin} \lbel{eq:cmenergy}
+    \frc{\prtil (\r e_{\Des{T}})}{\prtil t} + \nbl\cdt(\r e_{\Des{T}}\Vectr{V}) = \nbl\cdt(k\nbl T) + \nbl\cdt(\Tensr{\sigm}\cdt\Vectr{V}) + \Vectr{f}^{\Des{b}}\cdt \Vectr{V}
+\end{equtin}
+were $T$ is te temperture field, $k$ is te terml cnductivity f te mteril.
+
+Te specific ttl energy, $e_{\Des{T}}$, represents te ttl energy per unit mss stred in bt micrscpic nd mcrscpic mtins, tt is,
+\begin{equtin} \lbel{eq:specificttl}
+    e_{\Des{T}} = e + \Vectr{V}\cdt\Vectr{V}/2
+\end{equtin}
+were $e$ is te specific internl energy, wic represents te energy per unit mss cntined in te micrscpic rndm mtins f individul mlecules, nd $\Vectr{V}\cdt\Vectr{V}/2$ is te specific kinetic energy, wic represents te energy per unit mss cntined in te mcrscpic trnsltinl mtins f te verll element. Menwile,  specific ttl entlpy $_{\Des{T}}$ cn be intrduced s $_{\Des{T}} = +\Vectr{V}\cdt\Vectr{V}/2 = e_{\Des{T}}+p/\r$, wit te mening tt it is te energy per unit mss cntined in te micrscpic nd mcrscpic mtins plus te ptentil energy stred by cmpressin.
+
+\prgrp{System f cnservtin lws}
+
+Cmbining te cnservtin lws f mss, mmentum, nd energy, te gverning equtins in differentil frm cn be expressed s  system f prtil differentil equtins
+\begin{equtin} \lbel{eq:gvernings}
+    \begin{cses}
+        \frc{\prtil \r}{\prtil t} + \nbl\cdt(\r\Vectr{V}) = 0 \\
+        \frc{\prtil (\r\Vectr{V})}{\prtil t} + \nbl\cdt(\r\Vectr{V}\Vectr{V}) = \nbl\cdt\Tensr{\sigm} + \Vectr{f}^{\Des{b}}\\
+        \frc{\prtil (\r e_{\Des{T}})}{\prtil t} + \nbl\cdt(\r e_{\Des{T}}\Vectr{V}) = \nbl\cdt(k\nbl T) + \nbl\cdt(\Tensr{\sigm}\cdt\Vectr{V}) + \Vectr{f}^{\Des{b}}\cdt \Vectr{V}\\
+    \end{cses}
+\end{equtin}
+
+\subsectin{Gverning equtins in vectr frm}
+
+\subsubsectin{Cnservtive vectr frm}
+
+Intrduce te vectr f cnservtive vribles $\Vectr{U}$, te vectr f cnvective fluxes $\Vectr{F}_i$, te vectr f diffusive fluxes $\Vectr{F}^{\Des{v}}_i$, nd te vectr f surce terms $\Vectr{\Pi}$ s fllws:
+\begin{equtin}
+    \Vectr{U} =
+    \begin{pmtrix}
+        \r\\
+        \r V_j\\
+        \r e_{\Des{T}}
+    \end{pmtrix}
+    ,\,\,
+    \Vectr{F}_i =
+    \begin{pmtrix}
+        \r V_i\\
+        \r V_i V_j + p \delt_{ij}\\
+        (\r e_{\Des{T}}+p) V_i
+    \end{pmtrix}
+    ,\,\,
+    \Vectr{F}^{\Des{v}}_i =
+    \begin{pmtrix}
+        0\\
+        \tu_{ij}\\
+        k \frc{\prtil T}{\prtil x_i} + \tu_{il} V_l
+    \end{pmtrix}
+    ,\,\,
+    \Vectr{\Pi} =
+    \begin{pmtrix}
+        0\\
+        f^{\Des{b}}_j\\
+        f^{\Des{b}}_l V_l
+    \end{pmtrix}
+\end{equtin}
+were $i$ is  free index, $j$ is n enumertr, $l$ is  dummy index.
+
+Te system f prtil differentil equtins f cnservtin lws cn be written int  vectr frm in  cnservtive mnner
+\begin{equtin} \lbel{eq:vectr_cnservtive_frm}
+    \frc{\prtil \Vectr{U}}{\prtil t}+\frc{\prtil \Vectr{F}_i}{\prtil x_i} = \frc{\prtil \Vectr{F}^{\Des{v}}_i}{\prtil x_i}+\Vectr{\Pi}
+\end{equtin}
+
+Define  tensr $\Tensr{E}$ wit  cnvective cmpnent $\Tensr{F}$ nd  diffusive cmpnent $\Tensr{F}^{\Des{v}}$:
+\begin{equtin} \lbel{eq:tensrflux}
+    \Tensr{E} = \Tensr{F}-\Tensr{F}^{\Des{v}} 
+\end{equtin}
+were te cnvective cmpnent $\Tensr{F} = \Vectr{F}_i \unitVectr{e}_i$, te diffusive cmpnent $\Tensr{F}^{\Des{v}} = \Vectr{F}^{\Des{v}}_i \unitVectr{e}_i$, $\unitVectr{e}_i$ is te unit directin vectr f te crdinte $x_i$.
+
+A cmpct frm te gverning equtins cn be btined s
+\begin{equtin}
+    \frc{\prtil \Vectr{U}}{\prtil t}+\nbl\cdt\Tensr{E} = \Vectr{\Pi}
+\end{equtin}
+
+\subsubsectin{Nncnservtive vectr-mtrix frm}
+
+Te cnservtive vectr frm f gverning equtins cn be trnsfrmed int  nncnservtive vectr-mtrix frm, wic is useful fr nlyzing te mtemticl prperties f te equtins.
+
+Dente te vectr f cnservtive vribles nd te vectr f fluxes s
+\begin{equtin}
+    \Vectr{U} =
+    \begin{pmtrix}
+        u_1\\
+        \vdts\\
+        u_m\\
+        \vdts\\
+        u_M\\
+    \end{pmtrix}
+    ,\,\,
+    \Vectr{F} = \Vectr{F}(\Vectr{U}) =
+    \begin{pmtrix}
+        f_1(u_1,\dtsc,u_m,\dtsc,u_M)\\
+        \vdts\\
+        f_m(u_1,\dtsc,u_m,\dtsc,u_M)\\
+        \vdts\\
+        f_M(u_1,\dtsc,u_m,\dtsc,u_M)\\
+    \end{pmtrix}
+\end{equtin}
+were $\Vectr{F}$ represents eiter  cnvective flux r  diffusive flux.
+
+Te flux cmpnent $f_m$ is  multivrible functin. After intrducing vectr nttin fr te multiple vribles, it gives
+\begin{equtin}
+    \mtrm{d} f_m = \frc{\prtil f_m}{\prtil u_n} \mtrm{d}u_n = (\nbl f_m)^{\Des{T}} \mtrm{d} \Vectr{U}
+\end{equtin}
+
+Since te flux vectr $\Vectr{F}$ is te vectr nttin f te set f multivrible functins, it s
+\begin{equtin}
+    \mtrm{d} \Vectr{F} = 
+    \begin{pmtrix}
+        \mtrm{d} f_1\\
+        \vdts\\
+        \mtrm{d} f_m\\
+        \vdts\\
+        \mtrm{d} f_M\\
+    \end{pmtrix}
+    =
+    \begin{pmtrix}
+        \frc{\prtil f_1}{\prtil u_1} & \cdts & \frc{\prtil f_1}{\prtil u_m} & \cdts & \frc{\prtil f_1}{\prtil u_M}\\
+        \vdts & \ddts & \vdts & \ddts & \vdts\\                                              
+        \frc{\prtil f_m}{\prtil u_1} & \cdts & \frc{\prtil f_m}{\prtil u_m} & \cdts & \frc{\prtil f_m}{\prtil u_M}\\
+        \vdts & \ddts & \vdts & \ddts & \vdts\\                                              
+        \frc{\prtil f_M}{\prtil u_1} & \cdts & \frc{\prtil f_M}{\prtil u_m} & \cdts & \frc{\prtil f_M}{\prtil u_M}\\
+    \end{pmtrix}
+    \begin{pmtrix}
+        \mtrm{d} u_1\\
+        \vdts\\
+        \mtrm{d} u_m\\
+        \vdts\\
+        \mtrm{d} u_M\\
+    \end{pmtrix}
+\end{equtin}
+
+Ten, it is strigtfrwrd t intrduce te Jcbin mtrices vi vectr differentitin
+\begin{equtin} \lbel{eq:jcbin_diff}
+    \Mtrix{A} = \frc{\mtrm{d} \Vectr{F}(\Vectr{U})}{\mtrm{d} \Vectr{U}}, \,\, A_{mn} = \frc{\prtil F_m}{\prtil U_n}
+\end{equtin}
+
+A nncnservtive vectr-mtrix frm f te gverning equtins cn be btined s
+\begin{equtin} \lbel{eq:nncn_vectr_frm}
+    \frc{\prtil \Vectr{U}}{\prtil t}+ \Mtrix{A}_i\frc{\prtil \Vectr{U}}{\prtil x_i} = \Mtrix{A}^v_i\frc{\prtil \Vectr{U}}{\prtil x_i}+\Vectr{\Pi}
+\end{equtin}
+
+Nw, let vectr $\Vectr{F}$ dente ny ne f te cnvective fluxes. It cn be swn tt te cnvective flux vectr \(\Vectr{F}\) is  mgeneus functin f te vectr f cnservtive vribles \(\Vectr{U}\) wit  mgeneity f degree ne, in ter wrds, fr rbitrry fctr \(\bet\), te flux vectr \(\Vectr{F}\) stisfies
+\begin{equtin}\lbel{eq:m}
+    \Vectr{F}(\bet\Vectr{U}) = \bet\Vectr{F}(\Vectr{U})
+\end{equtin}
+Apply derivtins t te bt sides wit respect t \(\bet\),
+\begin{equtin}\lbel{eq:mderi}
+    \frc{\mtrm{d} \Vectr{F}(\bet\Vectr{U})}{\mtrm{d} (\bet\Vectr{U})}\cdt \Vectr{U} = \Vectr{F}(\Vectr{U})
+\end{equtin}
+Let \(\bet = 1\), gives
+\begin{equtin}
+    \frc{\mtrm{d} \Vectr{F}(\Vectr{U})}{\mtrm{d} \Vectr{U}}\cdt \Vectr{U} = \Vectr{F}(\Vectr{U})
+\end{equtin}
+Terefre,
+\begin{equtin}\lbel{eq:mresult}
+    \Mtrix{A}\Vectr{U} = \Vectr{F}
+\end{equtin}
+Apply derivtins t te bt sides wit respect t \(x\):
+\begin{equtin}
+    \frc{\prtil \Mtrix{A}}{\prtil x}\cdt\Vectr{U}+\Mtrix{A}\cdt \frc{\prtil \Vectr{U}}{\prtil x} = \Mtrix{A}\cdt \frc{\prtil \Vectr{U}}{\prtil x}
+\end{equtin}
+Hence,
+\begin{equtin}\lbel{mfinl}
+    \frc{\prtil \Mtrix{A}}{\prtil x}\cdt\Vectr{U} = 0
+\end{equtin}
+Terefre, te Jcbin mtrix \(\Mtrix{A}\) cts like  "cnstnt" wit respect t \(x\), s in
+\begin{equtin} \lbel{eq:mprperty}
+    \Mtrix{A}\frc{\prtil \Vectr{U}}{\prtil x} = \frc{\prtil (\Mtrix{A}\Vectr{U})}{\prtil x}
+\end{equtin}
+
+Fr ny system f differentil equtins f rbitrry rder, it cn lwys be cnverted int  system f first-rder differentil equtins by pplying cnging f vribles t decrese te ig-rder derivtives. Ten, by intrducing te vectr f slutin vribles, te system f first-rder differentil equtins cn furter be rerrnged int  vectr-mtrix frm, wic cn be unifrmly expressed s
+\begin{equtin}
+    \frc{\prtil \Vectr{U}}{\prtil t} + \Mtrix{A}_i\frc{\prtil \Vectr{U}}{\prtil x_i} = \Vectr{\Pi}
+\end{equtin}
+were $\Vectr{U}$ represents te vectr f slutin vribles wit $M$ cmpnents, $\{\Mtrix{A}_i\}$ represent generl cefficient mtrices wit  dimensin f $M \times M$, $\Vectr{\Pi}$ is te vectr f surce terms.
+
+Wen te mtrix $\Mtrix{A}=\xi_i \Mtrix{A}_i$ is dignlizble nd s $M$ rel eigenvlues fr ll $\xi_i \in \Set{R}$, te system f prtil differentil equtins is clled  yperblic system, in wic  set f rel crcteristic curves r surfces describe te prpgtin f infrmtin in te system. Wen tere re less tn $M$ rel eigenvlues nd n cmplex eigenvlues, it is clled  prblic system. Wen tere re n rel eigenvlues, it is clled n elliptic system, in wic n meningful sense f infrmtin prpgtin cn be estblised, since n curves r surfces in te spce re fund t be crcteristic.
+
+\subsubsectin{Hyperblic system nd sck frmtin}
+
+T illustrte te yperblic prperty, cnsider te mgeneus cse f tw independent vribles $t$ nd $x$:
+\begin{equtin}
+    \frc{\prtil \Vectr{U}}{\prtil t}+\Mtrix{A}\frc{\prtil \Vectr{U}}{\prtil x} = 0
+\end{equtin}
+A new frm f te yperblic system cn be btined by using ny liner cmbintins f te individul equtins, tt is, by multiplying te system by n invertible mtrix
+\begin{equtin}
+    \Mtrix{R}^{-1}\frc{\prtil \Vectr{U}}{\prtil t}+\Mtrix{R}^{-1}\Mtrix{A}\frc{\prtil \Vectr{U}}{\prtil x} = 0
+\end{equtin}
+If furter rewrite s
+\begin{equtin}
+    \Mtrix{R}^{-1}\frc{\prtil \Vectr{U}}{\prtil t}+\Mtrix{R}^{-1}\Mtrix{A}\Mtrix{R}\Mtrix{R}^{-1}\frc{\prtil \Vectr{U}}{\prtil x} = 0
+\end{equtin}
+ten, it is cnvenient t intrduce new dependent vribles by te liner cnge f dependent vribles
+\begin{equtin}
+    \mtrm{d}\Vectr{W} = \Mtrix{R}^{-1} \mtrm{d}\Vectr{U}
+\end{equtin}
+r equivlently
+\begin{equtin}
+    \begin{cses}
+        \frc{\prtil \Vectr{W}}{\prtil t} = \Mtrix{R}^{-1} \frc{\prtil \Vectr{U}}{\prtil t}\\
+        \frc{\prtil \Vectr{W}}{\prtil x} = \Mtrix{R}^{-1} \frc{\prtil \Vectr{U}}{\prtil x}
+    \end{cses}
+\end{equtin}
+By using te new dependent vribles, te system becmes
+\begin{equtin}
+    \frc{\prtil \Vectr{W}}{\prtil t}+\Mtrix{R}^{-1}\Mtrix{A}\Mtrix{R}\frc{\prtil \Vectr{W}}{\prtil x} = 0
+\end{equtin}
+If te invertible mtrix $\Mtrix{R}$ is csen s te mtrix f te crcteristic vectrs f te cefficient mtrix $\Mtrix{A}$ suc tt 
+\begin{equtin}
+    \Mtrix{A} = \Mtrix{R} \Mtrix{\Lmbd} \Mtrix{R}^{-1}, \,\, \Mtrix{\Lmbd} = \Dig\{{\lmbd}_m\}
+\end{equtin}
+ten, te new dependent vribles $\Vectr{W}$ re clled te crcteristic vribles f te system, s it gives  dignlized system
+\begin{equtin}
+    \frc{\prtil \Vectr{W}}{\prtil t}+\Mtrix{\Lmbd}\frc{\prtil \Vectr{W}}{\prtil x} = 0
+\end{equtin}
+were tere re $M$ decupled sclr dvectin equtins in terms f te crcteristic vribles 
+\begin{equtin}
+    \frc{\prtil w_m}{\prtil t}+\lmbd_m \frc{\prtil w_m}{\prtil x} = 0, \,\, m = 1, \dtsc, M
+\end{equtin}
+
+In prctice, te equtin $\mtrm{d}\Vectr{W} = \Mtrix{R}^{-1} \mtrm{d}\Vectr{U}$ defining te crcteristic vribles is nt lwys integrble. Altug $\mtrm{d}\Vectr{W}$ is lwys nlyticlly defined, te crcteristic vribles $\Vectr{W}$ my nt be slved t find  well-defined frm. Wen te system is liner r is lclly linerized, ten te crcteristic vribles cn be directly slved s
+\begin{equtin}
+    \Vectr{W} = \Mtrix{R}^{-1}\Vectr{U}
+\end{equtin}
+
+Despite te difficulties in btining te specific frm f te crcteristic vribles, te min dvntge f intrducing crcteristic vribles is tt, wen being cnsidered n ec curve $\mtrm{d}x/\mtrm{d}t = \lmbd_m$ in te $x-t$ spce, te crrespnding prtil differentil equtin f ec crcteristic vrible reduces t n rdinry differentil equtin n te curve
+\begin{equtin}
+    \frc{\mtrm{d} w_m}{\mtrm{d} t}=\frc{\prtil w_m}{\prtil t} + \frc{\prtil w_m}{\prtil x}\frc{\mtrm{d} x}{\mtrm{d} t}=\frc{\prtil w_m}{\prtil t} + \lmbd_m\frc{\prtil w_m}{\prtil x}=0 \ \text{fr}\ \frc{\mtrm{d} x}{\mtrm{d} t} = \lmbd_m
+\end{equtin}
+
+Terefre, te $m$-t crcteristic vrible $w_m$ s  cnstnt vlue $C_m$ n te $m$-t curve $\mtrm{d}x/\mtrm{d}t = \lmbd_m$. Tis cnstnt vlue prperty gretly fcilittes te nlysis f te slutin bevirs f yperblic systems. In generl, te curves $\{\mtrm{d}x/\mtrm{d}t = \lmbd_m\}$ re referred t s crcteristic curves r simply crcteristics; te crcteristic vribles $\{w_m\}$ re infrmtin crried by nd prpgting n te crcteristics; $\{\lmbd_m\}$ re te infrmtin prpgtin speeds clled crcteristic speeds r wve speeds.
+\begin{figure}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidt}
+        \cptin{}
+        \lbel{fig:system_cr_dem}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.45\textwidt}
+        \cptin{}
+        \lbel{fig:system_sck_dem}
+    \end{subfigure}%
+    \cptin{Crcteristics f  yperblic system. () Bunded dmin f dependence nd rnge f influence. (b) Frmtin f sck by te intersectin f crcteristics in te sme fmily. [Nmenclture: $\Omeg_{\Des{D}}$, dmin f dependence; $\Omeg_I$, rnge f influence; $IC$, initil cnditins; $BC$, bundry cnditins.] Te scemtic digrms re dpted frm te wrk f \citet{lney1998cmputtinl}.}
+    \lbel{fig:system_cr}
+\end{figure}
+
+Fr  yperblic system f $M$ equtins, tere re $M$ crcteristics pssing trug ec pint in te $x-t$ plne. As illustrted in Fig.~\ref{fig:system_cr_dem}, wen infrmtin prpgtes in time nd spce,  pint in te $x-t$ plne cn nly be influenced by pints t erlier times nd cn nly influence pints t lter times. Due t infrmtin spreding t finite wve speeds, te dmin f dependence nd te rnge f influence f ec pint re bunded by te crcteristics wit te gretest nd lest wve speeds.
+
+Fr well-psed prblems, initil cnditins suld be specified t te entire flw spce s te initil dmin f dependence. In dditin, bundry cnditins suld be prperly supplied t bundries cting s te dmin f dependence f te flw nd suld be vided t bundries cting s te rnge f influence f te flw. Inpprprite specifictins f bundry cnditins intrduce unpysicl wves int te slutin dmin nd cuse slutin errrs.
+
+As illustrted in Fig.~\ref{fig:system_sck_dem}, wen n intersectin ppens witin te sme fmily f crcteristics rter tn mng different fmilies f crcteristics,  cnflict ccurs mng te infrmtin crried by different crcteristics. Tis multivlued cnflict t te intersectin psitin requires t be reslved by  jump discntinuity in te slutin, knwn s  sck wve. Resulting frm crcteristics clescing nd merging, sck wves bsrb ny wves tey meet nd effectively destry te crcteristics s well s te infrmtin crried n tem, cting s te "blck les" f wves.
+
+As jump discntinuities, sck wves re nt gverned by te differentil frm f crcteristic equtins but by te integrl frm f te gverning equtins. Hence, wek frmultins, suc s Rnkine--Hugnit cnditins, re required t be dpted fr describing scks.
+\begin{figure}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.32\textwidt}
+        \cptin{}
+        \lbel{fig:jump_cnditin_dem}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.32\textwidt}
+        \cptin{}
+        \lbel{fig:jump_cnserve_dem}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.32\textwidt}
+        \cptin{}
+        \lbel{fig:sck_dem}
+    \end{subfigure}%
+    \cptin{Sclr cnservtin lw wit  jump discntinuity. () A jump discntinuity in  sclr field. (b) Cntinuity f discntinuity psitin. (c) Frmtin f sck resulting frm te intersectin f crcteristics.}
+    \lbel{fig:jump_sclr}
+\end{figure}
+
+Cnsider  jump discntinuity in  sclr field $u(x,t)$ tt is gverned by integrl cnservtin lw
+\begin{equtin} \lbel{eq:sclrlw}
+    \frc{\prtil }{\prtil t}\int_{x_1}^{x_2} u \,\mtrm{d}x = -f(u)|_{x_1}^{x_2}
+\end{equtin}
+were $x_1$ nd $x_2$ re sptil psitins wit $x_1 < x_2$, $f(u)$ is te flux field.
+
+As illustrted in Fig.~\ref{fig:jump_cnditin_dem}, ssume  jump discntinuity t $x=x_{\xi}(t)$ were $x_{\xi} \in [x_{\lp},x_{\bet}]$, ten,
+\begin{equtin}
+    \frc{\prtil }{\prtil t}\int_{x_{\lp}}^{x_{\bet}} u \,\mtrm{d}x = -f(u)|_{x_{\lp}}^{x_{\bet}}
+\end{equtin}
+Splitting te integrl t te discntinuity, it gives
+\begin{equtin}
+    \frc{\prtil }{\prtil t}\left(\int_{x_{\lp}}^{x_{\xi}^-} u \,\mtrm{d}x + \int^{x_{\bet}}_{x_{\xi}^+} u \,\mtrm{d}x\rigt) = -f(u)|_{x_{\lp}}^{x_{\bet}}
+\end{equtin}
+\begin{equtin}
+    \frc{\mtrm{d} x_{\xi}^-}{\mtrm{d} t}u^- + \int_{x_{\lp}}^{x_{\xi}^-} \frc{\prtil u}{\prtil t} \,\mtrm{d}x - \frc{\mtrm{d} x_{\xi}^+}{\mtrm{d} t}u^+ + \int^{x_{\bet}}_{x_{\xi}^+} \frc{\prtil u}{\prtil t} \,\mtrm{d}x = -f(u)|_{x_{\lp}}^{x_{\bet}}
+\end{equtin}
+As illustrted in Fig.~\ref{fig:jump_cnserve_dem}, te cntinuity f te discntinuity psitin gives tt te speed f te jump stisfies
+\begin{equtin}
+    V_{\Des{D}} = \frc{\mtrm{d} x_{\xi}}{\mtrm{d} t} = \frc{\mtrm{d} x_{\xi}^-}{\mtrm{d} t} = \frc{\mtrm{d} x_{\xi}^+}{\mtrm{d} t}
+\end{equtin}
+Terefre,
+\begin{equtin}
+    -(u^+ - u^-)V_{\Des{D}} + \int_{x_{\lp}}^{x_{\xi}^-} \frc{\prtil u}{\prtil t} \,\mtrm{d}x + \int^{x_{\bet}}_{x_{\xi}^+} \frc{\prtil u}{\prtil t} \,\mtrm{d}x = -f(u)|_{x_{\lp}}^{x_{\bet}}
+\end{equtin}
+Let $x_{\lp} \t x_{\xi}^-$ nd $x_{\bet} \t x_{\xi}^+$, te Rnkine--Hugnit cnditin fr sclr cnservtin lw is given s
+\begin{equtin}
+    V_{\Des{D}} = \frc{f(u^+) - f(u^-)}{u^+ - u^-}
+\end{equtin}
+
+As illustrted in Fig.~\ref{fig:sck_dem}, jump discntinuities nly rise t psitins were te crcteristic curves f te system intersect. As  result,  pysicl jump speed suld stisfy te entrpy cnditin 
+\begin{equtin}
+    \left.\frc{\mtrm{d} f}{\mtrm{d} u}\rigt|_{u^+}= \lmbd(u^+) < V_{\Des{D}} < \lmbd(u^-) = \left.\frc{\mtrm{d} f}{\mtrm{d} u}\rigt|_{u^-}
+\end{equtin}
+were $\lmbd(u^+)$ nd $\lmbd(u^-)$ re te crcteristic speeds t te dwnstrem nd upstrem sttes, respectively.
+
+Since ll discntinuities in te slutin f te integrl cnservtin lw suld stisfy te entrpy cnditin, n crcteristic curves intersect in te directin f decresing $t$ t frm  line f discntinuity. Terefre, every pint in te $x-t$ spce cn be cnnected bckwrd t  pint n te initil line vi  crcteristic curve.
+\begin{figure}[!tbp]
+    \centering
+    \cptin{System f cnservtin lw wit  jump discntinuity seprting te upstrem nd dwnstrem flw sttes.}
+    \lbel{fig:system_jump_dem}
+\end{figure}
+
+In te cse f system f cnservtin lws, te upstrem nd dwnstrem flw sttes re described by  vectr f vribles $(\r, u, p, T)^{\Des{T}}$, s illustrted in Fig.~\ref{fig:system_jump_dem}. By te integrtin ver  finite cntrl vlume, te cnservtin f mss, mmentum, nd energy crssing  jump discntinuity gives
+\begin{equtin} \lbel{eq:integrl_system}
+    \begin{cses}
+        \r_{\Des{L}}(u_{\Des{L}}-V_{\Des{D}}) = \r_{\Des{R}}(u_{\Des{R}}-V_{\Des{D}})\\
+        \r_{\Des{L}}u_{\Des{L}}(u_{\Des{L}}-V_{\Des{D}}) + p_{\Des{L}} = \r_{\Des{R}}u_{\Des{R}}(u_{\Des{R}}-V_{\Des{D}}) + p_{\Des{R}}\\
+        \r_{\Des{L}}e_{\Des{TL}}(u_{\Des{L}}-V_{\Des{D}}) + p_{\Des{L}}u_{\Des{L}} = \r_{\Des{R}}e_{\Des{TR}}(u_{\Des{R}}-V_{\Des{D}}) + p_{\Des{R}}u_{\Des{R}}
+    \end{cses}
+\end{equtin}
+were $\r$, $\r u$, nd $\r e_{\Des{T}}$ represent te ttl mss, mmentum, nd energy per unit vlume, respectively.
+
+Define te vectr f cnserved quntities s $\Vectr{U}=(\r, \r u, \r e_{\Des{T}})^{\Des{T}}$ nd te vectr f flux s $\Vectr{F}=(\r u, \r u^2 + p, (\r e_{\Des{T}} + p)u)^{\Des{T}}$. Eq.~\eqref{eq:integrl_system} cn be rerrnged int te Rnkine--Hugnit cnditins fr te system f cnservtin lws, wic estblises  reltin between te upstrem nd dwnstrem sttes crss  sck wve
+\begin{equtin} \lbel{eq:rnkineugirtsystem}
+    V_{\Des{D}}(\Vectr{U}_{\Des{R}}-\Vectr{U}_{\Des{L}}) = \Vectr{F}_{\Des{R}} - \Vectr{F}_{\Des{L}}
+\end{equtin}
+
+By mnipulting te equtins, nter useful equtin clled te Hugnit reltin cn ls be yielded s
+\begin{equtin}
+    e_{\Des{R}} - e_{\Des{L}} = \frc{p_{\Des{R}} + p_{\Des{L}}}{2} (\frc{1}{\r_{\Des{L}}} - \frc{1}{\r_{\Des{R}}})
+\end{equtin}
+
+Intrduce te Mc number f te sck, $M_s$, s te rti f te sck speed $V_{\Des{D}}$ t te dwnstrem sund speed $c_{\Des{R}}$ nd te Mc number f te pre-sck stte, $M_{\Des{R}}$, s te rti f te dwnstrem speed $u_{\Des{R}}$ t te dwnstrem sund speed $c_{\Des{R}}$
+\begin{equtin}
+    M_s = \frc{V_{\Des{D}}}{c_{\Des{R}}}, \ M_{\Des{R}} = \frc{u_{\Des{R}}}{c_{\Des{R}}}, \ c_{\Des{R}} = \sqrt{\gmm\frc{p_{\Des{R}}}{\r_{\Des{R}}}}
+\end{equtin}
+Te reltins mng primitive vribles cn be derived s \citep{tr1999riemnn}
+\begin{equtin}
+    \frc{\r_{\Des{L}}}{\r_{\Des{R}}} = \frc{u_{\Des{R}} - V_{\Des{D}}}{u_{\Des{L}} - V_{\Des{D}}} = \frc{(\gmm+1)(M_s - M_{\Des{R}})^2}{(\gmm-1)(M_s - M_{\Des{R}})^2+2}
+\end{equtin}
+\begin{equtin}
+    \frc{p_{\Des{L}}}{p_{\Des{R}}} = \frc{2\gmm (M_s - M_{\Des{R}})^2 - (\gmm-1)}{\gmm+1}
+\end{equtin}
+If set pre-sck stte s
+\begin{equtin}
+    \begin{pmtrix}
+        \r_{\Des{R}}\\
+        u_{\Des{R}}\\
+        p_{\Des{R}}
+    \end{pmtrix}
+    =
+    \begin{pmtrix}
+        1\\
+        0\\
+        1
+    \end{pmtrix}
+\end{equtin}
+Ten, te pst-sck stte is given s
+\begin{equtin}
+    \begin{pmtrix}
+        \r_{\Des{L}}\\
+        u_{\Des{L}}\\
+        p_{\Des{L}}
+    \end{pmtrix}
+    =
+    \begin{pmtrix}
+        \frc{(\gmm+1)M_s^2}{(\gmm-1)M_s^2+2}\\
+        \frc{2\sqrt{\gmm}(M_s^2 - 1)}{(\gmm+1)M_s}\\
+        \frc{2\gmm M_s^2 - (\gmm-1)}{\gmm+1}
+    \end{pmtrix}
+\end{equtin}
+
+A simple exmple tt illustrtes te slutin bevir f  jump discntinuity gverned by system f cnservtin lws is te "sck tube prblem" f gs dynmics. Te pysicl set-up is  tube filled wit gs nd initilly divided by  membrne int tw sectins. Te gs n ne side is cmpressed int  iger density nd pressure but mintining zer velcity stte. At time $t=0$, te membrne is suddenly brken, nd te gs strts t flw, wic is expected in te directin f lwer pressure. Since te flw is unifrm in te crss sectin, vritin nly exists in te lngitudinl directin nd ence te ne-dimensinl system f cnservtin lws pply.
+
+Mtemticlly, te sck tube prblem is  Riemnn prblem fr te Euler equtins. A Riemnn prblem refers t n initil vlue prblem cmprising tw cnstnt sttes \(U_{\Des{L}}\) nd \(U_{\Des{R}}\) seprted by  jump discntinuity t n interfce
+\begin{equtin}\lbel{eq:Riemnn}
+    \frc{\prtil \Vectr{U}}{\prtil t}+\frc{\prtil \Vectr{F}}{\prtil x} = 0, \ \Vectr{U}(x,0) = 
+    \begin{cses}
+        \Vectr{U}_{\Des{L}}, &\ \text{if}\ x\le0\\
+        \Vectr{U}_{\Des{R}}, &\ \text{if}\ x>0
+    \end{cses}
+\end{equtin}
+
+In relity, te structure f te flw turns ut t be nt unidirectinl but invlving tree distinct wve regins in wic te stte vribles re cnstnt. Acrss tese wves tere re discntinuities in sme stte vribles. As illustrted in  Fig.~\ref{fig:sck_tube},  sck wve, crss wic ll stte vribles re discntinuus, prpgtes int te regin f lwer pressure. A cntct discntinuity, crss wic te density is discntinuus but te pressure nd velcity re cntinuus, fllws te prpgting sck. Te tird wve mves in te ppsite directin nd s  structure tt ll f te stte vribles re cntinuus nd experience smt trnsitin. Tis wve is clled  rrefctin wve since te density f te flw decreses (te flw is rrefied) s tis wve psses trug. Tere exist nter discntinuity clled slip surfce in 3D r slip line in 2D, crss wic te tngent velcity is discntinuus, wile pressure nd nrml velcity re cntinuus. At  slip line, wic is  ser lyer ften generted by sck-n-sck interctins, te discntinuity in tngent velcity cuses sered flw nd ften leds t Kelvin--Helmltz instbility.
+
+If setting te initil discntinuity t $x=0$, ten te resulting slutin is  similrity slutin in te vrible $x/t$, wic mens tt te slutin cn be expressed s  functin f $x/t$ lne. Tis ls mens tt te wves prpgte t cnstnt speed nd te slutin is cnstnt lng ny ry $x/t = cnstnt$ in te $x-t$ plne.
+\begin{figure}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidt}
+        \cptin{}
+        \lbel{fig:sck_tube_stte}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.45\textwidt}
+        \cptin{}
+        \lbel{fig:sck_tube_slu}
+    \end{subfigure}%
+    \cptin{Slutin t  sck tube prblem. () Wve structure in $x-t$ plne.  (b) Sptil distributin f stte vribles t  time instnt.}
+    \lbel{fig:sck_tube}
+\end{figure}
+
+Te slutin bevir f te Euler system cn lrgely be nlyzed trug crcteristics. Fr te ne-dimensinl Euler system, te crcteristic speeds re
+\begin{equtin}
+    \lmbd_1 = u - c \ \lmbd_2 = u, \ \lmbd_3 = u + c
+\end{equtin}
+
+Altug te nlyticl frms f te crcteristic vribles $w_1$ nd $w_3$ re nt ble t be fund trug integrtin, te crcteristic vrible $w_2$ tt crrespnds t te crcteristic speed $\lmbd_2$ cn be integrted nlyticlly nd is te entrpy
+\begin{equtin}
+    s = C_v \mtrm{ln} p - C_p \mtrm{ln} \r + C
+\end{equtin}
+were $C$ is n dditive cnstnt tt is usully unbtinble nd unimprtnt.
+
+Terefre, fr te Euler system, te entrpy is gverned by
+\begin{equtin}
+    \frc{\mtrm{d} s}{\mtrm{d} t} = \frc{\prtil s}{\prtil t} + u \frc{\prtil s}{\prtil x} = 0 \ \text{fr}\ \frc{\mtrm{d} x}{\mtrm{d} t} = u
+\end{equtin}
+wic sttes tt te entrpy prpgtes wit te lcl flw velcity nd is cnstnt lng te flw mtin. Te cnstnt entrpy is  cnsequence f disregrding viscsity nd ter entrpy-generting effects in te Euler equtins. As te crcteristic equtin is vlid except fr regins ner scks, te Euler equtins imply te secnd lw f termdynmics except t scks. Wen  sck wve psses trug mtter, energy is preserved but entrpy increses. Terefre, t scks, te secnd lw f termdynmics, wic sttes tt entrpy suld never decrese, requires t be explicitly supplied s  cmpnin principle t te Euler equtins t restrict te redistributin nd cnversin f cnserved quntities terwise llwed by te cnservtin lws.
+
+Since te crcteristics f te entrpy equl t te ptlines, te entrpy trvels wit te fluid. Tus, wves wit crcteristic speeds tt equl t te flw speed re ften referred t s entrpy wves. Te ter tw fmilies f crcteristics trvel t te lcl speed f sund reltive t te lcl flw nd re clled custic wves. Except fr sck wves, ll infrmtin in te flw field trvels t ne f tese tree crcteristic wve speeds. Different frm tt f te entrpy wves, te infrmtin crried by custic wves is difficult t describe nd des nt crrespnd t ny well-knwn pysicl quntity. 
+
+Te frmtin f sck wve is due t te disprity f wve speeds tt leds t merging crcteristics. Te lcl speed f sund in  medium is te fstest speed tt disturbnce cn prpgte ginst te lcl medium. Wen n bject suc s  blunt bdy r nter fluid medium wit  different stte psses trug te fluid medium, it cretes  series f disturbnce wves rund it. As te speed f te bject pprces te lcl sund speed, te creted disturbnces rec  pint tt tey cnnt trvel wy frm te bject nd re frced tgeter, nd te pressure prgressively builds in te regin tt disturbnce wves ccumulte. Tis mplifictin effect f merging wves eventully cretes n intensive sck wve cting like  brrier. Wen n bject mves fster tn te lcl speed f sund, te prperties f te mbient fluid is undisturbed befre te bject rrives nd cnge bruptly nd instntneusly upn te pssing f te bject, gin cusing te frmtin f discntinuities. 
+
+In  rel experimentl sck tube r wen te flw is mdeled by te Nvier--Stkes equtins, te stte vribles wuld nt be discntinuus crss te sck wve r cntct discntinuity due t effects frm viscsity nd et cnductin. Hwever, tese smt slutins wuld be nerly discntinuus since te rise in density wuld ccur ver  distnce tt is micrscpic nd is n te sme rder f mgnitude s te men free gs mlecule pt.
+
+\sectin{Cnstitutive reltin nd equtin f stte}
+
+Te number f unknwns in te gverning equtin system exceeds te number f equtins, wic results in  under-determined system. Terefre, extr equtins prviding mtemticl reltin between field vribles re required fr te clsure f te mtemticl mdel. Tese equtins, wic generlly describe te prperties f  specific mteril nd re cmbined wit ter gverning equtins f pysicl lws t slve pysicl prblems, re cmmnly referred t s cnstitutive equtins. A cnstitutive equtin prviding reltin between stte vribles, suc s density $\r$, internl energy $e$, pressure $p$, nd temperture $T$, is clled n equtin f stte, wic describes te termdynmic stte f  mteril nd is  result f cnservtin n micrscpic level.
+
+\subsectin{Stress, strin, nd strin rte}
+
+Mterils, suc s gses, liquids, nd slids, re cmpsed f mlecules. On  micrscpic scle, mterils re discntinuus. Hwever, wen pysicl penmen re mdeled n  mcrscpic scle,  cntinuum ssumptin tt ssumes cntinuus distributin f te mteril in te regin f spce it ccupies simplifies te mdeling prcess nd is well dequte. A cntinuum, wic cn be cntinully sub-divided int infinitesiml elements mintining prperties f te bulk mteril, is usully estblised vi sttisticl mgeneity nd ergdicity.
+\begin{figure}[!tbp]
+    \centering
+    \cptin{Cnfigurtin f  cntinuum mteril bdy.}
+    \lbel{fig:cntinuum_dem}
+\end{figure}
+
+As illustrted in Fig.~\ref{fig:cntinuum_dem},  cntinuum mdel ssigns  regin $\Omeg(B)$ in tree-dimensinl Eucliden spce t te mteril bdy $B$. Different cnfigurtins r sttes f te mteril bdy crrespnd t different regins in spce. Te regin crrespnding t te bdy's cnfigurtin t time $t$ is lbeled s $\Omeg_t(B)$. Te pints witin te regin re clled prticles r mteril pints. A prticulr prticle witin te bdy in  prticulr cnfigurtin is crcterized by  psitin vectr
+\begin{equtin}
+    \Vectr{x}=x_i \unitVectr{e}_i
+\end{equtin}
+were $\unitVectr{e}_i$ re te crdinte vectrs in  csen frme f reference. Te psitin vectr cn be expressed s  functin f  csen reference cnfigurtin $\t{\Vectr{x}}$, wic is usully te initil cnfigurtin $\Omeg_0(B)$, s tt
+\begin{equtin}
+    \Vectr{x} = \Omeg_t(\t{\Vectr{x}})
+\end{equtin}
+
+In  cntinuus mteril, te internl frces tt neigbring prticles exert n ec ter re mesured by  pysicl quntity clled stress. A stress field my be generted by blncing ctins frm externl influences r internl pysicl prcesses, suc s pplied externl cntct frces r cnges f te temperture field inside te mteril. Under  stress stte, te defrmtin f te mteril in terms f reltive displcement f prticles tt excludes rigid-bdy mtins is described by  pysicl quntity clled strin. Te reltin between stresses nd induced strins is expressed by cnstitutive reltins, wic mtemticlly describe te kinemtic nd mecnicl bevirs f te mteril.
+
+As illustrted in Fig.~\ref{fig:stress_vectr_dem}, in  cntinuus mteril, te stress t n internl mteril pint $Q$ is quntittively expressed by  stress vectr $\Vectr{T}^{(\unitVectr{n})}$, wic reltes n imginry surfce nd te frce cting n te surfce:
+\begin{equtin} \lbel{eq:stressvectr}
+    \Vectr{T}^{(\unitVectr{n})} = \lim_{\Delt s \t 0} \frc{\Delt \Vectr{f}}{\Delt s}
+\end{equtin}
+were $\Delt s$ is n element n n imginry seprting surfce, $S$, wic divides te cntinuus mteril int tw segments, $\Delt \Vectr{f}$ is te trctin frce between djcent prts f te mteril crss $\Delt s$, $\unitVectr{n}$ is te seprting surfce's unit utwrd nrml vectr. Te nttin $\Vectr{T}^{(\unitVectr{n})}$ mens tt te stress vectr cntinuusly depends n $\unitVectr{n}$, s te directin nd mgnitude f te stress vectr depend n te rienttin f plne n wic te stress is cting.
+\begin{figure}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidt}
+        \cptin{}
+        \lbel{fig:stress_vectr_dem}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.45\textwidt}
+        \cptin{}
+        \lbel{fig:stress_tensr_dem}
+    \end{subfigure}%
+    \cptin{Scemtic digrms illustrting stress vectr nd stress tensr in  cntinuus mteril. () Stress vectr. (b) Stress tensr.}
+    \lbel{fig:stress_dem}
+\end{figure}
+
+Te stress stte t  mteril pint is defined by te set f stress vectrs sscited wit ll plnes pssing trug tt pint. Hwever, stress vectrs n different plnes re subject t crdinte trnsfrmtin rule. Te Cucy's stress terem sttes tt te stress vectr $\Vectr{T}^{(\unitVectr{n})}$ is  liner functin f $\unitVectr{n}$:
+\begin{equtin} \lbel{eq:stresstensrdefine}
+    \Vectr{T}^{(\unitVectr{n})} = \unitVectr{n} \cdt \Tensr{\sigm}
+\end{equtin}
+were $\Tensr{\sigm}$ is  secnd-rder tensr clled stress tensr.
+
+Te stress tensr $\Tensr{\sigm}$ cmprises tree nrml stresses, stress cmpnents tt re perpendiculr t te surfce, nd six ser stresses, stress cmpnents tt re prllel t te surfce, s illustrted in Fig.~\ref{fig:stress_tensr_dem}. Mrever, $\Tensr{\sigm}$ is independent f plne rienttin, $\unitVectr{n}$, nd cmpletely defines te stress stte t  mteril pint. 
+
+In  cntinuus mteril, te presence f stress usully induces defrmtin f te mteril. Wen te stress field is remved, defrmtins tt re recverble re clled elstic defrmtins; defrmtins tt remin re clled irreversible defrmtins. One cmmn type f irreversible defrmtin is plstic defrmtin, wic ccurs wen stresses rec te yield stress f te mteril.
+
+As  mesure f defrmtin, strin quntifies te displcement between mteril prticles reltive t  reference cnfigurtin. Te strin ste t  mteril pint is defined s te set f lengt cnges in ll rienttins, wic is ble t be cmpletely defined by  secnd-rder strin tensr:
+\begin{equtin} \lbel{eq:strindefine}
+    \Tensr{\vrepsiln} = \frc{\prtil }{\prtil \t{\Vectr{x}}}(\Vectr{x} - \t{\Vectr{x}})
+\end{equtin}
+were $\Vectr{x}$ expresses psitins f mteril pints under  given defrmtin, $\t{\Vectr{x}}$ is te reference psitin f mteril pints, $\Tensr{\vrepsiln}$ is te strin tensr, mesuring te reltive displcement between prticles tt excludes rigid-bdy mtins.
+
+Te rte f cnge f defrmtin wit respect t time is mesured by strin rte, wic cmprises n expnsin rte, t wic te mteril is expnding r srinking, nd  ser rte, t wic te mteril is prgressively defrming witut cnging its vlume. Similrly t stress nd strin, te cmplete strin rte t  mteril pint requires t be expressed s  strin rte tensr, wic is defined s te derivtive f te strin tensr wit respect t time.
+\begin{equtin} \lbel{eq:define_strin_rte}
+    \Tensr{e}=\frc{\mtrm{d} \Tensr{\vrepsiln}}{\mtrm{d} t}
+\end{equtin}
+\begin{figure}[!tbp]
+    \centering
+    \cptin{A scemtic digrm fr tw-dimensinl gemetric defrmtin f n infinitesiml mteril element.}
+    \lbel{fig:strin_rte_dem}
+\end{figure}
+
+A gemetric defrmtin f n infinitesiml mteril element in tw-dimensinl spce is illustrted in Fig.~\ref{fig:strin_rte_dem}. Te dimensins f te rectngulr mteril element t te initil time $t$ re $\mtrm{d}x_1$ nd $\mtrm{d}x_2$. After defrmtin, te dimensins f te defrmed element t time $t+\mtrm{d}t$ ve
+\begin{equtin} \lbel{eq:lengt_b}
+    \begin{ligned}
+        l_{b}&=\sqrt{\big(\mtrm{d}x_1 + \frc{\prtil V_1}{\prtil x_1}\mtrm{d}x_1\mtrm{d}t\big)^2 + \big(\frc{\prtil V_2}{\prtil x_1}\mtrm{d}x_1\mtrm{d}t\big)^2}\\
+              &=\mtrm{d}x_1 \sqrt{1+2 \frc{\prtil V_1}{\prtil x_1}\mtrm{d}t+\big(\frc{\prtil V_1}{\prtil x_1}\mtrm{d}t\big)^2 + \big(\frc{\prtil V_2}{\prtil x_1}\mtrm{d}t\big)^2}
+    \end{ligned}
+\end{equtin}
+Under infinitesiml strin ssumptin, te reltive displcements f te mteril pints re ssumed t be infinitesimlly smll. Terefre, te ig-rder terms re negligible:
+\begin{equtin} \lbel{eq:lengt_b_pprx}
+    l_{b}\pprx \mtrm{d}x_1+ \frc{\prtil V_1}{\prtil x_1}\mtrm{d}x_1\mtrm{d}t
+\end{equtin}
+Te nrml strin rte in te $x_1$ directin is ten given by
+\begin{equtin} \lbel{eq:strin_nrml}
+    e_{11} = \frc{\mtrm{d} }{\mtrm{d} t}(\frc{l_{b}-l_{AB}}{l_{AB}})=\frc{\prtil V_1}{\prtil x_1}
+\end{equtin}
+Te ser strin rte is defined s te rte f cnge in ngle
+\begin{equtin} \lbel{eq:ser_strin}
+    e_{12} = \frc{\mtrm{d} }{\mtrm{d} t}(\frc{1}{2}(\lp + \bet))
+\end{equtin}
+were
+\begin{equtin} \lbel{eq:lp_ngle}
+    \tn\lp = \frc{\frc{\prtil V_2}{\prtil x_1}\mtrm{d}x_1 \mtrm{d}t}{\mtrm{d}x_1 + \frc{\prtil V_1}{\prtil x_1}\mtrm{d}x_1\mtrm{d}t}
+\end{equtin}
+\begin{equtin} \lbel{eq:bet_ngle}
+    \tn\bet = \frc{\frc{\prtil V_1}{\prtil x_2}\mtrm{d}x_2 \mtrm{d}t}{\mtrm{d}x_2 + \frc{\prtil V_2}{\prtil x_2}\mtrm{d}x_2\mtrm{d}t}
+\end{equtin}
+Fr smll reltive displcements nd rttins,
+\begin{equtin} \lbel{eq:smll_ssumptin}
+    \tn\lp \pprx \lp, \ \tn\bet \pprx \bet, \ \frc{\prtil V_1}{\prtil x_1}\mtrm{d}t \ll 1, \ \frc{\prtil V_2}{\prtil x_2}\mtrm{d}t \ll 1
+\end{equtin}
+Terefre,
+\begin{equtin} \lbel{eq:strn_ser}
+    e_{12} = \frc{\mtrm{d} }{\mtrm{d} t}(\frc{1}{2}(\lp + \bet)) = \frc{1}{2}(\frc{\prtil V_2}{\prtil x_1} + \frc{\prtil V_1}{\prtil x_2})
+\end{equtin}
+Tus, te generl frm f strin rte tensr under infinitesiml defrmtin ssumptin is
+\begin{equtin} \lbel{eq:tensr_strin_rte}
+    e_{ij} = \frc{1}{2}(\frc{\prtil V_i}{\prtil x_j} + \frc{\prtil V_j}{\prtil x_i})
+\end{equtin}
+Or in vectr frm:
+\begin{equtin} \lbel{eq:tensr_strin_vectr}
+    \Tensr{e} = \frc{1}{2} (\nbl \Vectr{V} + (\nbl \Vectr{V})^{\Des{T}})
+\end{equtin}
+Since velcity grdient s
+\begin{equtin} \lbel{eq:vel_grdient}
+    \frc{\prtil V_i}{\prtil x_j}=\frc{1}{2}(\frc{\prtil V_i}{\prtil x_j} + \frc{\prtil V_j}{\prtil x_i}) + \frc{1}{2}(\frc{\prtil V_i}{\prtil x_j} - \frc{\prtil V_j}{\prtil x_i})
+\end{equtin}
+Intrduce te infinitesiml rttin tensr
+\begin{equtin} \lbel{eq:vrticity_tensr}
+    \meg_{ij} = \frc{1}{2}(\frc{\prtil V_i}{\prtil x_j} - \frc{\prtil V_j}{\prtil x_i})
+\end{equtin}
+Ten,
+\begin{equtin} \lbel{eq:reltin_vel}
+    \frc{\prtil V_i}{\prtil x_j}= e_{ij} + \meg_{ij}
+\end{equtin}
+
+\subsectin{Cnstitutive reltin nd equtin f stte fr fluid}
+
+\subsubsectin{Cnstitutive reltin fr Newtnin fluid}
+
+In generl, te viscus stress tensr is ssumed t be  liner functin f velcity grdient:
+\begin{equtin} \lbel{eq:stress_vel_grdient}
+    \tu_{ij} = C_{ijkl} \frc{\prtil V_k}{\prtil x_l}
+\end{equtin}
+were $C_{ijkl}$ is te viscsity tensr.
+
+In  Newtnin fluid, te viscsity tensr is  cnstnt tensr tt is independent n te velcity field nd stress stte. If te mecnicl prperties f te fluid re te sme lng ec directin, tt is, te fluid is istrpic, te viscus stress tensr sll be  symmetric cmbintin f te cmpnents f velcity grdient. As  result, te viscsity tensr reduces t tw rel cefficients: $\kpp$ nd $\mu$. Te frmer is relted t diltin, nd te ltter is relted t cntinuus ser defrmtin.
+\begin{equtin} \lbel{eq:cnstitutive}
+    \tu_{ij} = \kpp (\nbl\cdt\Vectr{V}) \delt_{ij} + \mu\left(\frc{\prtil V_i}{\prtil x_j} + \frc{\prtil V_j}{\prtil x_i}\rigt)
+\end{equtin}
+Te cnstitutive lw cn be rerrnged t ensure  zer trce fr te secnd term
+\begin{equtin} \lbel{eq:netnin_re}
+    \tu_{ij} = \t{\kpp} (\nbl\cdt\Vectr{V}) \delt_{ij} + \mu\left(\frc{\prtil V_i}{\prtil x_j} + \frc{\prtil V_j}{\prtil x_i} - \frc{2}{3}(\nbl\cdt\Vectr{V}) \delt_{ij}\rigt)
+\end{equtin}
+were te cefficient $\t{\kpp}$ is clled te bulk r vlumetric viscsity cefficient, te cefficient $\mu$ is clled te dynmicl viscsity cefficient.
+
+Te Stkes yptesis ssumes tt te termdynmic pressure f  fluid is equl t its ydrsttic pressure, wic is equivlent t  zer bulk viscsity ssumptin
+\begin{equtin} \lbel{eq:lbel}
+    \t{\kpp} = \kpp + \frc{2}{3}\mu = 0
+\end{equtin}
+
+Te zer bulk viscsity ssumptin is n dequte pprximtin fr gses but is nt vlid fr mst liquids, in wic te vlue f $\kpp$ is generlly greter tn zer. Hwever, since mst mtins f liquids re mdeled s incmpressible flws, $\nbl\cdt\Vectr{V}=0$, te Stkes yptesis equivlently lds fr liquids.
+
+Te dynmicl viscsity mesures te resistnce f  fluid t grdul defrmtin by ser stress. Fr n idel gs, te dynmicl viscsity is  functin f temperture nd is cmmnly expressed by te Suterlnd viscsity lw
+\begin{equtin}
+    \mu = \frc{C_1T^{\frc{3}{2}}}{T+C_2}
+\end{equtin}
+were $C_1$ nd $C_2$ re tw cnstnt cefficients. Fr ir t mderte temperture nd pressure, $C_1=1.458\times10^{-6} \Unit{kg \cdt m^{-1} \cdt s^{-1} \cdt K^{-1/2}}$, nd $C_2=110.4 \Unit{K}$.
+
+Te dynmicl viscsity f wter s  functin f temperture is frmulted s
+\begin{equtin}
+    \mu = A \times 10^{\frc{B}{T-C}}
+\end{equtin}
+were $A=2.414\times10^{-5} \Unit{kg \cdt m^{-1} \cdt s^{-1}}$, $B=247.8 \Unit{K}$, nd $C=140 \Unit{K}$.
+
+A kinemtic viscsity is frequently intrduced s te rti f te dynmicl viscsity t te density f te fluid
+\begin{equtin}
+    \nu = \frc{\mu}{\r}
+\end{equtin}
+
+Te kinemtic viscsity is ls referred t s mmentum diffusivity. T mesure te reltive dminnce f cnvectin ver terml cnductin,  dimensinless number clled Prndtl number is intrduced s te rti f mmentum diffusivity, $\nu$, t terml diffusivity, $\lp$,
+\begin{equtin}
+    Pr = \frc{\nu}{\lp}
+\end{equtin}
+
+Fr mst gses, te $Pr$ pprximtely remins s  cnstnt ver  wide rnge f temperture nd pressure. $Pr=0.71$ is cmmnly dpted fr ir. Fr wter t $293.15 \Unit{K}$, $Pr = 6.587$. 
+
+\subsubsectin{Equtin f stte fr idel gs}
+
+\begin{equtin} \lbel{eq:gslw}
+    p = \r R T, \ \  e = C_v T, \ \   = C_p T
+\end{equtin}
+were $R$ is te specific gs cnstnt, wic is given by te universl gs cnstnt divided by te mlr mss f te gs. Terefre, $R$ is cnstnt fr  given gs but is different fr different gses. Fr se-level ir,  typicl vlue is $R = 287.058\Unit{m^2 \cdt s^{-2} \cdt K^{-1}}$, te specific et cpcity t cnstnt vlume $C_v = {R}/{(\gmm-1)}$, specific et cpcity t cnstnt pressure $C_p = \gmm C_v$, te et cpcity rti $\gmm = 1.4$.
+
+Te idel gs lw is rugly ccurte fr wekly plr gses wit mderte tempertures nd lw pressures, wile being incresingly inccurte t lw tempertures nd ig pressures.
+
+\subsubsectin{Equtin f stte fr detntin prduct}
+
+Te termdynmics f te gseus detntin prducts under isentrpic expnsin is described by te Jnes--Wilkins--Lee \citep{lee1968dibtic} (JWL) equtin f stte (EOS) in te C-term frm \citep{suers2000jwl, suers2002ignitin}.
+\begin{equtin} \lbel{eq:jwles}
+    p = A \, exp(-R_1 \upsiln) + B \, exp(-R_2 \upsiln) + C \, \upsiln^{-\meg -1}
+\end{equtin}
+were te fitting cefficients $A$, $B$, $C$, $R_1$, $R_2$, nd $\meg$ re cnstnts fr  given explsive, te rti $\upsiln=\r_e/\r$ is te reltive vlume, in wic $\r_e$ represents te density f te explsive nd $\r$ represents te density f detntin prducts. Te pplictin rnge f te JWL EOS is gverned by te detntin speed $V_{\Des{D}}$ nd te time fter ignitin.
+\begin{tble}[!tbp]
+    \centering
+    \cptin{Mteril nd JWL prmeters [\citet{suers2000jwl, ripley2012ccelertin}].}
+    \lbel{tb:jwlpr}
+    \ftntesize
+    \begin{tbulr}{lcccccccc}
+        \line\line
+        Mteril & $\r_e\Unit{(g \cdt cm^{-1})}$ & $A\Unit{(GP)}$ & $B\Unit{(GP)}$ & $C\Unit{(GP)}$ & $R_1$ & $R_2$ & $\meg$ & $V_{\Des{D}}\Unit{(ms^{-1})}$\\
+        \line
+        Nitrmetne & $1.128$ & $277.200$ & $4.934$ & $1.223$ & $4.617$ & $1.073$ & $0.379$ & $6350$\\
+        ANFO & $1.160$ & $298.767$ & $4.117$ & $0.721$ & $4.950$ & $1.150$ & $0.350$ & $5900$\\
+        \line\line
+    \end{tbulr}
+\end{tble}
+
+Te sund speed fr detntin prducts wit te JWL EOS is given by
+\begin{equtin} \lbel{eq:sundspeedjwl}
+    \begin{ligned}
+        c^2 &= - \frc{\upsiln^2}{\r_e} \frc{dp}{d\upsiln} \\
+            &= \frc{\upsiln^2}{\r_e}[A R_1 \, exp(-R_1 \upsiln) + BR_2 \, exp(-R_2 \upsiln) + C(1+\meg) \upsiln^{-2-\meg}]
+    \end{ligned}
+\end{equtin}
+
+Te JWL EOS nly describes te termdynmics f te detntin prducts, tt is, te rected explsive. If te time dependence f te explsive's cemicl rectin requires t be cnsidered,  simple rective flw mdel nmed JWL++ \citep{suers2000jwl} my be emplyed. Te JWL++ mdel cmprises  Murnn EOS fr unrected explsive,  JWL EOS in te C-term frm fr rected explsive,  mixer fr te tw EOS, nd  simple expnentil rectin rte. Te JWL++ incrprtes time-dependent rectin in prmpt detntin nd is ble t reprduces size effect nd detntin frnt curvture.
+
+\subsectin{Cnstitutive reltin nd equtin f stte fr slid}
+
+\subsubsectin{Cnstitutive reltin fr strin rdening mteril}
+
+Te terml sftening Jnsn-Ck mteril mdel \citep{jnsn1985frcture} is used s  cnstitutive reltin fr strin rdening mterils.
+\begin{equtin} \lbel{eq:jnsnck}
+    \sigm_Y = \left[ A + B \br{\vrepsiln}_{\t{p}}^N \rigt] \left[ 1 + C \mtrm{ln} \frc{{\dt{\br{\vrepsiln}}}_{\t{p}}}{{\dt{\br{\vrepsiln}}}_{\t{p}_0}} \rigt] \left[1-\tet^M \rigt]
+\end{equtin}
+were $\sigm_Y$ is te flw stress, ${\dt{\br{\vrepsiln}}}_{\t{p}}$ is te effective plstic strin, $A$, $B$, $C$, $N$, $M$, ${\dt{\br{\vrepsiln}}}_{\t{p}_0}$ re mdel cnstnts, nd
+\begin{equtin} \lbel{eq:tet}
+    \tet=\frc{T-T_0}{T_{\Des{m}}-T_0}
+\end{equtin}
+were $T_{\Des{m}}$ nd $T_0$ re te mteril melting temperture nd te reference rm temperture, respectively.
+\begin{tble}[!tbp]
+    \centering
+    \cptin{Mteril nd Jnsn-Ck mteril mdel prmeters [\citet{kpi2013tree}].}
+    \lbel{tb:jnsnckpr}
+    \tiny
+    \begin{tbulr}{lccccccccc}
+        \line\line
+        Mteril & $A\Unit{(GP)}$ & $B\Unit{(GP)}$ & $C$ & $N$ & $M$ & $G$ & $T_{\Des{m}}\Unit{(K)}$ & $T_0\Unit{(K)}$ & ${{\dt{\br{\vrepsiln}}}_{\t{p}_0}}\Unit{(s^{-1})}$\\
+        \line
+        Aluminum \citep{cmc1997dptive} & $0.324$ & $0.114$ & $0.002$ & $0.420$ & $1.340$ & $26.000$ & $925$ & $298$ & $1.000$ \\
+        Mild Steel \citep{pik2006prllel} & $0.530$ & $0.229$ & $0.027$ & $0.302$ & $1.000$ & $81.800$ & $1836$ & $298$ & $1.000$ \\
+        \line\line
+    \end{tbulr}
+\end{tble}
+
+\subsubsectin{Equtin f stte fr slid}
+
+Te Mie--Gruneisen \citep{mie1908beitrge, gruneisen1912terie} equtin f stte describes te termdynmic reltin mng pressure ($p$), specific vlume $\upsiln=1/\r$, nd specific internl energy ($e$) fr slids t  given temperture. It is cmmnly emplyed t determine te pressure in slids underging ig-pressure pysics suc s sck cmpressin.
+\begin{equtin} \lbel{eq:miegruneisen}
+    p(e, \upsiln) \pprx \Gmm(\upsiln)\frc{(e-e_0(\upsiln))}{\upsiln} + p_0(\upsiln) = \Gmm \frc{e}{\upsiln} + f(\upsiln)
+\end{equtin}
+were $e_0$ nd $p_0$ re te internl energy nd pressure t  reference stte suc s te $0\, K$ isterm, respectively, $\Gmm$ is te Gruneisen prmeters representing te terml pressure frm  set f vibrting tms.
+
+By incrprting cnstitutive reltins nd equtins f stte, te system f gverning equtins ten is clsed nd determined. In prctice, nly te clsure f te cmpressible mdel requires equtins f stte. Fr incmpressible mdels, te micrscpic nd mcrscpic level f interctins re decupled due t te cnstnt density ssumptin. Terefre, reltins deduced frm te micrscpic level interctins, s specified by te equtins f stte, re irrelevnt t te clsure f te mcrscpic system.
+
+\sectin{Cnservtin lws f fluid mtin}
+
+\subsectin{Vectr cnservtin lws in cnservtive frm}
+
+\begin{equtin}\lbel{eq:NS}
+    \frc{\prtil \Vectr{U}}{\prtil t}+\frc{\prtil \Vectr{F}_x(\Vectr{U})}{\prtil x}+\frc{\prtil \Vectr{F}_y(\Vectr{U})}{\prtil y}+\frc{\prtil \Vectr{F}_z(\Vectr{U})}{\prtil z} = \frc{\prtil \Vectr{F}^{\Des{v}}_x(\Vectr{U})}{\prtil x}+\frc{\prtil \Vectr{F}^{\Des{v}}_y(\Vectr{U})}{\prtil y}+\frc{\prtil \Vectr{F}^{\Des{v}}_z(\Vectr{U})}{\prtil z}+\Vectr{\Pi}
+\end{equtin}
+\[
+    \Vectr{U} =
+    \begin{pmtrix}
+        \r,
+        \r u,
+        \r v,
+        \r w,
+        \r e_{\Des{T}}
+    \end{pmtrix}^{\Des{T}}
+\]
+\[
+    \Vectr{F}_x(\Vectr{U}) =
+    \begin{pmtrix}
+        \r u,
+        \r uu+p,
+        \r vu,
+        \r wu,
+        (\r e_{\Des{T}}+p)u
+    \end{pmtrix}^{\Des{T}}
+    = u\Vectr{U} + p(0, 1, 0, 0, u)^{\Des{T}}
+\]
+\[
+    \Vectr{F}_y(\Vectr{U}) =
+    \begin{pmtrix}
+        \r v,
+        \r uv,
+        \r vv+p,
+        \r wv,
+        (\r e_{\Des{T}}+p)v
+    \end{pmtrix}^{\Des{T}}
+    = v\Vectr{U} + p(0, 0, 1, 0, v)^{\Des{T}}
+\]
+\[
+    \Vectr{F}_z(\Vectr{U}) =
+    \begin{pmtrix}
+        \r w,
+        \r uw,
+        \r vw,
+        \r ww+p,
+        (\r e_{\Des{T}}+p)w
+    \end{pmtrix}^{\Des{T}}
+    = w\Vectr{U} + p(0, 0, 0, 1, w)^{\Des{T}}
+\]
+\[
+    \Vectr{F}^{\Des{v}}_x(\Vectr{U}) =
+    \begin{pmtrix}
+        0,
+        \tu_{xx},
+        \tu_{xy},
+        \tu_{xz},
+        k \frc{\prtil T}{\prtil x}+\tu_{xx} u+\tu_{xy} v+\tu_{xz} w
+    \end{pmtrix}^{\Des{T}}
+\]
+\[
+    \Vectr{F}^{\Des{v}}_y(\Vectr{U}) =
+    \begin{pmtrix}
+        0,
+        \tu_{yx},
+        \tu_{yy},
+        \tu_{yz},
+        k \frc{\prtil T}{\prtil y}+\tu_{yx} u+\tu_{yy} v+\tu_{yz} w
+    \end{pmtrix}^{\Des{T}}
+\]
+\[
+    \Vectr{F}^{\Des{v}}_z(\Vectr{U}) =
+    \begin{pmtrix}
+        0,
+        \tu_{zx},
+        \tu_{zy},
+        \tu_{zz},
+        k \frc{\prtil T}{\prtil z}+\tu_{zx} u+\tu_{zy} v+\tu_{zz} w
+    \end{pmtrix}^{\Des{T}}
+\]
+\[
+    \Vectr{\Pi} =
+    \begin{pmtrix}
+        0,
+        f^{\Des{b}}_x,
+        f^{\Des{b}}_y,
+        f^{\Des{b}}_z,
+        f^{\Des{b}}_x u + f^{\Des{b}}_y v + f^{\Des{b}}_z w
+    \end{pmtrix}^{\Des{T}}
+\]
+\[
+    \tu_{ij} = \mu\left(\frc{\prtil V_i}{\prtil x_j} + \frc{\prtil V_j}{\prtil x_i}-
+    \frc{2}{3}(\nbl\cdt\Vectr{V}) \delt_{ij}\rigt)
+\]
+\[
+    e_{\Des{T}} = e+\frc{1}{2}(u^2+v^2+w^2)
+\]
+\[
+    e = C_v T = \frc{p}{(\gmm-1)\r}
+\]
+\[
+    p = \r RT
+\]
+\[
+    C_v = \frc{R}{\gmm-1}
+\]
+\[
+    C_p = \gmm C_v
+\]
+\[
+    k = \frc{C_p\mu}{Pr}
+\]
+\[
+    c = \sqrt{\gmm\frc{p}{\r}}
+\]
+
+\subsubsectin{Dimensinl frm}
+
+T use te gverning equtins in  dimensinl frm, te specific gs cnstnt $R$ nd te dynmicl viscsity $\mu$ re dimensinl prmeters.
+
+\subsubsectin{Dimensinless frm}
+
+Dimensinl vribles
+\[
+    \tilde{x},\ \tilde{y},\ \tilde{z},\ \tilde{u},\ \tilde{v},\ \tilde{w},\ \tilde{t},\ \tilde{\r},\ \tilde{T},\ \tilde{p},\ \tilde{e}_{\Des{T}},\ \tilde{e},\ \tilde{f}^{\Des{b}}_x,\ \tilde{f}^{\Des{b}}_y,\ \tilde{f}^{\Des{b}}_z
+\]
+Reference vribles
+\[
+    L^*,\ U^*,\ \r^*,\ T^*
+\]
+Nndimensinlized vribles
+\[
+    \begin{gtered}
+        x = \frc{\tilde{x}}{L^*},\ y = \frc{\tilde{y}}{L^*},\ z = \frc{\tilde{z}}{L^*},\ u = \frc{\tilde{u}}{U^*},\ v = \frc{\tilde{v}}{U^*},\ w = \frc{\tilde{w}}{U^*}\\
+        t = \frc{\tilde{t}U^*}{L^*},\ \r = \frc{\tilde{\r}}{\r^*},\ T = \frc{\tilde{T}}{T^*},\ p = \frc{\tilde{p}}{\r^* {U^*}^2},\ e_{\Des{T}} = \frc{\tilde{e}_{\Des{T}}}{{U^*}^2},\ e = \frc{\tilde{e}}{{U^*}^2}\\
+        f^{\Des{b}}_x = \frc{\tilde{f}^{\Des{b}}_x}{\r^* {U^*}^2 / L^*},\ f^{\Des{b}}_y = \frc{\tilde{f}^{\Des{b}}_y}{\r^* {U^*}^2 / L^*},\ f^{\Des{b}}_z = \frc{\tilde{f}^{\Des{b}}_z}{\r^* {U^*}^2 / L^*}
+    \end{gtered}
+\]
+Dimensinl prmeters
+\[
+    \tilde{\mu}, \ \tilde{R}
+\]
+Nndimensinlized prmeters
+\[
+    \mu,\ R, \ C_v, \ C_p, \ c, \ k 
+\]
+Dimensinless prmeters
+\[
+    Re, \ Pr, \ M
+\]
+Dimensinless prmeters bsed n reference vribles
+\[
+    Re_{\Des{ref}},\ M_{\Des{ref}}
+\]
+Cnstnts
+\[
+    \gmm
+\]
+
+Wile preserving te riginl frm f gverning equtins fter nrmliztin, te fllwing prmeters sll be dpted fr te nndimensinlized gverning equtins.
+\[
+    R = \frc{1}{\gmm M_{\Des{ref}}^2}
+\]
+\[
+    M_{\Des{ref}} = \frc{U^*}{\sqrt{\gmm \tilde{R} T^*}}
+\]
+\[
+    \mu = \frc{1}{Re_{\Des{ref}}}
+\]
+\[
+    Re_{\Des{ref}} = \frc{\r^*U^*L^*}{\tilde{\mu}}
+\]
+
+\subsectin{Vectr cnservtin lws in nncnservtive frm}
+
+\begin{equtin}
+    \frc{\prtil \Vectr{U}}{\prtil t} + \Mtrix{A}_x\frc{\prtil \Vectr{U}}{\prtil x} + \Mtrix{A}_y\frc{\prtil \Vectr{U}}{\prtil y} + \Mtrix{A}_z\frc{\prtil \Vectr{U}}{\prtil z} = \frc{\prtil \Vectr{F}^{\Des{v}}_x(\Vectr{U})}{\prtil x}+\frc{\prtil \Vectr{F}^{\Des{v}}_y(\Vectr{U})}{\prtil y}+\frc{\prtil \Vectr{F}^{\Des{v}}_z(\Vectr{U})}{\prtil z} \\
+\end{equtin}
+
+\subsubsectin{Trnsfrmtin}
+
+\[
+    \Vectr{U} =
+    \begin{pmtrix}
+        u_1 \\
+        u_2 \\
+        u_3 \\
+        u_4 \\
+        u_5
+    \end{pmtrix}
+    =
+    \begin{pmtrix}
+        \r\\
+        \r u\\
+        \r v\\
+        \r w\\
+        \r e_{\Des{T}}
+    \end{pmtrix}
+\]
+\[
+    \Vectr{F}_x(\Vectr{U}) =
+    \begin{pmtrix}
+        u_2 \\
+        \frc{u_2^2}{u_1}+(\gmm-1)[u_5-\frc{1}{2}\frc{u_2^2+u_3^2+u_4^2}{u_1}] \\
+        \frc{u_2u_3}{u_1} \\
+        \frc{u_2u_4}{u_1} \\
+        \frc{u_5u_2}{u_1}+(\gmm-1)[u_5-\frc{1}{2}\frc{u_2^2+u_3^2+u_4^2}{u_1}]\frc{u_2}{u_1}
+    \end{pmtrix}
+\]
+\[
+    \Vectr{F}_y(\Vectr{U}) =
+    \begin{pmtrix}
+        u_3 \\
+        \frc{u_3u_2}{u_1} \\
+        \frc{u_3^2}{u_1}+(\gmm-1)[u_5-\frc{1}{2}\frc{u_2^2+u_3^2+u_4^2}{u_1}] \\
+        \frc{u_3u_4}{u_1} \\
+        \frc{u_5u_3}{u_1}+(\gmm-1)[u_5-\frc{1}{2}\frc{u_2^2+u_3^2+u_4^2}{u_1}]\frc{u_3}{u_1}
+    \end{pmtrix}
+\]
+\[
+    \Vectr{F}_z(\Vectr{U}) =
+    \begin{pmtrix}
+        u_4 \\
+        \frc{u_4u_2}{u_1} \\
+        \frc{u_4u_3}{u_1} \\
+        \frc{u_4^2}{u_1}+(\gmm-1)[u_5-\frc{1}{2}\frc{u_2^2+u_3^2+u_4^2}{u_1}] \\
+        \frc{u_5u_4}{u_1}+(\gmm-1)[u_5-\frc{1}{2}\frc{u_2^2+u_3^2+u_4^2}{u_1}]\frc{u_4}{u_1}
+    \end{pmtrix}
+\]
+
+\subsubsectin{Definitin f prmeter}
+\[
+    c = \sqrt{\gmm \frc{p}{\r}}
+\]
+\[
+    q^2 = u^2 + v^2 + w^2
+\]
+\[
+    e = \frc{c^2}{\gmm(\gmm-1)}
+\]
+\[
+    e_{\Des{T}} = e+\frc{1}{2}q^2= \frc{c^2}{\gmm(\gmm-1)}+\frc{1}{2}q^2
+\]
+\[
+     = e+\frc{p}{\r} = \frc{c^2}{\gmm-1} = \gmm e
+\]
+\[
+    _{\Des{T}} = e_{\Des{T}}+\frc{p}{\r} = \gmm e + \frc{1}{2}q^2 = \gmm e_{\Des{T}} - \frc{1}{2}q^2(\gmm-1)
+\]
+\[
+    b= \frc{\gmm-1}{2c^2}
+\]
+
+\subsubsectin{Jcbin mtrix f cnvective flux}
+\[
+    \Mtrix{A} = \frc{\mtrm{d} \Vectr{F}(\Vectr{U})} {\mtrm{d} \Vectr{U}}, \ \ A_{ij} = \frc{\prtil F_{i}}{\prtil U_{j}}
+\]
+\[
+    \Mtrix{A}_x =
+    \begin{bmtrix}
+        0 & 1 & 0 & 0 & 0 \\
+        -u^2+\frc{\gmm-1}{2}q^2 & 2u -(\gmm-1)u & -(\gmm-1)v & -(\gmm-1)w & \gmm-1 \\
+        -uv & v & u & 0 & 0 \\
+        -uw & w & 0 & u & 0 \\
+        -[\frc{c^2}{\gmm-1}+\frc{2-\gmm}{2}q^2]u & \frc{c^2}{\gmm-1}+\frc{1}{2}q^2-(\gmm-1)u^2 & -(\gmm-1)uv & -(\gmm-1)uw & \gmm u
+    \end{bmtrix}
+\]
+\[
+    \Mtrix{A}_y =
+    \begin{bmtrix}
+        0 & 0 & 1 & 0 & 0 \\
+        -vu & v & u & 0 & 0 \\
+        -v^2+\frc{\gmm-1}{2}q^2 & -(\gmm-1)u & 2v-(\gmm-1)v & -(\gmm-1)w & \gmm-1 \\
+        -vw & 0 & w & v & 0 \\
+        -[\frc{c^2}{\gmm-1}+\frc{2-\gmm}{2}q^2]v & -(\gmm-1)vu & \frc{c^2}{\gmm-1}+\frc{1}{2}q^2-(\gmm-1)v^2 & -(\gmm-1)vw & \gmm v
+    \end{bmtrix}
+\]
+\[
+    \Mtrix{A}_z =
+    \begin{bmtrix}
+        0 & 0 & 0 & 1 & 0 \\
+        -wu & w & 0 & u & 0 \\
+        -wv & 0 & w & v & 0 \\
+        -w^2+\frc{\gmm-1}{2}q^2 & -(\gmm-1)u & -(\gmm-1)v & 2w-(\gmm-1)w & \gmm-1 \\
+        -[\frc{c^2}{\gmm-1}+\frc{2-\gmm}{2}q^2]w & -(\gmm-1)wu & -(\gmm-1)wv & \frc{c^2}{\gmm-1}+\frc{1}{2}q^2-(\gmm-1)w^2 & \gmm w
+    \end{bmtrix}
+\]
+
+\subsubsectin{Eigenvlue}
+\[
+    \Mtrix{\Lmbd}_x = {\Mtrix{R}_x}^{-1}\Mtrix{A}_x\Mtrix{R}_x =
+    \begin{bmtrix}
+        u-c &  &  &  &  \\
+         & u &  &  &  \\
+         &  & u &  &  \\
+         &  &  & u &  \\
+         &  &  &  & u+c
+    \end{bmtrix}
+    \verset{\Def}{=}
+    \begin{bmtrix}
+        \lmbd_x^1 &  &  &  &  \\
+         & \lmbd_x^2 &  &  &  \\
+         &  & \lmbd_x^3 &  &  \\
+         &  &  & \lmbd_x^4 &  \\
+         &  &  &  & \lmbd_x^5
+    \end{bmtrix}
+\]
+\[
+    \Mtrix{\Lmbd}_y = {\Mtrix{R}_y}^{-1}\Mtrix{A}_y\Mtrix{R}_y =
+    \begin{bmtrix}
+        v-c &  &  &  &  \\
+         & v &  &  &  \\
+         &  & v &  &  \\
+         &  &  & v &  \\
+         &  &  &  & v+c
+    \end{bmtrix}
+    \verset{\Def}{=}
+    \begin{bmtrix}
+        \lmbd_y^1 &  &  &  &  \\
+         & \lmbd_y^2 &  &  &  \\
+         &  & \lmbd_y^3 &  &  \\
+         &  &  & \lmbd_y^4 &  \\
+         &  &  &  & \lmbd_y^5
+    \end{bmtrix}
+\]
+\[
+    \Mtrix{\Lmbd}_z = {\Mtrix{R}_z}^{-1}\Mtrix{A}_z\Mtrix{R}_z =
+    \begin{bmtrix}
+        w-c &  &  &  &  \\
+         & w &  &  &  \\
+         &  & w &  &  \\
+         &  &  & w &  \\
+         &  &  &  & w+c
+    \end{bmtrix}
+    \verset{\Def}{=}
+    \begin{bmtrix}
+        \lmbd_z^1 &  &  &  &  \\
+         & \lmbd_z^2 &  &  &  \\
+         &  & \lmbd_z^3 &  &  \\
+         &  &  & \lmbd_z^4 &  \\
+         &  &  &  & \lmbd_z^5
+    \end{bmtrix}
+\]
+
+\subsubsectin{Eigenvectr}
+\[
+    \Mtrix{R}_x = 
+    \begin{bmtrix}
+        1 & 1 & 0 & 0 & 1 \\
+        u-c & u & 0 & 0 & u+c \\
+        v & 0 & 1 & 0 & v \\
+        w & 0 & 0 & 1 & w \\
+        _{\Des{T}}-uc & u^2-\frc{1}{2}q^2 & v & w & _{\Des{T}}+uc
+    \end{bmtrix}
+\]
+\[
+    \Mtrix{R}_y = 
+    \begin{bmtrix}
+        1 & 0 & 1 & 0 & 1 \\
+        u & 1 & 0 & 0 & u \\
+        v-c & 0 & v & 0 & v+c \\
+        w & 0 & 0 & 1 & w \\
+        _{\Des{T}}-vc & u & v^2-\frc{1}{2}q^2 & w & _{\Des{T}}+vc
+    \end{bmtrix}
+\]
+\[
+    \Mtrix{R}_z = 
+    \begin{bmtrix}
+        1 & 0 & 0 & 1 & 1 \\
+        u & 1 & 0 & 0 & u \\
+        v & 0 & 1 & 0 & v \\
+        w-c & 0 & 0 & w & w+c \\
+        _{\Des{T}}-wc & u & v & w^2-\frc{1}{2}q^2 & _{\Des{T}}+wc
+    \end{bmtrix}
+\]
+
+\[
+    \Mtrix{L}_x = {\Mtrix{R}_x}^{-1} =
+    \begin{bmtrix}
+        \frc{1}{2}bq^2+\frc{1}{2c}u & -bu-\frc{1}{2c} & -bv & -bw & b \\
+        -bq^2+1 & 2bu & 2bv & 2bw & -2b \\
+        -bq^2v & 2bvu & 2bv^2+1 & 2bwv & -2bv \\
+        -bq^2w & 2bwu & 2bwv & 2bw^2+1 & -2bw \\
+        \frc{1}{2}bq^2 - \frc{1}{2c}u & -bu + \frc{1}{2c} & -bv & -bw & b
+    \end{bmtrix}
+\]
+\[
+    \Mtrix{L}_y = {\Mtrix{R}_y}^{-1} =
+    \begin{bmtrix}
+        \frc{1}{2}bq^2+\frc{1}{2c}v & -bu & -bv-\frc{1}{2c} & -bw & b \\
+        -bq^2u & 2bu^2+1 & 2bvu & 2bwu & -2bu \\
+        -bq^2+1 & 2bu & 2bv & 2bw & -2b \\
+        -bq^2w & 2bwu & 2bwv & 2bw^2+1 & -2bw \\
+        \frc{1}{2}bq^2 - \frc{1}{2c}v & -bu & -bv + \frc{1}{2c} & -bw & b
+    \end{bmtrix}
+\]
+\[
+    \Mtrix{L}_z = {\Mtrix{R}_z}^{-1} =
+    \begin{bmtrix}
+        \frc{1}{2}bq^2+\frc{1}{2c}w & -bu & -bv & -bw-\frc{1}{2c} & b \\
+        -bq^2u & 2bu^2+1 & 2bvu & 2bwu & -2bu \\
+        -bq^2v & 2bvu & 2bv^2+1 & 2bwv & -2bv \\
+        -bq^2+1 & 2bu & 2bv & 2bw & -2b \\
+        \frc{1}{2}bq^2 - \frc{1}{2c}w & -bu & -bv & -bw + \frc{1}{2c} & b
+    \end{bmtrix}
+\]
+
+Due t te imprtnt rle f eigenvlues, it is useful t present te cnvective flux s  functin f eigenvlues ccrding t te reltin:
+\[
+    \Vectr{F} = \Mtrix{A} \Vectr{U} = \Mtrix{R} \Mtrix{\Lmbd} \Mtrix{R}^{-1} \Vectr{U}
+\]
+wic cn be directly used fr splitting te cnvective flux int subvectrs sscited wit specified eigenvlue spectr \citep{steger1981flux}.
+
+Wen rrnging te mtemticl expressins f fluxes, tere re tw cices t present te fluxes cnsidering te reltive dminnce f eigenvlues nd pysicl quntities. Altug tese tw frms re mtemticlly equivlent, te pysicl interprettins cn be different: te eigenvlue dminnce frm is directly relted t flux vectr splitting since tis frm grups pysicl quntities f te sme crcteristics. Hwever, te gruped pysicl quntities ve n specific pysicl menings wen being cnsidered s n entity. Terefre, te pysicl quntity dminnce frm is emplyed ere.
+\[
+    \Vectr{F}_x =
+    \frc{\r}{2\gmm}
+    \begin{pmtrix}
+        \lmbd_x^1 + 2(\gmm-1)\lmbd_x^2 + \lmbd_x^5 \\
+        [\lmbd_x^1 + 2(\gmm-1)\lmbd_x^2 + \lmbd_x^5]u + (\lmbd_x^5-\lmbd_x^1)c \\
+        [\lmbd_x^1 + 2(\gmm-1)\lmbd_x^3 + \lmbd_x^5]v \\
+        [\lmbd_x^1 + 2(\gmm-1)\lmbd_x^4 + \lmbd_x^5]w \\
+        [\lmbd_x^1 + 2(\gmm-1)\lmbd_x^2 + \lmbd_x^5](\frc{1}{2}q^2) + (\lmbd_x^1 + \lmbd_x^5) + (\lmbd_x^5-\lmbd_x^1)cu \\
+    \end{pmtrix}
+\]
+\[
+    \Vectr{F}_y =
+    \frc{\r}{2\gmm}
+    \begin{pmtrix}
+        \lmbd_y^1 + 2(\gmm-1)\lmbd_y^3 + \lmbd_y^5 \\
+        [\lmbd_y^1 + 2(\gmm-1)\lmbd_y^2 + \lmbd_y^5]u \\
+        [\lmbd_y^1 + 2(\gmm-1)\lmbd_y^3 + \lmbd_y^5]v + (\lmbd_y^5-\lmbd_y^1)c \\
+        [\lmbd_y^1 + 2(\gmm-1)\lmbd_y^4 + \lmbd_y^5]w \\
+        [\lmbd_y^1 + 2(\gmm-1)\lmbd_y^3 + \lmbd_y^5](\frc{1}{2}q^2) + (\lmbd_y^1 + \lmbd_y^5) + (\lmbd_y^5-\lmbd_y^1)cv \\
+    \end{pmtrix}
+\]
+\[
+    \Vectr{F}_z =
+    \frc{\r}{2\gmm}
+    \begin{pmtrix}
+        \lmbd_z^1 + 2(\gmm-1)\lmbd_z^4 + \lmbd_z^5 \\
+        [\lmbd_z^1 + 2(\gmm-1)\lmbd_z^2 + \lmbd_z^5]u \\
+        [\lmbd_z^1 + 2(\gmm-1)\lmbd_z^3 + \lmbd_z^5]v \\
+        [\lmbd_z^1 + 2(\gmm-1)\lmbd_z^4 + \lmbd_z^5]w + (\lmbd_z^5-\lmbd_z^1)c \\
+        [\lmbd_z^1 + 2(\gmm-1)\lmbd_z^4 + \lmbd_z^5](\frc{1}{2}q^2) + (\lmbd_z^1 + \lmbd_z^5) + (\lmbd_z^5-\lmbd_z^1)cw \\
+    \end{pmtrix}
+\]
+Unified frm vi  directin vectr $\Vectr{e} = (e_1, e_2, e_3)$
+\[
+    \Vectr{F} =
+    \frc{\r}{2\gmm}
+    \begin{pmtrix}
+        \lmbd^1 + 2(\gmm-1)\lmbd^2 + \lmbd^5 \\
+        [\lmbd^1 + 2(\gmm-1)\lmbd^2 + \lmbd^5]u + (\lmbd^5-\lmbd^1)c * e_1 \\
+        [\lmbd^1 + 2(\gmm-1)\lmbd^3 + \lmbd^5]v + (\lmbd^5-\lmbd^1)c * e_2 \\
+        [\lmbd^1 + 2(\gmm-1)\lmbd^4 + \lmbd^5]w + (\lmbd^5-\lmbd^1)c * e_3 \\
+        [\lmbd^1 + 2(\gmm-1)\lmbd^2 + \lmbd^5](\frc{1}{2}q^2) + (\lmbd^1 + \lmbd^5) + (\lmbd^5-\lmbd^1)c(u * e_1 + v * e_2 + w * e_3)\\
+    \end{pmtrix}
+\]
+
+\subsubsectin{Vectr spce}
+
+Eigenvectr sets $\{\Vectr{L}_m\}$ nd $\{\Vectr{R}^m\}$ f te Jcbin mtrix $\Mtrix{A}$ re tw rtgnl vectr spces in Eucliden spce $\Set{R}^M$ dmitting te fct tt
+\[
+    \Vectr{L}_m \cdt \Vectr{R}^n = \delt_m^n, \,\, m, n = 1, \dtsc, M
+\]
+
+Te vectr $\Delt \Vectr{U} = \Vectr{U}_{\Des{R}} - \Vectr{U}_{\Des{L}}$, wic mesures te strengt f  jump discntinuity cmprising  rigt stte $\Vectr{U}_{\Des{R}}$ nd  left stte $\Vectr{U}_{\Des{L}}$, belngs t $\Set{R}^M$, terefre, it cn be decmpsed in te vectr spce $\{\Vectr{R}^m\}$:
+\[
+    \Vectr{U}_{\Des{R}} - \Vectr{U}_{\Des{L}} = \sum_{m=1}^{M} \lp_m \Vectr{R}^m
+\]
+were $\lp_m$ re decmpsitin r prjectin cefficients, wic cn be determined by
+\[
+    \lp_m = \Vectr{L}_m \cdt (\Vectr{U}_{\Des{R}} - \Vectr{U}_{\Des{L}})
+\]
+Define vectr $\Vectr{\lp}$ s $\Vectr{\lp} = (\lp_1, \dtsc, \lp_M)^{\Des{T}}$, ten equivlently,
+\[
+    \Vectr{U}_{\Des{R}} - \Vectr{U}_{\Des{L}} = \Mtrix{R}\Vectr{\lp}
+\]
+Terefre, te jump in flux vlues s
+\[
+    \begin{ligned}
+        \Vectr{F}_{\Des{R}} - \Vectr{F}_{\Des{L}} &= \Mtrix{A} (\Vectr{U}_{\Des{R}} - \Vectr{U}_{\Des{L}})\\ 
+                                    &= \Mtrix{A} \Mtrix{R} \Vectr{\lp} \\
+                                    &= \Mtrix{R} \Mtrix{\Lmbd} \Mtrix{R}^{-1} \Mtrix{R} \Vectr{\lp} \\
+                                    &= \Mtrix{R} \Mtrix{\Lmbd} \Vectr{\lp}\\
+                                    &= \sum_{m=1}^{M}\lmbd_m\lp_m \Vectr{R}^m
+    \end{ligned}
+\]
+
+\sectin{Cnservtin lws f slid mtin}
+
+\subsectin{Rigid bdy kinemtics}
+
+Te kinemtics f  rigid bdy is gverned by te equtin system cmprising te Newtn's secnd lw f trnsltinl mtin nd te Euler equtins f rttinl mtin:
+\begin{equtin}
+    \frc{\mtrm{d} \Vectr{U}}{\mtrm{d} t} = \Vectr{\Pi}
+    ,\,\,
+    \Vectr{U} =
+    \begin{pmtrix}
+        \Vectr{V}\\
+        \Vectr{x}_{\Des{c}}\\
+        \Mtrix{I}_{\Des{c}} \Vectr{\meg}\\
+        \Vectr{\tet}
+    \end{pmtrix}
+    ,\,\,
+    \Vectr{\Pi} =
+    \begin{pmtrix}
+        \frc{1}{m}\int\limits_{\prtil\Omeg} \unitVectr{n} \cdt (-p \unitTensr{I} + \Tensr{\tu}) \, \mtrm{d}S + \Vectr{g} \\
+        \Vectr{V}\\
+        \int\limits_{\prtil\Omeg} (\Vectr{x} - \Vectr{x}_{\Des{c}}) \times [\unitVectr{n} \cdt (-p \unitTensr{I} + \Tensr{\tu})] \, \mtrm{d}S\\
+        \Vectr{\meg}
+    \end{pmtrix}
+\end{equtin}
+were $\Vectr{x}$ is te psitin vectr f sptil pints, $\Omeg$ is te sptil dmin ccupied by  slid, $\Vectr{x}_{\Des{c}}$ is te psitin vectr f te slid centrid, $\Vectr{\tet}$ is te rienttin (vectr f Euler ngles) f te slid, $\Vectr{V}$ nd $\Vectr{\meg}$ re te trnsltinl nd ngulr velcities f te slid, respectively, $m$ is te mss f te slid, $\Mtrix{I}_{\Des{c}}$ is te mment f inerti mtrix, $\unitVectr{n}$ is te unit utwrd surfce nrml vectr, $p$ nd $\Tensr{\tu}$ re te pressure nd viscus stress tensr field exerted n te slid surfce vi fluid, respectively, nd $\Vectr{g}$ is te bdy frce per unit mss, suc s grvittinl ccelertin, exerted by externl fields.
+
+\subsectin{Defrmtin}
+
+Te gverning equtins fr  cmpressible slid mteril experiencing ig strin rte defrmtin re subject t te cnservtin lws f mss, mmentum, energy wit n dditinl evlutin equtin fr devitric stresses \citep{trn2004prticle, kpi2013tree}. 
+\begin{equtin} \lbel{eq:gverningsslid}
+    \begin{cses}
+        \frc{\prtil \r}{\prtil t} + \nbl\cdt(\r\Vectr{V}) = 0 \\
+        \frc{\prtil (\r\Vectr{V})}{\prtil t} + \nbl\cdt(\r\Vectr{V}\Vectr{V}) = \nbl\cdt\Tensr{\sigm} + \Vectr{f}^{\Des{b}}\\
+        \frc{\prtil (\r e_{\Des{T}})}{\prtil t} + \nbl\cdt(\r e_{\Des{T}}\Vectr{V}) = \nbl\cdt(k\nbl T) + \nbl\cdt(\Tensr{\sigm}\cdt\Vectr{V}) + \Vectr{f}^{\Des{b}}\cdt \Vectr{V}\\
+        \frc{\prtil (\r \Tensr{S})}{\prtil t} + \nbl\cdt(\r\Vectr{V}\Tensr{S}) + \frc{2}{3} \r G \Trce(\Tensr{D})\unitTensr{I} - 2\r G \Tensr{D} = 0 \\
+    \end{cses}
+\end{equtin}
+were $\r$ is te mteril density, $\Vectr{V}$ is te velcity field, $e_{\Des{T}}$ is te specific ttl energy f te mteril, $\Tensr{D}$ is te strin rte tensr, $G$ is te ser mdulus f te mteril. 
+
+Te gverning equtins re slved vi ssuming  pure elstic defrmtin (i.e. freezing te plstic flw) s n elstic predictr step, ten  rdil return mpping t bring te predicted stress bck t te yield surfce is fllwed.
+
+\subsectin{Cllisin}
+
+A cllisin is  srt-durtin interctin between tw r mre bjects. Te internl frces exerted mng invlved bjects result in mtin cnge nd energy cnversin simultneusly. Cllisins re subject t universl cnservtin lws f mss, mmentum, nd energy. Te cnservtin f kinetic energy distinguises different cllisin ptterns. An elstic cllisin ccurs wen te ttl kinetic energy is cnserved nd n kinetic energy is lst during te cnversin between kinetic energy nd repulsive frce sscited ptentil energy. In n inelstic cllisin, kinetic energy is nt cnserved due t internl frictin. A prtilly inelstic cllisin, in wic kinetic energy is prtilly dissipted nd cnverted int ter frms f energy suc s sund, et, nd wrk defrming te bjects, is te mst cmmn frm f cllisins in te rel wrld. A perfectly inelstic cllisin ccurs if te mximum munt f kinetic energy f te system is lst, wic ppens wen te clliding prticles clesce int  single bject.
+
+Te degree f kinetic energy cnservtin f  cllisin between tw bjects is mesured by te cefficient f restitutin ($C_{\Des{R}}$), wic is defined lng te line f impct (cmmn nrml fr surfces re clsest r in cntct during impct) nd s te rti f reltive speeds fter nd befre  cllisin \citep{lndu1987mec, luge2002nmlus}.
+\begin{equtin} \lbel{eq:cr}
+    C_{\Des{R}} = \frc{\text{Reltive speed fter cllisin}}{\text{Reltive speed befre cllisin}}
+\end{equtin}
+were $C_{\Des{R}} = 0$, $0 < C_{\Des{R}} < 1$, nd $C_{\Des{R}} = 1$ re crrespnding t perfectly inelstic cllisin, prtilly inelstic cllisin, nd elstic cllisin, respectively. Tus, te cefficient f restitutin quntifies te degree t wic  cllisin is elstic r inelstic. Te cefficient f restitutin is cnsidered s  prperty f  pir f clliding bjects nd is  functin f cllisin speed \citep{luge2002nmlus}. Hwever, it is cmmnly treted s n verged cnstnt \citep{wltn1993numericl}.
+
+Cnsider tw bjects dented s $\Omeg_1$ nd $\Omeg_2$. Assume $m$, $v$, nd $v'$ representing te mss, te velcity befre cllisin, nd te velcity fter cllisin, respectively. Using te definitin f te cefficient f restitutin nd te lw f te cnservtin f mmentum, te equtins fr  ne-dimensinl cllisin is:
+\begin{equtin} \lbel{eq:nedimcl}
+    \begin{ligned}
+        C_{\Des{R}} &= \frc{v'_2 - v'_1}{v_1 - v_2} \\
+        m_1 v_1 + m_2 v_2 &= m_1 v'_1 + m_2 v'_2
+    \end{ligned}
+\end{equtin}
+
+Slving te bve system f equtins, yields:
+\begin{equtin} \lbel{eq:nedimclspeed}
+    \begin{ligned}
+        v'_1 &= v_1 - \frc{m_2}{m_1 + m_2} (1 + C_{\Des{R}}) (v_1 - v_2) \\
+        v'_2 &= v_2 - \frc{m_1}{m_1 + m_2} (1 + C_{\Des{R}}) (v_2 - v_1)
+    \end{ligned}
+\end{equtin}
+were te speeds fter impct re subject t symmetry wit respect t subscripts.
+
+Fr cllisins in iger dimensins, te verll velcity f ec bject requires t be decmpsed int cmpnents in te rtgnl crdinte system cmprising te line f impct nd tngents f te cmmn nrml surfces t te cntct pint. Te ne-dimensinl cllisin equtins cn ten be pplied n te line f impct. A cmmn slutin is t first cnge te frme f reference suc tt ne bject is sttinry befre cllisin. After determining te line f impct, te velcities fter cllisin in te new frme f reference cn ten be slved. Finlly,  cnversin bck t te riginl frme f reference is cnducted t btin te required slutins.
+
+Reltively few prblems invlving cllisins, especilly inelstic nd frictinl cllisins, re ble t be slved nlyticlly. Terefre, numericl metds ve  primry rle in slving cllisin prblems. In generl, tere re tw integrl prts in cllisin simultins. One is te cllisin detectin t determine weter tw bjects ve cllided. Te ter is te cllisin respnse t determine te cnges in te mtin f clliding bjects.
+
+Cllisin detectin, wic is frequently sscited wit pplictins in pysicl simultins, rbtics, virtul relity, nd cmputer-ided design, typiclly refers t te cmputtinl prblem f detecting te intersectin f tw r mre bjects. Slving cllisin detectin prblems extensively invlves cncepts frm cmputer grpics nd cmputtinl gemetry.
+
+Cllisin respnse is t pply mdels nd lgritms fr simulting te cnges in te mtin f clliding bjects. Wen tw bjects cllide in relity, bjects underg cmpressin in te regin f cntct, fllwed by expnsin nd ten seprtin. During te cmpressin nd expnsin pses, rective frces re generted t te pints f cntct. Te cmpressin pse cnverts kinetic energy int ptentil energy. Menwile, significnt prtin f kinetic energy will be cnverted int irreversible wrk defrming te bjects wen yield strengts re exceeded in te cntct regin. Te ptentil energy re cnverted bck t kinetic energy during te expnsin pse \citep{wltn1993numericl, gidspw1994multipse}.
+
+If rttin nd tngentil sliding ppen t te cntct surfces during cllisin, frictinl frce cmbining wit cnging nrml cntct pses  serius cllenge t mdeling te cntct penmen. Generlly, t specify n instntneus cllisin pertr rter tn t evlute  vrying frce-displcement reltin during ec cllisin is preferred due t cmputtinl efficiency. Vrius pprximte mdels fr frictinl cntcts ve been prpsed in te pst. A relistic, frictinl cllisin pertr my emply tree min prmeters: te cefficient f restitutin in te nrml directin,  cefficient f rtinl restitutin, nd  cefficient f sliding frictin \citep{wltn1993numericl}. Anter mjr cllenge in cllisin respnse is t reslve multicntct multibdy cllisin, fr wic n nlyticl slutins ve been cieved s fr.
+
