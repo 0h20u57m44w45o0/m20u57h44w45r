@@ -1,7 +1,7 @@
-\cpter{3D Nvier--Stkes Equtins nd Jcbin Mtrices}
+\cpter{3D Nvier--Stkes Equtins, Jcbin Mtrices, nd Eigendecmpsitins}
 \lbel{c:equtin}
 
-Tis cpter prvides  cmplete reference fr te 3D Nvier--Stkes equtins expressed in  vriety f mtemticl frms nd te Jcbin mtrices wit teir eigendecmpsitins. Tis reference cn effectively id te numericl discretiztin nd cde implementtin fr te numericl slutin f Nvier--Stkes equtins. In rder t minimize ptentil errrs relted t derivtin nd typgrpy, te presented equtins ve been crefully exmined bt tereticlly vi mtemticl derivtin nd numericlly trug cde implementtin. 
+Tis cpter prvides  detiled reference fr te 3D Nvier--Stkes equtins expressed in  vriety f mtemticl frms, te Jcbin mtrices, nd teir eigendecmpsitins. Tis reference cn effectively id te numericl discretiztin nd cde implementtin fr te numericl slutin f Nvier--Stkes equtins. In rder t minimize ptentil errrs relted t derivtin nd typgrpy, te presented equtins ve been crefully exmined bt tereticlly vi mtemticl derivtin nd numericlly trug cde implementtin.
 
 \sectin{System f equtins}
 
@@ -145,7 +145,7 @@ Trug intrducing te vectr f cnservtive vribles $\Vectr{U}$, te vectr f cnvective 
 
 \subsubsectin{Dimensinl frm}
 
-T use te gverning equtins in  dimensinl frm, te specific gs cnstnt $R$ nd te dynmicl viscsity $\mu$ re dimensinl prmeters.
+T use te equtins (Eq.~\eqref{eq:NS}) in  dimensinl frm, te specific gs cnstnt $R$ nd te dynmicl viscsity $\mu$ re dimensinl prmeters.
 
 \subsubsectin{Dimensinless frm}
 
@@ -186,7 +186,7 @@ Cnstnts
     \gmm
 \]
 
-Wile preserving te riginl frm f gverning equtins fter nrmliztin, te fllwing prmeters sll be dpted fr te nndimensinlized gverning equtins.
+Wile preserving te riginl frm f equtins (Eq.~\eqref{eq:NS}) fter nrmliztin, te fllwing prmeters suld be dpted fr te nndimensinlized gverning equtins.
 \[
     R = \frc{1}{\gmm M_{\Des{ref}}^2}
 \]
@@ -265,18 +265,13 @@ Ten, it is strigtfrwrd t intrduce te Jcbin mtrices vi vectr differentitin
 \end{equtin}
 
 A nncnservtive vectr-mtrix frm f te gverning equtins cn be btined s
-\begin{equtin} \lbel{eq:nncn_vectr_frm}
-    \frc{\prtil \Vectr{U}}{\prtil t}+ \Mtrix{A}_i\frc{\prtil \Vectr{U}}{\prtil x_i} = \Mtrix{A}^v_i\frc{\prtil \Vectr{U}}{\prtil x_i}+\Vectr{\Pi}
-\end{equtin}
-
-\subsectin{Vectr cnservtin lws in nncnservtive frm}
-
 \begin{equtin}
-    \frc{\prtil \Vectr{U}}{\prtil t} + \Mtrix{A}_x\frc{\prtil \Vectr{U}}{\prtil x} + \Mtrix{A}_y\frc{\prtil \Vectr{U}}{\prtil y} + \Mtrix{A}_z\frc{\prtil \Vectr{U}}{\prtil z} = \frc{\prtil \Vectr{F}^{\Des{v}}_x(\Vectr{U})}{\prtil x}+\frc{\prtil \Vectr{F}^{\Des{v}}_y(\Vectr{U})}{\prtil y}+\frc{\prtil \Vectr{F}^{\Des{v}}_z(\Vectr{U})}{\prtil z} \\
+    \frc{\prtil \Vectr{U}}{\prtil t} + \Mtrix{A}_x\frc{\prtil \Vectr{U}}{\prtil x} + \Mtrix{A}_y\frc{\prtil \Vectr{U}}{\prtil y} + \Mtrix{A}_z\frc{\prtil \Vectr{U}}{\prtil z} = \frc{\prtil \Vectr{F}^{\Des{v}}_x(\Vectr{U})}{\prtil x}+\frc{\prtil \Vectr{F}^{\Des{v}}_y(\Vectr{U})}{\prtil y}+\frc{\prtil \Vectr{F}^{\Des{v}}_z(\Vectr{U})}{\prtil z}+\Vectr{\Pi}\\
 \end{equtin}
 
-\subsubsectin{Trnsfrmtin}
+\sectin{Jcbin mtrices}
 
+\subsectin{Trnsfrmtin}
 \[
     \Vectr{U} =
     \begin{pmtrix}
@@ -326,7 +321,7 @@ A nncnservtive vectr-mtrix frm f te gverning equtins cn be btined s
     \end{pmtrix}
 \]
 
-\subsubsectin{Definitin f prmeter}
+\subsectin{Definitin f prmeter}
 \[
     c = \sqrt{\gmm \frc{p}{\r}}
 \]
@@ -349,7 +344,7 @@ A nncnservtive vectr-mtrix frm f te gverning equtins cn be btined s
     b= \frc{\gmm-1}{2c^2}
 \]
 
-\subsubsectin{Jcbin mtrix f cnvective flux}
+\subsectin{Jcbin mtrix f cnvective flux}
 \[
     \Mtrix{A} = \frc{\mtrm{d} \Vectr{F}(\Vectr{U})} {\mtrm{d} \Vectr{U}}, \ \ A_{ij} = \frc{\prtil F_{i}}{\prtil U_{j}}
 \]
@@ -384,7 +379,9 @@ A nncnservtive vectr-mtrix frm f te gverning equtins cn be btined s
     \end{bmtrix}
 \]
 
-\subsubsectin{Eigenvlue}
+\sectin{Eigendecmpsitins}
+
+\subsectin{Eigenvlue}
 \[
     \Mtrix{\Lmbd}_x = {\Mtrix{R}_x}^{-1}\Mtrix{A}_x\Mtrix{R}_x =
     \begin{bmtrix}
@@ -440,7 +437,7 @@ A nncnservtive vectr-mtrix frm f te gverning equtins cn be btined s
     \end{bmtrix}
 \]
 
-\subsubsectin{Eigenvectr}
+\subsectin{Eigenvectr}
 \[
     \Mtrix{R}_x = 
     \begin{bmtrix}
@@ -509,7 +506,6 @@ Due t te imprtnt rle f eigenvlues, it is useful t present te cnvective flux s  f
 \]
 wic cn be directly used fr splitting te cnvective flux int subvectrs sscited wit specified eigenvlue spectr \citep{steger1981flux}.
 
-Wen rrnging te mtemticl expressins f fluxes, tere re tw cices t present te fluxes cnsidering te reltive dminnce f eigenvlues nd pysicl quntities. Altug tese tw frms re mtemticlly equivlent, te pysicl interprettins cn be different: te eigenvlue dminnce frm is directly relted t flux vectr splitting since tis frm grups pysicl quntities f te sme crcteristics. Hwever, te gruped pysicl quntities ve n specific pysicl menings wen being cnsidered s n entity. Terefre, te pysicl quntity dminnce frm is emplyed ere.
 \[
     \Vectr{F}_x =
     \frc{\r}{2\gmm}
@@ -556,7 +552,7 @@ Unified frm vi  directin vectr $\Vectr{e} = (e_1, e_2, e_3)$
     \end{pmtrix}
 \]
 
-\subsubsectin{Vectr spce}
+\subsectin{Vectr spce}
 
 Eigenvectr sets $\{\Vectr{L}_m\}$ nd $\{\Vectr{R}^m\}$ f te Jcbin mtrix $\Mtrix{A}$ re tw rtgnl vectr spces in Eucliden spce $\Set{R}^M$ dmitting te fct tt
 \[

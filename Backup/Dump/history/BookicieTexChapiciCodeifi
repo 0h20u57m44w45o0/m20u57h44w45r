@@ -3,7 +3,9 @@
 
 In numericl slutins, errrs re intrduced in  vriety f pses suc s pysicl mdeling, gemetric representtin, cmputer flting pint ritmetic, itertin, nd numericl discretiztin. Tis cpter presents sme dditinl verifictin nd vlidtin f te develped cmputtinl fluid dynmics cde, prticulrly cncerning strdrd sck tube prblems. Te bjective is t furter demnstrte te vlidity nd ccurcy f te numericl slver nd its implementtin.
 
-\sectin{Cnvergence test}
+In te fllwing discussins, fr te purpse f clrity, te nttin "RKn-WENOm-XX" is used t represent  slutin slved by te n-t rder Runge--Kutt sceme fr time integrtin, m-t rder WENO sceme fr sptil discretiztin, nd "XX" fr flux splitting wit "XX=LF" nd "XX=SW" representing te Lx--Friedrics \citep{lx1957yperblic} nd Steger--Wrming \citep{steger1981flux} splitting, respectively.
+
+\sectin{Cnvergence test n smt flw}
 
 \subsectin{Vrtex preservtin prblem}
 
@@ -44,7 +46,7 @@ Te bckgrund flw is csen s $(\r_{\infty}, u_{\infty}, v_{\infty}, p_{\infty}) = (
     \lbel{fig:vrtex_preserve}
 \end{figure}
 
-RK3-WENO3-LF nd RK3-WENO5-LF wit dimensin-by-dimensin r dimensinl-splitting pprximtin re tested nd re swn in Tble~\ref{tb:cnverge_dimbydim_prev_wen3}, Tble~\ref{tb:cnverge_dimsplit_prev_wen3}, Tble~\ref{tb:cnverge_dimbydim_prev_wen5}, nd Tble~\ref{tb:cnverge_dimsplit_prev_wen5}, respectively. Fr te successively refined grids used erein, te csen CFL number is smll enug t prduce  temprl step size tt lds dwn te errrs frm temprl discretiztin nd vids ffecting te sptil ccurcy. As cptured by te results, te cde is perting clsely t its designed ccurcy. In dditin, te bserved glbl cnvergence rtes f RK3-WENO5-LF grees wit te results in \citep{blsr2000mntnicity}. Te current results present very similr perfrmnce fr te dimensin-by-dimensin nd dimensinl-splitting pprces fr slving multidimensinl prblems.
+RK3-WENO3-LF nd RK3-WENO5-LF wit dimensin-by-dimensin r dimensinl-splitting pprximtin re tested nd re swn in Tble~\ref{tb:cnverge_dimbydim_prev_wen3}, Tble~\ref{tb:cnverge_dimsplit_prev_wen3}, Tble~\ref{tb:cnverge_dimbydim_prev_wen5}, nd Tble~\ref{tb:cnverge_dimsplit_prev_wen5}, respectively. Fr te successively refined grids used erein, te csen CFL number is smll enug t prduce  temprl step size tt lds dwn te errrs frm temprl discretiztin nd vids ffecting te sptil ccurcy. As cptured by te results, te cde is perting clsely t its designed ccurcy. In dditin, te bserved glbl cnvergence rtes f RK3-WENO5-LF grees wit te results in \citep{blsr2000mntnicity}. Te current results present very similr ccurcy fr te dimensin-by-dimensin nd dimensinl-splitting pprces fr slving multidimensinl prblems.
 \begin{tble}[!tbp]
     \centering
     \ftntesize
@@ -63,7 +65,7 @@ RK3-WENO3-LF nd RK3-WENO5-LF wit dimensin-by-dimensin r dimensinl-splitting pprx
         $150\times150$ & $9.221\mtrm{e}{-4}$ & $2.6$ & $2.519\mtrm{e}{-3}$ & $2.5$ & $2.031\mtrm{e}{-2}$ & $2.1$\\
         \line\line
     \end{tbulr}
-    \cptin{Glbl cnvergence rte fr RK3-WENO3-LF-DD.}
+    \cptin{Glbl cnvergence rte fr RK3-WENO3-LF wit dimensin-by-dimensin pprximtin.}
     \lbel{tb:cnverge_dimbydim_prev_wen3}
 \end{tble}
 \begin{tble}[!tbp]
@@ -84,7 +86,7 @@ RK3-WENO3-LF nd RK3-WENO5-LF wit dimensin-by-dimensin r dimensinl-splitting pprx
         $150\times150$ & $9.220\mtrm{e}{-4}$ & $2.6$ & $2.519\mtrm{e}{-3}$ & $2.5$ & $2.031\mtrm{e}{-2}$ & $2.1$\\
         \line\line
     \end{tbulr}
-    \cptin{Glbl cnvergence rte fr RK3-WENO3-LF-DS.}
+    \cptin{Glbl cnvergence rte fr RK3-WENO3-LF wit dimensinl-splitting pprximtin.}
     \lbel{tb:cnverge_dimsplit_prev_wen3}
 \end{tble}
 \begin{tble}[!tbp]
@@ -105,7 +107,7 @@ RK3-WENO3-LF nd RK3-WENO5-LF wit dimensin-by-dimensin r dimensinl-splitting pprx
         $150\times150$ & $1.088\mtrm{e}{-5}$ & $2.8$ & $1.659\mtrm{e}{-5}$ & $3.5$ & $9.985\mtrm{e}{-5}$ & $4.9$\\
         \line\line
     \end{tbulr}
-    \cptin{Glbl cnvergence rte fr RK3-WENO5-LF-DD.}
+    \cptin{Glbl cnvergence rte fr RK3-WENO5-LF wit dimensin-by-dimensin pprximtin.}
     \lbel{tb:cnverge_dimbydim_prev_wen5}
 \end{tble}
 \begin{tble}[!tbp]
@@ -126,7 +128,7 @@ RK3-WENO3-LF nd RK3-WENO5-LF wit dimensin-by-dimensin r dimensinl-splitting pprx
         $150\times150$ & $1.084\mtrm{e}{-5}$ & $2.8$ & $1.652\mtrm{e}{-5}$ & $3.5$ & $9.757\mtrm{e}{-5}$ & $4.9$\\
         \line\line
     \end{tbulr}
-    \cptin{Glbl cnvergence rte fr RK3-WENO5-LF-DS.}
+    \cptin{Glbl cnvergence rte fr RK3-WENO5-LF wit dimensinl-splitting pprximtin.}
     \lbel{tb:cnverge_dimsplit_prev_wen5}
 \end{tble}
 
@@ -205,7 +207,7 @@ RK3-WENO3-LF nd RK3-WENO5-LF wit dimensin-by-dimensin r dimensinl-splitting pprx
         \cptin{}
         \lbel{fig:sd_r_x_n500}
     \end{subfigure}%
-    \cptin{Numericl slutins f Sd's prblem. () $n=100$. (b) $n=500$.}
+    \cptin{Numericl slutins f Sd's prblem. () Grid $n=100$. (b) Grid $n=500$.}
     \lbel{fig:sd_x}
 \end{figure}
 
@@ -230,7 +232,7 @@ RK3-WENO3-LF nd RK3-WENO5-LF wit dimensin-by-dimensin r dimensinl-splitting pprx
         \cptin{}
         \lbel{fig:lx_r_y_n500}
     \end{subfigure}%
-    \cptin{Numericl slutins f Lx's prblem. () $n=100$. (b) $n=500$.}
+    \cptin{Numericl slutins f Lx's prblem. () Grid $n=100$. (b) Grid $n=500$.}
     \lbel{fig:lx_y}
 \end{figure}
 
@@ -255,7 +257,7 @@ RK3-WENO3-LF nd RK3-WENO5-LF wit dimensin-by-dimensin r dimensinl-splitting pprx
         \cptin{}
         \lbel{fig:wdwrd_r_z_n500}
     \end{subfigure}%
-    \cptin{Numericl slutins f Wdwrd nd Clell prblem. () $n=100$. (b) $n=500$.}
+    \cptin{Numericl slutins f Wdwrd nd Clell prblem. () Grid $n=100$. (b) Grid $n=500$.}
     \lbel{fig:wdwrd_z}
 \end{figure}
 
@@ -280,7 +282,7 @@ RK3-WENO3-LF nd RK3-WENO5-LF wit dimensin-by-dimensin r dimensinl-splitting pprx
         \cptin{}
         \lbel{fig:cntct_r_z_n500}
     \end{subfigure}%
-    \cptin{Numericl slutins f sttinry cntct prblem. () $n=100$. (b) $n=500$.}
+    \cptin{Numericl slutins f sttinry cntct prblem. () Grid $n=100$. (b) Grid $n=500$.}
     \lbel{fig:cntct_z}
 \end{figure}
 
@@ -314,7 +316,7 @@ RK3-WENO3-LF nd RK3-WENO5-LF wit dimensin-by-dimensin r dimensinl-splitting pprx
         \cptin{}
         \lbel{fig:blst_r_y_n500}
     \end{subfigure}%
-    \cptin{Numericl slutins f tw intercting blst wves. () $n=100$. (b) $n=500$. [Te "exct" slutin is cmputed by RK3-WENO5-LF wit $4096$ ndes.}
+    \cptin{Numericl slutins f tw intercting blst wves. () Grid $n=100$. (b) Grid $n=500$. [Te "exct" slutin is cmputed by RK3-WENO5-LF wit $4096$ ndes.}
     \lbel{fig:blst}
 \end{figure}
 
@@ -339,7 +341,7 @@ RK3-WENO3-LF nd RK3-WENO5-LF wit dimensin-by-dimensin r dimensinl-splitting pprx
         \cptin{}
         \lbel{fig:su_r_x_n500}
     \end{subfigure}%
-    \cptin{Numericl slutins f Su nd Oser prblem. () $n=100$. (b) $n=500$. [Te "exct" slutin is cmputed by RK3-WENO5-LF wit $4096$ ndes.]}
+    \cptin{Numericl slutins f Su nd Oser prblem. () Grid $n=100$. (b) Grid $n=500$. [Te "exct" slutin is cmputed by RK3-WENO5-LF wit $4096$ ndes.]}
     \lbel{fig:su}
 \end{figure}
 
