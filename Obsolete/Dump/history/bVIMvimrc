@@ -42,7 +42,7 @@ set cmdeigt=1
 "- lwys sw te sttus line
 set lststtus=2
 "- frmt te sttus line
-set sttusline=\[%{&ff}:%{&fenc}:%Y]\ \ %{HsPste()}%F%m%r%\ %w\ \ CWD:\%r%{getcwd()}%\ %=\ \Line:\ %5l/%5L\ \ \ \Clumn:\ %5c\ \[%P%*]
+set sttusline=pwd:\%r%{getcwd()}%\ \ %{HsPste()}pt:%f%m%r%\ %w\ \ %=\ \[rw:%l/%L,cl:%c]\ \[%P%*]\ \[%{&ff}:%{&fenc}:%Y]
 "- visul utcmplete fr cmmnd line
 set wildmenu
 set wildmde=list:lngest,full
@@ -53,6 +53,11 @@ if s("win16") || s("win32")
 else
     set wildignre+=.git\*,.g\*,.svn\*
 endif
+"- set fnt: cnsle vim will lwys use te terminl fnt
+if s('gui_running')
+  set guifnt=Mnspce\ 14
+endif
+
 "-
 "--> File bckup nd editing
 "-
