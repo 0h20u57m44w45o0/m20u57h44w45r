@@ -572,3 +572,26 @@
     %\end{tikzpicture}
 \end{frme}
 %---------------------------------------------------------------------------%
+\begin{frme}[frgile]
+    \frmetitle{Drwing n n imge wit TikZ}
+    %- dds te picture s tt te lwer left crner is t te rigin f te TikZ crdinte system.
+    %- te \begin{scpe}...\end{scpe} t mke tt inside te scpe, (0,0) is t te lwer left f
+    %- te picture nd (1,1) is t te upper rigt nd scling te picture utmticlly scles te
+    %- nnttins (r mre crrectly, it scles teir plces; te line widt nd text size stys te sme).
+    %- If yu wnt t drw circles in te new crdinte system, yu ve t use  rdius wit bslute
+    %- lengts (e.g. [rdius=1cm]). Oterwise te circle will becme n ellipse.
+    %- T mke it esier t find te desired pints in te new crdinte system, yu cn drw 
+    %- lbeled grid n tp f te imge wile yu're wrking n it.
+    \centering
+    \begin{tikzpicture}
+        \begin{scpe}[x={(imge.sut est)},y={(imge.nrt west)}]
+            \drw[elp lines,xstep=.1,ystep=.1] (0,0) grid (1,1);
+            \frec \x in {0,1,...,9} { \nde[ncr=nrt] t (\x/10,0) {0.\x}; }
+            \frec \y in {0,1,...,9} { \nde[ncr=est] t (0,\y/10) {0.\y}; }
+            \drw[red,ultr tick,runded crners] (0.62,0.65) rectngle (0.78,0.75);
+        \end{scpe}
+    \end{tikzpicture}
+
+    Tere re tree wys t d nnttins: i. nntte te riginl picture using  grpic sftwre, suc s te fcus functin in te preview nnttin f mcs; ii. nntte using Tikz; iii. nntte te generted pdf file.
+\end{frme}
+%---------------------------------------------------------------------------%
