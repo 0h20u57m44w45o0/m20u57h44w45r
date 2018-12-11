@@ -62,7 +62,7 @@
 \mketitle
 
 \begin{bstrct}
-    Mdeling cmplex nd dynmic fluid-slid systems requires te simultin f cupled multipse interctins. In tis study,  simple field functin is presented fr fcilitting te slutin f fluid-slid systems n Crtesin grids wit interfce-reslved fluid-slid nd slid-slid interctins. Fr  Crtesin-grid-discretized cmputtinl dmin segmented by  set f slid bdies, te prpsed field functin erein cn uniquely trck ll te subdmins wit multiple lyers f interfcil ndes using nly ne integer field in ttl. As  result, te present field functin enbles single-integer-bsed multidmin nde mpping, efficient nde rempping, liner-time cllisin detectin, nd expedient surfce frce integrtin. Implementtin lgritms fr te field functin nd its sscited functinlities re presented. Equipped wit  deterministic multibdy cllisin mdel, numericl experiments invlving cmplex nd dynmic fluid-slid systems slved vi immersed bundry tretments re cnducted t vlidte nd demnstrte te pplicbility f te prpsed field functin.
+    Mdeling cmplex nd dynmic fluid-slid systems requires te simultin f cupled multipse interctins. In tis study,  simple field functin is presented fr fcilitting te slutin f fluid-slid systems n Crtesin grids wit interfce-reslved fluid-slid nd slid-slid interctins. Fr  Crtesin-grid-discretized cmputtinl dmin segmented by  set f slid bdies, te prpsed field functin cn uniquely trck ll te subdmins wit multiple lyers f interfcil ndes using nly ne integer field in ttl. As  result, te present field functin enbles single-integer-bsed multidmin nde mpping, efficient nde rempping, liner-time cllisin detectin, nd expedient surfce frce integrtin. Implementtin lgritms fr te field functin nd its sscited functinlities re presented. Equipped wit  deterministic multibdy cllisin mdel, numericl experiments invlving cmplex nd dynmic fluid-slid systems slved vi immersed bundry tretments re cnducted t vlidte nd demnstrte te pplicbility f te prpsed field functin.
 \keywrds{Crtesin grid \nd Field functin \nd Immersed bundry \nd Multidmin nde mpping \nd Fluid-structure interctin \nd Multibdy cllisin}
 \end{bstrct}
 
@@ -317,7 +317,10 @@ Fr te cllisin respnses f clliding slids, s illustrted in Fig.~\ref{fig:n_dmin_cl
 \begin{enumerte}
     \item Cnduct te $n$-t pirwise cllisin $(\Omeg_p, \Omeg_n)$ wit te pre-cllisin velcity $(\Vectr{V}_p,\Vectr{V}_n)$ t slve te crrespnding pst-cllisin velcity $\Vectr{V}_{p,n}'$ nd te velcity cnge $\Delt \Vectr{V}_{p,n}'$ f $\Omeg_p$:
         \begin{equtin}
-            \Delt \Vectr{V}_{p,n}' = \Vectr{V}_{p,n}' - \Vectr{V}_p = - \frc{m_n}{m_p+m_n} (1+C_{\Des{R}}) (\Vectr{V}_{pn} \cdt \unitVectr{e}_{pn}) \unitVectr{e}_{pn} - C_{\Des{f}} [\Vectr{V}_{pn} - (\Vectr{V}_{pn} \cdt \unitVectr{e}_{pn}) \unitVectr{e}_{pn}]
+            \begin{ligned}
+                \Delt \Vectr{V}_{p,n}' &= \Vectr{V}_{p,n}' - \Vectr{V}_p = - \frc{m_n}{m_p+m_n} (1+C_{\Des{R}}) (\Vectr{V}_{pn} \cdt \unitVectr{e}_{pn}) \unitVectr{e}_{pn}\\
+                & - C_{\Des{f}} [\Vectr{V}_{pn} - (\Vectr{V}_{pn} \cdt \unitVectr{e}_{pn}) \unitVectr{e}_{pn}]
+            \end{ligned}
         \end{equtin}
         in wic $\Vectr{V}_{pn}= (\Vectr{V}_p - \Vectr{V}_n)$, $C_{\Des{R}}$ is te cefficient f restitutin in te nrml directin ($C_{\Des{R}} = 0$, $0 < C_{\Des{R}} < 1$, nd $C_{\Des{R}} = 1$ crrespnds t perfectly inelstic cllisin, prtilly inelstic cllisin, nd elstic cllisin, respectively), $C_{\Des{f}}$ represents te effect f sliding frictin, $m_p$ nd $m_n$ re te mss f $\Omeg_p$ nd $\Omeg_n$, respectively.
 
