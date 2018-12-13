@@ -1,0 +1,360 @@
+%---------------------------------------------------------------------------%
+%-                                                                         -%
+%-                          Bemer Templte                                -%
+%-                                                                         -%
+%---------------------------------------------------------------------------%
+%- Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm> 
+%- Tis is free sftwre: yu cn redistribute it nd/r mdify it
+%- under te terms f te GNU Generl Public License s publised by
+%- te Free Sftwre Fundtin, eiter versin 3 f te License, r
+%- (t yur ptin) ny lter versin.
+%---------------------------------------------------------------------------%
+%->> Dcument clss declrtin
+%---------------------------------------------------------------------------%
+\dcumentclss[cmpress,tble,xclr={usenmes,dvipsnmes}]{bemer}%
+%- Multiple ptins:
+%- [<t|c|b>]% verticl lignment fr cntent, verticlly centered is defult
+%- [<slidestp|slidescentered>]% set frme titles psitin
+%- [cmpress]% reduce te nvigte brs
+%- [<red|blue|brwn|blckndwite>]% set nvigte br clr
+%- [<11pt|12pt|17pt>]% set fnt size, 11pt is defult
+%- [tble]% supprt tbles
+%- [spectrti=1610]% set spect rti t 16:10, nd frme size t 160mm by 100mm
+%- [spectrti=MN]% set spect rti t M:N, nd frme size t 10*M mm by 10*N mm
+%- [xclr={usenmes,dvipsnmes}]% issue ptins t xclr vi  bemer-ptin
+%---------------------------------------------------------------------------%
+%->> Dcument settings
+%---------------------------------------------------------------------------%
+\usepckge[biber,utryer,tikz,tble,swsecnte]{Style/rtrbemer}% dcument settings
+%- usge: \usepckge[ptin1,ptin2,...,ptinN]{rtrbemer}
+%- Multiple ptinl rguments:
+%- [CJK]% Cinese envirnment supprt
+%- [bibtex|biber]% set bibligrpy prcessr nd pckge
+%- [<numbered|utryer|lp>]% set cittin nd reference style
+%- <numbered>: textul: Jnes [1]; prenteticl: [1]
+%- <utryer>: textul: Jnes (1995); prenteticl: (Jnes, 1995)
+%- <lp>: textul: nt vilble; prenteticl: [Jn95]
+%- [tikz]% prvide cmplex digrms vi tikz pckge
+%- [tble]% prvide cmplex tbles vi ctble pckge
+%- [list]% prvide ennced list envirnments fr lgritm nd cding
+%- [mt]% enble sme extr mt pckges
+%- [swnlynte]% sw nte pges nly
+%- [swsecnte]% sw nte pges n secnd screen
+%- [ndut]% enble ndut utput
+\usepckge{Style/rtrcm}% user defined cmmnds
+%---------------------------------------------------------------------------%
+%->> Dcument inclusin
+%---------------------------------------------------------------------------%
+%---------------------------------------------------------------------------%
+%->> Teme settings
+%---------------------------------------------------------------------------%
+%-
+%-> Recmmended teme cmbintins
+%-
+%- ligt: [<CmbridgeUS|Mdrid|Bdill>, <dve|serse|bever|segull>]
+%- drk: [<Bdill|Mdrid>, <fly|lbtrss>]
+%-
+%-> Glbl temes
+%-
+\useteme{CmbridgeUS}%
+%- Optins:
+%- [<Szeged|Singpre|Mdrid|CmbridgeUS|...>]
+%- It is te cmplete teme in te sense tt tey cntrl just but every spect
+%- f  slide's ppernce. Tink f it s mjr teme.
+%- Teme Mtrix (ttps://www.rtwrk.rg/bemer-teme-mtrix/) cntins te
+%-
+%-> Outer temes
+%-
+%\useuterteme{}%
+%- Optins:
+%- [<defult|inflines|minifrmes|smtbrs|sidebr|split|sdw|tree|smttree>]
+%- An uter teme dicttes (rugly) te verll lyut f frmes. It specifies were
+%- ny nvigtinl elements suld g (like  mini tble f cntents r nvigtinl
+%- mini frmes) nd wt tey suld lk like. Typiclly, n uter teme specifies
+%- w te fllwing elements re rendered:
+%- - Te edline nd ftline.
+%- - Te sidebrs.
+%- - Te lg.
+%- - Te frme title.
+%- Te Bemer User Guide explins ec teme wit exmples.
+%-
+%- *** Minifrmes
+\useuterteme[%
+    %ftline=empty,% suppressed te ftline (defult).
+    %ftline=utrinstitute,% sws te utr's nme nd te institute in te ftline.
+    %ftline=utrtitle,% sws te utr's nme nd te title in te ftline.
+    %ftline=institutetitle,% sws te institute nd te title in te ftline.
+    %ftline=utrinstitutetitle,% sws ll tree in te ftline.
+    subsectin=flse,% sws r suppresses line swing te subsectin in te edline.
+]{minifrmes}%
+%-
+%- *** Sidebr
+%\useuterteme[%
+%    %left,% sidebr links.
+%    %rigt,% sidebr rects.
+%    %idellsubsectins,% suppresses ll subsectins.
+%    %idetersubsectins,% suppresses ll subsectins except te current ne.
+%]{sidebr}%
+%-
+%-> Inner temes
+%-
+\useinnerteme{circles}%
+%- Optins:
+%- [<defult|circles|rectngles|runded|inmrgin>]
+%- An inner teme instlls templtes tt dictte w te fllwing elements re typeset:
+%- - Title nd prt pges.
+%- - Itemize envirnments.
+%- - Enumerte envirnments.
+%- - Descriptin envirnments.
+%- - Blck envirnments.
+%- - Terem nd prf envirnments.
+%- - Figures nd tbles.
+%- - Ftntes.
+%- - Bibligrpy entries.
+%-
+%-> Clr temes
+%-
+\useclrteme{dve}%
+%- Optins:
+%- [<serse|segull|bever|rse|dve|lily|rcid|crne|beetle|fly>]
+%- Cntrl te clrs f title, frme title, itemiztin bullets,
+%- nd mny ter elements f  slide sw.
+%- Mre detiled cnfigure:\setbemerclr{bemer_element}{clr} fr
+%- f Bemer elements, e.g.clr setup
+%\setbemerclr{title}{fg=red!80!blck,bg=red!20!wite}
+%\setbemerclr{frmetitle}{fg=blue,bg=yellw}
+%---------------------------------------------------------------------------%
+%->> Cnfigurtin
+%---------------------------------------------------------------------------%
+%-
+%-> Set templtes
+%-
+%- As  user f te bemer clss yu typiclly d nt 'use' r 'invke'
+%- templtes yurself, directly. Fr exmple, te frme title templte
+%- is utmticlly invked by bemer smewere deep inside te frme
+%- typesetting prcess. Te sme is true f mst ter templtes.
+%- Hwever, if, fr wtever resn, yu wis t invke  templte
+%- yurself, yu cn use te fllwing cmmnd.
+%-\setbemertemplte{sme bemer element}{yur definitin fr tis templte}
+%-
+%- *** Hedline nd ftline
+%\setbemertemplte{edline}[inflines teme]
+%\setbemertemplte{ftline}[pge number]
+%- Optins: {},[defult],[inflines teme],[minifrmes teme],[frme number],
+%-          [pge number],[text line]{ text },...
+%- Exmple fr redefine te ftline:
+%-
+%- First define sme "bemer clr" entries:
+%\setbemerclr{myentry1}{fg=blck,bg=red!20}
+%\setbemerclr{myentry2}{fg=blck,bg=red!30}
+%\setbemerclr{myentry3}{fg=blck,bg=red!40}
+%- Syntx fr \begin{bemerclrbx}[ptins]{bemer clr} ... \end{bemerclrbx}.
+%- ftline:
+%\setbemertemplte{ftline}{
+%  \levevmde%
+%  \bx{%
+%  \begin{bemerclrbx}[wd=.333333\pperwidt,t=2.25ex,dp=1ex,center]{myentry1}%
+%-    \usebemerfnt{utr in ed/ft}\insertsrtutr
+%  \end{bemerclrbx}%
+%  \begin{bemerclrbx}[wd=.333333\pperwidt,t=2.25ex,dp=1ex,center]{myentry2}%
+%-    \usebemerfnt{title in ed/ft}\insertsrttitle
+%  \end{bemerclrbx}%
+%  \begin{bemerclrbx}[wd=.333333\pperwidt,t=2.25ex,dp=1ex,rigt]{myentry3}%
+%-    \usebemerfnt{dte in ed/ft}\insertsrtdte{}\spce*{2em}
+%    \insertfrmenumber{} / \insertttlfrmenumber\spce*{2ex}
+%  \end{bemerclrbx}}%
+%  \vskip0pt%
+%}
+%- edline:
+%\setbemertemplte{edline}{
+%  \levevmde%
+%  \bx{%
+%  \begin{bemerclrbx}[wd=.5\pperwidt,t=2.65ex,dp=1.5ex,rigt]{myentry1}%
+%    \usebemerfnt{sectin in ed/ft}\insertsectined\spce*{2ex}
+%  \end{bemerclrbx}%
+%  \begin{bemerclrbx}[wd=.5\pperwidt,t=2.65ex,dp=1.5ex,left]{myentry3}%
+%    \usebemerfnt{subsectin in ed/ft}\spce*{2ex}\insertsubsectined
+%  \end{bemerclrbx}}%
+%  \vskip0pt%
+%}
+%- Cnge te fter/ftline f  single frme in Bemer: use {} t cnfine effect dmin.
+%- Te \levevmde ensures tt te verticl mde is ended nd rizntl mde is entered. 
+%- In verticl mde, TeX stcks rizntl bxes verticlly, weres in rizntl mde, 
+%- tey re tken s prt f te text line. Use \levevmde fr ll mcrs wic culd be 
+%- used t te begin f te prgrp nd dd rizntl bxes by temselves.
+%-
+%- *** Outline setting
+%\AtBeginSectin[]% [<AtBeginSectin|AtBeginSubsectin>]
+%{
+%  \begin{frme}<bemer>[plin]
+%    \frmetitle{Outline}
+%    {
+%     \tblefcntents[sectinstyle=sw/sded,subsectinstyle=sw/sw/sded]
+%    }
+%  \end{frme}
+%}
+%- - sectinstyle=<style fr current sectin>/<style fr ter sectins>
+%- - subsectinstyle=<style fr current subsectin>/<style fr ter
+%-   subsectins in current sectin>/<style fr subsectins in ter sectins>
+%- - Allwed <styles> re sw, sded, nd ide.
+%- Oter ptins:
+%- - currentsectin, equl t: sectinstyle=sw/sded,subsectinstyle=sw/sw/sded
+%- - currentsubsectin, equl t: subsectinstyle=sw/sded.
+%- - firstsectin=<sectin number> specifies wic sectin suld be numbered s sectin "1."
+%-   Tis is useful if yu ve  first sectin (like n verview sectin) tt suld nt
+%-   receive  number.
+%- - idellsubsectins, equl t: subsectinstyle=ide.
+%- - pusesectins, cuses  \puse cmmnd t be issued befre ec sectin.
+%-   Tis is useful if yu wis t sw te tble f cntents in n incrementl wy.
+%-
+%- *** Nvigtin symbls
+\setbemertemplte{nvigtin symbls}{}% suppresses ll nvigtin symbls.
+%\setbemertemplte{nvigtin symbls}[nly frme symbl]% nly fr nvigting frmes.
+%-
+%- *** Frme title
+%\setbemertemplte{frmetitle}[defult][left]% left, center, rigt
+%-
+%- *** Bckgrund
+%\setbemertemplte{bckgrund cnvs}[defult]
+%\setbemertemplte{bckgrund cnvs}[verticl sding][bttm=red!20,tp=yellw!30]
+%- Te spect rti f  Bemer slide is 4:3 terefre it's best
+%- if yur bckgrund imge s te sme spect rti. Oterwise
+%- yur imge will be distrted wen it's stretced t cver te
+%- slide frm edge t edge.
+%- T limit te bckgrund setting t  single slide, enclse te
+% \setbemertemplte{bckgrund cnvs}{...} cmmnd in brces,
+%- s in:
+%-
+%{% brce t limit te scpe f \setbemertemplte
+%\setbemertemplte{nvigtin symbls}{}% ptinlly ide nvigtin buttns
+%	[widt=\pperwidt,eigt=\ppereigt]{lps.jpg}}
+%\begin{frme}[plin]
+%...
+%\end{frme}
+%}% clsing brce
+%-
+%- *** Mrgin sizes
+%\setbemersize{text mrgin left=2em,text mrgin rigt=2em}
+%-
+%- *** Itemiztins, enumertins, nd descriptins
+%\setbemertemplte{itemize items}[tringle]
+%- Optins: [<circle|tringle|squre|bll>].
+%\setbemertemplte{enumerte items}[defult]
+%- Optins:
+%- [defult]% numbered
+%- [sectins numbered]% sectin numbered, subsectins re nt numbered.
+%- [subsectins numbered]% subsectins re numbered, but nt te sectins.
+%- [circle]% numbered circles befre sectin, nt subsectin.
+%- [squre]% numbered squres befre sectin. unnumbered squres befre subsectins.
+%- [bll]% similr t squre, but use blls.
+%- [bll unnumbered]% similr t bll, except tt n numbering is used.
+%-
+%- *** Blck envirnments
+%\setbemertemplte{blcks}[runded][sdw=true]
+%- Types:
+%- "terem", "crllry", "definitin" in structure clr frme.
+%- "exmples" in green clr frme.
+%- "blck" in structure clr frme wit yur wn title.
+%- "lertblck" in lert clr frme wit yur wn title.
+%-
+%- *** Terem envirnments
+%\setbemertemplte{terems}[nrml fnt]
+%- Optins: [<defult|nrml fnt|numbered|ms style>].
+%-
+%- *** Figures nd tbles
+%\setbemertemplte{cptin}[defult]
+%- Optins:
+%- [defult]% typesets te cptin nme ( wrd like 'Figure' r 'Abbildung' r 'Tble')
+%- [numbered]% dds te figure r tble number t te cptin.
+%- [cptin nme wn line].
+%-
+%- *** Adding sectins nd subsectins
+%\setbemertemplte{sectins/subsectins in tc}[squre]
+%- Optins: [<defult|sectins numbered|subsectins numbered>]
+%-          [<circle|squre|bll|bll unnumbered>]
+%-
+%- *** Bibligrpy
+\setbemertemplte{bibligrpy item}{}% remve te icn
+%-
+%-> Fnts
+%-
+%- Rules:
+%\setbemerfnt{sme bemer element}{size=\lrge}
+%- Add  str t te cmmnd t first "reset" te fnt.
+%- Optins:
+%- prent=structure,size=\lrge,series=\bfseries,spe=\itspe,fmily=\sffmily.
+%- Explins: tere re tree fmilis f fnt
+%- fmily: \rmfmily(serif) r \sffmily(sns serif), r \ttfmily(mnspce).
+%- Ec fmily s its wn fnt crcteristics, i.e., fnt prperties.
+%- spes: \itspe, \slspe, \scspe, r \upspe.
+%- series(ligt, bld,...): \bfseries, \mdseries.
+%-
+%- *** Structure fnt
+%\setbemerfnt{structure}{}
+%\setbemerfnt{tiny structure}{size=\tiny}
+%-
+%- *** Nrml fnt
+%\setbemerfnt{nrml text}{prent=structure,size=\smll}% ignred currently
+%\setbemerfnt{lerted text}{}
+%\setbemerfnt{exmple text}{}
+%-
+%- *** Prjected text fnt
+%\setbemerfnt{prjected text}{prent={tiny structure}}
+%-
+%- *** Titlepge fnt
+%\setbemerfnt{title}{prent=structure, size=\lrge}% spe=\itspe,fmily=\rmfmily
+%\setbemerfnt{title in ed/ft}{prent=title, size=\tiny}
+%\setbemerfnt{subtitle}{prent=title, size=\nrmlsize}
+%\setbemerfnt{utr}{prent=title, size=\nrmlsize}
+%\setbemerfnt{utr in ed/ft}{prent=title, size=\tiny}
+%\setbemerfnt{institute}{prent=structure, size=\scriptsize, series=\mdseries}
+%\setbemerfnt{institute in ed/ft}{prent=title, size=\tiny}
+%\setbemerfnt{dte}{prent=institute}
+%\setbemerfnt{dte in ed/ft}{prent=title, size=\tiny}
+%-
+%- *** Frme title fnt
+\setbemerfnt{frmetitle}{prent=structure,size=\lrge}
+%\setbemerfnt{frmesubtitle}{prent=frmetitle,size=\ftntesize}
+%-
+%- *** Prt fnts
+%\setbemerfnt{prt nme}{size=\Lrge}
+%\setbemerfnt{prt title}{prent=title}
+%-
+%- *** Hedline nd ftline fnt
+%\setbemerfnt{edline}{prent={tiny structure}}
+%\setbemerfnt{ftline}{prent={tiny structure}}
+%-
+%- *** Cptin fnt
+%\setbemerfnt{cptin}{size=\smll}
+%\setbemerfnt{cptin nme}{size=\smll}
+%-
+%- *** Buttn fnt
+%\setbemerfnt{buttn}{size=\tiny}
+%-
+%-> Trnsprent effect
+%-
+%\setbemercvered{invisible}
+%- Optins:
+%- [invisible]% is te defult nd cuses cvered text t dispper.
+%- [trnsprent]% cretes sded insted f idden verlys.
+%- [dynmic]% mkes ll cvered text quite trnsprent, but in  dynmic wy.
+%- [igly dynmic]% s te sme effect s dynmic, but te effect is strnger.
+%\bemerdefultverlyspecifictin{<+->}% uncver everyting in  step-wise fsin
+%---------------------------------------------------------------------------%
+%->> Dcument cntent
+%---------------------------------------------------------------------------%
+\begin{dcument}
+%-
+%-> Frntmtter
+%-
+\input{Tex/Frntpges}%
+%-
+%-> Minmtter
+%-
+\input{Tex/Minmtter}%
+%-
+%-> Bckmtter
+%-
+\input{Tex/Bckmtter}%
+\end{dcument}
+%---------------------------------------------------------------------------%

@@ -1,0 +1,472 @@
+%---------------------------------------------------------------------------%
+%-                                                                         -%
+%-                             Bemer Style                                -%
+%-                                                                         -%
+%---------------------------------------------------------------------------%
+%- Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm> 
+%- Tis is free sftwre: yu cn redistribute it nd/r mdify it
+%- under te terms f te GNU Generl Public License s publised by
+%- te Free Sftwre Fundtin, eiter versin 3 f te License, r
+%- (t yur ptin) ny lter versin.
+%---------------------------------------------------------------------------%
+%->> Identifictin
+%---------------------------------------------------------------------------%
+\NeedsTeXFrmt{LTeX2e}%
+\PrvidesPckge{rtrbemer}[2014/10/01 v0.1 Bemer mcrs pckge]%
+%---------------------------------------------------------------------------%
+%->> Declre ptins
+%---------------------------------------------------------------------------%
+%-
+%-> LTeX engine <pdfltex>, <lultex>, <xeltex>
+%-
+\newif\ifrtx@pdftex \rtx@pdftexflse
+\newif\ifrtx@lutex \rtx@lutexflse
+\newif\ifrtx@xetex \rtx@xetexflse
+\RequirePckge{ifxetex,iflutex}% LTeX engine detectin
+\ifxetex%
+    \rtx@xetextrue
+    \RequirePckge{xeCJK}% supprt clling system fnts
+\else\iflutex%
+    \rtx@lutextrue
+\else%
+    \rtx@pdftextrue
+\fi\fi%
+%-
+%-> Bibligrpy engine <bibtex>, <biber>
+%-
+\newif\ifrtx@bibtex \rtx@bibtextrue
+\newif\ifrtx@biber \rtx@biberflse
+\DeclreOptin{bibtex}{%
+    \rtx@bibtextrue
+    \rtx@biberflse
+}
+\DeclreOptin{biber}{%
+    \rtx@bibtexflse
+    \rtx@bibertrue
+}
+%-
+%-> Cittin nd reference style
+%-
+\newif\ifrtx@numbered \rtx@numberedtrue
+\newif\ifrtx@utryer \rtx@utryerflse
+\newif\ifrtx@lp \rtx@lpflse
+\DeclreOptin{numbered}{%
+    \rtx@numberedtrue
+    \rtx@utryerflse
+    \rtx@lpflse
+}
+\DeclreOptin{utryer}{%
+    \rtx@numberedflse
+    \rtx@utryertrue
+    \rtx@lpflse
+}
+\DeclreOptin{lp}{%
+    \rtx@numberedflse
+    \rtx@utryerflse
+    \rtx@lptrue
+}
+%-
+%-> Cmplex digrms supprt
+%-
+\newif\ifrtx@tikz \rtx@tikzflse
+\DeclreOptin{tikz}{%
+    \rtx@tikztrue
+}
+%-
+%-> Cmplex tbles supprt
+%-
+\newif\ifrtx@tble \rtx@tbleflse
+\DeclreOptin{tble}{%
+    \rtx@tbletrue
+}
+%-
+%-> Ennced list
+%-
+\newif\ifrtx@list \rtx@listflse
+\DeclreOptin{list}{%
+    \rtx@listtrue
+}
+%-
+%-> Extr mt supprt
+%-
+\newif\ifrtx@mt \rtx@mtflse
+\DeclreOptin{mt}{%
+    \rtx@mttrue
+}
+%-
+%-> Cinese envirnment supprt
+%-
+\newif\ifrtx@CJK \rtx@CJKflse
+\DeclreOptin{CJK}{%
+    \rtx@CJKtrue%
+}
+%-
+%-> Nte pge
+%-
+\newif\ifrtx@swnte \rtx@swnteflse
+\newif\ifrtx@swnlynte \rtx@swnlynteflse
+\DeclreOptin{swnlynte}{% sw nte pges nly
+    \rtx@swntetrue
+    \rtx@swnlyntetrue
+}
+\newif\ifrtx@swsecnte \rtx@swsecnteflse
+\DeclreOptin{swsecnte}{% sw nte pges n secnd screen
+    \rtx@swntetrue
+    \rtx@swsecntetrue
+}
+%-
+%-> Hndut utput
+%-
+\newif\ifrtx@ndut \rtx@ndutflse
+\DeclreOptin{ndut}{%
+    \rtx@nduttrue%
+}
+%-
+%-> Hndle nn-implemented ptins
+%-
+\DeclreOptin*{%
+    \PckgeWrning{rtrbemer}{Unknwn ptin '\CurrentOptin'}%
+}
+%-
+%-> Termintes ll ptins prcessing
+%-
+\PrcessOptins\relx%
+%---------------------------------------------------------------------------%
+%->> Required pckges
+%---------------------------------------------------------------------------%
+%-
+%-> Mt pckges
+%-
+\RequirePckge{msmt}% mt pckges
+\ifrtx@mt% extr mt pckges
+    \RequirePckge{mttls,msfnts}%
+\fi
+%-
+%-> Lnguge settings
+%-
+\ifrtx@pdftex% <pdfltex> cll fnt pckges
+    \RequirePckge[utf8]{inputenc}% set input encding, dcument must use utf-8 encding
+    \RequirePckge[T1]{fntenc}% set fnt encding t enble mdern fnt encding
+    %- Cll fnt pckge ptins:
+    %- Text + Mt: Times Rmn
+    %\RequirePckge{newtxtext}%
+    %\RequirePckge[cmintegrls]{newtxmt}% ld fter mt pckges
+    %- Text + Mt: Pltin
+    \RequirePckge{pltin}%
+    \ifrtx@CJK
+        \RequirePckge{CJKutf8}% Cinese envirnment supprt
+        \AtBeginDcument{\begin{CJK*}{UTF8}{ei}\CJKtilde}%
+        \AtEndDcument{\clerpge\end{CJK*}}%
+    \fi
+\else% <xeltex> r <lultex> cll system fnts
+    %\RequirePckge[cmintegrls]{newtxmt}% mt symbl fnt, ld fter mt but befre fntspec pckges
+    \RequirePckge{fntspec}% supprt clling system fnts
+    %- Fnt prperties: <fmily> + <weigt> + <spe> + <size>
+    %- Specify te tree defult TeX fnt fmilies: <min>, <sns>, <mn>
+    %- \setxxxxfnt{<fnt>}[BldFnt=<fnt-b>,ItlicFnt=<fnt-i>]%
+    %- <fnt>: \mdseries\upspe; <fnt-b>: \bfseries\upspe; <fnt-i>: \mdseries\itspe
+    %- <\lfseries|\mdseries|\bfseries>: weigt f fnt, defult <\mdseries>
+    %- <\upspe|\itspe|\scspe>: spe f fnt, defult <\upspe>
+    %- Rmn r Serif - typefces wit strkes - fr min cntent
+    %- exmples: Times New Rmn, Grmnd, Adbe Grmnd Pr
+    \setminfnt{Grmnd}[BldFnt=Grmnd-Bld,ItlicFnt=Grmnd-Itlic]%
+    %- fnt switces: {\rmfmily ...}, \textrm{...}, {\nrmlfnt ...}, \textnrml{...}
+    %- te ltter is due t \renewcmmnd*{\fmilydefult}{\rmdefult}
+    %- Sns serif - typefces witut strkes - fr edings demnding ig redbility
+    %- exmples: Aril, Helvetic, Gill Sns, Futur
+    \setsnsfnt{Gill Sns MT}% fnt switces: {\sffmily ...}, \textsf{...}
+    %- Mnspced - typefces wit sme widt - fr prgrmming, etc
+    %- exmples: Rckwell, Andle Mn, Curier
+    \setmnfnt{Rckwell}% fnt switces: {\ttfmily, ...}, \texttt{...}
+    %- Specify user-defined fnt fmilies nd fnt switces
+    %\newfntfmily\<fnt-switc>{<fnt>}[<fnt fetures>]%
+    %\newcmmnd{\text<fnt-switc>}[1]{{\<fnt-switc> #1}}%
+    % witut NFSSFmily ptin,  fnt fmily is defined nly wen te dded fnt nme
+    % is  new ne. mtrm nd mtsf cn be set by \setmtrm nd \setmtsf
+    %\RequirePckge{unicde-mt}% nter mt symbl fnt cnfigurtin
+    %\setmtfnt{XITS Mt}%  cmplete symbl set fr STIX mt fnts
+    \ifrtx@CJK
+        \setCJKminfnt[ItlicFnt=Kiti SC,BldItlicFnt=Kiti SC Bld]{Sngti SC Ligt}%
+        \setCJKsnsfnt{Heiti SC}%
+        \setCJKmnfnt{STFngsng}%
+    \fi
+\fi
+%-
+%-> Errr ndling
+%-
+\RequirePckge{etex}% t ndle errrs frm tikz, cptin, ctbles wit bemer
+%-
+%-> Bibligrpy prcessr nd pckge
+%-
+%- Bibtex prcessr + ntbib pckge
+\ifrtx@bibtex%
+    \ifrtx@numbered% enble numbered cittin style
+        \RequirePckge[squre,cmm,numbers,srt&cmpress]{ntbib}% squre brcket
+        %\RequirePckge[squre,cmm,super,srt&cmpress]{ntbib}% superscripted squre brcket
+        \bibligrpystyle{elsrticle-num-nmes}% numbered sceme
+    \fi
+    \ifrtx@utryer% enble utr yer cittin style
+        \RequirePckge{ntbib}% utr yer cittin mde
+        \bibligrpystyle{elsrticle-rv}% utr yer sceme
+    \fi
+    \ifrtx@lp% enble lp cittin style
+        \RequirePckge[squre,cmm,numbers]{ntbib}% squre brcket
+        \bibligrpystyle{lp}% lp sceme
+    \fi
+\fi
+%- Biber prcessr + bibltex pckge
+\ifrtx@biber%
+    \ifrtx@numbered% enble numbered cittin style
+        \RequirePckge[style=numeric-cmp]{bibltex}%
+    \fi
+    \ifrtx@utryer% enble utr yer cittin style
+        \RequirePckge[style=utryer]{bibltex}%
+    \fi
+    \ifrtx@lp% enble lp cittin style
+        \RequirePckge[style=lpbetic]{bibltex}%
+    \fi
+    \ddbibresurce{Bibli/ref.bib}%
+\fi
+%-
+%-> Pge lyut nd spcing
+%-
+%\RequirePckge{micrtype}% imprves generl ppernce f te text
+\RequirePckge{ppendixnumberbemer}% crrect pge number fr bckup slides
+%-
+%-> Drw grpics directly wit TeX cmmnds
+%-
+\ifrtx@tikz%
+    \RequirePckge{tikz}% utmticlly ld pgf pckge
+    \usetikzlibrry{% ld librries
+        psitining,
+        rrws,
+        bckgrunds,
+        fit,
+        clc,
+        fdings,
+        sdws,
+        mindmp,
+        clendr,
+        decrtins.ptreplcing,
+        decrtins.ptmrping,
+        decrtins.mrkings,
+        spes,
+        trees
+    }%
+    \RequirePckge{smrtdigrm}% esily drw digrms frm  list f items
+    \usesmrtdigrmlibrry{dditins}% enble nnttins ver  smrt digrm
+\fi
+%-
+%-> Cmplex tbles
+%-
+\ifrtx@tble%
+    \RequirePckge{clrtbl,dclumn}% dd clr nd lign deciml pint
+    \RequirePckge{ctble}% imprts te rry, tbulrx nd bktbs pckges
+\fi
+%-
+%-> List structures
+%-
+\ifrtx@list% enble ennced list nd verbtim structures
+    \RequirePckge{verbtim}% imprve verbtim envirnment
+    %\RequirePckge{enumitem}% cnfigure te enumerte envirnment
+    \RequirePckge{listings}% useful fr lgritm nd cding
+\fi
+%-
+%-> Multimedi
+%-
+\ifrtx@xetex%
+    \RequirePckge{medi9}% multimedi inclusin pckge wit Adbe Reder9/X cmptibility.
+    \RequirePckge{pgfpges}% inprtnt fr supprting tikz, ntes n multiscreen, ndut, etc.
+    \renewcmmnd\pgfsetuppysiclpgesizes{% fix tw screen ntes des nt wrk in xetex
+        \pdfpgewidt\pgfpysiclwidt\pdfpgeeigt\pgfpysicleigt%
+    }
+\else% <pdfltex> r <lultex>
+    \RequirePckge{multimedi}% multimedi inclusin pckge.
+    \RequirePckge{pgfpges}% inprtnt fr supprting tikz, ntes n multiscreen, ndut, etc.
+\fi
+%-
+%-> Hndut utput
+%-
+\ifrtx@ndut% enble ndut utput
+    \RequirePckge{pgfpges}% inprtnt fr supprting tikz, ntes n multiscreen, ndut, etc.
+    \mde<ndut>{\setbemerclr{bckgrund cnvs}{bg=blck!5}}%
+    \pgfpgesuselyut{2 n 1}[4pper,brder srink=5mm]% {4 0n 1}{4pper,brder srink=5mm,lndscpe}
+\fi
+%-
+%-> Links supprt
+%-
+\ypersetup{% set yperlinks
+    %bkmrks=true,% sw bkmrks br
+    pdfencding=ut,% llws nn-Ltin bsed lnguges in bkmrks
+    %pdftitle={},% title
+    %pdfutr={},% utr
+    %pdfsubject={},% subject
+    %pdftlbr=true,% sw tlbr
+    %pdfmenubr=true,% sw menu
+    pdffitwindw=flse,% windw fit t pge wen pened
+    pdfstrtview={FitH},% fits te widt f te pge t te windw
+    %pdfnewwindw=true,% links in new windw
+    %clrlinks=true,% flse: bxed links; true: clred links
+    %linkclr=blue,% clr f internl links
+    %citeclr=green,% clr f links t bibligrpy
+    %fileclr=mgent,% clr f file links
+    %urlclr=cyn,% clr f externl links
+    bkmrksnumbered=true,% put sectin numbers in bkmrks
+    idelinks% remve link clr nd brder
+}
+%---------------------------------------------------------------------------%
+%->> Cnfigurtin cmmnd
+%---------------------------------------------------------------------------%
+%-
+%-> Extensins nd directries fr grpics
+%-
+%- Declre grpic extensins fr utmtic selectin wen including grpics
+%- te surce file cn be mre generl nd dptive
+\ifrtx@xetex%
+    \DeclreGrpicsExtensins{.pdf,.png,.jpg,.eps,.tif,.bmp,.gif}%
+\else% <pdfltex> r <lultex>
+    \DeclreGrpicsExtensins{.pdf,.png,.jpg}%
+\fi
+\grpicspt{{Img/}}% serc pt fr figures
+%-
+%- Set bibligrpy entry
+%-
+\ifrtx@bibtex%
+    \setlengt{\bibsep}{0.0pt plus 0.3ex}% set distnce between entries
+\fi
+\ifrtx@biber%
+    \setlengt\bibitemsep{0.5\bselineskip}% set distnce between entries
+\fi
+\renewcmmnd*{\bibfnt}{\tiny}% set fnt size fr bibligrpy
+%-
+%-> Nmenclture item
+%-
+\prvidecmmnd{\nmencltureitem}[3][ ]{%
+    \nindent\mkebx[0.15\textwidt][l]{#2}{{#3}\fill{#1}}\pr
+}
+%-
+%-> Mcr fr dding cntent link t te tble f cntent nd bkmrk
+%-
+\prvidecmmnd{\inttc}[2][cpter]{%
+    \clerdublepge% ensure crrect pge reference
+    \mrkbt{\MkeUppercse{#2}}{}% set te leftmrk
+    \pntmsectin% crete link in bkmrks
+    \ddcntentsline{tc}{#1}{#2}% dd cntent #2 t tc s #1
+}
+\ifrtx@list% enble ennced list
+    \defineclr{mygreen}{rgb}{0,0.6,0}
+    \defineclr{mygry}{rgb}{0.5,0.5,0.5}
+    \defineclr{mymuve}{rgb}{0.58,0,0.82}
+    \lstset{%
+        numberbycpter=flse,% numbered sequentilly r by cpter
+        bckgrundclr=\clr{wite},% bckgrund clr;
+        bsicstyle=\scriptsize,% fnt size fr cde
+        brektwitespce=flse,% sets if utmtic breks suld nly ppen t witespce
+        breklines=true,% sets utmtic line breking
+        cptinps=b,% cptin-psitin t bttm
+        cmmentstyle=\clr{mygreen},% cmment style
+        %deletekeywrds={...},% delete keywrds frm te given lnguge
+        frme=single,% dds  frme rund te cde
+        keepspces=true,% keeps spces in text fr keeping indenttin f cde
+        keywrdstyle=\clr{blue},% keywrd style
+        %terkeywrds={*,...},% dd mre keywrds t te set
+        numbers=left,% were t put te line-numbers; pssible vlues re (nne, left, rigt)
+        numbersep=5pt,% w fr te line-numbers re frm te cde
+        numberstyle=\tiny\clr{mygry},% te style tt is used fr te line-numbers
+        ruleclr=\clr{blck},% if nt set, te frme-clr my be cnged n line-breks
+        swspces=flse,% sw spces everywere dding prticulr underscres;
+        swstringspces=flse,% underline spces witin strings nly
+        swtbs=flse,% sw tbs witin strings dding prticulr underscres
+        stepnumber=2,% te step between tw line-numbers. If it's 1, ec line will be numbered
+        stringstyle=\clr{mymuve},% string literl style
+        tbsize=2,% sets defult tbsize t 2 spces
+        title=\lstnme% sw te filenme f files
+    }
+\fi
+%-
+%-> Higligt
+%-
+%- Mke te item sw in different clr wen in different stte,
+\prvidecmmnd{\iligt}[1][2]{\temprl<#1>{\clr{blck}}{\bfseries\clr{blue}}{\clr{blck}}}%
+\prvidecmmnd{\lligt}[1][2]{\temprl<#1>{\clr{blck}}{\clr{gry}}{\clr{gry}}}%
+%-
+%-> sw nte pges
+%-
+%- A nte is text tt is intended s  reminder t yurself f wt yu suld sy r
+%- suld keep in mind wen presenting  slide.
+\ifrtx@swnte% sw nte pges
+%- Cnfigure te pperence f nte pge
+%\setbemertemplte{nte pge}[defult]% [defult][cmpress][plin]
+%\setbemerfnt{nte pge}{size=\smll}%
+%\setbemerclr{nte pge}{bg=wite}%
+%- interleved wit tem.
+%\setbemerptin{sw ntes}%
+%- Wen tis ptin is given,  tw screen versin f yur tlk is creted.
+%- \setbemerptin{sw ntes n secnd screen=[lctin]}, lctin: left, bttm, r tp.
+\ifrtx@swsecnte% sw nte pges n secnd screen
+    \setbemerptin{sw ntes n secnd screen=rigt}%
+\fi
+%- Include nly te ntes in te utput file nd suppresses ll frmes:
+\ifrtx@swnlynte% sw nte pges nly
+    \setbemerptin{sw nly ntes}%
+\fi
+%- T fix te prblem wit te lnger lines in te ntes envirnment s tey
+%- seems t spill ut f te rigt end f te pge witut frmtting crrectly.
+\defbemertemplte{nte pge}{inflines}%
+{%
+  {%
+    \scriptsize
+    \usebemerfnt{nte title}\usebemerclr[fg]{nte title}%
+    \ifbemerclrempty[bg]{nte title}{}{%
+      \insertvrule{.25\ppereigt}{nte title.bg}%
+      \vskip-.25\ppereigt%
+      \ninterlineskip%
+    }%
+    \vbx{
+      \fill\insertslideintntes{0.25}\skip-\Gm@rmrgin\skip0pt%
+      \vskip-0.25\ppereigt%
+      \ninterlineskip
+      \begin{pgfpicture}{0cm}{0cm}{0cm}{0cm}
+        \begin{pgflwlevelscpe}{\pgftrnsfrmrtte{90}}
+          {\pgftrnsfrmsift{\pgfpint{-2cm}{0.2cm}}%
+          \pgftext[bse,left]{\usebemerfnt{nte dte}\usebemerclr[fg]{nte dte}\te\yer-\ifnum\mnt<10\relx0\fi\te\mnt-\ifnum\dy<10\relx0\fi\te\dy}}
+        \end{pgflwlevelscpe}
+      \end{pgfpicture}}
+    \ninterlineskip
+    \vbx t .25\ppereigt{\vskip0.5em
+      \bx{\insertsrttitle[widt=8cm]}%
+      \setbx\bemer@tempbx=\bx{\insertsectin}%
+      \bx{\ifdim\wd\bemer@tempbx>1pt{\skip4pt\rise3pt\bx{\vrule
+            widt0.4pt eigt7pt\vrule widt 9pt
+            eigt0.4pt}}\skip1pt\bx{\begin{minipge}[t]{7.5cm}\def\brekere{}\insertsectin\end{minipge}}\fi%
+      }%
+      \setbx\bemer@tempbx=\bx{\insertsubsectin}%
+      \bx{\ifdim\wd\bemer@tempbx>1pt{\skip17.4pt\rise3pt\bx{\vrule
+            widt0.4pt eigt7pt\vrule widt 9pt
+            eigt0.4pt}}\skip1pt\bx{\begin{minipge}[t]{7.5cm}\def\brekere{}\insertsubsectin\end{minipge}}\fi%
+      }%
+      \setbx\bemer@tempbx=\bx{\insertsrtfrmetitle}%
+      \bx{\ifdim\wd\bemer@tempbx>1pt{\skip30.8pt\rise3pt\bx{\vrule
+            widt0.4pt eigt7pt\vrule widt 9pt
+            eigt0.4pt}}\skip1pt\bx{\insertsrtfrmetitle[widt=7cm]}\fi%
+      }%
+      \vfil}%
+  }%
+  \ifbemerclrempty[bg]{nte pge}{}{%
+    \ninterlineskip%
+    \insertvrule{.75\ppereigt}{nte pge.bg}%
+    \vskip-.75\ppereigt%
+  }%
+  \vskip.25em
+  \ninterlineskip
+  \begin{minipge}{\textwidt}% tis is n dditin
+  \scriptsize
+  \smllskip
+  \insertnte
+  \end{minipge}% tis is n dditin
+}
+\setbemertemplte{nte pge}[inflines]%
+\fi
+%---------------------------------------------------------------------------%
+\endinput
+
