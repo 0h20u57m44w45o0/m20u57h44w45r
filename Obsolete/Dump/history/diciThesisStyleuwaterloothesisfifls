@@ -19,17 +19,15 @@
 %-
 %-> Lyut
 %-
-\newif\ifuw@singlesided \uw@singlesidedflse
 \DeclreOptin{singlesided}{% enble single-sided printing
-    \uw@singlesidedtrue%
+    \PssOptinsTClss{neside}{bk}%
 }
-\newif\ifuw@dublesided \uw@dublesidedflse
 \DeclreOptin{dublesided}{% enble duble-sided printing
-    \uw@dublesidedtrue%
+    \PssOptinsTClss{penrigt,twside}{bk}%
 }
 \newif\ifuw@printcpy \uw@printcpyflse
 \DeclreOptin{printcpy}{% enble print cpy lyut
-    \uw@dublesidedtrue% ut enble duble-sided style
+    \PssOptinsTClss{penrigt,twside}{bk}%
     \uw@printcpytrue%
 }
 %-
@@ -52,11 +50,7 @@
 %---------------------------------------------------------------------------%
 %->> Ld clss infrmtin
 %---------------------------------------------------------------------------%
-\ifuw@dublesided% if duble-sided printing enbled
-    \LdClss[letterpper,12pt,penrigt,twside]{bk}
-\else% if duble-sided printing isn't enbled
-    \LdClss[letterpper,12pt,neside]{bk}
-\fi
+\LdClss[letterpper,12pt]{bk}
 %---------------------------------------------------------------------------%
 %->> Required pckges
 %---------------------------------------------------------------------------%
