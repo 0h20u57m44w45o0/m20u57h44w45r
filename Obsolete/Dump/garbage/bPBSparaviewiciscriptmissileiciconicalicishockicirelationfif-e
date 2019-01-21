@@ -1,0 +1,314 @@
+#### import the simple module from the paraview
+from paraview.simple import *
+#### disable automatic camera reset on 'Show'
+paraview.simple._DisableFirstRenderCameraReset()
+
+# find source
+calculator1 = FindSource('Calculator1')
+
+# set active source
+SetActiveSource(calculator1)
+
+# create a new 'Slice'
+slice1 = Slice(Input=calculator1)
+slice1.SliceType = 'Plane'
+slice1.SliceOffsetValues = [0.0]
+
+# init the 'Plane' selected for 'SliceType'
+slice1.SliceType.Origin = [0.7500000298023224, 0.0, 0.0]
+
+# find source
+computeDerivatives1 = FindSource('ComputeDerivatives1')
+
+# find source
+cellDatatoPointData1 = FindSource('CellDatatoPointData1')
+
+# find source
+isoVolume1 = FindSource('IsoVolume1')
+
+# find source
+threshold1 = FindSource('Threshold1')
+
+# find source
+enSightReader1 = FindSource('EnSightReader1')
+
+# find source
+sTLReader1 = FindSource('STLReader1')
+
+# find source
+sTLReader2 = FindSource('STLReader2')
+
+# find source
+sTLReader3 = FindSource('STLReader3')
+
+# find source
+sTLReader4 = FindSource('STLReader4')
+
+# find source
+sTLReader5 = FindSource('STLReader5')
+
+# find source
+sTLReader6 = FindSource('STLReader6')
+
+# find source
+sTLReader7 = FindSource('STLReader7')
+
+# Properties modified on slice1.SliceType
+slice1.SliceType.Origin = [0.0, 0.0, 0.0]
+slice1.SliceType.Normal = [0.0, 0.0, 1.0]
+
+# Properties modified on slice1.SliceType
+slice1.SliceType.Origin = [0.0, 0.0, 0.0]
+slice1.SliceType.Normal = [0.0, 0.0, 1.0]
+
+# get active view
+renderView1 = GetActiveViewOrCreate('RenderView')
+# uncomment following to set a specific view size
+# renderView1.ViewSize = [977, 638]
+
+# get color transfer function/color map for 'drho'
+drhoLUT = GetColorTransferFunction('drho')
+
+# show data in view
+slice1Display = Show(slice1, renderView1)
+# trace defaults for the display properties.
+slice1Display.AmbientColor = [0.0, 0.0, 0.0]
+slice1Display.ColorArrayName = ['POINTS', 'drho']
+slice1Display.DiffuseColor = [0.0, 0.0, 0.0]
+slice1Display.LookupTable = drhoLUT
+slice1Display.BackfaceDiffuseColor = [0.0, 0.0, 0.0]
+slice1Display.OSPRayScaleArray = 'drho'
+slice1Display.OSPRayScaleFunction = 'PiecewiseFunction'
+slice1Display.GlyphType = 'Arrow'
+slice1Display.SetScaleArray = ['POINTS', 'drho']
+slice1Display.ScaleTransferFunction = 'PiecewiseFunction'
+slice1Display.OpacityArray = ['POINTS', 'drho']
+slice1Display.OpacityTransferFunction = 'PiecewiseFunction'
+
+# show color bar/color legend
+slice1Display.SetScalarBarVisibility(renderView1, True)
+
+# find source
+annotateTimeFilter1 = FindSource('AnnotateTimeFilter1')
+
+# Rescale transfer function
+drhoLUT.RescaleTransferFunction(0.0, 3281.64069047)
+
+# get opacity transfer function/opacity map for 'drho'
+drhoPWF = GetOpacityTransferFunction('drho')
+
+#change interaction mode for render view
+renderView1.InteractionMode = '2D'
+
+# reset view to fit data
+renderView1.ResetCamera()
+
+# hide data in view
+Hide(isoVolume1, renderView1)
+
+# set active source
+SetActiveSource(isoVolume1)
+
+# set active source
+SetActiveSource(slice1)
+
+# get color legend/bar for drhoLUT in view renderView1
+drhoLUTColorBar = GetScalarBar(drhoLUT, renderView1)
+
+# Apply a preset using its name. Note this may not work as expected when presets have duplicate names.
+drhoLUT.ApplyPreset('X Ray', True)
+
+# Properties modified on slice1Display
+slice1Display.Specular = 1.0
+
+# hide color bar/color legend
+slice1Display.SetScalarBarVisibility(renderView1, False)
+
+# Rescale transfer function
+drhoLUT.RescaleTransferFunction(1.0, 500.0)
+
+# Rescale transfer function
+drhoPWF.RescaleTransferFunction(1.0, 500.0)
+
+# reset view to fit data
+renderView1.ResetCamera()
+
+# reset view to fit data
+renderView1.ResetCamera()
+
+# create a new 'Line'
+line1 = Line()
+
+# Properties modified on line1
+line1.Point1 = [0.0, 0.0, 0.0]
+line1.Point2 = [0.5, 0.18249, 0.0]
+
+# show data in view
+line1Display = Show(line1, renderView1)
+# trace defaults for the display properties.
+line1Display.AmbientColor = [0.0, 0.0, 0.0]
+line1Display.ColorArrayName = [None, '']
+line1Display.DiffuseColor = [0.0, 0.0, 0.0]
+line1Display.BackfaceDiffuseColor = [0.0, 0.0, 0.0]
+line1Display.OSPRayScaleArray = 'Texture Coordinates'
+line1Display.OSPRayScaleFunction = 'PiecewiseFunction'
+line1Display.GlyphType = 'Arrow'
+line1Display.SetScaleArray = [None, '']
+line1Display.ScaleTransferFunction = 'PiecewiseFunction'
+line1Display.OpacityArray = [None, '']
+line1Display.OpacityTransferFunction = 'PiecewiseFunction'
+
+# Properties modified on line1Display
+line1Display.LineWidth = 4.0
+
+# change solid color
+line1Display.DiffuseColor = [1.0, 0.0, 0.0]
+
+# change representation type
+line1Display.SetRepresentationType('Points')
+
+# Properties modified on line1Display
+line1Display.PointSize = 16.0
+
+# change solid color
+line1Display.AmbientColor = [1.0, 0.0, 0.0]
+
+# set active source
+SetActiveSource(sTLReader1)
+
+# set active source
+SetActiveSource(slice1)
+
+# set active source
+SetActiveSource(line1)
+
+# create a new 'Line'
+line2 = Line()
+
+# Properties modified on line2
+line2.Point1 = [0.0, 0.0, 0.0]
+line2.Point2 = [0.5, -0.18249, 0.0]
+
+# show data in view
+line2Display = Show(line2, renderView1)
+# trace defaults for the display properties.
+line2Display.AmbientColor = [0.0, 0.0, 0.0]
+line2Display.ColorArrayName = [None, '']
+line2Display.DiffuseColor = [0.0, 0.0, 0.0]
+line2Display.BackfaceDiffuseColor = [0.0, 0.0, 0.0]
+line2Display.OSPRayScaleArray = 'Texture Coordinates'
+line2Display.OSPRayScaleFunction = 'PiecewiseFunction'
+line2Display.GlyphType = 'Arrow'
+line2Display.SetScaleArray = [None, '']
+line2Display.ScaleTransferFunction = 'PiecewiseFunction'
+line2Display.OpacityArray = [None, '']
+line2Display.OpacityTransferFunction = 'PiecewiseFunction'
+
+# Properties modified on line2Display
+line2Display.PointSize = 16.0
+
+# Properties modified on line2Display
+line2Display.LineWidth = 4.0
+
+# change solid color
+line2Display.DiffuseColor = [1.0, 0.0, 0.0]
+
+# change representation type
+line2Display.SetRepresentationType('Points')
+
+# change solid color
+line2Display.AmbientColor = [1.0, 0.0, 0.0]
+
+# set active source
+SetActiveSource(line1)
+
+# set active source
+SetActiveSource(sTLReader7)
+
+# reset view to fit data
+renderView1.ResetCamera()
+
+# reset view to fit data
+renderView1.ResetCamera()
+
+# reset view to fit data
+renderView1.ResetCamera()
+
+# reset view to fit data
+renderView1.ResetCamera()
+
+# reset view to fit data
+renderView1.ResetCamera()
+
+# reset view to fit data
+renderView1.ResetCamera()
+
+# reset view to fit data
+renderView1.ResetCamera()
+
+# reset view to fit data
+renderView1.ResetCamera()
+
+# reset view to fit data
+renderView1.ResetCamera()
+
+# reset view to fit data
+renderView1.ResetCamera()
+
+# reset view to fit data
+renderView1.ResetCamera()
+
+# reset view to fit data
+renderView1.ResetCamera()
+
+# reset view to fit data
+renderView1.ResetCamera()
+
+# set active source
+SetActiveSource(sTLReader6)
+
+# set active source
+SetActiveSource(line1)
+
+# Properties modified on line2
+line2.Resolution = 8
+
+# set active source
+SetActiveSource(line2)
+
+# set active source
+SetActiveSource(line1)
+
+# Properties modified on line1
+line1.Resolution = 8
+
+# set active source
+SetActiveSource(sTLReader7)
+
+# reset view to fit data
+renderView1.ResetCamera()
+
+# reset view to fit data
+renderView1.ResetCamera()
+
+# reset view to fit data
+renderView1.ResetCamera()
+
+# reset view to fit data
+renderView1.ResetCamera()
+
+# reset view to fit data
+renderView1.ResetCamera()
+
+# current camera placement for renderView1
+renderView1.InteractionMode = '2D'
+renderView1.CameraPosition = [0.8681418721988577, -0.005625802018882643, 4.094621413208957]
+renderView1.CameraFocalPoint = [0.8681418721988577, -0.005625802018882643, 0.0]
+renderView1.CameraParallelScale = 0.5982102813411877
+
+# save screenshot
+#SaveScreenshot('/scratch/morui/graham/missile/missile_long_schlieren_slice_m192.jpg', layout=layout1, magnification=2, quality=100)
+
+#### uncomment the following to render all views
+# RenderAllViews()
+# alternatively, if you want to write images, you can use SaveScreenshot(...).

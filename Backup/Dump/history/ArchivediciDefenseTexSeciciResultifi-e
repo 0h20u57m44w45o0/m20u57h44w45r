@@ -1,0 +1,1249 @@
+%---------------------------------------------------------------------------%
+\section{Results}
+%---------------------------------------------------------------------------%
+\subsection{Solver validation}
+%---------------------------------------------------------------------------%
+\begin{frame}[fragile]
+    \frametitle{A modified vortex preservation problem}
+    \begin{center}
+        \includegraphics[trim = 00mm 10mm 00mm 10mm, clip, width=0.6\textwidth]{vortex_preserve_demo}
+    \end{center}
+
+    \begin{center}
+        \footnotesize
+        \setlength{\tabcolsep}{3pt}
+        %\renewcommand{\arraystretch}{1.5}
+        \begin{tabular}{lc>{\columncolor[gray]{0.8}}cc>{\columncolor[gray]{0.8}}cc>{\columncolor[gray]{0.8}}c}
+            \hline\hline
+            %\multicolumn{2}{c}{Item} \\
+            %\cline{1-2}
+            $m_x \times m_y$ & $L_1$ error & $L_1$ order & $L_{2}$ error & $L_{2}$ order & $L_{\infty}$ error & $L_{\infty}$ order\\
+            \hline
+            $40\times20$ & $3.536\mathrm{e}{-2}$ & $-$ & $6.097\mathrm{e}{-2}$ & $-$ & $4.105\mathrm{e}{-1}$ & $-$\\
+            $80\times40$ & $9.113\mathrm{e}{-3}$ & $1.956$ & $2.497\mathrm{e}{-2}$ & $1.288$ & $1.997\mathrm{e}{-1}$ & $1.039$\\
+            $160\times80$ & $2.034\mathrm{e}{-3}$ & $2.163$ & $6.548\mathrm{e}{-3}$ & $1.931$ & $5.236\mathrm{e}{-2}$ & $1.931$\\
+            $320\times160$ & $5.114\mathrm{e}{-4}$ & $1.992$ & $1.640\mathrm{e}{-3}$ & $1.997$ & $1.278\mathrm{e}{-2}$ & $2.035$\\
+            $640\times320$ & $1.287\mathrm{e}{-4}$ & $1.990$ & $4.097\mathrm{e}{-4}$ & $2.001$ & $3.119\mathrm{e}{-3}$ & $2.034$\\
+            $1280\times640$ & $3.233\mathrm{e}{-5}$ & $1.993$ & $1.024\mathrm{e}{-4}$ & $2.000$ & $7.818\mathrm{e}{-4}$ & $1.996$\\
+            \hline\hline
+        \end{tabular}
+    \end{center}
+
+    %- insert external multimedia play icon at frame corner
+    \begin{tikzpicture}[remember picture, overlay]
+        \node [anchor=south east, inner sep=0pt] at (0.95\paperwidth,0.00\paperheight) {%
+            \movie[width=0.05\paperwidth, height=0.05\paperheight, externalviewer]{%
+                \includegraphics[width=0.05\paperwidth]{vortex_preserve_geo_t05}%
+            }{./Video/vortex_preserve_geo.avi}%
+        };
+    \end{tikzpicture}
+
+\end{frame}
+%---------------------------------------------------------------------------%
+%\begin{frame}[fragile]
+%    \frametitle{Flow around a cylinder -- steady flows}
+%    \begin{columns}
+%        \begin{column}{.45\textwidth}
+%            \centering
+%            \includegraphics[trim = 0mm 20mm 0mm 20mm, clip, width=\textwidth]{flow_cylinder_demo_a}
+%
+%            Computational domain
+%        \end{column}
+%
+%        \begin{column}{.45\textwidth}
+%            \centering
+%            \includegraphics[trim = 0mm 20mm 0mm 20mm, clip, width=\textwidth]{flow_cylinder_demo_b}
+%
+%            Vortex parameters
+%        \end{column}
+%    \end{columns}
+%
+%    \medskip
+%
+%    \begin{columns}
+%        \begin{column}{.45\textwidth}
+%            \centering
+%            \includegraphics[width=\textwidth]{1_cyn_vortex_stream_re020}
+%
+%            $Re =20$
+%        \end{column}
+%
+%        \begin{column}{.45\textwidth}
+%            \centering
+%            \includegraphics[width=\textwidth]{1_cyn_vortex_stream_re040}
+%
+%            $Re =40$
+%        \end{column}
+%    \end{columns}
+%\end{frame}
+%%---------------------------------------------------------------------------%
+%\begin{frame}[fragile]
+%    \frametitle{Flow around a cylinder -- unsteady flows}
+%    \begin{columns}
+%        \begin{column}{.35\textwidth}
+%            \centering
+%            \includegraphics[trim = 0mm 80mm 0mm 80mm, clip, width=\textwidth]{1_cyn_vortex_re100_t0500ms}
+%        \end{column}
+%
+%        \begin{column}{.35\textwidth}
+%            \centering
+%            \includegraphics[trim = 0mm 80mm 0mm 80mm, clip, width=\textwidth]{1_cyn_vortex_re200_t0500ms}
+%        \end{column}
+%
+%        \begin{column}{.15\textwidth}
+%            \centering
+%            $t = 0.5 \mathrm{s}$
+%        \end{column}
+%    \end{columns}
+%    \begin{columns}
+%        \begin{column}{.35\textwidth}
+%            \centering
+%            \includegraphics[trim = 0mm 80mm 0mm 80mm, clip, width=\textwidth]{1_cyn_vortex_re100_t1000ms}
+%        \end{column}
+%
+%        \begin{column}{.35\textwidth}
+%            \centering
+%            \includegraphics[trim = 0mm 80mm 0mm 80mm, clip, width=\textwidth]{1_cyn_vortex_re200_t1000ms}
+%        \end{column}
+%
+%        \begin{column}{.15\textwidth}
+%            \centering
+%            $t = 1.0 \mathrm{s}$
+%        \end{column}
+%    \end{columns}
+%    \begin{columns}
+%        \begin{column}{.35\textwidth}
+%            \centering
+%            \includegraphics[trim = 0mm 80mm 0mm 80mm, clip, width=\textwidth]{1_cyn_vortex_re100_t1500ms}
+%        \end{column}
+%
+%        \begin{column}{.35\textwidth}
+%            \centering
+%            \includegraphics[trim = 0mm 80mm 0mm 80mm, clip, width=\textwidth]{1_cyn_vortex_re200_t1500ms}
+%        \end{column}
+%
+%        \begin{column}{.15\textwidth}
+%            \centering
+%            $t = 1.5 \mathrm{s}$
+%        \end{column}
+%    \end{columns}
+%    \begin{columns}
+%        \begin{column}{.35\textwidth}
+%            \centering
+%            \includegraphics[trim = 0mm 80mm 0mm 80mm, clip, width=\textwidth]{1_cyn_vortex_re100_t3000ms}
+%        \end{column}
+%
+%        \begin{column}{.35\textwidth}
+%            \centering
+%            \includegraphics[trim = 0mm 80mm 0mm 80mm, clip, width=\textwidth]{1_cyn_vortex_re200_t3000ms}
+%        \end{column}
+%
+%        \begin{column}{.15\textwidth}
+%            \centering
+%            $t = 3.0 \mathrm{s}$
+%        \end{column}
+%    \end{columns}
+%    \begin{columns}
+%        \begin{column}{.35\textwidth}
+%            \centering
+%            \includegraphics[trim = 0mm 80mm 0mm 80mm, clip, width=\textwidth]{1_cyn_vortex_re100_t5000ms}
+%        \end{column}
+%
+%        \begin{column}{.35\textwidth}
+%            \centering
+%            \includegraphics[trim = 0mm 80mm 0mm 80mm, clip, width=\textwidth]{1_cyn_vortex_re200_t5000ms}
+%        \end{column}
+%
+%        \begin{column}{.15\textwidth}
+%            \centering
+%            $t = 5.0 \mathrm{s}$
+%        \end{column}
+%    \end{columns}
+%    \begin{columns}
+%        \begin{column}{.35\textwidth}
+%            \centering{$Re=100$}
+%        \end{column}
+%
+%        \begin{column}{.35\textwidth}
+%            \centering{$Re=200$}
+%        \end{column}
+%
+%        \begin{column}{.15\textwidth}
+%        \end{column}
+%    \end{columns}
+%
+%    %- insert external multimedia play icon at frame corner
+%    \begin{tikzpicture}[remember picture, overlay]
+%        \node [anchor=south east, inner sep=0pt] at (0.05\paperwidth,0.00\paperheight) {%
+%            \movie[width=0.05\paperwidth, height=0.05\paperheight, externalviewer]{%
+%                \includegraphics[width=0.05\paperwidth]{1_cyn_vortex_re100_t0500ms}%
+%            }{./Video/1_cyn_vortex_re100.avi}%
+%        };
+%    \end{tikzpicture}
+%    \begin{tikzpicture}[remember picture, overlay]
+%        \node [anchor=south east, inner sep=0pt] at (0.95\paperwidth,0.00\paperheight) {%
+%            \movie[width=0.05\paperwidth, height=0.05\paperheight, externalviewer]{%
+%                \includegraphics[width=0.05\paperwidth]{1_cyn_vortex_re200_t0500ms}%
+%            }{./Video/1_cyn_vortex_re200.avi}%
+%        };
+%    \end{tikzpicture}
+%\end{frame}
+%%---------------------------------------------------------------------------%
+%\begin{frame}[fragile]
+%    \frametitle{Flow around a cylinder -- quantification}
+%    \begin{center}
+%        \scriptsize
+%        %\setlength{\tabcolsep}{4pt}% column separation
+%        %\renewcommand{\arraystretch}{1.5}% row space 
+%        \begin{tabular}{lccccc}
+%            \hline
+%            %\multicolumn{num_of_cols_to_merge}{alignment}{contents} \\
+%            %\cline{i-j}% partial hline from column i to column j
+%            & $a$ & $b$ & $c$ & $\theta$ & $C_{\Des{D}}$ \\
+%            \hline
+%            $Re=20$ & & & & & \\
+%            \cite{coutanceau1977experimental}$^*$ & $0.33$ & $0.46$ & $0.93$ & $45.0^{\circ}$ & $--$\\
+%            \cite{brehm2015locally} & $0.36$ & $0.42$ & $0.96$ & $44.0^{\circ}$ & $2.02$\\
+%            \emph{Present study} & $0.36$ & $0.42$ & $0.93$ & $43.8^{\circ}$ & $2.01$\\
+%            $Re=40$ & & & & & \\
+%            \cite{coutanceau1977experimental}$^*$ & $0.76$ & $0.59$ & $2.13$ & $53.8^{\circ}$ & $--$\\
+%            \cite{brehm2015locally} & $0.72$ & $0.58$ & $2.26$ & $52.9^{\circ}$ & $1.51$\\
+%            \emph{Present study} & $0.73$ & $0.60$ & $2.27$ & $52.4^{\circ}$ & $1.50$\\
+%            \hline
+%        \end{tabular}
+%    \end{center}
+%
+%    \begin{center}
+%        \scriptsize
+%        \begin{tabular}{lccc}
+%            \hline
+%            %\multicolumn{num_of_cols_to_merge}{alignment}{contents} \\
+%            %\cline{i-j}% partial hline from column i to column j
+%            & $St$ & $C_{\Des{D}}$ & $C_{\Des{L}}$\\
+%            \hline
+%            $Re=100$ & & & \\
+%            \cite{berger1972periodic}$^*$ & $0.160-0.170$ & $-$ & $-$\\
+%            \cite{linnick2005high} & $0.165$ & $1.320$ & $\pm 0.320$\\
+%            \cite{brehm2015locally} & $0.170$ & $1.380$ & $\pm 0.342$\\
+%            \emph{Present study} & $0.163$ & $1.304$ & $\pm0.310$\\
+%            $Re=200$ & & & \\
+%            \cite{berger1972periodic}$^*$ & $0.180-0.190$ & $-$ & $-$\\
+%            \cite{linnick2005high} & $0.192$ & $1.300$ & $\pm 0.660$\\
+%            \cite{brehm2015locally} & $0.198$ & $1.380$ & $\pm 0.700$\\
+%            \emph{Present study} & $0.187$ & $1.286$ & $\pm 0.613$\\
+%            \hline
+%        \end{tabular}
+%    \end{center}
+%\end{frame}
+%---------------------------------------------------------------------------%
+\begin{frame}[fragile]
+    \frametitle{Mach $2.81$ shock diffraction over a cylinder -- Schlieren}
+    \begin{columns}
+        \begin{column}{.26\textwidth}
+            \centering
+            \includegraphics[trim = 10mm 0mm 30mm 0mm, clip, width=\textwidth]{shock_cylinder_demo_a}
+        \end{column}
+
+        \begin{column}{.26\textwidth}
+            \centering
+            \includegraphics[trim = 30mm 0mm 10mm 0mm, clip, width=\textwidth]{shock_cylinder_demo_b}
+        \end{column}
+
+        \begin{column}{.48\textwidth}
+        \end{column}
+    \end{columns}
+
+    \begin{columns}
+        \begin{column}{.325\textwidth}
+            \centering
+            \includegraphics[trim = 60mm 0mm 60mm 0mm, clip, width=\textwidth]{1_cyn_nomv_invis_m2400_schlieren_normal}
+
+            \smallskip
+
+            Slip wall
+        \end{column}
+
+        \begin{column}{.325\textwidth}
+            \centering
+            \includegraphics[trim = 60mm 0mm 60mm 0mm, clip, width=\textwidth]{1_cyn_nomv_vis_m2400_schlieren_normal}
+
+            \smallskip
+
+            Noslip wall
+        \end{column}
+
+        \begin{column}{.325\textwidth}
+            \centering
+            \includegraphics[angle=180, origin=c, width=.90\textwidth]{1_cyn_nomv_schlieren_exp}
+
+            \smallskip
+
+            Bryson et al. Exp.
+        \end{column}
+    \end{columns}
+
+    \begin{tikzpicture}[remember picture, overlay]
+        \node [anchor=south east, inner sep=0pt, text width=3.6cm] at (0.94\paperwidth,0.62\paperheight) {%
+            {\raggedright\tiny \textsc{Source:} \fullcite{bryson1961diffraction}\par}
+        };
+    \end{tikzpicture}
+
+    %- insert external multimedia play icon at frame corner
+    %\begin{tikzpicture}[remember picture, overlay]
+    %    \node [anchor=south east, inner sep=0pt] at (0.50\paperwidth,0.68\paperheight) {%
+    %        \movie[width=0.05\paperwidth, height=0.05\paperheight, externalviewer]{%
+    %            \includegraphics[width=0.05\paperwidth]{1_cyn_nomv_invis_m2400_schlieren_normal}%
+    %        }{./Video/1_cyn_nomv_invis_m2400_schlieren.avi}%
+    %    };
+    %\end{tikzpicture}
+
+    %\begin{tikzpicture}[remember picture, overlay]
+    %    \node [anchor=south east, inner sep=0pt] at (0.50\paperwidth,0.65\paperheight) {%
+    %        \movie[width=0.05\paperwidth, height=0.05\paperheight, externalviewer]{%
+    %            \includegraphics[width=0.05\paperwidth]{1_cyn_nomv_vis_m2400_schlieren_normal}%
+    %        }{./Video/1_cyn_nomv_vis_m2400_schlieren.avi}%
+    %    };
+    %\end{tikzpicture}
+
+    \note{
+        \begin{itemize}
+            \item Shock reflection, diffraction, and collision.
+            \item Triple point path.
+            \item Point of flow separation indicates better agreement between no-slip wall and exp.
+            \item No significant difference in main flow features between slip and no-slip walls.
+        \end{itemize}
+    }
+\end{frame}
+%---------------------------------------------------------------------------%
+\begin{frame}[fragile]
+    \frametitle{Mach $2.81$ shock diffraction over a cylinder -- triple point path}
+    \centering{\includegraphics[width=0.35\textwidth]{1_cyn_nomv_invis_triple_path}}
+    \begin{columns}
+        \begin{column}{.290\textwidth}
+            \centering
+            \includegraphics[trim = 60mm 0mm 60mm 0mm, clip, width=\textwidth]{1_cyn_nomv_invis_m0300_overlap}
+
+            \smallskip
+
+            $300\times300$ ($29.8^{\circ}$)
+        \end{column}
+
+        \begin{column}{.290\textwidth}
+            \centering
+            \includegraphics[trim = 60mm 0mm 60mm 0mm, clip, width=\textwidth]{1_cyn_nomv_invis_m0600_overlap}
+
+            \smallskip
+
+            $600\times600$ ($30.3^{\circ}$)
+        \end{column}
+
+        \begin{column}{.290\textwidth}
+            \centering
+            \includegraphics[trim = 60mm 0mm 60mm 0mm, clip, width=\textwidth]{1_cyn_nomv_invis_m1200_overlap}
+
+            \smallskip
+
+            $1200\times1200$ ($30.9^{\circ}$)
+        \end{column}
+    \end{columns}
+    \note{
+    }
+\end{frame}
+%---------------------------------------------------------------------------%
+%\begin{frame}[fragile]
+%    \frametitle{Interface sharpness examined by stream traces}
+%    \footnotesize
+%    \begin{columns}
+%        \begin{column}{.35\textwidth}
+%            \centering
+%            \includegraphics[width=\textwidth]{1_cyn_nomv_invis_m0600_streamline}
+%
+%            \smallskip
+%
+%            Cylinder, no-slip Wall
+%        \end{column}
+%
+%        \begin{column}{.35\textwidth}
+%            \centering
+%            \includegraphics[width=\textwidth]{1_cyn_nomv_vis_m0600_streamline}
+%
+%            \smallskip
+%
+%            Cylinder, slip Wall
+%        \end{column}
+%    \end{columns}
+%
+%    \medskip
+%
+%    \begin{columns}
+%        \begin{column}{\textwidth}
+%            \centering
+%            \includegraphics[width=.35\textwidth]{2_sph_nomv_vis_m0250_streamline}
+%
+%            \smallskip
+%
+%            Partially overlapped spheres, no-slip wall
+%        \end{column}
+%    \end{columns}
+%    \note{
+%        \begin{itemize}
+%            \item Here we present the stream traces of shock diffracting over different geometries as well as different wall boundary conditions.
+%            \item We can observe that the stream traces can closely align with the geometry, even we're using non-body conformal grids.
+%        \end{itemize}
+%    }
+%\end{frame}
+%---------------------------------------------------------------------------%
+\begin{frame}[fragile]
+    \frametitle{Mach $1.22$ shock diffraction over a sphere -- Schlieren}
+    \begin{columns}
+        \begin{column}{.33\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{shock_sphere_demo_a}
+
+            Computational domain
+        \end{column}
+
+        \begin{column}{.33\textwidth}
+            \centering
+
+            \includegraphics[width=\textwidth]{shock_sphere_demo_b}
+
+            Pressure probes
+        \end{column}
+    \end{columns}
+
+    \medskip
+
+    \begin{columns}
+        \begin{column}{.24\textwidth}
+            \centering
+            \includegraphics[trim = 75mm 0mm 75mm 0mm, clip, width=\textwidth]{1_sph_force_volume_t15}
+
+            $t = 150 \Unit{\mu s}$
+        \end{column}
+        \begin{column}{.24\textwidth}
+            \centering
+            \includegraphics[trim = 75mm 0mm 75mm 0mm, clip, width=\textwidth]{1_sph_force_volume_t40}
+
+            $t = 400 \Unit{\mu s}$
+        \end{column}
+        \begin{column}{.24\textwidth}
+            \centering
+            \includegraphics[trim = 75mm 0mm 75mm 0mm, clip, width=\textwidth]{1_sph_force_volume_t50}
+
+            $t = 500 \Unit{\mu s}$
+        \end{column}
+        \begin{column}{.24\textwidth}
+            \centering
+            \includegraphics[trim = 75mm 0mm 75mm 0mm, clip, width=\textwidth]{1_sph_force_volume_t75}
+
+            $t = 750 \Unit{\mu s}$
+        \end{column}
+    \end{columns}
+
+    %- insert external multimedia play icon at frame corner
+    \begin{tikzpicture}[remember picture, overlay]
+        \node [anchor=south east, inner sep=0pt] at (0.95\paperwidth,0.60\paperheight) {%
+            \movie[width=0.05\paperwidth, height=0.05\paperheight, externalviewer]{%
+                \includegraphics[width=0.05\paperwidth]{1_sph_force_volume_t15}%
+            }{./Video/1_sph_force.avi}%
+        };
+    \end{tikzpicture}
+
+\end{frame}
+%---------------------------------------------------------------------------%
+\begin{frame}[fragile]
+    \frametitle{Mach $1.22$ shock diffraction over a sphere -- forces}
+    \begin{columns}
+        \begin{column}{.35\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{1_sph_force_p1}
+
+            $P_1$
+        \end{column}
+
+        \begin{column}{.35\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{1_sph_force_p7}
+
+            $P_2$
+        \end{column}
+    \end{columns}
+
+    \medskip
+
+    \begin{columns}
+        \begin{column}{.70\textwidth}
+            \centering
+            \includegraphics[width=0.5\textwidth]{1_sph_force_cd}
+
+            $C_{\Des{D}}$
+        \end{column}
+    \end{columns}
+\end{frame}
+%---------------------------------------------------------------------------%
+\begin{frame}[fragile]
+    \frametitle{Oblique shock relation -- $M_{\infty}-\theta-\beta$}
+    \begin{minipage}[c][.85\textheight][c]{\textwidth}% a fixed height minipage to control vertical alignment
+        \begin{columns}
+            \begin{column}{.48\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{flow_wedge_demo_a}
+            \end{column}
+
+            \begin{column}{.48\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{flow_wedge_demo_c}
+            \end{column}
+        \end{columns}
+
+        \medskip
+
+        \begin{columns}
+            \begin{column}{.2\textwidth}
+            \end{column}
+
+            \begin{column}{.6\textwidth}
+                \centering
+                $\tan \theta = \frac{2}{\tan \beta} \frac{M_{\infty}^2 \sin^2 \beta - 1}{M_{\infty}^2 (\gamma + \cos(2\beta)) + 2}$
+            \end{column}
+
+            \begin{column}{.2\textwidth}
+            \end{column}
+        \end{columns}
+    \end{minipage}
+
+    \vfill
+
+    {\centering\tiny \textsc{Source:} \fullcite{anderson2010fundamentals}\par}%
+
+    \note{
+        \begin{itemize}
+            \item Galilean transformation.
+            \item Oblique shock relation.
+            \item Prandtl-Meyer expansion waves.
+        \end{itemize}
+    }
+\end{frame}
+%---------------------------------------------------------------------------%
+\begin{frame}[fragile]
+    \frametitle{Oblique shock relation -- Galilean transformation}
+    \begin{columns}
+        \begin{column}{.285\textwidth}
+            \centering
+            \includegraphics[trim = 0mm 30mm 0mm 30mm, clip, width=\textwidth]{1_wedge_nomv_deg15_mach2_m1200_t050ms}
+        \end{column}
+
+        \begin{column}{.285\textwidth}
+            \centering
+            \includegraphics[trim = 0mm 30mm 0mm 30mm, clip, width=\textwidth]{1_wedge_mv_deg15_mach2_m1200_t050ms}
+        \end{column}
+
+        \begin{column}{.15\textwidth}
+            \centering
+            $t = 0.05 \mathrm{s}$
+        \end{column}
+    \end{columns}
+    \begin{columns}
+        \begin{column}{.285\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{1_wedge_nomv_deg15_mach2_m1200_t100ms}
+        \end{column}
+
+        \begin{column}{.285\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{1_wedge_mv_deg15_mach2_m1200_t100ms}
+        \end{column}
+
+        \begin{column}{.15\textwidth}
+            \centering
+            $t = 0.10 \mathrm{s}$
+        \end{column}
+    \end{columns}
+    \begin{columns}
+        \begin{column}{.285\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{1_wedge_nomv_deg15_mach2_m1200_t150ms}
+        \end{column}
+
+        \begin{column}{.285\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{1_wedge_mv_deg15_mach2_m1200_t150ms}
+        \end{column}
+
+        \begin{column}{.15\textwidth}
+            \centering
+            $t = 0.15 \mathrm{s}$
+        \end{column}
+    \end{columns}
+    \begin{columns}
+        \begin{column}{.285\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{1_wedge_nomv_deg15_mach2_m1200_t200ms}
+        \end{column}
+
+        \begin{column}{.285\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{1_wedge_mv_deg15_mach2_m1200_t200ms}
+        \end{column}
+
+        \begin{column}{.15\textwidth}
+            \centering
+            $t = 0.20 \mathrm{s}$
+        \end{column}
+    \end{columns}
+
+    %- insert external multimedia play icon at frame corner
+    \begin{tikzpicture}[remember picture, overlay]
+        \node [anchor=south east, inner sep=0pt] at (0.95\paperwidth,0.00\paperheight) {%
+            \movie[width=0.05\paperwidth, height=0.05\paperheight, externalviewer]{%
+                \includegraphics[width=0.05\paperwidth]{flow_wedge_demo_c}%
+            }{./Video/1_wedge_deg15_mach2_m1200.avi}%
+        };
+    \end{tikzpicture}
+
+\end{frame}
+%---------------------------------------------------------------------------%
+\begin{frame}[fragile]
+    \frametitle{Oblique shock relation -- $M_{\infty}(\hat{M})-\theta(\hat{\theta})-\beta_e(\hat{\beta}_e)-\beta_n(\hat{\beta}_n)$}
+    \begin{columns}
+        \begin{column}{.38\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{1_wedge_nomv_deg10_mach4_m1200_lined}
+        \end{column}
+
+        \begin{column}{.12\textwidth}
+            \centering\tiny
+            $M_{\infty}(4)-\theta(10^{\circ})-\beta_e(22.234^{\circ})-\beta_n(22.227^{\circ})$
+        \end{column}
+
+        \begin{column}{.38\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{1_wedge_nomv_deg15_mach6_m1200_lined}
+        \end{column}
+
+        \begin{column}{.12\textwidth}
+            \centering\tiny
+            $M_{\infty}(6)-\theta(15^{\circ})-\beta_e(22.672^{\circ})-\beta_n(22.585^{\circ})$
+        \end{column}
+    \end{columns}
+    \begin{columns}
+        \begin{column}{.38\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{1_wedge_nomv_deg15_mach4_m1200_lined}
+        \end{column}
+
+        \begin{column}{.12\textwidth}
+            \centering\tiny
+            $M_{\infty}(4)-\theta(15^{\circ})-\beta_e(27.063^{\circ})-\beta_n(27.325^{\circ})$
+        \end{column}
+
+        \begin{column}{.38\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{1_wedge_nomv_deg15_mach8_m1200_lined}
+        \end{column}
+
+        \begin{column}{.12\textwidth}
+            \centering\tiny
+            $M_{\infty}(8)-\theta(15^{\circ})-\beta_e(20.860^{\circ})-\beta_n(20.595^{\circ})$
+        \end{column}
+    \end{columns}
+    \begin{columns}
+        \begin{column}{.38\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{1_wedge_nomv_deg20_mach4_m1200_lined}
+        \end{column}
+
+        \begin{column}{.12\textwidth}
+            \centering\tiny
+            $M_{\infty}(4)-\theta(20^{\circ})-\beta_e(32.464^{\circ})-\beta_n(32.293^{\circ})$
+        \end{column}
+
+        \begin{column}{.38\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{1_wedge_nomv_deg15_mach10_m1200_lined}
+        \end{column}
+
+        \begin{column}{.12\textwidth}
+            \centering\tiny
+            $M_{\infty}(10)-\theta(15^{\circ})-\beta_e(19.942^{\circ})-\beta_n(18.930^{\circ})$
+        \end{column}
+    \end{columns}
+\end{frame}
+%---------------------------------------------------------------------------%
+\begin{frame}[fragile]
+    \frametitle{Mach $2.5$ multibody contact and collision}
+    \begin{center}
+        \includegraphics[trim = 30mm 0mm 30mm 0mm, clip, width=0.5\textwidth]{multibody_collision_demo}
+    \end{center}
+
+    %- insert external multimedia play icon at frame corner
+    \begin{tikzpicture}[remember picture, overlay]
+        \node [anchor=south east, inner sep=0pt] at (0.95\paperwidth,0.00\paperheight) {%
+            \movie[width=0.05\paperwidth, height=0.05\paperheight, externalviewer]{%
+                \includegraphics[width=0.05\paperwidth]{multi_col_wall_m1200_t080ms}%
+            }{./Video/multi_col_wall_m2o5_m1200.avi}%
+        };
+    \end{tikzpicture}
+
+    \note{
+    }
+\end{frame}
+%---------------------------------------------------------------------------%
+\begin{frame}[fragile]
+    \frametitle{Mach $3$ supersonic wedge penetrating a particle bed}
+    \begin{center}
+        \includegraphics[width=0.8\textwidth]{flow_wedge_demo_e}
+    \end{center}
+
+    %- insert external multimedia play icon at frame corner
+    \begin{tikzpicture}[remember picture, overlay]
+        \node [anchor=south east, inner sep=0pt] at (0.95\paperwidth,0.00\paperheight) {%
+            \movie[width=0.05\paperwidth, height=0.05\paperheight, externalviewer]{%
+                \includegraphics[width=0.05\paperwidth]{1_wedge_impact_deg15_mach3_cr0d00_t250ms}%
+            }{./Video/1_wedge_impact_deg15_mach3_cr0d00.avi}%
+        };
+    \end{tikzpicture}
+
+    \note{
+    }
+\end{frame}
+%---------------------------------------------------------------------------%
+\begin{frame}[fragile]
+    \frametitle{A numerical wind tunnel test -- fast construction}
+    \begin{columns}
+        \begin{column}{.330\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{missile_short_demo_divide_note}
+
+            \smallskip
+
+            Components
+        \end{column}
+
+        \begin{column}{.330\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{missile_short_demo_assemble}
+
+            \smallskip
+
+            Integration
+        \end{column}
+
+        \begin{column}{.330\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{missile_short_demo_did_main}
+
+            \smallskip
+
+            $\Vector{\Phi}_{i,j,k}(\phi=0, \varphi)$
+        \end{column}
+    \end{columns}
+
+    \medskip
+
+    \begin{columns}
+        \begin{column}{.330\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{missile_short_demo_did_all}
+
+            \smallskip
+
+            $\Vector{\Phi}_{i,j,k}(8 \ge \phi \ge 1, \varphi)$
+        \end{column}
+
+        \begin{column}{.330\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{missile_short_demo_lid}
+
+            \smallskip
+
+            Interfacial nodes
+        \end{column}
+
+        \begin{column}{.330\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{missile_short_demo_gst}
+
+            \smallskip
+
+            Ghost nodes
+        \end{column}
+    \end{columns}
+    \note{
+        \begin{itemize}
+            \item Builds a node map for the numerical discretization of the assembled domain.
+            \item Enables an automatic boolean treatment for geometric intersections.
+        \end{itemize}
+    }
+\end{frame}
+%---------------------------------------------------------------------------%
+\begin{frame}[fragile]
+    \frametitle{A numerical wind tunnel test -- Mach $5$ solution}
+    \begin{columns}
+        \begin{column}{.330\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{missile_short_schlieren_volume_m192_t0d02}
+
+            \smallskip
+
+            $t = 0.02 \Unit{s}$
+        \end{column}
+
+        \begin{column}{.330\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{missile_short_schlieren_volume_m192_t0d03}
+
+            \smallskip
+
+            $t = 0.03 \Unit{s}$
+        \end{column}
+
+        \begin{column}{.330\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{missile_short_schlieren_volume_m192_t0d04}
+
+            \smallskip
+
+            $t = 0.04 \Unit{s}$
+        \end{column}
+    \end{columns}
+
+    \bigskip
+
+    \begin{columns}
+        \begin{column}{.330\textwidth}
+            \centering
+            \includegraphics[trim = 0mm 50mm 0mm 50mm, clip, width=\textwidth]{missile_short_schlieren_slice_m096}
+
+            \smallskip
+
+            $350 \times 96 \times 96$
+        \end{column}
+
+        \begin{column}{.330\textwidth}
+            \centering
+            \includegraphics[trim = 0mm 50mm 0mm 50mm, clip, width=\textwidth]{missile_short_schlieren_slice_m144}
+
+            \smallskip
+
+            $525 \times 145 \times 145$
+        \end{column}
+
+        \begin{column}{.330\textwidth}
+            \centering
+            \includegraphics[trim = 0mm 50mm 0mm 50mm, clip, width=\textwidth]{missile_short_schlieren_slice_m192}
+
+            \smallskip
+
+            $700 \times 192 \times 192$
+        \end{column}
+    \end{columns}
+
+    %- insert external multimedia play icon at frame corner
+    \begin{tikzpicture}[remember picture, overlay]
+        \node [anchor=south east, inner sep=0pt] at (0.95\paperwidth,-0.10\paperheight) {%
+            \movie[width=0.05\paperwidth, height=0.05\paperheight, externalviewer]{%
+                \includegraphics[width=0.05\paperwidth]{missile_short_schlieren_volume_m192_t0d04}%
+            }{./Video/missile_short_schlieren_m192.avi}%
+        };
+    \end{tikzpicture}
+
+    \note{
+    }
+\end{frame}
+%---------------------------------------------------------------------------%
+%\begin{frame}[fragile]
+%    \frametitle{Transient rotational flow -- $\omega(0) = 0 \Unit{rad/s}$, $\alpha(t) = 10 \pi \Unit{rad/s^2}$}
+%    \begin{columns}
+%        \begin{column}{.330\textwidth}
+%            \centering
+%            \includegraphics[trim = 00mm 0mm 00mm 0mm, clip, width=\textwidth]{naca_demo_2d}
+%
+%            \smallskip
+%
+%            2D Components
+%        \end{column}
+%
+%        \begin{column}{.330\textwidth}
+%            \centering
+%            \includegraphics[trim = 00mm 0mm 00mm 0mm, clip, width=\textwidth]{naca_demo_3d}
+%
+%            \smallskip
+%
+%            3D Components
+%        \end{column}
+%
+%        \begin{column}{.330\textwidth}
+%            \centering
+%            \includegraphics[trim = 00mm 0mm 00mm 0mm, clip, width=\textwidth]{naca_demo_3d_multi}
+%
+%            \smallskip
+%
+%            Integration
+%        \end{column}
+%    \end{columns}
+%
+%    \medskip
+%
+%    \begin{columns}
+%        \begin{column}{.330\textwidth}
+%            \centering
+%            \includegraphics[trim = 00mm 0mm 00mm 0mm, clip, width=\textwidth]{trans_rot_w5n_vort_0000ms}
+%
+%            \smallskip
+%
+%            $t = 0.0 \Unit{s}$
+%        \end{column}
+%
+%        \begin{column}{.330\textwidth}
+%            \centering
+%            \includegraphics[trim = 00mm 0mm 00mm 0mm, clip, width=\textwidth]{trans_rot_w5n_vort_0500ms}
+%
+%            \smallskip
+%
+%            $t = 0.5 \Unit{s}$
+%        \end{column}
+%
+%        \begin{column}{.330\textwidth}
+%            \centering
+%            \includegraphics[trim = 00mm 0mm 00mm 0mm, clip, width=\textwidth]{trans_rot_w5n_vort_1000ms}
+%
+%            \smallskip
+%
+%            $t = 1.0 \Unit{s}$
+%        \end{column}
+%    \end{columns}
+%
+%    %- insert external multimedia play icon at frame corner
+%    \begin{tikzpicture}[remember picture, overlay]
+%        \node [anchor=south east, inner sep=0pt] at (0.95\paperwidth,0.00\paperheight) {%
+%            \movie[width=0.05\paperwidth, height=0.05\paperheight, externalviewer]{%
+%                \includegraphics[width=0.05\paperwidth]{trans_rot_w5n_vort_0500ms}%
+%            }{./Video/trans_rot_w5n_vort.avi}%
+%        };
+%    \end{tikzpicture}
+%
+%    \note{
+%        \begin{itemize}
+%            \item Unifies 1D, 2D, and 3D computations
+%            \item Generate complex geometric objects via simply positioning components
+%            \item Vortex-induced vortex shedding
+%            \item Vortex rolling
+%        \end{itemize}
+%    }
+%\end{frame}
+%---------------------------------------------------------------------------%
+\subsection{Particle clustering and jetting investigation}
+%---------------------------------------------------------------------------%
+\begin{frame}[fragile]
+    \frametitle{Direct simulation of explosively dispersed granular materials}
+    \begin{center}
+        \includegraphics[trim = 00mm 10mm 00mm 10mm, clip, width=0.35\textwidth]{burster_payload_demo}
+    \end{center}
+
+    \begin{center}
+        $\Des{L}_{h.i}-\Des{B}_j-\Des{C}_k$: Payload $\Omega_{\Des{L}h}$.sample $i$ - Burster $\Des{B}_j$ - Coefficient $\Des{C}_k$
+
+        $\Omega_{\Des{L}h}=\{r: r \in [r_1, r_2]\}$, $h = 1, \dotsc, 4$, $i=1,2,3$
+
+        $\Omega_{\Des{A}} = (\rho_a, u_a, v_a, p_a)=(1.2047 \Unit{kg/m^3}, 0, 0, 1.01325 \times 10^5 \Unit{Pa})$
+
+        $\Des{B}_j = (\rho_b, u_b, v_b, p_b) = (1.0 \times 10^3 \Unit{kg/m^3}, 0, 0, [0.5, 1.0, 2.5] \times 10^{10} \Unit{Pa})$
+
+        $\rho_{s} = 2700 \Unit{kg/m^3}$, $\Des{C}_1 = 1.0$, $\Des{C}_2 = 0.5$
+
+        $l = 0.15 \Unit{m}$, $[d_{\min}, d_{\max}] = [1 \Unit{mm}, 2 \Unit{mm}]$
+
+        $\max\{n_{\Des{gps}}\} = 7500$, $\min\{n_{\Des{gpd}}\} = 50$
+    \end{center}
+
+    \note{
+        \begin{itemize}
+            \item A 2D stratified burster-payload configuration with a cylindrical charge shape is considered.
+            \item The computational domain is a square region and is characterized by three sub-domains: the burster region $\Omega_{\Des{B}}$, payload region $\Omega_{\Des{L}}$, and ambient air region $\Omega_{\Des{A}}$.
+            \item As the timescale of burster detonation is usually much smaller than that of payload expansion, the burster in initially condensed phase is approximated by a reacted gas product with constant volume.
+            \item In order to focus on granular dynamics, the payload consists of tightly-packed, inert, rigid, and circular particles.
+            \item Notation $\Des{L}_{h.i}-\Des{B}_j-\Des{C}_k$ is used to represent a case with the $i$-th sample of payload size $\Omega_{\Des{L}h}$, burster state $\Des{B}_j$, and coefficient of restitution $\Des{C}_k$.
+            \item The density of particles is $2700 \Unit{kg/m^3}$ and the coefficient of restitution is either $\Des{C}_1 = 1.0$ for elastic pairwise collision or $\Des{C}_2 = 0.5$ for a representative inelastic pairwise collision.
+        \end{itemize}
+    }
+\end{frame}
+%---------------------------------------------------------------------------%
+\begin{frame}[fragile]
+    \frametitle{Payload morphology samples generated by random sampling}
+
+    \begin{columns}
+        \begin{column}{.50\textwidth}
+            \centering
+            \includegraphics[trim = 40mm 00mm 40mm 00mm, clip, width=0.45\textwidth]{jet_SL1_001}
+
+            $\Omega_{\Des{L}1.1}$, $n=428$, $M/C=4.704$
+        \end{column}
+
+        \begin{column}{.50\textwidth}
+            \centering
+            \includegraphics[trim = 40mm 00mm 40mm 00mm, clip, width=0.45\textwidth]{jet_SL2_001}
+
+            $\Omega_{\Des{L}2.1}$, $n=742$, $M/C=8.310$
+        \end{column}
+    \end{columns}
+
+    \bigskip
+
+    \begin{columns}
+        \begin{column}{.50\textwidth}
+            \centering
+            \includegraphics[trim = 40mm 00mm 40mm 00mm, clip, width=0.45\textwidth]{jet_SL3_001}
+
+            $\Omega_{\Des{L}3.1}$, $n=1162$, $M/C=13.040$
+        \end{column}
+
+        \begin{column}{.50\textwidth}
+            \centering
+            \includegraphics[trim = 40mm 00mm 40mm 00mm, clip, width=0.45\textwidth]{jet_SL4_001}
+
+            $\Omega_{\Des{L}4.1}$, $n=2170$, $M/C=24.700$
+        \end{column}
+    \end{columns}
+
+    \bigskip
+
+    %- insert external multimedia play icon at frame corner
+    \begin{tikzpicture}[remember picture, overlay]
+        \node [anchor=south east, inner sep=0pt] at (0.20\paperwidth,-0.03\paperheight) {%
+            \movie[width=0.05\paperwidth, height=0.05\paperheight, externalviewer]{%
+                \includegraphics[width=0.05\paperwidth]{jet_SL1_001}%
+            }{./Video/jet_SL1_001_B2_C2_ani.avi}%
+        };
+    \end{tikzpicture}
+    \begin{tikzpicture}[remember picture, overlay]
+        \node [anchor=south east, inner sep=0pt] at (0.40\paperwidth,-0.03\paperheight) {%
+            \movie[width=0.05\paperwidth, height=0.05\paperheight, externalviewer]{%
+                \includegraphics[width=0.05\paperwidth]{jet_SL2_001}%
+            }{./Video/jet_SL2_001_B2_C2_ani.avi}%
+        };
+    \end{tikzpicture}
+    \begin{tikzpicture}[remember picture, overlay]
+        \node [anchor=south east, inner sep=0pt] at (0.60\paperwidth,-0.03\paperheight) {%
+            \movie[width=0.05\paperwidth, height=0.05\paperheight, externalviewer]{%
+                \includegraphics[width=0.05\paperwidth]{jet_SL3_001}%
+            }{./Video/jet_SL3_001_B2_C2_ani.avi}%
+        };
+    \end{tikzpicture}
+    \begin{tikzpicture}[remember picture, overlay]
+        \node [anchor=south east, inner sep=0pt] at (0.80\paperwidth,-0.03\paperheight) {%
+            \movie[width=0.05\paperwidth, height=0.05\paperheight, externalviewer]{%
+                \includegraphics[width=0.05\paperwidth]{jet_SL4_001}%
+            }{./Video/jet_SL4_001_B2_C2_ani.avi}%
+        };
+    \end{tikzpicture}
+\end{frame}
+%---------------------------------------------------------------------------%
+\begin{frame}[fragile]
+    \frametitle{Statistical dissipative behavior -- a velocity scaling law}
+    \begin{columns}
+        \begin{column}{.45\textwidth}
+            \centering\footnotesize
+            \[
+                V_{\Des{G}} = \sqrt{2E} {\left(\frac{M}{C} + \frac{n}{n+2}\right)}^{-0.5}
+            \]
+        \end{column}
+
+        \begin{column}{.55\textwidth}
+            \centering\footnotesize
+            \[
+                V_{\Des{G}, \phi} = \sqrt{2E} {\left(\frac{M}{C} \frac{1}{\alpha(\rho_0)} + \frac{n}{n+2}\right)}^{-0.5} * F(\phi)
+            \]
+        \end{column}
+    \end{columns}
+
+    \smallskip
+
+    {\centering\tiny \textsc{Source:} \fullcite{gurney1943initial}\par \fullcite{milne2016gurney}\par}
+
+    \smallskip
+
+    \begin{footnotesize}
+        \[
+            \frac{t_n}{t_m} = \frac{\hat{V}_{\Des{G}}^{m}}{\hat{V}_{\Des{G}}^{n}} = \sqrt{\frac{E_m}{E_n}}
+        \]
+    \end{footnotesize}
+
+    \begin{columns}
+        \begin{column}{.325\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{SL1_001_Bj_C2_VE_t_Max}
+
+            $V_{\Des{E,Max}}$
+        \end{column}
+
+        \begin{column}{.325\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{SL1_001_Bj_C2_VE_t_Mean}
+
+            $V_{\Des{E,Mean}}$
+        \end{column}
+
+        \begin{column}{.325\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{SL1_001_Bj_C2_VE_t_Min}
+
+            $V_{\Des{E,Min}}$
+        \end{column}
+    \end{columns}
+
+    \note{
+        \begin{itemize}
+            \item a valid statistical dissipative property of the framework in solving explosively dispersed granular materials with respect to Gurney velocity is demonstrated.
+            \item The predicted surface expansion velocities can extend the time range of the velocity scaling law with regard to Gurney energy in the Gurney theory from the steady-state termination phase to the unsteady evolution phase.
+        \end{itemize}
+    }
+\end{frame}
+%---------------------------------------------------------------------------%
+\begin{frame}[fragile]
+    \frametitle{Statistical dissipative behavior -- a velocity scaling law: $V_{\Des{E,Mean}}$}
+    \begin{columns}
+        \begin{column}{.40\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{SL1_001_Bj_C2_VE_t_Mean}
+        \end{column}
+
+        \begin{column}{.40\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{SL2_001_Bj_C2_VE_t_Mean}
+        \end{column}
+    \end{columns}
+
+    \begin{columns}
+        \begin{column}{.40\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{SL3_001_Bj_C2_VE_t_Mean}
+        \end{column}
+
+        \begin{column}{.40\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{SL4_001_Bj_C2_VE_t_Mean}
+        \end{column}
+    \end{columns}
+
+\end{frame}
+%---------------------------------------------------------------------------%
+\begin{frame}[fragile]
+    \frametitle{Statistical dissipative behavior -- $V_{\Des{G}}$, $V_{\Des{G},\phi}$, $V_{\Des{E,Max}}$, $V_{\Des{E,Mean}}$, $V_{\Des{E,Min}}$}
+    \begin{columns}
+        \begin{column}{.48\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{jet_VG_Lhi_B2_C2}
+
+            $\Des{L}_{h.i}-\Des{B}_2-\Des{C}_2$
+        \end{column}
+
+        \begin{column}{.48\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{jet_VG_Lhi_B2_C3}
+
+            $\Des{L}_{h.i}-\Des{B}_2-\Des{C}_1$
+        \end{column}
+    \end{columns}
+
+    \begin{center}
+        Legend: {\color[RGB]{0, 0, 0} $\bullet$} $V_{\Des{G}}$; {\color[RGB]{31, 119, 180} $+$} $V_{\Des{G},\phi}$; {\color[RGB]{214, 39, 40} $\blacktriangledown$} $V_{\Des{E,Max}}$; {\color[RGB]{148, 103, 189} $\times$} $V_{\Des{E,Mean}}$; {\color[RGB]{255, 127, 14} $\blacklozenge$} $V_{\Des{E,Min}}$
+    \end{center}
+    \note{
+        \begin{itemize}
+            \item Comparing $V_{\Des{E,Mean}}$ with $V_{\Des{G},\phi}$, the results show that $V_{\Des{E,Mean}}$ can agree well with $V_{\Des{G},\phi}$ for elastic cases with a relatively large $M/C$. Considering the difference between the 1D continuum modeling for $V_{\Des{G},\phi}$ and our 2D discrete modeling for $V_{\Des{E,Mean}}$, this agreement on large $M/C$ could be the incidentally agreed overall dissipation, mainly due to the solid volume fraction, between the two different modeling approaches for these case settings.
+        \end{itemize}
+    }
+\end{frame}
+%---------------------------------------------------------------------------%
+\begin{frame}[fragile]
+    \frametitle{Particle clustering and jetting instabilities -- an explanation}
+
+    \begin{columns}
+        \begin{column}{.29\textwidth}
+            \centering
+            \includegraphics[trim = 40mm 00mm 40mm 00mm, clip, width=\textwidth]{jet_SL2_001_B2_C2_time_0000}
+
+            $t = 0.0 \Unit{us}$
+        \end{column}
+
+        \begin{column}{.29\textwidth}
+            \centering
+            \includegraphics[trim = 40mm 00mm 40mm 00mm, clip, width=\textwidth]{jet_SL2_001_B2_C2_time_0005}
+
+            $t = 1.4 \Unit{us}$
+        \end{column}
+
+        \begin{column}{.29\textwidth}
+            \centering
+            \includegraphics[trim = 40mm 00mm 40mm 00mm, clip, width=\textwidth]{jet_SL2_001_B2_C2_time_0010}
+
+            $t = 2.8 \Unit{us}$
+        \end{column}
+    \end{columns}
+
+    \medskip
+
+    \begin{columns}
+        \begin{column}{.29\textwidth}
+            \centering
+            \includegraphics[trim = 40mm 00mm 40mm 00mm, clip, width=\textwidth]{jet_SL2_001_B2_C2_time_0020}
+
+            $t = 5.8 \Unit{us}$
+        \end{column}
+
+        \begin{column}{.29\textwidth}
+            \centering
+            \includegraphics[trim = 40mm 00mm 40mm 00mm, clip, width=\textwidth]{jet_SL2_001_B2_C2_time_0030}
+
+            $t = 8.6 \Unit{us}$
+        \end{column}
+
+        \begin{column}{.29\textwidth}
+            \centering
+            \includegraphics[trim = 40mm 00mm 40mm 00mm, clip, width=\textwidth]{jet_SL2_001_B2_C2_time_0040}
+
+            $t = 11.4 \Unit{us}$
+        \end{column}
+    \end{columns}
+
+\end{frame}
+%---------------------------------------------------------------------------%
+%\begin{frame}[fragile]
+%    \frametitle{A 3D dispersal demo}
+%    \begin{columns}
+%        \begin{column}{.45\textwidth}
+%            \centering
+%            \includegraphics[width=\textwidth]{3d_jet_l5_nf24_domain_demo}
+%
+%            Computational domain
+%        \end{column}
+%
+%        \begin{column}{.45\textwidth}
+%            \centering
+%            \includegraphics[width=\textwidth]{3d_jet_l5_nf24_slice_demo}
+%
+%            A clip view
+%        \end{column}
+%    \end{columns}
+%
+%    \begin{center}
+%        $\Des{D} = (\rho, u, v, p,) = (100 \Unit{kg/m^3}, 0, 0, 1.0 \times 10^{2} \Unit{atm})$
+%
+%        $\rho_{s} = 27 \Unit{kg/m^3}$, $\Des{C} = 0.5$, $n = 2130$, $m = 961^3$
+%
+%        $\Des{Ambient} = (\rho_0, u_0, v_0, p_0) = (1.204 \Unit{kg/m^3}, 0, 0, 1.0 \Unit{atm})$
+%    \end{center}
+%
+%    %- insert external multimedia play icon at frame corner
+%    \begin{tikzpicture}[remember picture, overlay]
+%        \node [anchor=south east, inner sep=0pt] at (0.95\paperwidth,0.00\paperheight) {%
+%            \movie[width=0.05\paperwidth, height=0.05\paperheight, externalviewer]{%
+%                \includegraphics[width=0.05\paperwidth]{3d_jet_l5_nf24_slice_demo}%
+%            }{./Video/3d_n2130_rho10p2_p10p2atm_m961p3.avi}%
+%        };
+%    \end{tikzpicture}
+%
+%\end{frame}
+%---------------------------------------------------------------------------%

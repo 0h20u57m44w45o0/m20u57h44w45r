@@ -1,0 +1,37 @@
+#!/bin/bash
+
+#------------------------------------------------------------
+#-
+#-                  Sqsub Submission System
+#-
+#- submit:              sbatch slurm.sh
+#- list jobs:           squeue -u $USER
+#- cancel jobs:         scancel <jobid> or scancel -u $USER
+#- check running job:   scontrol show job -dd <jobid>
+#- check completed job: sacct -j <jobid>
+#- check CPU & memory:  seff <jobid>  
+#- find work directory: find . -name *<jobid>.out
+#- check user storage:  diskusage_report
+#- check system:        partition-stats
+#- data mover:          gra-dtn1.computecanada.ca
+#------------------------------------------------------------
+
+#- produce a jobname
+dir_work=$(pwd)
+cd ../../
+dir_pre=$(pwd)
+cd $dir_work
+jname=${dir_work/$dir_pre\//}
+
+echo "submit job $(pwd)" >> ~/job_list
+
+#- generate the submission command
+#- serial
+#sqsub -q rrg-fslien --mpp=6g -r 1d -o output -e errfile --idfile=JobID -j $jname artracfd -m seq
+#- omp
+sqsub -q rrg-fslien -f threaded -n 16 --mpp=6g -r 1d -o output -e errfile --idfile=JobID -j $jname artracfd -m omp -n 1*1*16
+#- mpi
+#sqsub -q rrg-fslien -f mpi -n 16 --mpp=6g -r 1d -o output -e errfile --idfile=JobID -j $jname artracfd -m mpi -n 1*1*16
+
+echo "complete job $(pwd)" >> ~/job_list
+

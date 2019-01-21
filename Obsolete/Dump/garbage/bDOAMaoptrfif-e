@@ -1,0 +1,764 @@
+#---------------------------------------------------------------------------#
+#-                   Data Operation and Manipulation                       -#
+#-                          <By Huangrui Mo>                               -#
+#- Copyright (C) Huangrui Mo <huangrui.mo@gmail.com>                       -#
+#- This file is part of ArtraDOAM.                                         -#
+#- ArtraDOAM is free software: you can redistribute it and/or modify it    -#
+#- under the terms of the GNU General Public License as published by       -#
+#- the Free Software Foundation, either version 3 of the License, or       -#
+#- (at your option) any later version.                                     -#
+#---------------------------------------------------------------------------#
+
+import numpy as np
+import random as rdm
+
+def sys_env():
+    """ System and running environment.
+
+    Args:
+        dirs: files and directories for input and output.
+
+    Returns:
+        sysdict: contains environment settings.
+
+    Comments:
+        Double quotes for text; Single quotes for anything that behaves
+        like an identifier; Tripled double quotes for docstrings.
+    """
+    sysdict = {
+            'delimld': ";,", # possible non whitespace separators in loading
+            'delimsv': ",", # value separator in saving
+            'imdir': "../importer/",
+            'procdir': "../processor/",
+            'exdir': "../exporter/",
+            'optrdir': "../operator/",
+            'pldir': "../plotter/",
+            'cinfo': "case.info",
+            'clist': "case.list",
+            'cplot': "artraplot",
+            'cols': None, # columns to load
+            'cdim': 2, # ensure 2D array type
+            'fmt': " %12.8g", # data format in saving
+            }
+    return sysdict
+
+def delim_detect(cpath, delims):
+    """ Detect data value separator.
+
+    Check the first non empty and non comment line to detect delimiter.
+    Assume a consistent delimiter for all data lines.
+
+    Args:
+        cpath: data file path.
+        delims: possible none whitespace delimiters.
+
+    Returns:
+        a delimiter.
+    """
+    with open(cpath, 'r') as cfile:
+        for line in cfile:
+            #- find and check the first non-blank and non-comment line
+            if line.strip() and line.find('#') == -1:
+                for c in delims:
+                    if line.find(c) != -1:
+                        return c
+                return None # whitespace delimiter as default
+    return None
+
+def process_data(pid, ctag, cdata):
+    """ Apply operators to data.
+
+    Args:
+        pid: operator identifier.
+        ctag: [number of cases, case index, case name].
+        cdata: primitive data.
+
+    Returns:
+        crlt: processed data.
+        headinfo: informative header.
+    """
+    #- use dict to map a key to a function
+    optrdict = {
+            'stream': optr_stream,
+            'diff': optr_diff,
+            'transform': optr_transform,
+            'statistic': optr_statistic,
+            'fft': optr_fft,
+            'polyfit': optr_polyfit,
+            'convrate': optr_convrate,
+            'compute': optr_compute,
+            }
+    crlt, headinfo = optrdict[pid](ctag, cdata)
+    return crlt, headinfo
+
+def optr_stream(ctag, cdata):
+    """ Extract and stream data operation.
+
+    Shallow and Deep Copy
+        Assignment statements in Python use shallow copy that does
+        not copy objects but only creates bindings between a target
+        and an object unless the programmer explicitly demands deep
+        copy to create a new object with independent memory location.
+        Difference between shallow and deep copy is only relevant
+        for compound objects like lists, arrays, dicts, and classes.
+
+    Slice notation: slice(start,stop,step) or [start:stop:step]
+        # https://docs.scipy.org/doc/numpy/reference/arrays.indexing.html
+        a[n] # (n+1)th item
+        a[m:n] # items m to n-1
+        a[m:] # items m to the end of the array
+        a[:n] # items from the beginning to n-1
+        a[m:n:s] # items m to not past n by step s
+        a[:] # all array items
+        # a negative value means in reversed order
+        a[-n] # -nth item
+        a[-n:] # items -n to the end of the array
+        a[:-n] # items from the beginning to -(n+1)
+        a[m:n:-s] # items m to not past n by step s in reversed order
+        'None' for accessing position extrema.
+        A slicing tuple can always be constructed as obj and used in
+        the x[obj] notation. Slice objects can be used in the construction
+        in place of the [start:stop:step] notation. For example,
+        x[1:10:5,::-1]
+        can also be implemented as
+        obj = (slice(1,10,5), slice(None,None,-1)); x[obj];
+        This can be useful for constructing generic code that works on
+        arrays of arbitrary dimension.
+
+    Extract via range indexing by slice:
+        slice indexing, scalar indexing, assignment =, function
+        argument passing all only create a pointer to the original
+        array rather than a new array.
+        Note: Python always passes mutable objects as references.
+    Extract via discrete indexing by list:
+        [0, ..., n, ..., N-1]
+        List indexing always create a new array rather than a pointer.
+
+    Index a multidimensional array may get a subdimensional array.
+    slice indexing preserve array dimension.
+    Otherwise, one can use 'None' to restore collapsed dimensions.
+    """
+    rls = slice(None, None, None)
+    cls = slice(None, None, None)
+    crlt = cdata[rls, cls]
+    headinfo = "streamed data"
+    return crlt, headinfo
+
+def optr_diff(ctag, cdata):
+    """ Compare data with the base data.
+    """
+    csys = sys_env()
+    bname = "base"
+    bdelim = delim_detect(csys['imdir'] + bname, csys['delimld'])
+    bdata = np.loadtxt(csys['imdir'] + bname, delimiter=bdelim, usecols=csys['cols'], ndmin=csys['cdim'])
+    rls = slice(None, None, None)
+    cls = slice(None, None, None)
+    bdata = bdata[rls, cls]
+    cdata = cdata[rls, cls]
+    rows, cols = cdata.shape
+    arr = np.zeros([rows, cols+(cols-1)*2])
+    arr[:, 0] = bdata[:, 0]
+    arr[:, 1::3] = cdata[:, 1:] - bdata[:, 1:]
+    arr[:, 2::3] = cdata[:, 1:] / bdata[:, 1:] * 100
+    arr[:, 3::3] = np.abs(arr[:, 1::3]) / bdata[:, 1:] * 100
+    absdiff = np.abs(cdata - bdata)
+    idx = np.argmax(absdiff, axis=0) # row index for the max element in each column
+    crlt = np.zeros([5, cols])
+    crlt[0, :] = idx
+    crlt[1, :] = np.amax(absdiff, axis=0, keepdims=False)
+    crlt[2, :] = cdata[idx, range(0, cols)]
+    crlt[3, :] = bdata[idx, range(0, cols)]
+    crlt[4, :] = crlt[1, :] / crlt[3, :] * 100
+    print("[[row], [maxabsdiff], [raw data], [base data], [deviation %]]")
+    print(crlt)
+    crlt = arr
+    headinfo = "[axis, diff, ratio %, deviation %]"
+    return crlt, headinfo
+
+def optr_fft(ctag, cdata):
+    """ Fast Fourier transform.
+    """
+    rls = slice(None, None, None)
+    cls = slice(None, None, None)
+    arr = cdata[rls, cls]
+    rows, cols = arr.shape
+    #- parameter
+    t = arr[:, 0] # time variable
+    y = arr[:, 1] # signal variable
+    dt = np.mean(t[1:] - t[:-1]) # sample spacing in time domain
+    seg = 0 # samples in Welch's overlap segmented average method, <0|2^n>
+    win_type = 'rect' # window type, <rect|hanning|hamming|...>
+    win_para = { # window parameter (window function, overlap rate)
+            'rect': (np.ones, 0),
+            'hanning': (np.hanning, 0.5),
+            'hamming': (np.hamming, 0.5),
+            }
+    #- compute
+    num = len(y) # total number of samples in signal
+    N = num # number of samples per segment
+    if seg > 1 and seg < num:
+        N = seg
+    #- scale property of discrete Fourier transform gives t_fov * df = f_fov * dt = 1
+    t_fov = N * dt # field of view in time domain
+    df = 1 / t_fov # sample spacing in frequency domain
+    f_fov = 1 / dt # field of view in frequency domain
+    M = int((N + 1) / 2) # non-negative sample frequency index upper limit
+    f = np.arange(M) * df # non-negative sample frequency in frequency space
+    y = y - np.mean(y) # remove zero frequency component
+    win_weight = win_para[win_type][0](N) # window weights
+    seg_nonlap = int(N * (1 - win_para[win_type][1])) # non-overlap samples per segment
+    num_seg = int((num - N) / seg_nonlap) + 1 # number of segments
+    #- apply fft to each segment data
+    y_seg = np.zeros(N) # store segment signal
+    I = np.zeros([M-1, num_seg]) # store segment energy for positive frequency
+    for s in range(num_seg):
+        idxl = s * seg_nonlap # start index for current segment
+        idxr = idxl + N # end index for current segment
+        y_seg[:] = y[idxl:idxr] # segment signal
+        y_seg[:] = y_seg - np.mean(y_seg) # remove zero frequency component
+        F = np.fft.fft(y_seg * win_weight, N) # fft transform
+        mag = np.abs(F[1:M]) # amplitude spectrum for positive frequency
+        I[:, s] = mag**2 # energy intensity
+    #- averaged fft over segments, average must be based on energy intensity
+    mag_ave = np.sqrt(np.mean(I, axis=1, keepdims=False))
+    #- amplitude spectrum in quantity peak, apply transform factor 1/N on fft rather than ifft
+    #- since we need the spectrum having amplitude independent on N.
+    factor_fft = 1 / N
+    #- fft gives a two-sided spectrum of the signal over both the positive and negative frequency,
+    #- the coefficients of Fourier transform and Fourier series have the relationship:
+    #- c-n = (an + i*bn) / 2, cn = (an - i*bn) / 2, |cn| = |c-n| = sqrt(an^2 + bn^2) / 2 = An / 2
+    #- where cn and c-n are the Fourier transform coefficients, an and bn are Fourier series
+    #- coefficients. An is the amplitude spectrum. To have the amplitude spectrum of Fourier
+    #- transform match each sinusoidal component making up the time-domain signal (based on
+    #- function space series), we need to convert the two-sided spectrum to a signal-sided
+    #- spectrum via multiplying each frequency amplitude except for zero frequency by two.
+    compensate_fft = 2
+    #- windowing the original signal would change the amplitude of the signal points accordingly,
+    #- which means the loss of the total energy has happened in different degrees. Then in the
+    #- spectrum domain, governed by the conservation of energy, the amplitude of spectrum will also
+    #- decrease compared with that of without windowing. Therefore, compensation should be applied.
+    compensate_win = N / np.sum(win_weight)
+    #- total post scale factor
+    scale = factor_fft * compensate_fft * compensate_win
+    #- compute the scaled amplitude
+    A = scale * mag_ave
+    #- rms scale factor
+    factor_rms = 1 / np.sqrt(2)
+    #- amplitude in volts rms
+    A_rms = A * factor_rms
+    #- compute spl core via A_rms(f)^2 / A_ref^2
+    A_ref = 2e-5
+    spl_core = A_rms**2 / A_ref**2
+    #- SPL
+    spl = 10 * np.log10(spl_core)
+    #- A weighted SPL
+    shift_onek = 1.9974816
+    f_sq = f[1:M]**2
+    f_weight = 20 * (8.1727197 + 2 * np.log10(f_sq)
+            - np.log10(f_sq + 424.36)
+            - np.log10(f_sq + 1.488e+08)
+            - 0.5 * np.log10(f_sq + 11599.29)
+            - 0.5 * np.log10(f_sq + 544496.41))
+    spl_A = spl + f_weight + shift_onek
+    #- the use of window and energy leakage increase the bandwidth of energy distribution,
+    #- then we should introduce the bandwidth factor and effective bandwidth for computing
+    #- power spectrum distribution.
+    factor_bandwith = N * (np.sum(win_weight**2)) / (np.sum(win_weight))**2;
+    #- effective noise bandwidth
+    df_eff = factor_bandwith * df
+    #- compute power spectrum distribution based on the effective bandwidth
+    psd_core = spl_core / df_eff
+    #- power spectrum distribution
+    psd = 10 * np.log10(psd_core)
+    #- assemble data for both zero and positive frequency
+    crlt = np.zeros([M, 5])
+    crlt[0:M, 0] = f
+    crlt[0:1, 1] = np.mean(y) # recover dc in amplitude spectrum
+    crlt[1:M, 1] = A
+    crlt[1:M, 2] = spl
+    crlt[1:M, 3] = spl_A
+    crlt[1:M, 4] = psd
+    headinfo = "[frequency, amplitude, spl(dB), spla(dBA), psd(dB)]"
+    return crlt, headinfo
+
+def optr_transform(ctag, cdata):
+    """ Transform data
+    """
+    comptype = 0 # [add column from base data, add column from new data, create data, switch data]
+    rls = slice(None, None, None)
+    cls = slice(None, None, None)
+    rows, cols = cdata.shape
+    arr = cdata[rls, cls]
+    #- add column from base data file
+    if comptype == 0:
+        csys = sys_env()
+        bname = "base"
+        if ctag[-1] == bname:
+            return np.zeros([1,1]), "no data for base case"
+        bdelim = delim_detect(csys['imdir'] + bname, csys['delimld'])
+        bdata = np.loadtxt(csys['imdir'] + bname, delimiter=bdelim, usecols=csys['cols'], ndmin=csys['cdim'])
+        bdata = bdata[rls, cls]
+        newc = bdata.flatten()
+        scale = 10**6
+        crlt = np.c_[newc * scale, arr]
+    #- add column from new data
+    if comptype == 1:
+        newc = arr[:,0] - 2 / 2
+        crlt = np.c_[newc, arr]
+    #- create data
+    if comptype == 2:
+        l = [0, 1]
+        n = 4096
+        crlt = np.zeros([n, 2])
+        x = np.linspace(l[0], l[1], n)
+        crlt[:, 0] = x
+        crlt[:, 1] = np.sin(2*np.pi*10*x) + np.sin(2*np.pi*20*x) + np.sin(2*np.pi*50*x)
+    #- switch data
+    if comptype == 3:
+        arr[:, 2] = arr[:, 1]
+        arr[:, 1] = arr[:, 0]
+        arr[:, 0] = arr[:, 4]
+        crlt = arr
+    #- transform data
+    if comptype == 4:
+        arr[:, 0] = arr[:, 0] * 10**6
+        crlt = arr
+    #- sift and transform data
+    if comptype == 5:
+        crlt = np.zeros([rows, 2])
+        crlt[:, 0] = arr[:, 0] * 10**6
+        crlt[:, 1] = (arr[:, 5] - 101325) / 1000
+    headinfo = "transformed data"
+    return crlt, headinfo
+
+def optr_statistic(ctag, cdata):
+    """ Find data statistics such as min, max, mean, rms.
+    """
+    rls = slice(None, None, None)
+    cls = slice(None, None, None)
+    arr = cdata[rls, cls]
+    rows, cols = arr.shape
+    absarr = np.abs(arr)
+    crlt = np.zeros([12, cols])
+    crlt[0, :] = np.argmax(absarr, axis=0)
+    crlt[1, :] = np.amax(absarr, axis=0, keepdims=False)
+    crlt[2, :] = np.argmin(absarr, axis=0)
+    crlt[3, :] = np.amin(absarr, axis=0, keepdims=False)
+    crlt[4, :] = np.argmax(arr, axis=0)
+    crlt[5, :] = np.amax(arr, axis=0, keepdims=False)
+    crlt[6, :] = np.argmin(arr, axis=0)
+    crlt[7, :] = np.amin(arr, axis=0, keepdims=False)
+    crlt[8, :] = np.mean(absarr, axis=0, keepdims=False)
+    crlt[9, :] = np.mean(arr, axis=0, keepdims=False)
+    crlt[10, :] = np.sqrt(np.mean(arr**2, axis=0, keepdims=False))
+    crlt[11, :] = np.sqrt(np.mean((arr - crlt[9, :])**2, axis=0, keepdims=False))
+    headinfo = "[[row], [absmax/max norm], [row], [absmin], [row], [max], [row], [min], [absmean/l1 norm], [mean], [l2 norm], [rms]]"
+    ##print("absmax, absmean, absmin, rms")
+    #print(crlt[1,-1], crlt[8,-1], crlt[3,-1], crlt[11,-1], sep=', ')
+    ##print("row, absmax, absmean, row, absmin")
+    #print(crlt[0,-1], crlt[1,-1], crlt[8,-1], crlt[2,-1], crlt[3,-1], sep=', ')
+    ##print("a fixed max, absmean, a fixed min, rms")
+    #fmax = 0
+    #fmin = 0
+    #print(arr[fmax,-1], crlt[8,-1], arr[fmin,-1], crlt[11,-1], sep=', ')
+    ##print("mesh number, l1 norm, l2 norm, max norm")
+    #print([int(s) for s in ctag[2].rsplit('_', 1) if s.isdigit()], crlt[8,-1], crlt[10,-1], crlt[1,-1], sep=', ')
+    return crlt, headinfo
+
+def optr_polyfit(ctag, cdata):
+    """ Least squares fit.
+
+    In mathematics, a basis function is an element of a particular basis for a
+    function space. Every continuous function in the function space can be
+    represented as a linear combination of basis functions, just as every vector
+    in a vector space can be represented as a linear combination of basis vectors.
+
+    Least squares fit p(x) = a0 * fn(x) + ... + an * f0(x) for a function y(x) is
+    to decompose a signal y, whose function expression is unknown but its samples
+    (xn, yn) can be obtained, into a linear combination of given and known basis
+    functions [fn(x)], where [an] are undetermined coefficients, [fn(x)] are basis
+    functions. For polynomial fit, fn(x) = x**n. The solution of this problem is to
+    find a vector of coefficients [an] that minimizes the squared error, in other
+    words, to minimize the l2 norm of the residual vector r = p(x) - y(x). This is
+    equivalent to find the least square solution of the linear system B = AX, where
+    B = y, A = [fn(x), ..., f0(x)], X = [a0, ..., an], which is in turn to solve
+    the normal equation of the linear system, A'B = A'AX, where A' is A transpose.
+    """
+    rls = slice(None, None, None)
+    cls = slice(None, None, None)
+    arr = cdata[rls, cls]
+    x = arr[:, 0]
+    y = arr[:, 1]
+    a = np.polyfit(x, y, deg=1) # linear fit y =a0 * x**1 + a1 * x**0
+    c = np.rad2deg(np.pi - np.arctan2(a[0], -1)) # slope angle in degree
+    crlt = np.zeros([1, 3])
+    crlt[0, :] = [a[0], a[1], c]
+    headinfo = "[slope, interception, slope angle in degree]"
+    return crlt, headinfo
+
+def optr_convrate(ctag, cdata):
+    """ Convergence rate.
+
+    Compute the convergence rate for grid refinement studies.
+    """
+    rls = slice(None, None, None)
+    cls = slice(None, None, None)
+    arr = cdata[rls, cls]
+    rows, cols = arr.shape
+    crlt = np.zeros([rows, cols])
+    crlt[:, 0] = arr[:, 0] # copy grid size column
+    comptype = 0 # [absolute error based, relative error based (require fixed grid ratio)]
+    if comptype == 0:
+        for m in range(1, rows):
+            r = arr[m, 0] / arr[m-1, 0] # grid refinement ratio
+            em = arr[m-1, 1:] # e(n-1)
+            en = arr[m, 1:] # e(n)
+            crlt[m, 1:] = np.log2(em / en) / np.log2(r)
+    else:
+        for m in range(2, rows):
+            r = arr[m, 0] / arr[m-1, 0] # grid refinement ratio
+            em = np.abs(arr[m-2, 1:] - arr[m-1, 1:]) # e(n-1)
+            en = np.abs(arr[m-1, 1:] - arr[m, 1:]) # e(n)
+            crlt[m, 1:] = np.log2(em / en) / np.log2(r)
+    headinfo = "[mesh, l1 norm, l2 norm, max norm]"
+    return crlt, headinfo
+
+def optr_compute(ctag, cdata):
+    """ Additional data operators.
+    """
+    #- use dict to map a key to a function
+    compdict = {
+            'dist': comp_distribute,
+            'pdf': comp_pdf,
+            'vg': comp_gurney,
+            'polar': comp_polar,
+            'fcoe': comp_fcoe,
+            'flux': comp_flux,
+            }
+    crlt, headinfo = compdict['polar'](ctag, cdata)
+    return crlt, headinfo
+
+def comp_distribute(ctag, cdata):
+    """ Compute particle distribution.
+        A sample case file:
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2700, -1, 1.0e-100, 0, 0, 2
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+        0, 0, 0, 0.15, 36, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0
+    """
+    rls = slice(None, None, None)
+    cls = slice(None, None, None)
+    arr = cdata[rls, cls]
+    rows, cols = arr.shape
+    #- the common center of trace spheres
+    xc, yc, zc = arr[-1, 0:3]
+    #- the radius of the innermost trace sphere
+    rc = arr[-1, 3]
+    #- number of particles on the innermost trace sphere
+    nc = arr[-1, 4]
+    #- number of layers
+    nl = np.int(arr[-1, 5])
+    #- particle number increase ratio <0:automatic>
+    sn = arr[-1, 6]
+    #- angle offset between layers
+    da = arr[-1, 7]
+    #- distribution shape <0:cylinder|1:sphere>
+    ds = arr[-1, 8]
+    #- distribution range for cylinder shape <low:high>
+    lc = arr[-1, 9:11]
+    #- scale factor for radius
+    sr = arr[-1, 11]
+    #- solver type <0:state|1:transform>
+    st = arr[-1, 12]
+    #- parameters for each layer
+    rt = np.zeros(nl) # trace sphere radius
+    rp = np.zeros(nl) # particle radius
+    n = np.zeros(nl) # number of particles
+    rt[0] = rc
+    n[0] = nc
+    rp[0] = rt[0] * np.sin(np.pi / n[0])
+    for l in range(1, nl):
+        if sn <= 0:
+            #- compute number of particles by assuming equal radius
+            n[l] = np.int(np.pi / np.arcsin(rp[l-1] / (rt[l-1] + 2.0 * rp[l-1])))
+        else:
+            n[l] = np.int(n[l-1] * sn)
+        rt[l] = (rt[l-1] + rp[l-1]) / (1.0 - np.sin(np.pi / n[l]))
+        rp[l] = rt[l] * np.sin(np.pi / n[l])
+    #- determine output according to solver type
+    if st == 0:
+        ary = np.zeros([rows-1, cols])
+        ary[0:rows-1, :] = arr[0:rows-1, :]
+        crlt = np.empty([0, cols])
+    else:
+        ary = np.zeros([1, 9])
+        crlt = np.empty([0, 9])
+    #- inner layer to outer layer
+    for l in range(0, nl):
+        if ds == 0:
+            #- number of particles on longitude axis
+            ml = np.int((lc[1] - lc[0]) / np.max(rp)) + 1
+            if ml < 2:
+                ml = 1
+                dh = 0
+            else:
+                #- distance between two stacked layers on the third dimension
+                dh = (lc[1] - lc[0]) / (ml - 1)
+        else:
+            #- number of particles on longitude arc
+            ml = np.int(n[l] / 2.0) + 1
+            #- inclination angle between two stacked layers on the third dimension
+            phi = np.pi / (ml - 1)
+        #- longitude layer
+        for m in range(0, ml):
+            #- latitude trace radius
+            if ds != 0 and (m == 0 or m == ml - 1):
+                rl = 0
+                theta = 0
+                nn = 1
+            else:
+                if ds == 0:
+                    rl = rt[l]
+                else:
+                    rl = rt[l] * np.sin(m * phi)
+                theta = 2.0 * np.arcsin(rp[l] / rl)
+                nn = np.int(2.0 * np.pi / theta)
+                theta = 2.0 * np.pi / nn
+            #- azimuthal entity on latitude trace
+            for p in range(0, nn):
+                if st == 0:
+                    ary[0, 0] = xc + rl * np.cos(p * theta + l * np.deg2rad(da))
+                    ary[0, 1] = yc + rl * np.sin(p * theta + l * np.deg2rad(da))
+                    if ds == 0:
+                        ary[0, 2] = zc + lc[0] + m * dh
+                    else:
+                        ary[0, 2] = zc + rt[l] * np.cos(m * phi)
+                    ary[0, 3] = sr * rp[l]
+                else:
+                    ary[0, 0] = sr * 2.0 * rp[l]
+                    ary[0, 1] = sr * 2.0 * rp[l]
+                    ary[0, 2] = sr * 2.0 * rp[l]
+                    ary[0, 5] = p * theta
+                    ary[0, 6] = xc + rl * np.cos(p * theta + l * np.deg2rad(da))
+                    ary[0, 7] = yc + rl * np.sin(p * theta + l * np.deg2rad(da))
+                    if ds == 0:
+                        ary[0, 8] = zc + lc[0] + m * dh
+                    else:
+                        ary[0, 8] = zc + rt[l] * np.cos(m * phi)
+                crlt = np.r_[crlt, ary]
+    headinfo = "Particle distribution"
+    return crlt, headinfo
+
+def comp_pdf(ctag, cdata):
+    """ Compute morphology using probability density function.
+        A sample case file:
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2700, -1, 1.0e-100, 0, 0, 2
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+        0, 0, 0, 0.01, 0.02, 50, 0.0005, 0.001, 0, 0, 0, 1, 0, 0, 0, 0
+    """
+    rls = slice(None, None, None)
+    cls = slice(None, None, None)
+    arr = cdata[rls, cls]
+    rows, cols = arr.shape
+    #- morphology center
+    xc, yc, zc = arr[-1, 0:3]
+    #- morphology radius interval
+    ri, ro = arr[-1, 3:5]
+    print("ri, ro", ri, ro)
+    #- trial fail factor
+    nt = arr[-1, 5]
+    #- particle radius interval
+    ra, rb = arr[-1, 6:8]
+    print("ra, rb", ra, rb)
+    #- charge shape <0:cylinder|1:sphere>
+    cs = arr[-1, 8]
+    #- distribution range for cylinder shape <low:high>
+    lc = arr[-1, 9:11]
+    #- scale factor for radius
+    sr = arr[-1, 11]
+    #- solver type <0:state|1:transform>
+    st = arr[-1, 12]
+    #- determine output according to solver type
+    nmax = int((ro**2 - ri**2) / ra**2) # maximum number of particles
+    npp = rows - 1 # data entries per particle
+    if st == 0:
+        ary = np.zeros([npp, cols])
+        ary[0:npp, :] = arr[0:npp, :]
+        pt = np.zeros([npp*nmax, cols])
+    else:
+        ary = np.zeros([1, 9])
+        pt = np.zeros([npp*nmax, 9])
+    #- random sampling
+    n = 0 # sample count
+    nt = nt * int((ro**2 - ri**2) / ra**2) # number of continuous trial fails
+    print("nt", nt)
+    ntc = 0 # trial fail count
+    flag = 0 # trial fail tag
+    while ntc <= nt:
+        theta = rdm.random() * 2 * np.pi
+        r = (rdm.random() * (ro**2 - ri**2) + ri**2)**0.5
+        y = r * np.cos(theta)
+        z = r * np.sin(theta)
+        rp = ra + rdm.random() * (rb - ra) * (1 - (ntc / nt)**0.5)
+        #- check distance to domain boundaries
+        dsq = (y)**2 + (z)**2
+        dsqi = (ri + rp)**2
+        dsqo = (ro - rp)**2
+        if dsq < dsqi or dsq > dsqo:
+            ntc = ntc + 1
+            continue
+        #- check distance to point sets
+        flag = 0
+        for i in range(0, n):
+            dsq = (pt[i*npp, 1] - y)**2 + (pt[i*npp, 2] - z)**2
+            dmin = (rp + pt[i*npp, 3])**2
+            if dsq < dmin:
+                ntc = ntc + 1
+                flag = 1
+                break
+        if 1 == flag:
+            continue
+        if 0 == st:
+            ary[0, 1] = y
+            ary[0, 2] = z
+            ary[0, 3] = sr * rp
+        else:
+            ary[0, 0] = sr
+            ary[0, 1] = sr
+            ary[0, 2] = sr
+            ary[0, 5] = theta
+            ary[0, 7] = y
+            ary[0, 8] = z
+        pt[n*npp:(n+1)*npp, :] = ary
+        n = n + 1
+        ntc = 0
+    crlt = pt[0:n*npp, :]
+    print("n", n)
+    headinfo = "Morphology"
+    return crlt, headinfo
+
+def comp_gurney(ctag, cdata):
+    """ Compute Gurney velocity.
+    """
+    comptype = 0 # [entire payload, outermost layer]
+    rls = slice(None, None, None)
+    cls = slice(None, None, None)
+    arr = cdata[rls, cls]
+    rows, cols = arr.shape
+    n = 2 # charge geometry parameter, plane n=1, cylinder n=2, sphere=3
+    rho_d = 1000 # driver density
+    rho_a = 1.2047 # ambient density
+    rho_p = arr[::2, -6] # particle density
+    p_a = 101325 # ambient pressure
+    p_d = 1.0 * 10**5 * p_a # driver pressure
+    r_p = arr[::2, 3] # particle radius
+    if comptype == 0:
+        r_d = 0.01 # driver radius
+        C = (np.pi * r_d**2) * rho_d # burster mass
+        r_in = r_d
+        r_ou = 0.02
+    else:
+        r_d = (arr[0, 0]**2 + arr[0, 1]**2 + arr[0, 2]**2)**0.5 # driver radius
+        unique, counts = np.unique(r_p, return_counts=True)
+        n_p = counts[0] # number of first layer particles
+        C = (np.pi * r_d**2 - 0.5 * np.pi * np.sum(r_p[0:n_p]**2)) * rho_d # burster mass
+        r_in = (arr[0, 0]**2 + arr[0, 1]**2 + arr[0, 2]**2)**0.5 - r_p[0] # inner radius of payload
+        r_ou = (arr[-2, 0]**2 + arr[-2, 1]**2 + arr[-2, 2]**2)**0.5 + r_p[-1] # outer radius of payload
+    M = np.sum(np.pi * r_p**2 * rho_p) # payload mass
+    E = p_d / ((1.4 - 1.0) * rho_d) - p_a / ((1.4 - 1.0) * rho_a) # Gurney energy
+    V_G = (2 * E)**0.5 * (M / C + n / (n + 2))**(-0.5) # Gurney velocity
+    phi = np.sum(np.pi * r_p**2) / (np.pi * (r_ou**2 - r_in**2)) # porosity
+    rho_b = np.mean(rho_p) # bulk density
+    a = [0.200, 0.180, 0.162, 1.127] # constant coefficients
+    alpha = a[0] * rho_b**a[1]
+    F = 1 + (a[2] * np.exp(a[3] * phi) - 0.5) * np.log10(M / C)
+    V_GM = (2 * E)**0.5 * (M / C * 1 / alpha + n / (n + 2))**(-0.5) * F # modified Gurney velocity
+    crlt = np.array([[M/C, phi, V_G, V_GM, V_GM/V_G*100]])
+    headinfo = "[[M/C, phi, V_G, V_GM, V_GM/V_G*100]]"
+    #print(M/C, phi, V_G, V_GM, sep=', ')
+    return crlt, headinfo
+
+def comp_polar(ctag, cdata):
+    """ Particle velocity state vs angle.
+    """
+    comptype = 1 # [last layer, all layers]
+    rls = slice(None, None, None)
+    cls = slice(None, None, None)
+    arr = cdata[rls, cls]
+    rows, cols = arr.shape
+    x = arr[::2, 0]
+    y = arr[::2, 1]
+    z = arr[::2, 2]
+    r = arr[::2, 3]
+    u = arr[::2, 4]
+    v = arr[::2, 5]
+    w = arr[::2, 6]
+    unique, counts = np.unique(r, return_counts=True)
+    if comptype == 0:
+        n = counts[-1] # number of last layer particles
+        px = x
+        py = y
+    if comptype == 1:
+        n, = r.shape
+        px = y
+        py = z
+    crlt = np.zeros([n, 2])
+    crlt[:, 0] = np.rad2deg(np.pi - np.arctan2(py[-n:], -px[-n:])) # turn coordinate pairs into angles
+    crlt[:, 1] = (u[-n:]**2 + v[-n:]**2 + w[-n:]**2)**0.5 # velocity magnitude
+    headinfo = "[theta, vel]"
+    #print("radius:", unique)
+    #print("counts:", counts)
+    return crlt, headinfo
+
+def comp_fcoe(ctag, cdata):
+    """ Compute force coefficients.
+    """
+    rls = slice(None, None, None)
+    cls = slice(None, None, None)
+    arr = cdata[rls, cls]
+    rows, cols = arr.shape
+    #rho = 1.176
+    #u = 34.7
+    #D = 1
+    #denom = 0.5 * rho * u**2 * D
+    rho = 1.658
+    u = 114.477
+    r = 0.04
+    denom = 0.5 * rho * u**2 * np.pi * r**2
+    crlt = np.zeros([rows, 3])
+    crlt[:,0] = arr[:,0]
+    crlt[:,1] = (arr[:,1] + arr[:,4]) / denom # cd
+    crlt[:,2] = (arr[:,2] + arr[:,5]) / denom # cl
+    headinfo = "[time, cd, cl]"
+    return crlt, headinfo
+
+def comp_flux(ctag, cdata):
+    """ Compute surface flux.
+    """
+    rls = slice(None, None, None)
+    cls = slice(None, None, None)
+    arr = cdata[rls, cls]
+    vs = [-40, 0, 0]
+    x = arr[:, 0]
+    y = arr[:, 1]
+    z = arr[:, 2]
+    nx = arr[:, 3]
+    ny = arr[:, 4]
+    nz = arr[:, 5]
+    rho = arr[:, 6]
+    u = arr[:, 7] - vs[0]
+    v = arr[:, 8] - vs[1]
+    w = arr[:, 9] - vs[2]
+    p = arr[:, 10]
+    T = arr[:, 11]
+    rows, cols = arr.shape
+    ary = np.zeros([rows, 3])
+    #- turn coordinate pairs into angles distributed in [0, 2pi], counterclockwise
+    ary[:, 0] = np.rad2deg(np.pi - np.arctan2(y, -x))
+    ary[:, 1] = u * nx + v * ny
+    ary[:, 2] = np.abs(ary[:, 1])
+    #- sort the resulting array by the angle column
+    idx = np.argsort(ary[:, 0])
+    crlt = ary[idx, :] # use idx[::-1] if reverse order
+    headinfo = "[angle, flux, absflux]"
+    return crlt, headinfo
+

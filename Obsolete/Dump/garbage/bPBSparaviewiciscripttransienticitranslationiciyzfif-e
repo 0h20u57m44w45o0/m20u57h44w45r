@@ -1,0 +1,298 @@
+#### import the simple module from the paraview
+from paraview.simple import *
+#### disable automatic camera reset on 'Show'
+paraview.simple._DisableFirstRenderCameraReset()
+
+# create a new 'EnSight Reader'
+fieldcase = EnSightReader(CaseFileName='/scratch/morui/graham/transient_rotation/field.case')
+fieldcase.PointArrays = ['rho', 'u', 'v', 'w', 'p', 'T', 'did', 'Vel']
+
+# get animation scene
+animationScene1 = GetAnimationScene()
+
+# update animation scene based on data timesteps
+animationScene1.UpdateAnimationUsingDataTimeSteps()
+
+# Properties modified on fieldcase
+fieldcase.PointArrays = ['Vel']
+
+# get active view
+renderView1 = GetActiveViewOrCreate('RenderView')
+# uncomment following to set a specific view size
+# renderView1.ViewSize = [977, 638]
+
+# show data in view
+fieldcaseDisplay = Show(fieldcase, renderView1)
+# trace defaults for the display properties.
+fieldcaseDisplay.AmbientColor = [0.0, 0.0, 0.0]
+fieldcaseDisplay.ColorArrayName = [None, '']
+fieldcaseDisplay.DiffuseColor = [0.0, 0.0, 0.0]
+fieldcaseDisplay.BackfaceDiffuseColor = [0.0, 0.0, 0.0]
+fieldcaseDisplay.OSPRayScaleArray = 'Vel'
+fieldcaseDisplay.OSPRayScaleFunction = 'PiecewiseFunction'
+fieldcaseDisplay.GlyphType = 'Arrow'
+fieldcaseDisplay.ScalarOpacityUnitDistance = 0.04732290439279088
+
+# reset view to fit data
+renderView1.ResetCamera()
+
+#changing interaction mode based on data extents
+renderView1.InteractionMode = '2D'
+renderView1.CameraPosition = [10000.0, 0.0, 0.0]
+renderView1.CameraViewUp = [0.0, 0.0, 1.0]
+
+# set scalar coloring
+ColorBy(fieldcaseDisplay, ('POINTS', 'Vel'))
+
+# rescale color and/or opacity maps used to include current data range
+fieldcaseDisplay.RescaleTransferFunctionToDataRange(True)
+
+# show color bar/color legend
+fieldcaseDisplay.SetScalarBarVisibility(renderView1, True)
+
+# get color transfer function/color map for 'Vel'
+velLUT = GetColorTransferFunction('Vel')
+
+# get opacity transfer function/opacity map for 'Vel'
+velPWF = GetOpacityTransferFunction('Vel')
+
+# create a new 'Compute Derivatives'
+computeDerivatives1 = ComputeDerivatives(Input=fieldcase)
+computeDerivatives1.Scalars = [None, '']
+computeDerivatives1.Vectors = ['POINTS', 'Vel']
+
+# Properties modified on computeDerivatives1
+computeDerivatives1.OutputVectorType = 'Vorticity'
+computeDerivatives1.OutputTensorType = 'Nothing'
+
+# show data in view
+computeDerivatives1Display = Show(computeDerivatives1, renderView1)
+# trace defaults for the display properties.
+computeDerivatives1Display.AmbientColor = [0.0, 0.0, 0.0]
+computeDerivatives1Display.ColorArrayName = ['POINTS', 'Vel']
+computeDerivatives1Display.DiffuseColor = [0.0, 0.0, 0.0]
+computeDerivatives1Display.LookupTable = velLUT
+computeDerivatives1Display.BackfaceDiffuseColor = [0.0, 0.0, 0.0]
+computeDerivatives1Display.OSPRayScaleArray = 'Vel'
+computeDerivatives1Display.OSPRayScaleFunction = 'PiecewiseFunction'
+computeDerivatives1Display.GlyphType = 'Arrow'
+computeDerivatives1Display.ScalarOpacityUnitDistance = 0.04732290439279088
+
+# hide data in view
+Hide(fieldcase, renderView1)
+
+# show color bar/color legend
+computeDerivatives1Display.SetScalarBarVisibility(renderView1, True)
+
+# set scalar coloring
+ColorBy(computeDerivatives1Display, ('CELLS', 'Vorticity'))
+
+# rescale color and/or opacity maps used to include current data range
+computeDerivatives1Display.RescaleTransferFunctionToDataRange(True)
+
+# show color bar/color legend
+computeDerivatives1Display.SetScalarBarVisibility(renderView1, True)
+
+# get color transfer function/color map for 'Vorticity'
+vorticityLUT = GetColorTransferFunction('Vorticity')
+
+# get opacity transfer function/opacity map for 'Vorticity'
+vorticityPWF = GetOpacityTransferFunction('Vorticity')
+
+# create a new 'Cell Data to Point Data'
+cellDatatoPointData1 = CellDatatoPointData(Input=computeDerivatives1)
+
+# show data in view
+cellDatatoPointData1Display = Show(cellDatatoPointData1, renderView1)
+# trace defaults for the display properties.
+cellDatatoPointData1Display.AmbientColor = [0.0, 0.0, 0.0]
+cellDatatoPointData1Display.ColorArrayName = [None, '']
+cellDatatoPointData1Display.DiffuseColor = [0.0, 0.0, 0.0]
+cellDatatoPointData1Display.BackfaceDiffuseColor = [0.0, 0.0, 0.0]
+cellDatatoPointData1Display.OSPRayScaleArray = 'Vel'
+cellDatatoPointData1Display.OSPRayScaleFunction = 'PiecewiseFunction'
+cellDatatoPointData1Display.GlyphType = 'Arrow'
+cellDatatoPointData1Display.ScalarOpacityUnitDistance = 0.04732290439279088
+
+# hide data in view
+Hide(computeDerivatives1, renderView1)
+
+# set scalar coloring
+ColorBy(cellDatatoPointData1Display, ('POINTS', 'Vorticity'))
+
+# rescale color and/or opacity maps used to include current data range
+cellDatatoPointData1Display.RescaleTransferFunctionToDataRange(True)
+
+# show color bar/color legend
+cellDatatoPointData1Display.SetScalarBarVisibility(renderView1, True)
+
+# create a new 'Calculator'
+calculator1 = Calculator(Input=cellDatatoPointData1)
+calculator1.Function = ''
+
+# Properties modified on calculator1
+calculator1.ResultArrayName = 'vort'
+calculator1.Function = 'mag(Vorticity)'
+
+# get color transfer function/color map for 'vort'
+vortLUT = GetColorTransferFunction('vort')
+
+# show data in view
+calculator1Display = Show(calculator1, renderView1)
+# trace defaults for the display properties.
+calculator1Display.AmbientColor = [0.0, 0.0, 0.0]
+calculator1Display.ColorArrayName = ['POINTS', 'vort']
+calculator1Display.DiffuseColor = [0.0, 0.0, 0.0]
+calculator1Display.LookupTable = vortLUT
+calculator1Display.BackfaceDiffuseColor = [0.0, 0.0, 0.0]
+calculator1Display.OSPRayScaleArray = 'vort'
+calculator1Display.OSPRayScaleFunction = 'PiecewiseFunction'
+calculator1Display.GlyphType = 'Arrow'
+calculator1Display.ScalarOpacityUnitDistance = 0.04732290439279088
+
+# hide data in view
+Hide(cellDatatoPointData1, renderView1)
+
+# show color bar/color legend
+calculator1Display.SetScalarBarVisibility(renderView1, True)
+
+# get opacity transfer function/opacity map for 'vort'
+vortPWF = GetOpacityTransferFunction('vort')
+
+# Rescale transfer function
+vortLUT.RescaleTransferFunction(0.0, 2000.0)
+
+# Rescale transfer function
+vortPWF.RescaleTransferFunction(0.0, 2000.0)
+
+# create a new 'Contour'
+contour1 = Contour(Input=calculator1)
+contour1.ContourBy = ['POINTS', 'vort']
+contour1.Isosurfaces = [786.7239829169334]
+contour1.PointMergeMethod = 'Uniform Binning'
+
+# Properties modified on contour1
+contour1.Isosurfaces = [20.0, 60.0, 100.0, 140.0, 180.0, 220.0, 260.0, 300.0, 340.0, 379.99999999999994, 420.0, 460.0, 499.99999999999994, 540.0, 580.0, 620.0, 660.0, 700.0000000000001, 739.9999999999999, 780.0, 820.0, 860.0, 900.0, 940.0, 979.9999999999999, 1020.0, 1060.0, 1100.0000000000002, 1140.0, 1180.0, 1220.0, 1260.0, 1300.0, 1340.0, 1380.0000000000002, 1420.0, 1459.9999999999998, 1500.0, 1540.0, 1580.0000000000002, 1620.0, 1659.9999999999998, 1700.0, 1740.0, 1780.0, 1820.0, 1860.0, 1900.0, 1939.9999999999998, 1980.0, 2020.0]
+
+# show data in view
+contour1Display = Show(contour1, renderView1)
+# trace defaults for the display properties.
+contour1Display.AmbientColor = [0.0, 0.0, 0.0]
+contour1Display.ColorArrayName = [None, '']
+contour1Display.DiffuseColor = [0.0, 0.0, 0.0]
+contour1Display.BackfaceDiffuseColor = [0.0, 0.0, 0.0]
+contour1Display.OSPRayScaleArray = 'Vel'
+contour1Display.OSPRayScaleFunction = 'PiecewiseFunction'
+contour1Display.GlyphType = 'Arrow'
+contour1Display.SetScaleArray = [None, '']
+contour1Display.ScaleTransferFunction = 'PiecewiseFunction'
+contour1Display.OpacityArray = [None, '']
+contour1Display.OpacityTransferFunction = 'PiecewiseFunction'
+
+# hide data in view
+Hide(calculator1, renderView1)
+
+# set scalar coloring
+ColorBy(contour1Display, ('POINTS', 'Vorticity'))
+
+# rescale color and/or opacity maps used to include current data range
+contour1Display.RescaleTransferFunctionToDataRange(True)
+
+# show color bar/color legend
+contour1Display.SetScalarBarVisibility(renderView1, True)
+
+# Rescale transfer function
+vorticityLUT.RescaleTransferFunction(0.0, 2000.0)
+
+# Rescale transfer function
+vorticityPWF.RescaleTransferFunction(0.0, 2000.0)
+
+# reset view to fit data
+renderView1.ResetCamera()
+
+# reset view to fit data
+renderView1.ResetCamera()
+
+# reset view to fit data
+renderView1.ResetCamera()
+
+# set active source
+SetActiveSource(calculator1)
+
+# show data in view
+calculator1Display = Show(calculator1, renderView1)
+
+# show color bar/color legend
+calculator1Display.SetScalarBarVisibility(renderView1, True)
+
+# hide data in view
+Hide(contour1, renderView1)
+
+# Rescale transfer function
+vortLUT.RescaleTransferFunction(1.0, 6000.0)
+
+# Rescale transfer function
+vortPWF.RescaleTransferFunction(1.0, 6000.0)
+
+# convert to log space
+vortLUT.MapControlPointsToLogSpace()
+
+# Properties modified on vortLUT
+vortLUT.UseLogScale = 1
+
+# Apply a preset using its name. Note this may not work as expected when presets have duplicate names.
+vortLUT.ApplyPreset('X Ray', True)
+
+# Properties modified on calculator1Display
+calculator1Display.Specular = 1.0
+
+# Apply a preset using its name. Note this may not work as expected when presets have duplicate names.
+vortLUT.ApplyPreset('Black-Body Radiation', True)
+
+# Apply a preset using its name. Note this may not work as expected when presets have duplicate names.
+vortLUT.ApplyPreset('X Ray', True)
+
+# Rescale transfer function
+vortLUT.RescaleTransferFunction(1.0, 2000.0)
+
+# Rescale transfer function
+vortPWF.RescaleTransferFunction(1.0, 2000.0)
+
+# Rescale transfer function
+vortLUT.RescaleTransferFunction(1.0, 1000.0)
+
+# Rescale transfer function
+vortPWF.RescaleTransferFunction(1.0, 1000.0)
+
+# get color legend/bar for vortLUT in view renderView1
+vortLUTColorBar = GetScalarBar(vortLUT, renderView1)
+
+# Properties modified on vortLUTColorBar
+vortLUTColorBar.Title = 'Vorticity'
+
+# create a new 'Annotate Time'
+annotateTime1 = AnnotateTime()
+
+# Properties modified on annotateTime1
+annotateTime1.Format = 'Time: %.3fs'
+
+# show data in view
+annotateTime1Display = Show(annotateTime1, renderView1)
+# trace defaults for the display properties.
+annotateTime1Display.Color = [0.0, 0.0, 0.0]
+
+# Properties modified on annotateTime1Display
+annotateTime1Display.FontSize = 8
+
+#### saving camera placements for all active views
+
+# current camera placement for renderView1
+renderView1.InteractionMode = '2D'
+renderView1.CameraPosition = [6.605295453955494, 0.0540393590927124, 0.007195591926574707]
+renderView1.CameraFocalPoint = [0.0, 0.0540393590927124, 0.007195591926574707]
+renderView1.CameraViewUp = [0.0, 0.0, 1.0]
+renderView1.CameraParallelScale = 1.7095762620127821
+
+#### uncomment the following to render all views
+# RenderAllViews()
+# alternatively, if you want to write images, you can use SaveScreenshot(...).

@@ -1,0 +1,985 @@
+%%
+%%%*************************** Document Class *****************************
+%%
+\documentclass[twocolumn]{svjour3}
+%%
+%%%*********************** Packages and Settings **************************
+%%
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage[numbers]{natbib}
+\usepackage{microtype}% improves general appearance of the text
+\usepackage{amsmath,amssymb,amstext}% math support
+\usepackage{newtxtext,newtxmath}% font support
+\usepackage{enumitem}% customizing enumerated lists
+\usepackage{subcaption}% subfigures
+\captionsetup{compatibility=false}
+%\usepackage[section]{placeins}% to prevent floats from being moved over section
+\graphicspath{{./}{./img/}}
+\journalname{Shock Waves}
+%%
+%%%*************************** Math Commands ******************************
+%%
+\providecommand{\Vector}[1]{\boldsymbol{#1}}% General vectors in bold italic
+\providecommand{\unitVector}[1]{\boldsymbol{\mathbf{#1}}}% Unit vectors in bold roman
+\providecommand{\Tensor}[1]{\boldsymbol{\mathsf{#1}}}% Tensor in sans-serif bold italic
+\providecommand{\unitTensor}[1]{\boldsymbol{{\mathsf{#1}}}}% Identity tensor in sans-serif bold
+\providecommand{\Matrix}[1]{\boldsymbol{\mathbf{#1}}}% Matrix in bold roman
+\providecommand{\unitMatrix}[1]{\boldsymbol{\mathbf{#1}}}% Identity matrix in bold roman
+\providecommand{\Unit}[1]{\,\mathrm{#1}}% Units in roman
+\providecommand{\Const}[1]{\mathrm{#1}}% Math constants, functions
+\providecommand{\Set}[1]{\mathbb{#1}}% Special sets (e.g. real numbers) in blackboard bold
+\providecommand{\Div}{\operatorname{div}}% divergence operator
+\providecommand{\Order}{\operatorname{O}}% order operator
+\providecommand{\Trace}{\operatorname{tr}}% trace operator
+\providecommand{\Diag}{\operatorname{diag}}% diagonal
+\providecommand{\Def}{\operatorname{def}}% define
+\providecommand{\Max}{\operatorname{max}}% maximum
+\providecommand{\Min}{\operatorname{min}}% minimum
+\providecommand{\Loptr}{\operatorname{\mathcal{L}}}% spatial operator
+\providecommand{\Toptr}{\operatorname{\mathcal{LL}}}% temporal operator
+\providecommand{\Soptr}{\operatorname{\mathcal{S}}}% solution operator
+%%
+%%%************************* Document Contents ****************************
+%%
+\begin{document}
+
+\title{A numerical framework for the direct simulation of dense particulate flow under explosive dispersal}
+
+\author{Huangrui Mo \and Fue-Sang Lien \and Fan Zhang \and Duane S. Cronin}
+
+\institute{
+    Huangrui Mo \and Fue-Sang Lien \and Duane S. Cronin
+    \at Department of Mechanical Engineering, University of Waterloo, 200 University Avenue West, Waterloo, ON N2L 3G1, Canada\\ \email{huangrui.mo@uwaterloo.ca $\cdot$ fslien@uwaterloo.ca $\cdot$ duane.cronin@uwaterloo.ca}
+    \and
+    Fan Zhang
+    \at Defense Research and Development Canada, P.O. Box 4000, Medicine Hat, AB T1A 8K6, Canada\\ \email{fan.zhang@drdc-rddc.gc.ca}
+}
+
+\date{Received: date / Accepted: date}
+
+\maketitle
+
+\begin{abstract}
+    In this paper, we present a Cartesian grid based numerical framework for the direct simulation of dense particulate flow under explosive dispersal. This numerical framework is established through the integration of the following numerical techniques: 1) operator splitting for partitioned fluid-solid interaction in the time domain, 2) the second-order SSP Runge-Kutta method and third-order WENO scheme for temporal and spatial discretization of governing equations, 3) the front-tracking method for evolving phase interfaces, 4) a field function proposed for low-memory-cost multimaterial mesh generation and fast collision detection, 5) an immersed boundary method \textcolor{blue}{developed} for treating arbitrarily irregular and changing boundaries, and 6) a \textcolor{blue}{deterministic} multi-body contact and collision model. Employing the developed framework, this paper further studies particle jet formation under explosive dispersal by considering the effects of particle properties, particulate payload morphologies, and burster pressures. By the simulation of the dispersal processes of dense particle systems driven by pressurized gas, in which the driver pressure reaches $1.01325\times10^{10} \Unit{Pa}$ ($10^5$ times the ambient pressure) and particles are impulsively accelerated from stationary to a speed that is more than $12000 \Unit{m/s}$ within $15 \Unit{\mu s}$, it is demonstrated that the presented framework is able to effectively resolve coupled shock-shock, shock-particle, and particle-particle interactions in complex fluid-solid systems with shocked flow conditions, arbitrarily irregular particle shapes, and realistic multi-body collisions.
+\keywords{Cartesian numerical framework \and Particulate flow \and Explosive dispersal \and Particle jet}
+\end{abstract}
+
+\section{Introduction}\label{sec:intro}
+
+When granular media are dispersed in processes involving impulsive energy release, such as explosions with explosive charges surrounded by or mixed with solid particles \citep{frost2012particle, zhang2014large}, explosive volcanic eruptions \citep{kedrinskiy2009hydrodynamic}, and the impact of a solid projectile on granular media \citep{lohse2004impact, pacheco2011impact}, coherent particle clustering and jetting structures are commonly formed. Widely observed in nature, the particle jetting phenomenon is of interest to a broad range of fields, including fluid, solid, and \textcolor{blue}{astrophysical} sciences. Owing to the wide usage of high explosives in civil and military applications, there is an increasing demand for advancing our knowledge of particle jet formation under explosive dispersal.
+
+In order to understand particle jetting phenomena, many studies \citep{zhang2009shock}, both experimental and numerical, have been conducted over the past decades. Due to the complexity and difficulty to accurately resolve coupled shock-shock, shock-particle, and particle-particle interactions involved in explosive dispersal, particularly, the presence of complex shock-particle interactions \citep{ripley2012acceleration, rodriguez2013solid} and the random nature of force-chain networks in granular materials \citep{liu1995force, jaeger1996granular}, the underlying mechanism causing particle jetting is still largely undiscovered.
+
+\citet{frost2012particle} conducted a series of experiments on densely-packed particles dispersed under explosive loading. It was postulated that the number of particle jets formed can be linked to a particle compaction Reynolds number. This particle compaction Reynolds number represents a balance between the detonation expansion, which tends to fracture particle layers, and the viscous resistance of the shock-compacted powder bed, which tends to stabilize the particle layers. The outer surface of the powder bed expands smoothly and no jet structures are formed when the compaction Reynolds number is below a certain threshold.
+
+Based on experimental studies on explosively disseminated material, \citet{milne2010dynamic} speculated that the Rayleigh-Taylor instability, which required a long time to develop, was not responsible for the formation of jet structures due to the discrepancy of their time scales. However, as discussed by \citet{zhang2014large}, it remains unknown whether the jet formation was influenced by the early phase of the shock-\textcolor{blue}{enhanced} Rayleigh-Taylor instability, commonly referred to as Richtmyer-Meshkov instability \citep{richtmyer1960taylor}.
+
+To study particle jetting instabilities under large-scale explosive dispersal, \citet{zhang2014large} experimentally investigated the explosive dispersal of $5,090$ kg gasoline. The gasoline payload was in a cylindrically stratified configuration and was detonated by explosives placed at the center\textcolor{blue}{line}. According to the experimental observation, a dual hierarchical jet structure comprising numerous fine particle jets and a limited number of primary particle jets was produced. Fine particle jets were formed immediately after the casing fragmentation and dissipated through aerodynamic interactions as time progressed. Primary particle jets emerged out of the surface of fine jet structures and persisted in time as a coherent jet structure. This dual hierarchical jet structure can be formed within an expansion length of $1.5-2$ times the initial charge diameter.
+
+\citet{zhang2014large} suggest that the generation of fine jets may be due to surface instabilities at the exterior interface between the bulk payload and the air, and the formation of primary jets may originate from shock-\textcolor{blue}{enhanced} instability at the interior interface between the burster explosive and the bulk payload. The casing fragmentation at each interface may further enhance or dominate the interfacial instabilities. In the experiments of explosive dispersal of stratified powders and hybrid mixtures \citep{zhang2010hybrid}, the dual jet structures are also featured, although the use of stratified powders and hybrid mixtures results in particulate flows, \textcolor{blue}{which} adds the additional complexity of collision, agglomeration, compaction, and fragmentation of particles \textcolor{blue}{and} may influence the length scales of the formed primary jets.
+
+While experiments have successfully demonstrated particle jet behavior and illustrated the bulk dispersal process \citep{milne2010dynamic, zhang2010hybrid, frost2012particle, rodriguez2013solid, zhang2014large}, due to the limitations of flow visualization and the extremely small time scales involved in jet formation, relying solely on experimental observations does not lead efficiently to further understanding. Therefore, numerical approaches have gained increasing importance in the investigation of particle jet formation.
+
+To simplify the physical and mathematical models as well as decrease the numerical complexity, researchers have made several key assumptions, such as the shape of particles being identical and spherical \citep{ripley2014jetting, tenneti2014particle}, particles being non-contacting \citep{xu2013formation, kempe2014relevance}, and perfectly inelastic collision \citep{xu2013formation} or short-range repulsive-force based collision \citep{hu2001direct, glowinski2001fictitious}, in simulating particle jet formation or interface-resolved dense particle flows. Consequently, the resulting models may not adequately represent the practical problems, and some important physical details may be absent in the obtained results.
+
+By applying and developing numerical methods and mathematical models, this paper establishes a Cartesian grid based numerical framework for the direct simulation of dense particulate flow. The resulting solver is able to provide high-fidelity numerical solutions for the investigation of particle jet formation under explosive dispersal. By the simulation of the dispersal processes of dense particle systems, this paper demonstrates that the presented framework is capable of resolving coupled shock-shock, shock-particle, and particle-particle interactions in complex fluid-solid systems with shocked flow conditions, arbitrarily irregular particle shapes, and realistic multi-body collisions.
+
+\section{A numerical framework}\label{sec:framework}
+
+\subsection{Fluid-solid interaction}
+
+In particulate flows, experimentally correlated models based on drag and heat transfer laws are commonly used for modelling fluid\textcolor{blue}{-}particle interactions \citep{rudinger2012fundamentals}. While empirical models perform relatively well for dilute particle flows with low pressure conditions, the traditional momentum and heat exchange correlations are generally no longer valid under dense particle settings with detonated flow conditions \citep{zhang2001explosive}.
+
+In an explosive dispersal, the initial volume fraction of particles is frequently more than $50\%$. \textcolor{blue}{The} shock interacts with a very dense particle system at \textcolor{blue}{an} early stage. Then, a dense-to-dilute transition is followed under the rapid expansion driven by detonation shocks, in which less severe boundary layer interactions exist among individual particles \citep{zhang2001explosive}. Therefore, for predictive modelling of shock-particle interactions, particularly, to adequately describe the interactions at the early stage of explosive dispersal, a physics-based interface-resolved shock-particle interaction model is required.
+
+A fully coupled fluid-solid interaction algorithm generally involves implicit discretization of governing equations and solves large matrix systems by iteration. Although being able to achieve a general solver for all the problem domains, it imposes stringent conditions on the solution process. In contrast, a partitioned algorithm decouples physical processes in the time domain. Adopting numerical techniques optimized for each problem domain and physical process, the partitioned approach has advantages in flexibility and efficiency \citep{goldman1996n}. 
+
+A partitioned fluid-solid interaction algorithm with second-order temporal accuracy is employed herein, which is obtained by applying Strang splitting \citep{strang1968construction} to split physical processes:
+\begin{equation}
+    \Vector{U}^{n+1} = \Soptr_{\mathrm{s}}(\frac{\Delta t}{2})\Soptr_{\mathrm{f}}(\frac{\Delta t}{2})\Soptr_{\mathrm{f}}(\frac{\Delta t}{2})\Soptr_{\mathrm{s}}(\frac{\Delta t}{2}) \Vector{U}^n
+\end{equation}
+where $\Vector{U}^{n}$ and $\Vector{U}^{n+1}$ denote the solution vectors of physical quantities at time $t^n$ and $t^{n+1}$, respectively; $\Soptr_{\mathrm{s}}$ and $\Soptr_{\mathrm{f}}$ represent the solution operators of solid dynamics and fluid dynamics, respectively.
+
+Traditionally, to reduce \textcolor{blue}{the} computational load resulting from a symmetric splitting, the group property of the solution operator, $\Soptr(\Delta t_1)\Soptr(\Delta t_2) = \Soptr(\Delta t_1 +\Delta t_2)$, is applied to concatenate consecutive operators of the same type \citep{strang1968construction, goldman1996n}. Consequently, it breaks the uniformity at the start and end steps of computation. By observing that the value range of the CFL number can be doubled, the ungrouped form preserves uniformity while achieving equivalent overall efficiency for temporal integration, or higher efficiency when more than two operators present.
+
+\subsection{Governing equations and discretization}
+
+\subsubsection{Fluid dynamics}
+
+The conservative form of the three-dimensional Navier-Stokes equations in Cartesian coordinates is used for describing motion of fluids: 
+\begin{equation}
+    \frac{\partial \Vector{U}}{\partial t}+\frac{\partial \Vector{F}_i}{\partial x_i} = \frac{\partial \Vector{F}^{\mathrm{v}}_i}{\partial x_i}+\Vector{\Phi}
+\end{equation}
+
+The vector of conservative variables $\Vector{U}$, convective fluxes $\Vector{F}_i$, diffusive fluxes $\Vector{F}^{\mathrm{v}}_i$, and source terms $\Vector{\Phi}$ are as follows:
+\begin{equation}
+    \begin{split}
+    \Vector{U} =
+    \begin{pmatrix}
+        \rho\\
+        \rho V_j\\
+        \rho e_{\mathrm{T}}
+    \end{pmatrix}
+    ,\text{   }
+    \Vector{F}_i =
+    \begin{pmatrix}
+        \rho V_i\\
+        \rho V_i V_j + p \delta_{ij}\\
+        (\rho e_{\mathrm{T}}+p) V_i
+    \end{pmatrix}
+    \\
+    \Vector{F}^{\mathrm{v}}_i =
+    \begin{pmatrix}
+        0\\
+        \tau_{ij}\\
+        k \frac{\partial T}{\partial x_i} + \tau_{il} V_l
+    \end{pmatrix}
+    ,\text{   }
+    \Vector{\Phi} =
+    \begin{pmatrix}
+        0\\
+        f^{\mathrm{b}}_j\\
+        f^{\mathrm{b}}_l V_l
+    \end{pmatrix}
+    \end{split}
+\end{equation}
+where $\rho$ is the density, $\Vector{V}$ is the velocity, $e_{\mathrm{T}} = e +\Vector{V}\cdot\Vector{V}/2$ is the specific total energy, $e$ is the specific internal energy, $p$ is the thermodynamic pressure, $\Tensor{\tau}$ is the viscous stress tensor, $T$ is the temperature, $k$ is the thermal conductivity, $\Vector{f}^{\mathrm{b}}$ represents external body forces such as gravity, $i$ is a free index, $j$ is an enumerator, $l$ is a dummy index. 
+
+Currently, the closure of the system is by supplying the Newtonian fluid relation with the Stokes hypothesis
+\begin{equation}
+    \tau_{ij} = \mu\left(\frac{\partial V_i}{\partial x_j} + \frac{\partial V_j}{\partial x_i} - \frac{2}{3}(\nabla\cdot\Vector{V}) \delta_{ij}\right)
+\end{equation}
+and the perfect gas law
+\begin{equation}
+    \begin{gathered}
+        p = \rho R T \\
+        e = C_v T
+    \end{gathered}
+\end{equation}
+where $\mu$ is the dynamic viscosity and is determined by the Sutherland viscosity law, $R$ is the specific gas constant, and $C_v$ is the specific heat capacity at constant volume.
+
+The temporal integration is done by the second-order SSP Runge-Kutta method \citep{shu1988efficient, gottlieb2001strong}:
+\begin{equation}
+    \begin{aligned}
+        &\Vector{U}^{(1)} = \Toptr\Vector{U}^n\\
+        &\Vector{U}^{(n+1)} = 1/2\Vector{U}^n+1/2\Toptr\Vector{U}^{(1)}\\
+        &\Toptr = (\Matrix{I} + \Delta t \Loptr)\\
+    \end{aligned}
+\end{equation}
+where $\Matrix{I}$ is the identity matrix, operator $\Loptr = \Loptr_x + \Loptr_y + \Loptr_z$, $\Loptr_x$, $\Loptr_y$, and $\Loptr_z$ represent the spatial operators of $x$, $y$, and $z$ dimension, respectively.
+
+For systems of conservation laws in multidimensional space, the discretization of spatial operators can be conducted using dimension-by-dimension \citep{shu1988efficient} or dimensional-splitting \citep{strang1968construction} approximation. While the former preserves temporal accuracy, the latter has a much less severe stability constraint. To guarantee discrete mass conservation, conservative discretization is adopted for all the spatial derivatives. Taking the $x$ dimension as an example, the flux derivative at a node $i$ is approximated as
+\begin{equation}
+    \left. \frac{\partial \Vector{F}}{\partial x} \right|_i = \frac{1}{\Delta x}\left[\hat{\Vector{F}}_{i+\frac{1}{2}}-\hat{\Vector{F}}_{i-\frac{1}{2}}\right]
+\end{equation}
+where $\Vector{F}$ represents either the convective flux vector or the diffusive flux vector, $\hat{\Vector{F}}_{i+{1}/{2}}$ is a numerical flux at the interface between the discretization interval $\Omega_i=[x_{i-{1}/{2}},x_{i+{1}/{2}}]$ and $\Omega_{i+1}=[x_{i+{1}/{2}},x_{i+{3}/{2}}]$.
+
+In convective flux discretization, local characteristic splitting is employed to locally decompose the vector system into a set of scalar conservation laws, and scalar flux splitting is conducted to ensure upwinding property
+\begin{equation}
+    f(u) = f^+(u) + f^-(u), \text{~~} \frac{\mathrm{d} f^+(u)}{\mathrm{d} u} \ge 0, \text{~~} \frac{\mathrm{d} f^-(u)}{\mathrm{d} u} \le 0
+\end{equation}
+where $f$ is a scalar characteristic flux.
+
+Since both the forward flux and backward flux are discretized in conservative form, the discretization of a scalar flux derivative has the form
+\begin{equation}
+    \left. \frac{\partial f}{\partial x} \right|_i = \frac{1}{\Delta x} \left[ \hat{f}_{i+\frac{1}{2}} - \hat{f}_{i-\frac{1}{2}} \right]
+\end{equation}
+where the numerical fluxes are given as
+\begin{equation}
+    \hat{f}_{i+\frac{1}{2}} = \hat{f}_{i+\frac{1}{2}}^+ + \hat{f}_{i+\frac{1}{2}}^-, \text{~~} \hat{f}_{i-\frac{1}{2}} = \hat{f}_{i-\frac{1}{2}}^+ + \hat{f}_{i-\frac{1}{2}}^-
+\end{equation}
+
+The third-order WENO scheme \citep{jiang1996efficient} is then applied for the reconstruction of numerical fluxes. Due to the symmetry between the numerical flux $\hat{f}_{i+{1}/{2}}^+$ and $\hat{f}_{i-{1}/{2}}^-$, only the reconstruction of the former is presented herein. To obtain the latter, one replaces all $+$ and $-$ signs in the superscript and subscript of each variable in the equations by the corresponding opposite signs $-$ and $+$, respectively.
+\begin{equation}
+    \hat{f}_{i+\frac{1}{2}}^{+} = \sum_{n=0}^{N} \omega_{n}^+ q_{n}^+(f_{i+n-N}^+, \dotsc, f_{i+n}^+), \text{~~} N=(r-1)=1
+\end{equation}
+\textcolor{blue}{where}
+\begin{equation}
+    \begin{aligned}
+        &q_0^+(f_{i-1}^+, f_{i}^+) = (-f_{i-1}^+ + 3f_{i}^+) / 2\\
+        &q_1^+(f_{i}^+, f_{i+1}^+) = (f_{i}^+ + f_{i+1}^+) / 2\\
+        &\omega_{n}^+ = \frac{\alpha_n^+}{\alpha_0^+ + \dotsb + \alpha_N^+}, \text{~~} \alpha_n^+ = \frac{C_n}{(\varepsilon + IS_n^+)^2}, \text{~~} \varepsilon = 10^{-6}\\
+        &C_0 = \frac{1}{3}, \text{~~} C_1 = \frac{2}{3}\\
+        &IS_{0}^+ =(f_{i}^+ - f_{i-1}^+)^2\\
+        &IS_{1}^+ = (f_{i+1}^+ - f_{i}^+)^2
+    \end{aligned}
+\end{equation}
+where $r$ is the number of candidate stencils, $q_n$ are the $r$-th order approximations of $\hat{f}_{i+1/2}$ on the candidate stencils $S_n=(x_{i+n-N},\dotsc,x_{i+n})$, $\omega_{n}$ are the actual weights of $q_n$, which are determined by the smoothness of solution in the candidate stencils $S_n$, as measured by $IS_n$, and $C_n$ are optimal weights to ensure that the convex combination of $q_n$ converges to a $(2r-1)$-th order approximation of $\hat{f}_{i+1/2}$ on the undivided stencil $S=(x_{i-N},\dotsc,x_{i+N})$ in smooth regions.
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[trim = 0mm 25mm 0mm 18mm, clip, width=0.35\textwidth]{diffusive_flux_demo}
+    \caption{A schematic diagram illustrating interfacial diffusive flux reconstruction.}
+    \label{fig:diffusive_flux_discretize}
+\end{figure}
+
+The second-order central difference discretization is employed for diffusive fluxes. A conservative discretization of the diffusive fluxes involves consecutive differentiation, which may lead to an even-odd decoupling issue \citep{pirozzoli2011numerical, brehm2015locally}. Therefore, the reconstruction function should be carefully devised. In this work, the interfacial flux $\hat{\Vector{F}^{\mathrm{v}}}_{i+{1}/{2}}$ is reconstructed on the discretized space $[i, i+1] \times [j-1, j+1] \times [k-1, k+1]$, as illustrated in Fig.~\ref{fig:diffusive_flux_discretize}. Let $\phi$ denote a physical quantity in $\Vector{F}^{\mathrm{v}}$, in order to avoid even-odd decoupling resulting from applying consecutive derivative discretization, the following reconstructions can be adopted:
+\begin{equation}
+    \begin{aligned}
+        \phi_{i+\frac{1}{2}, j, k} &= \frac{\phi_{i, j, k} + \phi_{i+1, j, k}}{2} \\
+        \left.\frac{\partial \phi}{\partial x}\right|_{i+\frac{1}{2}, j, k} &= \frac{\phi_{i+1, j, k} - \phi_{i, j, k}}{\Delta x} \\
+        \left.\frac{\partial \phi}{\partial y}\right|_{i+\frac{1}{2}, j, k} &= \frac{\phi_{i, j+1, k} + \phi_{i+1, j+1, k} - \phi_{i, j-1, k} - \phi_{i+1, j-1, k}}{4\Delta y} \\
+        \left.\frac{\partial \phi}{\partial z}\right|_{i+\frac{1}{2}, j, k} &= \frac{\phi_{i, j, k+1} + \phi_{i+1, j, k+1} - \phi_{i, j, k-1} - \phi_{i+1, j, k-1}}{4\Delta z}
+    \end{aligned}
+\end{equation}
+
+\subsubsection{Solid dynamics}
+
+The motion of solids is governed by the equation system comprising the Newton's second law of translational motion and the Euler equations of rotational motion:
+\begin{equation}
+    \small
+    \frac{\mathrm{d} \Vector{U}}{\mathrm{d} t} = \Vector{\Phi}
+    ,\text{   }
+    \Vector{U} =
+    \begin{pmatrix}
+        \Vector{V}\\
+        \Vector{x}_{\mathrm{c}}\\
+        \Matrix{I}_{\mathrm{c}} \Vector{\omega}\\
+        \Vector{\theta}
+    \end{pmatrix}
+    ,\text{   }
+    \Vector{\Phi} =
+    \begin{pmatrix}
+        \frac{1}{m}\int\limits_{\partial\Omega} \unitVector{n} \cdot (-p \unitTensor{I} + \Tensor{\tau}) \, \mathrm{d}S + \Vector{g} \\
+        \Vector{V}\\
+        \int\limits_{\partial\Omega} (\Vector{x} - \Vector{x}_{\mathrm{c}}) \times [\unitVector{n} \cdot (-p \unitTensor{I} + \Tensor{\tau})] \, \mathrm{d}S\\
+        \Vector{\omega}
+    \end{pmatrix}
+\end{equation}
+where $\Vector{x}$ is the position vector of spatial points, $\Omega$ is the spatial domain occupied by a particle, $\Vector{x}_{\mathrm{c}}$ is the position vector of the particle centroid, $\Vector{\theta}$ is the orientation (vector of Euler angles) of the particle, $\Vector{V}$ and $\Vector{\omega}$ are the translational and angular velocities of the particle, respectively, $m$ is the mass of the particle, $\Matrix{I}_{\mathrm{c}}$ is the moment of inertia matrix, $\unitVector{n}$ is the unit outward surface normal vector, $p$ and $\Tensor{\tau}$ are the pressure and viscous stress tensor field exerted on the particle surface via fluid, respectively, and $\Vector{g}$ is the body force per unit mass, such as gravitational acceleration, exerted by external fields.
+
+The time integration of the ordinary differential equation system is via a second-order Runge-Kutta scheme:
+\begin{equation}
+    \begin{aligned}
+        &\Vector{k}_1 = \Vector{\Phi}(t^n, \Vector{U}^n)\\
+        &\Vector{k}_2 = \Vector{\Phi}(t^n + \Delta t, \Vector{U}^n + \Delta t \Vector{k}_1)\\
+        &\Vector{U}^{n+1} = \Vector{U}^n + \Delta t(\Vector{k}_1 + \Vector{k}_2) / 2
+    \end{aligned}
+\end{equation}
+
+\subsection{Interface description and evolution}
+
+Currently, \textcolor{blue}{the solid particles are treated as rigid bodies, and the front-tracking method \citep{tryggvason2001front} is employed for interface description and evolution. More specifically,} individual Lagrangian grids such as triangulated facets are used to explicitly track interfaces, and the evolution of interfaces is governed by the laws of solid motion.
+
+\subsection{Multimaterial mesh generation and multi-body collision}
+
+In the direct simulation of a fluid-solid system with dense and irregular particles, classifying the ownership of computational nodes and identifying numerical boundaries are prerequisites for numerical discretization implementation and interface condition enforcement, which problem can be referred to as multimaterial mesh generation. In addition, solving particle interactions in an interface-resolved dense particle system requires algorithms for collision detection and multi-body collision. Here, we describe a field function for low-memory-cost multimaterial mesh generation and fast collision detection as well as a multi-body collision model with parameterized elasticity and friction for deterministic and realistic modelling of particle-particle interactions. A complete development of the field function and collision model can be found in reference \citep{mo2017field}.
+
+\subsubsection{Field function description}
+
+Considering a spatial domain $\Omega$ discretized by a Cartesian grid $I \times J \times K$, and a set of polyhedron domains $\{\Omega_p: \ p = 1, \dotsc, P\}$ in space, we introduce an additional domain $\Omega_0$ as
+\begin{equation}
+    \Omega_0 = \{\Vector{x} \in \Omega: \Vector{x} \notin \cup_{p=1}^P\Omega_p\}
+\end{equation}
+
+To classify computational nodes inside $\Omega_m$ ($m = 0, \dotsc, P$) while identifying $R$ layers of interfacial nodes, an integer type field function is introduced as
+\begin{equation}
+    \Vector{\Phi} = \{(\phi, \varphi): \phi \in \{0, \dotsc, P\}, \varphi \in \{0, \dotsc, R\}\}
+\end{equation}
+where the domain identifier, $\phi$, is determined by
+\begin{equation}
+    \phi_{i,j,k} = m, \text{ if } \Vector{x}_{i,j,k} \in \Omega_m
+\end{equation}
+and the interfacial node layer identifier, $\varphi$, is determined by
+\begin{equation} \label{eq:condition}
+    \varphi_{i,j,k} = 
+    \begin{cases}
+        r, &\text{ if } \exists \, \phi_{i',j',k'} \neq \phi_{i,j,k} \text{ for condition } Q\\
+        0, &\text{ if } r > R 
+    \end{cases}
+\end{equation}
+where $(i', j', k')$ denotes a neighbouring node of the processing node $(i, j, k)$, $R$ is the total number of interfacial node layers, and the condition $Q$ is
+\begin{equation}
+    \begin{cases}
+        |i'-i| = r, |j'- j| = 0, |k'- k| = 0 &\text{ or }\\
+            |i'-i| = 0, |j'- j| = r, |k'- k| = 0 &\text{ or }\\
+            |i'-i| = 0, |j'- j| = 0, |k'- k| = r &\text{ or }\\
+            |i'-i| = r-1, |j'- j| = r-1, |k'- k| = 0 &\text{ or }\\
+            |i'-i| = r-1, |j'- j| = 0, |k'- k| = r-1 &\text{ or }\\
+            |i'-i| = 0, |j'- j| = r-1, |k'- k| = r-1 &\\
+    \end{cases}
+\end{equation}
+
+The criteria for \textcolor{blue}{the} domain identifier, $\phi$, are based on the point inclusion results. The criteria for \textcolor{blue}{the} interfacial node layer identifier, $\varphi$, are based on the existence of a heterogeneous node on the discretization stencils of the tested node. Therefore, the determination of the value of $\varphi$ depends on the type of differential operators presented in the governing equations as well as the type and order of the employed spatial discretization schemes. 
+
+To avoid either insufficient or excessive classification of interfacial nodes, the criteria in Eq.~\eqref{eq:condition} may be required to adapt to the specific problem scenarios. For instance, if no mixed derivatives are discretized, only line type stencils are involved in discretization. The condition $Q$ in Eq.~\eqref{eq:condition} shall be reduced to
+\begin{equation}
+    \begin{cases}
+        |i'-i| = r, |j'- j| = 0, |k'- k| = 0 &\text{ or }\\
+        |i'-i| = 0, |j'- j| = r, |k'- k| = 0 &\text{ or }\\
+        |i'-i| = 0, |j'- j| = 0, |k'- k| = r
+    \end{cases}
+\end{equation}
+
+\subsubsection{Multimaterial mesh generation}
+
+The field function $\Vector{\Phi}(\phi,\varphi)$ is able to generate a mesh utilized for computing multimaterial flows. As illustrated in Fig.~\ref{fig:n_domain_demo}, for a computational node $(i,j,k)$, $\phi_{i,j,k}$ gives the domain inclusion state of the node, and $\varphi_{i,j,k}$ contains the interfacial state of the node.
+
+Let $\Omega_m$ be the solution domain, when the solution is conducted without using a ghost cell approach, $\Vector{\Phi}_{i,j,k}(\phi=m, \varphi=0)$ describes a normal computational node while $\Vector{\Phi}_{i,j,k}(\phi=m, \varphi>0)$ describes that the node $(i,j,k)$ locates on the numerical boundaries. When a ghost-cell approach is employed, $\Vector{\Phi}_{i,j,k}(\phi=m, \varphi \ge 0)$ describes a normal computational node while $\Vector{\Phi}_{i,j,k}(\phi \neq m, \varphi>0)$ with a neighbouring node $\Vector{\Phi}_{i',j',k'}(\phi = m, \varphi \ge 0)$ on the discretization stencils of the node $(i,j,k)$ describes that the node $(i,j,k)$ locates on the numerical boundaries of the computational domain $\Omega_m$.
+
+As a low-memory-cost integer field, the devised field function explicitly tracks all the problem domains with multiple resolved interfacial node layers. Therefore, employing this field function for a multimaterial problem, it is straightforward to enforce designated governing equations, constitutive models, numerical schemes, and interface conditions for each material domain.
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.48\textwidth]{n_domain_demo}
+    \caption{A 2D schematic diagram of the field function $\Vector{\Phi}(\phi,\varphi)$. Geometric shapes represent \textcolor{blue}{the} value of $\phi$: circle, $0$; triangle, $1$; star, $p$; square, $P$. Colors represent \textcolor{blue}{the} value of $\varphi$: grey, $0$; red, $1$; $R=1$ is assumed here.}
+    \label{fig:n_domain_demo}
+\end{figure}
+
+\subsubsection{Collision detection}
+
+In addition to multimaterial mesh generation, the field function $\Vector{\Phi}$ also enables fast collision detection. As illustrated in Fig.~\ref{fig:n_domain_collide_demo}, by sweeping through the nodes $(i,j,k)$ with $\Vector{\Phi}_{i,j,k}(\phi=p,\varphi=1)$ for finding the neighbouring nodes $(i',j',k')$ with $\Vector{\Phi}_{i',j',k'}(\phi \neq p, \varphi=1)$, where $|i-i'| \leq 1$, $|j-j'| \leq 1$, and $|k-k'| \leq 1$, all the polyhedrons $\Omega_{n}$ colliding with the polyhedron $\Omega_p$ can be detected in an easy and efficient way. 
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.48\textwidth]{n_domain_collide_demo}
+    \caption{A 2D schematic diagram of applying the field function for collision detection. Geometric shapes represent \textcolor{blue}{the} value of $\phi$: circle, $0$; triangle, $1$; star, $n$; square, $N$; lozenge, $p$; Colors represent \textcolor{blue}{the} value of $\varphi$: grey, $0$; red, $1$; $R=1$ is assumed, and the interfacial nodes of $\Omega_0$ are deactivated for the purpose of clarification.}
+    \label{fig:n_domain_collide_demo}
+\end{figure}
+
+When the polyhedron $\Omega_p$ collides with the polyhedron $\Omega_n$, multiple elements such as vertices, edges, and faces on $\Omega_p$ may contact with multiple elements on $\Omega_n$, in which one element on $\Omega_p$ may contact with either a portion of an element or multiple elements on $\Omega_n$. This multi-contact problem introduces difficulties in the determination of the line of impact. Instead of finding the common normal of contacting geometric elements, an alternative approach is to approximate the line of impact via the Cartesian grid. 
+
+Suppose $C$ computational nodes $(i_c,j_c,k_c)$ in $\Omega_p$ satisfying $\Vector{\Phi}_{i_c,j_c,k_c}(\phi = p, \varphi=1)$, and each $(i_c,j_c,k_c)$ has $D$ neighbouring nodes $(i'_d,j'_d,k'_d)$ with $\Vector{\Phi}_{i'_d,j'_d,k'_d}(\phi = n, \varphi=1)$, one possible approximation of the line of impact between $\Omega_p$ and $\Omega_n$ can be chosen as
+\begin{equation}
+    \unitVector{e}_{pn} = \frac{\sum^{C}_{c=1}\sum^{D}_{d=1} [(i'_d - i_c)\unitVector{e}_1 + (j'_d - j_c)\unitVector{e}_2 + (k'_d - k_c)\unitVector{e}_3]}{|\sum^{C}_{c=1}\sum^{D}_{d=1} [(i'_d - i_c)\unitVector{e}_1 + (j'_d - j_c)\unitVector{e}_2 + (k'_d - k_c)\unitVector{e}_3]|}
+\end{equation}
+where $\unitVector{e}_1$, $\unitVector{e}_2$, $\unitVector{e}_3$ are the unit direction vectors of the coordinate $x$, $y$, and $z$, respectively. 
+
+\subsubsection{\textcolor{blue}{Collision response}}
+
+Suppose $\Omega_p$ collides with $N$ polyhedrons $\Omega_n$ ($n=1,\dotsc,N$). Denote the velocities of $\Omega_p$ as $\Vector{V}_p$ and $\Vector{V}_p'$ for before and after multi-body collision, respectively. Denote the velocities of $\Omega_n$ as $\Vector{V}_n$ for before collision. To resolve multi-body collision while avoiding introducing temporal priority, pairwise collision $(\Omega_p, \Omega_n)$ with the velocity state $(\Vector{V}_p,\Vector{V}_n)$ is conducted to predict the post-collision velocity of $\Omega_p$ for the $n$-th pair collision:
+\begin{equation}
+    \begin{split}
+    \Vector{V}_{p,n}' = \Vector{V}_p - \frac{m_n}{m_p+m_n} (1+C_{\mathrm{R}}) (\Vector{V}_{pn} \cdot \unitVector{e}_{pn}) \unitVector{e}_{pn}\\ - C_{\mathrm{f}} [\Vector{V}_{pn} - (\Vector{V}_{pn} \cdot \unitVector{e}_{pn}) \unitVector{e}_{pn}]
+    \end{split}
+\end{equation}
+where $\Vector{V}_{pn}= (\Vector{V}_p - \Vector{V}_n)$ is the relative velocity before collision, $C_{\mathrm{R}}$ is the coefficient of restitution in the normal direction ($C_{\mathrm{R}} = 0$, $0 < C_{\mathrm{R}} < 1$, and $C_{\mathrm{R}} = 1$ are corresponding to perfectly inelastic collision, partially inelastic collision, and elastic collision, respectively), $C_{\mathrm{f}}$ is a coefficient used to mimic the effect of sliding friction, $m_p$ and $m_n$ are the mass of $\Omega_p$ and $\Omega_n$, respectively.
+
+Then a vector summation of the post-collision velocities is adopted to approximate the final velocity of $\Omega_p$:
+\begin{equation}
+    \Vector{V}_p' = \sum_{n=1}^{N}\Vector{V}_{p,n}'
+\end{equation}
+
+After the above process is applied to each $\Omega_p$ ($p=1,\dotsc,P$) in the particle system, a corresponding post multi-body collision velocity, $\Vector{V}_p'$, is obtained for each $\Omega_p$. Then, the velocity state of the system is updated simultaneously. 
+
+\subsection{Interface boundary treatment}
+
+As an attractive alternative to the Arbitrary Lagrangian-Eulerian method \citep{hirt1974arbitrary}, in which a body-conformal grid following the movement of phase interfaces is employed, the immersed boundary method \citep{peskin1972flow, peskin2002immersed} and ghost fluid method \citep{fedkiw1999non, fedkiw2002coupling} are able to solve problems with irregular and dynamic interfaces on generic Cartesian grids. Since the main data structures for numerical computation are simple arrays, the memory requirement is relatively low, and high-order spatial discretization schemes are easy to implement.
+
+To provide efficient, accurate, and robust boundary treatment for arbitrarily irregular and changing phase interfaces, an immersed boundary method proposed in reference \citep{mo2016powerful} is implemented, which enforces \textcolor{blue}{the} Dirichlet, Neumann, Robin, and Cauchy boundary conditions in a straightforward and consistent manner.
+
+\textcolor{blue}{Figure}~\ref{fig:gcibm_demo} illustrates a Cartesian grid based computational domain with an immersed boundary. $G$ denotes a ghost node, a computational node that is outside the physical domain and locates at the numerical boundaries. $O$ denotes a boundary point with $\Vector{GO}$ as the outward normal vector. $I$ is the image point of the ghost node $G$ reflected by the physical boundary. 
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.35\textwidth]{gcibm_demo_2D}
+    \caption{Schematic diagram of a Cartesian grid based computational domains with an immersed boundary. [Nomenclature: $G$, ghost node; $O$, boundary point; $I$, image point; $\Omega_D$, domain of dependence; $\Omega_1$, fluid domain; $\Omega_2$, solid domain; $IB$, immersed boundary].}
+    \label{fig:gcibm_demo}
+\end{figure}
+
+In a direct forcing immersed boundary method \citep{mittal2005immersed}, boundary treatment is mainly about constructing the flow at numerical boundaries. To obtain a proper ghost flow with the existence of physical boundaries effectively admitted, a two-step approach incorporating the method of \textcolor{blue}{images} is adopted:
+\begin{subequations} \label{eq:gcibm}
+    \begin{align}
+        \psi_G &= 2\psi_O - \psi_I \label{eq:gcibma} \\
+        \psi_I &= f(x_I, y_I, z_I) \label{eq:gcibmb}
+    \end{align}
+\end{subequations}
+where $\psi$ denotes a generic flow variable, $f(x, y, z)$ is a local reconstruction function of $\psi$ at the image point $I$. When the local reconstruction function is established on the physical boundary conditions and the known the value of $\psi$ at nearby fluid nodes, we have
+\begin{equation} \label{eq:gcibmb_another}
+    \psi_I = f(\{\psi_N\}, \psi_O) 
+\end{equation}
+where $\psi_O$ is the value of $\psi$ at the boundary point $O$, at which the physical boundary conditions are enforced, and $\{\psi_N\}$ represents the values of $\psi$ at fluid nodes $\{N\}$ that satisfy
+\begin{equation} \label{eq:domain}
+    d_N = ||\Vector{x}_I - \Vector{x}_N|| \le R_I
+\end{equation}
+where $\Vector{x}_I$ and $\Vector{x}_N$ are the position vectors of the point $I$ and $N$, respectively. $R_I$, referred to as the domain of dependence of the point $I$ and illustrated in Fig.~\ref{fig:gcibm_demo}, is the maximum distance from the point $I$ to nearby fluid nodes that are employed for flow reconstruction. 
+
+For constructing $\psi_I=f(\{\psi_N\}, \psi_O)$ with $\psi$ representing a generic field variable, a three-step flow reconstruction scheme is used:
+\begin{enumerate}
+    \item Prediction step: pre-estimate the value of $\psi_I$ by applying inverse distance weighting on the fluid nodes that locate in the domain of dependence of the image point $I$. Denote the predicted value as $\psi_I^*$.
+        \begin{equation}\label{eq:prediciton}
+            \psi_I^* = \frac{\sum w(d_N) \psi_N}{\sum w(d_N)},\ d_N = \max(d_N, d_{\mathrm{tiny}}) \ \text{and} \ \ d_N \le R_I
+        \end{equation}
+        where the weighting function $w(d)$ employs an inverse-power law $1/d^q$ with $q \in \Set{N}$, $d_N$ is the distance from the node $N$ to the image point $I$, $d_{\mathrm{tiny}} = \varepsilon \min(\Delta_x, \Delta_y, \Delta_z)$ is a positive real number to avoid a zero denominator, $\Delta_x, \Delta_y, \Delta_z$ are the mesh sizes in $x$, $y$, $z$ directions, respectively. The power $q=2$, the constant $\varepsilon=10^{-6}$, and the domain of dependence $R_I =2 \max(\Delta_x, \Delta_y, \Delta_z)$ are used herein.
+    \item Physical boundary condition enforcement step: determine the value of $\psi_O$ via the physical boundary conditions that $\psi$ needs to satisfy at the boundary point $O$ and the values of $\psi$ at interior physical domain.
+        \begin{equation} \label{eq:unified}
+            \psi_O = C \psi_I + \mathrm{R.R.H.S.}
+        \end{equation}
+        where the values of the coefficient $C$ and the rest right hand side $\mathrm{R.R.H.S.}$ for different boundary conditions are summarized in Table~\ref{tab:bcmap}.
+    \item Correction step: solve the value of $\psi_I$ by adding the boundary point $O$ as a stencil node for the inverse distance weighting of $\psi_I$.
+        \begin{equation}\label{eq:correction}
+            \psi_I = \frac{\sum w(d_N) \psi_N + w(d_O) \psi_O}{\sum w(d_N) + w(d_O)} = \frac{\psi_I^* + \frac{w(d_O)}{\sum w(d_N)}\psi_O}{1+\frac{w(d_O)}{\sum w(d_N)}}
+        \end{equation}
+        It should be mentioned here that the repetition of calculations on fluid nodes can be avoided since the sum of weights and sum of weighted values are already obtained in the prediction step.
+\end{enumerate}
+\begin{table*}[!htbp]
+    \centering
+    \caption{Value map of $C$ and $\mathrm{R.R.H.S.}$ for different boundary conditions.}
+    \label{tab:bcmap}
+    %\tiny
+    \setlength{\tabcolsep}{3pt}
+    \renewcommand{\arraystretch}{1.15}
+    \begin{tabular}{lccc}
+        \hline
+        Type & Example Form & $C$ & $\mathrm{R.R.H.S.}$\\
+        \hline
+        Dirichlet & $\psi_O = g$ & $0$ & $g$ \\[8pt]
+        Neumann & $\left. \frac{\partial \psi}{\partial n} \right|_O = \frac{\partial \psi_O}{\partial n}$ & $1$ & $- ||\Vector{x}_I - \Vector{x}_O||\frac{\partial \psi_O}{\partial n}$ \\[8pt]
+        Robin & $\alpha \psi_O + \beta \left. \frac{\partial \psi}{\partial n} \right|_O = g$ & $\frac{\beta}{\beta - ||\Vector{x}_I - \Vector{x}_O|| \alpha}$ & $\frac{- ||\Vector{x}_I - \Vector{x}_O|| g}{\beta - ||\Vector{x}_I - \Vector{x}_O|| \alpha}$ \\[8pt]
+        Cauchy & $\begin{aligned} \left. (\Vector{V} \cdot \unitVector{n}) \right|_{\Vector{x}=\Vector{x}_O} &= \Vector{V}_{S} \cdot \unitVector{n} \\ \left. \frac{\partial (\Vector{V} \cdot \hat{\Vector{t}})}{\partial n} \right|_{\Vector{x}=\Vector{x}_O} &= 0 \\ \left. \frac{\partial (\Vector{V} \cdot \tilde{\Vector{t}})}{\partial n} \right|_{\Vector{x}=\Vector{x}_O} &= 0 \end{aligned}$ & $\begin{bmatrix} n_x & n_y & n_z \\ \hat{t}_x & \hat{t}_y & \hat{t}_z \\ \tilde{t}_x & \tilde{t}_y & \tilde{t}_z \end{bmatrix}^{T} \begin{bmatrix} 0 & 0 & 0 \\ \hat{t}_x & \hat{t}_y & \hat{t}_z \\ \tilde{t}_x & \tilde{t}_y & \tilde{t}_z \end{bmatrix}$ & $\begin{bmatrix} n_x & n_y & n_z \\ \hat{t}_x & \hat{t}_y & \hat{t}_z \\ \tilde{t}_x & \tilde{t}_y & \tilde{t}_z \end{bmatrix}^{T} \begin{bmatrix} n_x & n_y & n_z \\ 0 & 0 & 0 \\ 0 & 0 & 0 \end{bmatrix} \cdot \Vector{V}_S$ \\
+            \hline
+    \end{tabular}
+\end{table*}
+
+\section{Numerical results}\label{sec:result}
+
+\subsection{Shock diffraction over a cylinder} \label{case:1_cyn}
+
+A Mach $2.81$ planar incident shock interacting with a stationary circular cylinder is employed here to evaluate the presented framework for solving shock-particle interactions.
+\begin{figure}[!htbp]
+    \centering
+    \begin{subfigure}[b]{0.24\textwidth}
+        \includegraphics[width=\textwidth]{shock_cylinder_demo_a}
+        \caption{}
+        \label{fig:shock_cylinder_demo_a}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.24\textwidth}
+        \includegraphics[width=\textwidth]{shock_cylinder_demo_b}
+        \caption{}
+        \label{fig:shock_cylinder_demo_b}
+    \end{subfigure}%
+    \caption{Schematic diagrams for a planar shock wave interacting with a stationary circular cylinder. (a) Before collision. (b) Well-developed diffraction. [Nomenclature: $I$, incident shock; $R$, reflected shock; $M$, Mach stem (diffracted shock); $S$, slip line (contact discontinuity); $T$, triple point]. Schematic diagrams adapted from \citet{kaca1988interferometric}.}
+    \label{fig:shock_cylinder_demo}
+\end{figure}
+
+The interaction between the incident shock and the cylinder is a time-dependent process, during which complex compressible flow features, such as shocks and contact discontinuities, are created and destroyed. \textcolor{blue}{Figure}~\ref{fig:shock_cylinder_demo} illustrates two scenarios of this interaction at two different stages. Before collision, the incident shock travels freely toward the cylinder. After colliding with the cylinder, the shock reflects as well as diffracts over the convex solid surface. A curved Mach stem and a slip line are formed at each side of the plane of symmetry. During the evolution, the incident shock, reflected shock, and diffracted shock \textcolor{blue}{intersect} in space. The intersection point is referred to as a triple point. At the later stage of evolution, the two diffracting Mach stems will collide with each other and form a shock-induced wake at the rear of the cylinder.
+
+In the current numerical study, a circular cylinder with diameter $D = 1$ is positioned at the center of a $6D \times 6D$ square domain while an initial shock is positioned $0.5D$ upstream of the cylinder. This computational configuration is similar to \citep{ripley2006numerical} except that a full domain size without symmetrical boundary assumption is used here. The flow is assumed to be inviscid, and the slip wall boundary condition is enforced at the cylinder surface. Physical quantities are non-dimensionalized with their corresponding unit reference quantities, and the problem is solved to $t=1.0$.
+\begin{figure*}[!htbp]
+    \centering
+    \begin{subfigure}[b]{0.3\textwidth}
+        \includegraphics[trim = 75mm 0mm 75mm 0mm, clip, width=\textwidth]{1_cyn_nomv_invis_m0180_density_contour}
+        \caption{}
+        \label{fig:1_cyn_nomv_invis_m0180_density_contour}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.3\textwidth}
+        \includegraphics[trim = 75mm 0mm 75mm 0mm, clip, width=\textwidth]{1_cyn_nomv_invis_m0360_density_contour}
+        \caption{}
+        \label{fig:1_cyn_nomv_invis_m0360_density_contour}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.3\textwidth}
+        \includegraphics[trim = 75mm 0mm 75mm 0mm, clip, width=\textwidth]{1_cyn_nomv_invis_m0720_density_contour}
+        \caption{}
+        \label{fig:1_cyn_nomv_invis_m0720_density_contour}
+    \end{subfigure}%
+    \caption{Density contour of shock diffraction over a cylinder solved with different grid sizes. (a) $180\times180$. (b) $360\times360$. (c) $720\times720$.}
+    \label{fig:1_cyn_nomv_invis_density_contour}
+\end{figure*}
+
+\textcolor{blue}{Figure}~\ref{fig:1_cyn_nomv_invis_density_contour} shows the obtained density contour over a series of grids. Although the resolution of slip lines is affected by the relative high dissipation of the third-order WENO scheme, the reflected and diffracted shocks are well resolved. We are able to observe a well-behaved shock curvature profile even on the $180\times180$ grid, which has a grid resolution of about $30$ nodes per diameter. In addition, the plane of symmetry is well preserved over all the employed grids.
+\begin{figure*}[!htbp]
+    \centering
+    \begin{subfigure}[b]{0.3\textwidth}
+        \includegraphics[trim = 75mm 0mm 75mm 0mm, clip, width=\textwidth]{1_cyn_nomv_invis_m0180_overlap}
+        \caption{}
+        \label{fig:1_cyn_nomv_invis_m0180_overlap}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.3\textwidth}
+        \includegraphics[trim = 75mm 0mm 75mm 0mm, clip, width=\textwidth]{1_cyn_nomv_invis_m0360_overlap}
+        \caption{}
+        \label{fig:1_cyn_nomv_invis_m0300_overlap}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.3\textwidth}
+        \includegraphics[trim = 75mm 0mm 75mm 0mm, clip, width=\textwidth]{1_cyn_nomv_invis_m0720_overlap}
+        \caption{}
+        \label{fig:1_cyn_nomv_invis_m0720_overlap}
+    \end{subfigure}%
+    \caption{Superimposition of density contours showing the predicted propagation path of the triple point (The two straight red lines are the $33^{\circ}$ tangent lines of the cylinder). (a) $180\times180$. (b) $360\times360$. (c) $720\times720$.}
+    \label{fig:1_cyn_nomv_invis_overlap}
+\end{figure*}
+
+As illustrated in Fig.~\ref{fig:shock_cylinder_demo_b}, the intersection of the incident shock, reflected shock, and diffracted shock forms a triple point. During the time-dependent evolution process, this triple point travels in space and produces a triple-point path, as shown in Fig.~\ref{fig:1_cyn_nomv_invis_overlap}. Interferometric measurements of \citep{kaca1988interferometric} predict that this triple-point path is tangent to the cylinder at an angle of $33^{\circ}$ for Mach numbers in the range of $1.42 - 5.96$.
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.48\textwidth]{1_cyn_nomv_invis_triple_path}
+    \caption{Comparison of the predicted triple-point paths with experimental correlation.}
+    \label{fig:1_cyn_nomv_invis_triple_path}
+\end{figure}
+
+The predicted triple-point paths are plotted in Fig.~\ref{fig:1_cyn_nomv_invis_triple_path}. The least square linear regressions of the predicted triple-point paths on the grids of $180\times180$, $360\times360$, and $720\times720$ nodes are about $26.9^{\circ}$, $29.2^{\circ}$, and $30.2^{\circ}$, respectively. These results agree well with the experimental correlation \citep{kaca1988interferometric} and the numerical results in references \citep{sambasivan2009ghostb, ji2010numerical, ripley2006numerical}, demonstrating the capability of the presented framework for solving shock-particle interactions.
+
+\subsection{\textcolor{blue}{Supersonic translating wedge}}
+
+\textcolor{blue}{As illustrated in Fig.~\ref{fig:flow_wedge_demo_c}, when a wedge with a deflection angle $\theta$ moves at a Mach number $M_{\infty}$, oblique shock waves with a shock angle $\beta$ can be created at the nose of the wedge. The $\theta-\beta-M_{\infty}$ relation has the following analytical solution \citep{anderson2010fundamentals}:}
+\begin{equation}
+    \tan \theta = \frac{2}{\tan \beta} \frac{M_{\infty}^2 \sin^2 \beta - 1}{M_{\infty}^2 (\gamma + \cos(2\beta)) + 2}
+\end{equation}
+\textcolor{blue}{where $\gamma$ is the heat capacity ratio.}
+\begin{figure}[!htbp]
+    \centering
+    \begin{subfigure}[b]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{flow_wedge_demo_c}
+        \caption{}
+        \label{fig:flow_wedge_demo_c}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{flow_wedge_demo_d}
+        \caption{}
+        \label{fig:flow_wedge_demo_d}
+    \end{subfigure}%
+    \caption{Schematic diagrams for a supersonic translating wedge. (a) Oblique shock relation. (b) Computational configuration. [Nomenclature: $M_{\infty}$, Mach number of the moving wedge; $S$, oblique shock; $\theta$, deflection angle; $\beta$, shock angle; $D$, length of wedge; $O$, the front vertex of wedge; $L$, domain length; $H$, domain height]. Schematic diagrams adapted from \citet{anderson2010fundamentals}.}
+    \label{fig:flow_wedge_demo}
+\end{figure}
+
+\textcolor{blue}{To validate the accuracy of the framework for solving flow with moving geometries, this supersonic translating wedge problem is solved. As illustrated in Fig.~\ref{fig:flow_wedge_demo_d}, in a $L \times H = [-0.5D, 9.5D] \times [-2.5D, 2.5D]$ domain discretized by a $1800 \times 900$ grid, an initial flow state of $(\rho, u, v, p)=(1.4 \Unit{kg/m^3}, 0, 0, 400 \Unit{Pa})$ is imposed, in which the speed of sound is $a=20 \Unit{m/s}$. The left and right domain boundaries are outflow conditions, and the top and bottom boundaries are treated as slip walls. A wedge with $D=1 \Unit{m}$ is initially positioned at $O(8D,0)$ and has a constant velocity of $M_{\infty}=2$ as well as the slip-wall boundary condition. Wedges with $\theta=10^{\circ}$, $15^{\circ}$, and $20^{\circ}$ are tested, and the inviscid flow is solved to $t=0.2 \Unit{s}$.}
+
+\textcolor{blue}{The flow evolution is captured in Fig.~\ref{fig:flow_wedge_mv_deg15_mach2}, in which the formation of oblique shocks at the wedge nose and Prandtl-Meyer expansion waves at the rear corners is clearly depicted. The solutions at $t=0.2 \Unit{s}$ under three deflection angles are shown in Fig.~\ref{fig:flow_wedge_mv}. Remarkable agreement is achieved between the numerical and analytical solutions among all the three cases, which demonstrates the high validity of the presented framework for solving flow involving moving geometries.}
+\begin{figure}[!htbp]
+    \centering
+    \begin{subfigure}[b]{0.38\textwidth}
+        \includegraphics[width=\textwidth]{flow_wedge_mv_deg15_mach2_t000ms}
+        \caption{$0.00 \Unit{s}$}
+        \label{fig:flow_wedge_mv_deg15_mach2_t000ms}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.38\textwidth}
+        \includegraphics[width=\textwidth]{flow_wedge_mv_deg15_mach2_t050ms}
+        \caption{$0.05 \Unit{s}$}
+        \label{fig:flow_wedge_mv_deg15_mach2_t050ms}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.38\textwidth}
+        \includegraphics[width=\textwidth]{flow_wedge_mv_deg15_mach2_t100ms}
+        \caption{$0.10 \Unit{s}$}
+        \label{fig:flow_wedge_mv_deg15_mach2_t100ms}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.38\textwidth}
+        \includegraphics[width=\textwidth]{flow_wedge_mv_deg15_mach2_t150ms}
+        \caption{$0.15 \Unit{s}$}
+        \label{fig:flow_wedge_mv_deg15_mach2_t150ms}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.38\textwidth}
+        \includegraphics[width=\textwidth]{flow_wedge_mv_deg15_mach2_t200ms}
+        \caption{$0.20 \Unit{s}$}
+        \label{fig:flow_wedge_mv_deg15_mach2_t200ms}
+    \end{subfigure}%
+    \caption{Numerical Schlieren field illustrating the flow evolution of a supersonic translating wedge ($\theta = 15^{\circ}$). Red lines represent the analytical solution.}
+    \label{fig:flow_wedge_mv_deg15_mach2}
+\end{figure}
+\begin{figure}[!htbp]
+    \centering
+    \begin{subfigure}[b]{0.38\textwidth}
+        \includegraphics[width=\textwidth]{flow_wedge_mv_deg10_mach2_t200ms}
+        \caption{}
+        \label{fig:flow_wedge_mv_deg10}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.38\textwidth}
+        \includegraphics[width=\textwidth]{flow_wedge_mv_deg15_mach2_t200ms}
+        \caption{}
+        \label{fig:flow_wedge_mv_deg15}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.38\textwidth}
+        \includegraphics[width=\textwidth]{flow_wedge_mv_deg20_mach2_t200ms}
+        \caption{}
+        \label{fig:flow_wedge_mv_deg20}
+    \end{subfigure}%
+    \caption{Comparison of numerical and analytical solutions on oblique shock relation. Red lines represent the analytical solutions. (a) $\theta=10^{\circ}$. (b) $\theta=15^{\circ}$. (c) $\theta=20^{\circ}$}
+    \label{fig:flow_wedge_mv}
+\end{figure}
+
+\subsection{Supersonic collision}
+
+\textcolor{blue}{To illustrate the capability of the presented framework for solving fluid-solid systems involving collision detection for complex geometries}, the supersonic collision of two NACA $0012$ airfoils with zero elasticity is simulated. In a $12 \Unit{m} \times 2 \Unit{m}$ domain discretized by a $3840\times640$ grid, two NACA $0012$ airfoils with a chord length of $1 \Unit{m}$ are positioned at the each end of the domain. Each airfoil has a $0.5 \Unit{m}$ offset from the airfoil rear to the end of the domain. At $t = 0 \Unit{s}$, the stationary airfoils start to move with a constant acceleration $a = 4\times10^4 \Unit{m/s^2}$. The initial ambient flow state is $(\rho, u, v, p)=(1.204 \Unit{kg/m^3}, 0, 0, 1.01325\times10^5 \Unit{Pa})$ with the slip wall boundary condition enforced on the airfoils, and the flow is solved to $t = 0.016 \Unit{s}$.
+\begin{figure*}[!htbp]
+    \centering
+     \begin{subfigure}[b]{0.80\textwidth}
+         \includegraphics[trim = 80mm 120mm 80mm 120mm, clip, width=\textwidth]{trans_collide_schlieren_slip_ma100}
+         \caption{$t=8.58 \Unit{ms}$, M $1.00$}
+         \label{fig:trans_collide_schlieren_slip_ma100}
+     \end{subfigure}%
+     \\
+     \begin{subfigure}[b]{0.80\textwidth}
+         \includegraphics[trim = 80mm 120mm 80mm 120mm, clip, width=\textwidth]{trans_collide_schlieren_slip_ma130}
+         \caption{$t=11.15 \Unit{ms}$, M $1.30$}
+         \label{fig:trans_collide_schlieren_slip_ma130}
+     \end{subfigure}%
+     \\
+     \begin{subfigure}[b]{0.80\textwidth}
+         \includegraphics[trim = 80mm 120mm 80mm 120mm, clip, width=\textwidth]{trans_collide_schlieren_slip_ma150}
+         \caption{$t=12.87 \Unit{ms}$, M $1.50$}
+         \label{fig:trans_collide_schlieren_slip_ma150}
+     \end{subfigure}%
+     \\
+     \begin{subfigure}[b]{0.80\textwidth}
+         \includegraphics[trim = 80mm 120mm 80mm 120mm, clip, width=\textwidth]{trans_collide_schlieren_slip_ma175}
+         \caption{$t=15.00 \Unit{ms}$, M $0.00$}
+         \label{fig:trans_collide_schlieren_slip_ma175}
+     \end{subfigure}%
+     \\
+     \begin{subfigure}[b]{0.80\textwidth}
+         \includegraphics[trim = 80mm 120mm 80mm 120mm, clip, width=\textwidth]{trans_collide_schlieren_slip_ma187}
+         \caption{$t=16.00 \Unit{ms}$, M $0.00$}
+         \label{fig:trans_collide_schlieren_slip_ma187}
+     \end{subfigure}%
+     \caption{Numerical Schlieren field generated by two accelerating NACA $0012$ airfoils with perfect inelastic collision.}
+     \label{fig:trans_collide_schlieren_slip}
+\end{figure*}
+
+\textcolor{blue}{Figure}~\ref{fig:trans_collide_schlieren_slip} shows the numerical Schlieren field at different time instants. As the airfoils approach supersonic speeds, flow disturbances continuously accumulate at the head and rear of the airfoils. When the airfoils reach supersonic states, disturbances are merged into shocks. For each airfoil, a bow shock is formed in front of the airfoil head, as the head region has a blunt body shape. Meanwhile, two oblique shocks are formed and attached at the airfoil rear, as the rear region has a wedge like shape. Under the further increase of speed, the bow shock angle declines, and the old wake shocks detach from the rear tip with the formation of new wake shocks. These results closely replicate the typical transition process of a moving object from subsonic to supersonic states. \textcolor{blue}{At $t=15 \Unit{ms}$, the two airfoils collide, and their velocities decline to zero instantly. After the collision, the shock waves detach from the airfoil bodies, and the two airfoils under the imposed constant acceleration still successfully maintain the zero velocity state. These behaviors agree with the assumed perfectly inelastic collision. The obtained results demonstrate the high capability of the presented framework for solving fluid-solid systems involving collision detection for complex geometries}.
+
+\textcolor{blue}{After the validation of collision detection, we design a test case to further examine the applicability of the framework for multi-body contact and collision problems. As illustrated in Fig.~\ref{fig:multibody_collision_demo}, five identical and cylindrical particles with diameter $D=1 \Unit{m}$ are distributed in a $L \times H = [-5D, 5D] \times [-5D, 5D]$ domain. The air in the domain has an initial state of $(\rho, u, v, p)=(1.4 \Unit{kg/m^3}, 0, 0, 400 \Unit{Pa})$, in which the speed of sound is $a=20 \Unit{m/s}$. The centers of the particles are $C_1(-4D,0)$, $C_2(0,4D)$, $C_3(0,0)$, $C_4(2D, -2D)$, and $C_5(2D+1/\sqrt{2}D, -2D-1/\sqrt{2}D)$, respectively. The particles $C_1$ and $C_2$ initially have a velocity magnitude of $V=\Unit{100m/s}$, corresponding to a Mach number of $M=V/a=5$. Other particles are initially stationary. The system is solved to $t=50 \Unit{ms}$ on a $1200\times1200$ grid. In the motions of the fluid-solid system, the elastic collision is assumed when particles collide, and fluid forces acting on particles are neglected. Under the given conditions and assumptions, the motions of the system are analytically solvable. More specifically, $C_1$ and $C_2$ will simultaneously collide with $C_3$ at $t=30 \Unit{ms}$ and completely transfer their momentum to $C_3$. Then, at $t=50 - 5\sqrt{2} \Unit{ms}$, $C_3$ with the velocity state $(u,v)=(100 \Unit{m/s}, 100 \Unit{m/s})$ will collide with $C_4$ to form a particle string consisting of $C_3$, $C_4$, and $C_5$ and instantly transfer its momentum to $C_5$. At $t=50 \Unit{ms}$, $C_5$ should travel to the location $(2D+\sqrt{2}D, -2D-\sqrt{2}D)$ while other particles should remain stationary.}
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.45\textwidth]{multibody_collision_demo}
+    \caption{A schematic diagram of a multi-body system.}
+    \label{fig:multibody_collision_demo}
+\end{figure}
+
+\textcolor{blue}{As captured in Fig.~\ref{fig:multibody_collision}, the presented framework herein can successfully predict the solution behavior of the designed system with the correct resolution of multi-body contact and collisions. Through the examination of the numerical data, the velocity states of all the particles are predicted exactly, whereas the position errors of the particle centers are all within $0.7\%$. During the particle collisions, although particle states instantly switch between $M=0$ and $M=5\sqrt{2}$, the presented framework manages these challenging conditions successfully. As an ill-posed problem, multi-body collision in general is an unsolvable problem unless additional hypotheses are imposed \citep{ivanov1995multiple}. Nonetheless, the current test case illustrates the ability of the presented framework for solving complex fluid-solid systems involving multi-body contact and collisions.}
+\begin{figure*}[!htbp]
+    \centering
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 40mm 0mm 40mm 0mm, clip, width=\textwidth]{multibody_collision_t00ms}
+        \caption{$0 \Unit{ms}$}
+        \label{fig:multibody_collision_t00ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 40mm 0mm 40mm 0mm, clip, width=\textwidth]{multibody_collision_t15ms}
+        \caption{$15 \Unit{ms}$}
+        \label{fig:multibody_collision_t15ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 40mm 0mm 40mm 0mm, clip, width=\textwidth]{multibody_collision_t30ms}
+        \caption{$30 \Unit{ms}$}
+        \label{fig:multibody_collision_t30ms}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 40mm 0mm 40mm 0mm, clip, width=\textwidth]{multibody_collision_t40ms}
+        \caption{$40 \Unit{ms}$}
+        \label{fig:multibody_collision_t40ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 40mm 0mm 40mm 0mm, clip, width=\textwidth]{multibody_collision_t43ms}
+        \caption{$43 \Unit{ms}$}
+        \label{fig:multibody_collision_t43ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 40mm 0mm 40mm 0mm, clip, width=\textwidth]{multibody_collision_t50ms}
+        \caption{$50 \Unit{ms}$}
+        \label{fig:multibody_collision_t50ms}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.50\textwidth}
+        \includegraphics[trim = 40mm 150mm 40mm 120mm, clip, width=\textwidth]{multibody_collision_legend}
+    \end{subfigure}%
+    \caption{Numerical solution of the motions of a fluid-solid system involving analytically solvable multi-body contact and collision.}
+    \label{fig:multibody_collision}
+\end{figure*}
+
+\subsection{Particle jet formation under explosive dispersal}
+
+In this section, the presented framework is employed to study the particle clustering and jetting behavior of explosively dispersed particles. As shown in Fig.~\ref{fig:2d_n126_demo}, three different particulate payload morphologies are used and are referred to as $\mathrm{M1}$, $\mathrm{M2}$, and $\mathrm{M3}$, respectively. In each payload morphology, $126$ particles are packed in a $1 \Unit{m} \times 1 \Unit{m}$ computational domain. The centers of particles are evenly distributed on three circular layers with the number of particles in each layer being $36$, $42$, and $48$, respectively. The radius of the first layer is $0.15 \Unit{m}$, and the radius of the other two layers as well as the radius of particles in each layer are determined by ensuring zero-gap among neighbouring particles. In the $\mathrm{M1}$ payload, each particle layer is generated by positioning the first particle on the $x$ axis. The $\mathrm{M2}$ payload is obtained from the $\mathrm{M1}$ payload via rotating each layer clockwise by $5^{\circ}(l-1)$, and the $\mathrm{M3}$ payload is obtained from the $\mathrm{M1}$ payload via rotating each layer clockwise by $10^{\circ}(l-1)$, where $l=1,2,3$ is the layer number.
+
+The gas driver is positioned at a circular region centered in the domain, whose radius is $0.1 \Unit{m}$. Three flow states
+\begin{equation}
+    (\rho, u, v, p) = 
+    \begin{cases}
+        (1.204 \Unit{kg/m^3}, 0, 0, 1.01325\times10^8 \Unit{Pa})\\
+        (1.204 \Unit{kg/m^3}, 0, 0, 1.01325\times10^9 \Unit{Pa})\\
+        (1.204 \Unit{kg/m^3}, 0, 0, 1.01325\times10^{10} \Unit{Pa}) 
+    \end{cases}
+\end{equation}
+are used as the initial driver states and are denoted as $\mathrm{P1}$, $\mathrm{P2}$, and $\mathrm{P3}$, respectively. The initial flow state at the rest of the region is set to $(\rho, u, v, p)=(1.204 \Unit{kg/m^3}, 0, 0, 1.01325\times10^5 \Unit{Pa})$. In order to reduce the discrepancy of the timescales between shock propagation and particle acceleration, relatively light particles with a density of $27 \Unit{kg/m^3}$ are adopted here. A $2500 \times 2500$ grid is used for the computational domain, which ensures a minimum resolution of $32$ nodes per diameter for all the particles. In the pairwise collisions of particles, three types of coefficient of restitution $C_{\mathrm{R}} = 0.0$, $C_{\mathrm{R}}=0.5$, and $C_{\mathrm{R}}=1.0$ are considered and are denoted as $\mathrm{C1}$, $\mathrm{C2}$, and $\mathrm{C3}$, respectively. Currently, the coefficient of sliding friction is assumed to be zero.
+\begin{figure*}[!htbp]
+    \centering
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 40mm 20mm 40mm 20mm, width=\textwidth]{2d_n126_ang00_demo}
+        \caption{}
+        \label{fig:2d_n126_ang00_demo}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 40mm 20mm 40mm 20mm, width=\textwidth]{2d_n126_ang05_demo}
+        \caption{}
+        \label{fig:2d_n126_ang05_demo}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 40mm 20mm 40mm 20mm, width=\textwidth]{2d_n126_ang10_demo}
+        \caption{}
+        \label{fig:2d_n126_ang10_demo}
+    \end{subfigure}%
+    \caption{Three different payload morphologies for explosive dispersal of dense particles. (a) $\mathrm{M1}$. (b) $\mathrm{M2}$. (c) $\mathrm{M3}$.}
+    \label{fig:2d_n126_demo}
+\end{figure*}
+
+In the following discussion of numerical results, the notation $\mathrm{M}i-\mathrm{P}j-\mathrm{C}k$ is used to denote the case with the payload morphology $\mathrm{M}i$, driver state $\mathrm{P}j$, and collision parameter $\mathrm{C}k$. \textcolor{blue}{Figure}~\ref{fig:2d_n126_rho27_ps} compares the dispersal processes of $\mathrm{M1-P1-C3}$, $\mathrm{M1-P2-C3}$, and $\mathrm{M1-P3-C3}$. For the results obtained in this paper, the explosive dispersal of particles shares a common pattern: complex shock-shock, shock-particle, and particle-particle interactions are presented during dispersal. When meeting the particles, shocks diffract and reflect over the particles. Diffracted shocks propagate along particle surfaces and later collide at the concave regions, forming locally heavy fluids. Richtmyer-Meshkov instability is then induced by the injection of the heavy fluid into the ambient light fluid. Meanwhile, the reflected shock waves propagate back toward particles after coalescing at the domain center, which then collide with the growing fluid jets and severely disturb the jet structure. The repetitive impacts of coming shocks effectively destabilize the particle system, producing gaps among particles. High speed fluid jets are then generated at those gaps, which further fracture the particle system.
+
+As captured in Fig.~\ref{fig:2d_n126_rho27_ps}, the dispersal processes under different initial driver states present high similarity, including the development of the shocked flow and the fracture of the payload. Although the time period of payload fracture is shortened by the increase of the burster pressure, we discover that there also exists a similarity in time. By correlating the time instants of dispersal stages and the pressure ratio of different driver states, we find that the time of development \textcolor{blue}{is subjected} to the scaling law $t \propto 1/c$, where $c$ is the sound speed of the initial driver state. For instance, the initial sound speed of the burster in $\mathrm{M1-P3-C3}$ is $10$ times that of the burster in $\mathrm{M1-P1-C3}$. According to the described scaling law, the time of development in $\mathrm{M1-P3-C3}$ is suggested to be reduced to $1/10$ of that in $\mathrm{M1-P1-C3}$, which is agreed by the numerical results.
+\begin{figure*}[!htbp]
+    \centering
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 100mm 85mm 100mm 50mm, clip, width=\textwidth]{2d_n126_ang00_rho27_10p3atm_cr10_025us}
+        \caption{$25.00 \Unit{\mu s}$}
+        \label{fig:2d_n126_ang00_rho27_10p3atm_cr10_025us}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 100mm 85mm 100mm 50mm, clip, width=\textwidth]{2d_n126_ang00_rho27_10p4atm_cr10_008us}
+        \caption{$7.91 \Unit{\mu s}$}
+        \label{fig:2d_n126_ang00_rho27_10p4atm_cr10_008us}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 100mm 85mm 100mm 50mm, clip, width=\textwidth]{2d_n126_ang00_rho27_10p5atm_cr10_002us}
+        \caption{$2.50 \Unit{\mu s}$}
+        \label{fig:2d_n126_ang00_rho27_10p5atm_cr10_002us}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 100mm 80mm 100mm 50mm, clip, width=\textwidth]{2d_n126_ang00_rho27_10p3atm_cr10_050us}
+        \caption{$50.00 \Unit{\mu s}$}
+        \label{fig:2d_n126_ang00_rho27_10p3atm_cr10_050us}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 100mm 80mm 100mm 50mm, clip, width=\textwidth]{2d_n126_ang00_rho27_10p4atm_cr10_016us}
+        \caption{$15.81 \Unit{\mu s}$}
+        \label{fig:2d_n126_ang00_rho27_10p4atm_cr10_016us}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 100mm 80mm 100mm 50mm, clip, width=\textwidth]{2d_n126_ang00_rho27_10p5atm_cr10_005us}
+        \caption{$5.00 \Unit{\mu s}$}
+        \label{fig:2d_n126_ang00_rho27_10p5atm_cr10_005us}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 100mm 50mm 100mm 50mm, clip, width=\textwidth]{2d_n126_ang00_rho27_10p3atm_cr10_100us}
+        \caption{$100.00 \Unit{\mu s}$}
+        \label{fig:2d_n126_ang00_rho27_10p3atm_cr10_0100us}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 100mm 50mm 100mm 50mm, clip, width=\textwidth]{2d_n126_ang00_rho27_10p4atm_cr10_031us}
+        \caption{$31.62 \Unit{\mu s}$}
+        \label{fig:2d_n126_ang00_rho27_10p4atm_cr10_031us}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 100mm 50mm 100mm 50mm, clip, width=\textwidth]{2d_n126_ang00_rho27_10p5atm_cr10_010us}
+        \caption{$10.00 \Unit{\mu s}$}
+        \label{fig:2d_n126_ang00_rho27_10p5atm_cr10_010us}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 90mm 10mm 90mm 10mm, clip, width=\textwidth]{2d_n126_ang00_rho27_10p3atm_cr10_150us}
+        \caption{$150.00 \Unit{\mu s}$}
+        \label{fig:2d_n126_ang00_rho27_10p3atm_cr10_0150us}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 90mm 10mm 90mm 10mm, clip, width=\textwidth]{2d_n126_ang00_rho27_10p4atm_cr10_047us}
+        \caption{$47.43 \Unit{\mu s}$}
+        \label{fig:2d_n126_ang00_rho27_10p4atm_cr10_047us}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 90mm 10mm 90mm 10mm, clip, width=\textwidth]{2d_n126_ang00_rho27_10p5atm_cr10_015us}
+        \caption{$15.00 \Unit{\mu s}$}
+        \label{fig:2d_n126_ang00_rho27_10p5atm_cr10_015us}
+    \end{subfigure}%
+    \caption{Particle dispersal processes under different driver states. The flow fields are rendered by numerical Schlieren. (a), (d), (g), (j): $\mathrm{M1-P1-C3}$. (b), (e), (h), (k): $\mathrm{M1-P2-C3}$. (c), (f), (i), (l): $\mathrm{M1-P3-C3}$.}
+    \label{fig:2d_n126_rho27_ps}
+\end{figure*}
+
+\textcolor{blue}{Figure}~\ref{fig:2d_n126_rho27_cs} compares the dispersal processes under different coefficients of restitution. The currently obtained results suggest the change of the coefficient of restitution affects the clustering behavior of particles such that the morphology of each particle jet group presents differences, and the number of formed particle jets is increased from $10$ to $14$ as the coefficient of restitution changes from $C_{\mathrm{R}}=0.0$ to $C_{\mathrm{R}}=1.0$. However, the fractures of the payload under the same payload morphology still show high similarity, in particular for the fracture locations of the payload, \textcolor{blue}{regardless} of the change of the coefficient of restitution in pairwise collision. This similarity may indicate a dominant role of the initial payload morphology on particle jetting behavior. However, this similarity may also originate from the limitations of the employed multi-body collision model, since the pairwise collision approach inherently \textcolor{blue}{cannot} lead to multi-body collision solution with physical correctness under all circumstances. Nonetheless, the current collision model accurately models pair collisions and achieves deterministic prediction of the collision behavior of a complex particle system, which enables potential parametric studies.
+\begin{figure*}[!htbp]
+    \centering
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 100mm 85mm 100mm 50mm, clip, width=\textwidth]{2d_n126_ang05_rho27_10p4atm_cr00_008us}
+        \caption{$7.91 \Unit{\mu s}$}
+        \label{fig:2d_n126_ang05_rho27_10p4atm_cr00_008us}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 100mm 85mm 100mm 50mm, clip, width=\textwidth]{2d_n126_ang05_rho27_10p4atm_cr05_008us}
+        \caption{$7.91 \Unit{\mu s}$}
+        \label{fig:2d_n126_ang05_rho27_10p4atm_cr05_008us}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 100mm 85mm 100mm 50mm, clip, width=\textwidth]{2d_n126_ang05_rho27_10p4atm_cr10_008us}
+        \caption{$7.91 \Unit{\mu s}$}
+        \label{fig:2d_n126_ang05_rho27_10p4atm_cr10_008us}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 100mm 80mm 100mm 50mm, clip, width=\textwidth]{2d_n126_ang05_rho27_10p4atm_cr00_016us}
+        \caption{$15.81 \Unit{\mu s}$}
+        \label{fig:2d_n126_ang05_rho27_10p4atm_cr00_016us}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 100mm 80mm 100mm 50mm, clip, width=\textwidth]{2d_n126_ang05_rho27_10p4atm_cr05_016us}
+        \caption{$15.81 \Unit{\mu s}$}
+        \label{fig:2d_n126_ang05_rho27_10p4atm_cr05_016us}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 100mm 80mm 100mm 50mm, clip, width=\textwidth]{2d_n126_ang05_rho27_10p4atm_cr10_016us}
+        \caption{$15.81 \Unit{\mu s}$}
+        \label{fig:2d_n126_ang05_rho27_10p4atm_cr10_016us}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 100mm 60mm 100mm 50mm, clip, width=\textwidth]{2d_n126_ang05_rho27_10p4atm_cr00_031us}
+        \caption{$31.62 \Unit{\mu s}$}
+        \label{fig:2d_n126_ang05_rho27_10p4atm_cr00_031us}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 100mm 60mm 100mm 50mm, clip, width=\textwidth]{2d_n126_ang05_rho27_10p4atm_cr05_031us}
+        \caption{$31.62 \Unit{\mu s}$}
+        \label{fig:2d_n126_ang05_rho27_10p4atm_cr05_031us}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 100mm 60mm 100mm 50mm, clip, width=\textwidth]{2d_n126_ang05_rho27_10p4atm_cr10_031us}
+        \caption{$31.62 \Unit{\mu s}$}
+        \label{fig:2d_n126_ang05_rho27_10p4atm_cr10_031us}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 60mm 20mm 60mm 10mm, clip, width=\textwidth]{2d_n126_ang05_rho27_10p4atm_cr00_047us}
+        \caption{$47.43 \Unit{\mu s}$}
+        \label{fig:2d_n126_ang05_rho27_10p4atm_cr00_047us}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 60mm 20mm 60mm 10mm, clip, width=\textwidth]{2d_n126_ang05_rho27_10p4atm_cr05_047us}
+        \caption{$47.43 \Unit{\mu s}$}
+        \label{fig:2d_n126_ang05_rho27_10p4atm_cr05_047us}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 60mm 20mm 60mm 10mm, clip, width=\textwidth]{2d_n126_ang05_rho27_10p4atm_cr10_047us}
+        \caption{$47.43 \Unit{\mu s}$}
+        \label{fig:2d_n126_ang05_rho27_10p4atm_cr10_047us}
+    \end{subfigure}%
+    \caption{Particle dispersal processes under different coefficients of restitution. The flow fields are rendered by numerical Schlieren. (a), (d), (g), (j): $\mathrm{M2-P2-C1}$. (b), (e), (h), (k): $\mathrm{M2-P2-C2}$. (c), (f), (i), (l): $\mathrm{M2-P2-C3}$.}
+    \label{fig:2d_n126_rho27_cs}
+\end{figure*}
+
+The dispersal processes under different payload morphologies are compared in Fig.~\ref{fig:2d_n126_rho27_ms}, in which we can clearly observe that the initial payload morphology has a strong influence on the particle clustering and jetting behaviors. \citet{xu2013formation} previously studied the particle dispersal problem, and their simulated results indicated the importance of the inner fluid jets in the initial fracture of the particulate payload such that the number of the formed inner fluid jets highly correlates to the number of particle jets formed at a later time. However, the case configurations they used all had a predefined minimum gap between particles due to the numerical difficulties encountered. Different from the case configurations used by \citet{xu2013formation}, with the numerical methods developed, no minimum distances between particles are predefined in the initial particle payload as well as in the solving process for the cases used in this paper. In addition, a different multi-body collision model is employed herein. Currently, our results suggest that the correlation between the number of inner fluid jets and particle jets is less evident. 
+
+As captured in Fig.~\ref{fig:2d_n126_ang00_rho27_10p4atm_008us},  Fig.~\ref{fig:2d_n126_ang05_rho27_10p4atm_008us}\textcolor{blue}{,} and Fig.~\ref{fig:2d_n126_ang10_rho27_10p4atm_008us}, an inner fluid jet is observed at each concave region introduced by particle distribution. The formed inner fluid jets maintain strong similarity among different payload morphologies as the first particle layers are the same. Therefore, it is suggested that the formation of inner fluid jets is mainly related to the early stage of shock-particle interactions dominated by the initial payload morphology. By examining the formation of particle jets at a later stage, different payload morphologies are destabilized into different forms. The formed particle jets and their morphologies deviate considerably as the dispersal progresses in time, \textcolor{blue}{regardless} of sharing highly similar flows at the early stages. These observations support that the particle clustering and jetting significantly depend on the particulate payload morphology, not solely on the inner fluid jets. The observations suggest that the formation of the particle clusters and jets arises from the interaction of the high-pressure fluid jets and the particulate payload morphology, in which the payload fracture must grow radially to a depth coupled with particle outward-moving and diverging expansion of the payload.
+\begin{figure*}[!htbp]
+    \centering
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 100mm 85mm 100mm 50mm, clip, width=\textwidth]{2d_n126_ang00_rho27_10p4atm_cr05_008us}
+        \caption{$7.91 \Unit{\mu s}$}
+        \label{fig:2d_n126_ang00_rho27_10p4atm_008us}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 100mm 85mm 100mm 50mm, clip, width=\textwidth]{2d_n126_ang05_rho27_10p4atm_cr05_008us}
+        \caption{$7.91 \Unit{\mu s}$}
+        \label{fig:2d_n126_ang05_rho27_10p4atm_008us}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 100mm 85mm 100mm 50mm, clip, width=\textwidth]{2d_n126_ang10_rho27_10p4atm_cr05_008us}
+        \caption{$7.91 \Unit{\mu s}$}
+        \label{fig:2d_n126_ang10_rho27_10p4atm_008us}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 100mm 80mm 100mm 50mm, clip, width=\textwidth]{2d_n126_ang00_rho27_10p4atm_cr05_016us}
+        \caption{$15.81 \Unit{\mu s}$}
+        \label{fig:2d_n126_ang00_rho27_10p4atm_016us}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 100mm 80mm 100mm 50mm, clip, width=\textwidth]{2d_n126_ang05_rho27_10p4atm_cr05_016us}
+        \caption{$15.81 \Unit{\mu s}$}
+        \label{fig:2d_n126_ang05_rho27_10p4atm_016us}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 100mm 80mm 100mm 50mm, clip, width=\textwidth]{2d_n126_ang10_rho27_10p4atm_cr05_016us}
+        \caption{$15.81 \Unit{\mu s}$}
+        \label{fig:2d_n126_ang10_rho27_10p4atm_016us}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 100mm 50mm 100mm 50mm, clip, width=\textwidth]{2d_n126_ang00_rho27_10p4atm_cr05_031us}
+        \caption{$31.62 \Unit{\mu s}$}
+        \label{fig:2d_n126_ang00_rho27_10p4atm_031us}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 100mm 60mm 100mm 50mm, clip, width=\textwidth]{2d_n126_ang05_rho27_10p4atm_cr05_031us}
+        \caption{$31.62 \Unit{\mu s}$}
+        \label{fig:2d_n126_ang05_rho27_10p4atm_031us}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 100mm 60mm 100mm 50mm, clip, width=\textwidth]{2d_n126_ang10_rho27_10p4atm_cr05_031us}
+        \caption{$31.62 \Unit{\mu s}$}
+        \label{fig:2d_n126_ang10_rho27_10p4atm_031us}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 80mm 10mm 80mm 10mm, clip, width=\textwidth]{2d_n126_ang00_rho27_10p4atm_cr05_047us}
+        \caption{$47.43 \Unit{\mu s}$}
+        \label{fig:2d_n126_ang00_rho27_10p4atm_047us}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 60mm 20mm 60mm 10mm, clip, width=\textwidth]{2d_n126_ang05_rho27_10p4atm_cr05_047us}
+        \caption{$47.43 \Unit{\mu s}$}
+        \label{fig:2d_n126_ang05_rho27_10p4atm_047us}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 60mm 20mm 60mm 10mm, clip, width=\textwidth]{2d_n126_ang10_rho27_10p4atm_cr05_047us}
+        \caption{$47.43 \Unit{\mu s}$}
+        \label{fig:2d_n126_ang10_rho27_10p4atm_047us}
+    \end{subfigure}%
+    \caption{Particle dispersal processes under different payload morphologies. The flow fields are rendered by numerical Schlieren. (a), (d), (g), (j): $\mathrm{M1-P2-C2}$. (b), (e), (h), (k): $\mathrm{M2-P2-C2}$. (c), (f), (i), (l): $\mathrm{M3-P2-C2}$.}
+    \label{fig:2d_n126_rho27_ms}
+\end{figure*}
+
+\section{Conclusion}\label{sec:conclusion}
+
+A Cartesian grid based numerical framework for the direct simulation of dense particulate flow under explosive dispersal is presented. Numerical techniques regarding fluid-solid interaction, temporal and spatial discretization of governing equations, multimaterial mesh generation and collision detection, interface boundary treatment, and multi-body collision are discussed. The presented framework is able to effectively resolve coupled shock-shock, shock-particle, and particle-particle interactions in complex fluid-solid systems with shocked flow conditions, arbitrarily irregular particle shapes, and realistic multi-body collisions. 
+
+\textcolor{blue}{The validity of the framework for shock-particle interactions is demonstrated through studying the classical shock-cylinder diffraction problem. Complex shock-shock and shock-particle interactions are resolved in good agreement with experimental observations. The validity of the framework for flow involving moving geometries is demonstrated through solving the supersonic translating wedge problem. The predicted oblique shock relation is in excellent agreement with the analytical solution over a range of deflection angles. The applicability of the framework for simulating fluid-solid systems involving collision detection for complex geometries is demonstrated by solving a supersonic collision problem, in which two initially stationary NACA $0012$ airfoils are accelerated under a constant acceleration of $4\times10^4 \Unit{m/s^2}$ and are collided under supersonic states. The transient shock formation and evolution are successfully captured in the numerical solutions. A fluid-solid system with analytical multi-body contact and collision solutions is designed to test the presented framework, and excellent agreement is obtained between the numerical and analytical solutions.}
+
+The presented framework is further applied to the investigation of particle jet formation under explosive dispersal. By the simulation of the dispersal processes of dense particle systems driven by pressurized gas, in which the driver pressure reaches $1.01325\times10^{10} \Unit{Pa}$ ($10^5$ times the ambient pressure) and particles are impulsively accelerated from stationary to a speed that is more than $12000 \Unit{m/s}$ within $15 \Unit{\mu s}$, the applicability of the framework for the investigation of particle jet phenomenon is very promising. The effects of driver pressure, coefficient of restitution in pairwise collision, and payload morphologies on particle clustering and jetting behaviors are studied. A time scaling law for particle dispersal under different driver pressures ranging from $1.01325\times10^{8} \Unit{Pa}$ to $1.01325\times10^{10} \Unit{Pa}$ is proposed. In addition, the numerical simulation results suggest that the formation of the particle clusters and jets mainly arises from the interaction of the high-pressure fluid jets and the particulate payload morphology, in which the payload fractures, initiated by the fluid jets at the weak spots of the payload innermost layer, must grow radially to a depth coupled with the particle outward-moving and diverging expansion of the payload.
+
+Although preliminary results and physical details of the particle dispersal process are achieved, \textcolor{blue}{more numerical studies, particularly cases involving large payload-to-driver mass ratios,} are required to advance the understanding of the particle jet formation under impulsive or explosive loading. In addition, numerical models related to multi-body collision as well as the dynamic compaction and fragmentation of a solid particulate payload require further development and improvement.
+
+\begin{acknowledgements}
+Financial support of this work was provided by Natural Sciences and Engineering Research Council of Canada (NSERC) and Defence Research and Development Canada (DRDC). This work was made possible by the facilities of the Shared Hierarchical Academic Research Computing Network (SHARCNET: www.sharcnet.ca) and Compute/Calcul Canada.
+\end{acknowledgements}
+
+\clearpage
+
+\bibliographystyle{spbasic}
+\bibliography{ref}
+
+\end{document}

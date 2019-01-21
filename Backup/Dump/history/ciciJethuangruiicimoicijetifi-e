@@ -1,0 +1,391 @@
+%---------------------------------------------------------------------------%
+%->> Document class declaration
+%---------------------------------------------------------------------------%
+%\documentclass{elsarticle}
+\documentclass[twocolumn,letterpaper,fleqn]{ModDetSymp}
+\usepackage{multicol,ifthen,graphicx}
+\usepackage{dblfloatfix}
+\usepackage{hyperref}
+\usepackage[square,comma,numbers,sort&compress]{natbib}% square bracket
+\hypersetup{colorlinks=true,citecolor=blue}
+%\bibliographystyle{Det_Symp}
+\bibliographystyle{Det_Symp}
+%---------------------------------------------------------------------------%
+%->> Document settings
+%---------------------------------------------------------------------------%
+\usepackage{microtype}% improves general appearance of the text
+\usepackage{amsmath,amssymb,amstext}% math support
+\usepackage{newtxtext}% main text
+\usepackage[cmintegrals]{newtxmath}% load after math packages
+\usepackage{color}% color support
+\usepackage{enumitem}% customizing enumerated lists
+\setlist[enumerate]{wide=\parindent}% only indent the first line
+\setlist[itemize]{wide=\parindent}% only indent the first line
+\setlist{nosep}% default text spacing
+\usepackage{subcaption}% subfigures
+%\usepackage[section]{placeins}% to prevent floats from being moved over section
+\graphicspath{{./}{./img/}}
+%\usepackage{lineno,hyperref}
+%\modulolinenumbers[5]
+%\journal{16th IDS, 2018}
+%\bibliographystyle{elsarticle-num-names}
+%---------------------------------------------------------------------------%
+%->> User defined commands
+%---------------------------------------------------------------------------%
+\providecommand{\Vector}[1]{\boldsymbol{#1}}% General vectors in bold italic
+\providecommand{\unitVector}[1]{\boldsymbol{\mathbf{#1}}}% Unit vectors in bold roman
+\providecommand{\Tensor}[1]{\boldsymbol{\mathsf{#1}}}% Tensor in sans-serif bold italic
+\providecommand{\unitTensor}[1]{\boldsymbol{{\mathsf{#1}}}}% Identity tensor in sans-serif bold
+\providecommand{\Matrix}[1]{\boldsymbol{\mathbf{#1}}}% Matrix in bold roman
+\providecommand{\unitMatrix}[1]{\boldsymbol{\mathbf{#1}}}% Identity matrix in bold roman
+\providecommand{\Unit}[1]{\,\mathrm{#1}}% Units in roman
+\providecommand{\Const}[1]{\mathrm{#1}}% Math constants, functions
+\providecommand{\Set}[1]{\mathbb{#1}}% Special sets (e.g. real numbers) in blackboard bold
+\providecommand{\Des}[1]{\mathrm{#1}}% description
+\providecommand{\Div}{\operatorname{div}}% divergence operator
+\providecommand{\Order}{\operatorname{O}}% order operator
+\providecommand{\Trace}{\operatorname{tr}}% trace operator
+\providecommand{\Diag}{\operatorname{diag}}% diagonal
+\providecommand{\Def}{\operatorname{def}}% define
+\providecommand{\Loptr}{\operatorname{\mathcal{L}}}% spatial operator
+\providecommand{\Toptr}{\operatorname{\mathcal{LL}}}% temporal operator
+\providecommand{\Soptr}{\operatorname{\mathcal{S}}}% solution operator
+\providecommand{\Rev}[1]{\begingroup\color{blue}{#1}\endgroup}% revision highlight
+%---------------------------------------------------------------------------%
+%->> Document content
+%---------------------------------------------------------------------------%
+\title{A Mesoscale Study on Explosively Dispersed Granular Materials}% conference
+
+\author{Huangrui~Mo$^{1}$, Fue-Sang~Lien$^{1}$, Fan~Zhang$^{1,2}$ and Duane~S.~Cronin$^{1}$}
+
+\affiliation{$^{1}$Department of Mechanical Engineering, University of Waterloo, 200 University Avenue West, Waterloo, ON N2L 3G1, Canada\\
+$^{2}$Defence Research and Development Canada, P.O. Box 4000, Station Main, Medicine Hat, AB T1A 8K6, Canada}
+
+\begin{document}
+
+%\begin{frontmatter}
+%
+%\title{A Mesoscale Study on Explosively Dispersed Granular Materials}% conference
+%%\title{A mesoscale study on particle jetting instability through direct simulation}% conference
+%
+%\author[uw]{Huangrui Mo}
+%\ead{huangrui.mo@uwaterloo.ca}
+%
+%\author[uw]{Fue-Sang Lien}
+%\ead{fslien@uwaterloo.ca}
+%
+%\author[defence]{Fan Zhang}
+%\ead{fan.zhang@drdc-rddc.gc.ca}
+%
+%\author[uw]{Duane S. Cronin}
+%\ead{duane.cronin@uwaterloo.ca}
+%
+%%\cortext[correspondingauthor]{Corresponding author}
+%\address[uw]{Department of Mechanical Engineering, University of Waterloo, 200 University Avenue West, Waterloo, ON N2L 3G1, Canada}
+%\address[defence]{Defence Research and Development Canada, P.O. Box 4000, Station Main, Medicine Hat, AB T1A 8K6, Canada}
+
+\twocolumn[
+\setlength{\fboxrule}{0.5pt}
+\begin{@twocolumnfalse}
+\maketitle
+\begin{center}
+\parbox{5in}{\textbf{Abstract. }%
+%\begin{abstract}
+Explosively dispersed granular materials frequently exhibit macroscale coherent particle clustering and jetting structures with a dual hierarchy. The underlying mechanism is of significant interest to study instability and mixing in high-speed gas-solid flows but remains unclear, primarily attributed to the complex mesoscale multiphase interactions involved in the dispersal process. In this study, an interface-resolved direct simulation framework is applied to solve gas-solid flow with shock-shock, shock-particle, and particle-particle interactions. The framework is validated for solving flow with irregular, moving, and colliding non-deformable granular bodies. A statistical dissipative property of the framework in solving explosively dispersed granular materials with respect to Gurney velocity is also demonstrated. On the basis of direct simulations that capture coupled multiphase interactions and deterministic mesoscale granular dynamics, an explanation for particle jetting instabilities is proposed and applied to explaining established experimental observations in the literature.
+%\end{abstract}
+
+\sectionline}
+\end{center}
+\end{@twocolumnfalse}
+]
+
+%\begin{keyword}
+%Granular material \sep Explosive dispersal \sep Particle jet \sep Mesoscale modeling \sep Gurney velocity
+%\end{keyword}
+%
+%\end{frontmatter}
+
+\section{Introduction}\label{sec:intro}
+
+Granular additives such as glass particles or aluminum powders are widely used in explosives to either mitigate or enhance the overall performance \citep{milne2010dynamic, zhang2012metalized}. The introduced grain-scale heterogeneities lead to coupled mesoscale interactions between the detonation reaction zone, shock waves, and solid particles. Under high rates of momentum and energy transfer resulting from shock compaction, the mesoscale interactions are effectively enhanced and later are manifested via complex macroscale phenomena associated with blast propagation. One important phenomenon is the formation of coherent particle clustering and jetting structures. Influencing the mass concentration and related particle reaction and energy release, the underlying physical mechanism is of significant interest to study flow instability and turbulent mixing in heterogeneous detonation and explosion \citep{zhang2010hybrid, zhang2012metalized}.
+
+In experiments concerning the explosive dispersal of liquids \citep{zhang2010hybrid, milne2010dynamic, frost2012particle, zhang2015large}, dry powders \citep{zhang2010hybrid, milne2010dynamic, frost2012particle, zhang2012metalized}, or hybrid liquid-powder mixtures \citep{zhang2001explosive, zhang2010hybrid, frost2012particle, bai2018experimental} in a stratified \citep{zhang2010hybrid, milne2010dynamic, frost2012particle, zhang2012metalized, zhang2015large, bai2018experimental} or premixed \citep{zhang2001explosive} burster-payload configuration with a cylindrical \citep{zhang2010hybrid, frost2012particle, zhang2012metalized, zhang2015large, bai2018experimental} or spherical \citep{zhang2001explosive, milne2010dynamic, frost2012particle} charge shape, a dual hierarchy of particle jets featuring a limited number of large primary jets accompanied with numerous small fine jets was frequently observed, although different configurations can influence the number and length scales of the formed jets. In general, the fine jets occurred at the outer payload-air interface immediately after the fragmentation of casing, and the primary jets emerged out of the surface of the fine jets at a later time. While the fine jets dissipated through aerodynamic interaction or destroyed by payload expansion shortly, the primary jets persisted as coherent jetting structures for a longer time. This dual jetting structure can be formed within an expansion length of several times the initial charge diameter \citep{zhang2015large}.
+
+Casing fragmentation at the inner burster-payload and outer payload-air interfaces could enhance or dominate the interfacial behaviors and hence the formation of particle jets, particularly for liquid payloads \citep{zhang2015large, bai2018experimental}. Strong shocks generated by detonation can induce plastic deformation and agglomeration of solid grains to form a casing-like structure at the inner burster-payload interface, which subsequently fragments under blast expansion and introduces interfacial instabilities \citep{frost2017fracture}. Less affected by plastic deformation and agglomeration, liquids can still reveal granular behaviors after breakup and mixing with air, while bringing continuum related effects such as cohesion and surface tension. However, the formation of coherent particle clustering and jetting structures with a dual hierarchy was also observed in the absence of casings, strong shocks, granular deformation, cohesion, and surface tension, such as in experiments on blast-dispersed powders using Hele-Shaw cells with non-cohesive particles \citep{rodriguez2013solid, rodriguez2014external, xue2018dual}, in which particle rings were confined between two closely separated parallel plates and dispersed by a central gas burster. This consistency suggests an inherent instability in impulsively dispersed granular materials.
+
+Compared with 3D spherical or cylindrical settings, quasi-2D Hele-Shaw cell configurations \citep{rodriguez2013solid, rodriguez2014external, xue2018dual} have provided better visualization of the dispersal evolution. Nonetheless, extra effects can be introduced by the confining plates, such as wall boundaries, burster fluid tending to escape near the upper plate, and payload might dragged by the lower plate under gravity and plate friction. When considered as the zero-surface-tension limit of a high viscous fluid \citep{cheng2008towards}, granular materials dispersed by a gas burster can exhibit the finger-like branching pattern featured in Saffman--Taylor instabilities (STI), particularly at the early fragmentation stage of the payload \citep{johnsen2006pattern, cheng2008towards}, in which granular dissipation instead of the classical viscous damping is characterized as the stabilizing mechanism for counterbalancing the destabilizing pressure gradient.
+
+From the perspective of accelerated material interfaces with density disparity and initial interfacial nonuniformity, particle jets at the inner burster-payload and outer payload-air interfaces can be related to the Rayleigh--Taylor instability (RTI) and Richtmyer--Meshkov instability (RMI), in which RMI can be considered as an impulsive RTI subjected to shock rather than continuous acceleration. RTI and RMI can grow initial surface corrugations with locally misaligned pressure and density gradients in the form of spikes, bubbles, and fingers.
+
+The macroscale explosive dispersal of granular materials shares many similarities, such as burster-payload interaction, layered material shells, rapid acceleration, and shock presence, with astrophysical supernova explosions \citep{burrows2000supernova} and microscale inertial confinement fusion implosions \citep{lindl1992progress} with an inverse acceleration direction. Through measuring the growth rates of particle jets, recent Hele-Shaw cell studies \citep{xue2018dual} on blast-dispersed granular rings suggest that the formation of fine jets at the outer payload-air interface can also be seen as a form of RTI. Initiated very early but revealed later, primary jets are only weakly linked to RTI due to the discrepancy in timescales and growth rates \citep{milne2010dynamic, xue2018dual}. Therefore, a distinct evolution process should be proposed for the primary and fine jets, respectively, in which numerical simulations could better reveal the early time multiphase interactions through visualizing the fluid and solid motions simultaneously.
+
+Compared with Eulerian--Eulerian and non-resolved Eulerian--Lagrangian approaches, a particle-resolved Eulerian--Lagrangian mesoscale simulation approach can avoid the necessity of correlated closure laws for fluid-particle and particle-particle interactions \citep{van2008numerical}. The challenges are then mainly shifted to irregular and moving boundaries, mesh generation and regeneration, computational efficiency and robustness, and particle-particle interactions. Advances in Cartesian-grid methods \citep{peskin1972flow} have greatly simplified the grid generation and regeneration for treating irregular and moving boundaries, which enable cost-effective direct simulations for explosive dispersal problems, provided a method that can robustly handle irregular, moving, and colliding geometries with shocked flow conditions. Meanwhile, multibody collision in theory remains as an unsolved problem \citep{ivanov1995multiple}. A few approximation attempts such as sequential pairwise collision \citep{guendelman2003nonconvex} and perfectly inelastic non-contact collision \citep{xu2013formation} have been explored in interface-resolved multibody collision modeling. Nonetheless, a deterministic multibody contact and collision model can better facilitate the investigations of the particle jetting problem.
+
+For the purpose of advancing the understanding of particle clustering and jetting dynamics, particularly the governing instability of primary jets, through capturing mesoscale multiphase interactions, this study employs a resolved Eulerian--Lagrangian approach to directly simulate gas-solid flow with shock-shock, shock-particle, and particle-particle interactions, in which the Eulerian gird describing the fluid phase is at least one order of magnitude less than particle sizes to resolve phase interfaces, fluid-solid interaction is via enforcing boundary conditions at phase interfaces, and particle-particle interaction is through a deterministic multibody contact and collision model with parameterized coefficients of restitution and friction.
+
+%In this study, the framework is validated for solving flow with irregular, moving, and colliding non-deformable granular bodies. A statistical dissipative property of the framework in solving explosively dispersed granular materials is also demonstrated with respect to Gurney velocity. On the basis of direct simulations that capture coupled multiphase interactions and deterministic mesoscale granular dynamics, an explanation for particle jetting instabilities is proposed and applied to explaining established experimental observations in the literature.
+
+\section{Numerical framework}
+
+The Navier--Stokes equations are used to describe the motion of fluid and are solved on a Cartesian grid. The 2nd order SSP Runge--Kutta method \citep{jiang1996efficient} is used for temporal integration, and the 3rd order WENO scheme \citep{jiang1996efficient} and 2nd order central-difference scheme is used for the spatial discretization of convective and diffusive fluxes, respectively. The Newton's second law is used to evolve solids tracked by individual Lagrangian grids, in which time integration is done by a 2nd order Runge--Kutta scheme. Boundary treatment is via an immersed boundary method \citep{mo2018immersed}. Algorithms for collision detection and response can be found in \citep{mo2017field}. The integration of the numerical framework is available in \citep{mo2017numerical}, in which the collision model is recently improved in \citep{mo2017field}. Subsequently, the validation of the framework for solving flow with irregular, moving, and colliding non-deformable granular bodies please refer to \citep{mo2018immersed, mo2017field, mo2017numerical}.
+\begin{figure*}
+    \centering
+    \begin{subfigure}[b]{0.40\textwidth}
+        \includegraphics[width=\textwidth]{D2-C2-L3-Vel-t}
+        %\caption{}
+        %\label{fig:D2-C2-L3-Vel-t}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.40\textwidth}
+        \includegraphics[width=\textwidth]{D2-C2-L7-Vel-t}
+        %\caption{}
+        %\label{fig:D2-C2-L7-Vel-t}
+    \end{subfigure}%
+    \caption{Time history of surface expansion velocity $V_{\Des{E}}$. Left: $\Des{D}_2-\Des{C}_2-\Des{L}_3$. Right: $\Des{D}_2-\Des{C}_2-\Des{L}_7$.}
+    \label{fig:Di_Cj_Lk_VE_time}
+\end{figure*}
+
+\section{Results}
+
+%\subsection{Numerical validation}
+
+% Find minimum number of nodes per particles. Validate shock-particle interaction via triple point. Validate force integration via shock-sphere interaction. Validate flow with moving geometry via Galilean transformation. Validate collision via multibody contact and collision system.
+
+%\subsection{Case settings}
+
+A 2D stratified burster-payload configuration with a cylindrical charge shape is used, as shown in Fig.~\ref{fig:d2_c1_l7_n24_t000us}. As the timescale of burster detonation is usually much smaller than that of payload expansion, the burster (region $R1$ in Fig.~\ref{fig:d2_c1_l7_n24_t008us}) in initially condensed phase is approximated by a reacted gas product with constant volume, for which the initial burster considers two different driver states as $\Des{D}_1: (\rho, p) = (1.0 \times 10^3 \Unit{kg/m^3}, 1.0 \times 10^5 \Unit{atm}$) and $\Des{D}_2: (\rho, p) = (1.0 \times 10^3 \Unit{kg/m^3}, 2.5 \times 10^5 \Unit{atm}$), respectively.
+
+In order to focus on granular dynamics, the payload consists of tangentially packed, inert, frictionless, rigid, and circular particles with density being $2700 \Unit{kg/m^3}$ and the coefficient of restitution being either $\Des{C}_1 = 1.0$ for elastic pairwise collision or $\Des{C}_2 = 0.5$ for a representative inelastic pairwise collision, in which the number of particle layers $\Des{L}_k$ ranges from $k=3$ to $k=7$ with the number of particles being $24 + (k-1)*6$ for the $k$th layer, and casings are omitted. In addition, the far-field air is at atmospheric conditions.
+
+In the following discussions, $\Des{D}_i-\Des{C}_j-\Des{L}_k$ is used to represent a case with burster state $\Des{D}_i$, coefficient of restitution $\Des{C}_j$, and number of particle layers $\Des{L}_k$. The flow field is of size $1 \Unit{m} \times 1 \Unit{m}$ and is discretized by a $2500\times2500$ Cartesian grid, and the radius of particles ranges from $1.305 \times 10^{-2} \Unit{m}$ to $1.331 \times 10^{-2} \Unit{m}$ with a minimum resolution of $65$ nodes per diameter. As a multiscale problem, the ratio between particle size and computational domain range is limited by available computational power.
+
+In order to obtain a similar expansion range, $\Des{D}_1-\Des{C}_j-\Des{L}_k$ and $\Des{D}_2-\Des{C}_j-\Des{L}_k$ cases are solved to $t=200 \Unit{\mu s}$ and $t=150 \Unit{\mu s}$, respectively. In this study, the surface expansion velocity $V_{\Des{E}}$ of a payload is represented by the velocities of the outermost-layer particles and is analyzed via the maximum $V_{\Des{E,Max}}$, mean $V_{\Des{E,Mean}}$, and minimum $V_{\Des{E,Min}}$ of particle velocities in $V_{\Des{E}}$ as well as the root mean square of velocity fluctuations $V_{\Des{E,RMS}}$. Limited by the domain range, at the end of solution time, payloads with small $\Des{L}_k$ can reach a nearly constant expansion stage, while payloads with large $\Des{L}_k$ may still undergo very gradual acceleration but have passed the early phase of rapid acceleration, as captured in Fig.~\ref{fig:Di_Cj_Lk_VE_time}, in which $V_{\Des{E,Max}}$ and $V_{\Des{E,Min}}$ consistently record the velocity history of two individual particles that have the maximum and minimum velocity at the end of solution time, respectively. 
+
+\subsection{Statistical dissipative behavior}
+
+%In many applications, it is useful to predict how fast the explosive will accelerate the surrounding shell. For inert materials, this speed largely determines the radius of the resulting explosion cloud under inertial motion. For energetic materials, this speed can partly determine the ability to ignite the material and the compromise between inertial and reactive effects \citep{milne2016gurney}.
+
+% 1) Should do grid convergence test first. 2) Should reach a nearly constant expansion state with maximum speed. 3) Consider averaged velocity.
+
+Predicting the maximum expansion speed and subsequent expansion range is useful in explosive dispersal. Through assuming a uniform density and a linear velocity gradient in the detonation gas products, an intact payload shell, and axial symmetry, the maximum speed of an explosively dispersed solid shell can be modeled by the Gurney equation using 1D analytical analysis \citep{gurney1943initial}
+\begin{equation} \label{eq:gurney}
+    \small
+    V_{\Des{G}} = \sqrt{2E} {\left(\frac{M}{C} + \frac{n}{n+2}\right)}^{-0.5}
+\end{equation}
+where, $V_{\Des{G}}$ is the maximum velocity of the accelerated shell; $C$ is the mass of the burster; $M$ is the mass of the payload shell; $n$ depends on system geometry \citep{milne2016gurney}, such as plane $n=1$, cylinder $n=2$, and sphere $n=3$; $E$ is related to the specific total energy of the burster and is referred to as the Gurney energy. Herein, $E$ is determined as the difference between the initial specific total energies of the burster and the ambient air.%For standard explosives, an engineering correlation between the Gurney velocity coefficient $\sqrt{2E}$ and the detonation velocity $D$ is given as $D / \sqrt{2E} = 2.97$ \citep{cooper1996explosives}. 
+
+The Gurney theory \citep{gurney1943initial} assumes the payload remaining intact throughout its acceleration. In configurations where the solid shell fractures, the fragment velocities are typically about $80\%$ of the value predicted by the Gurney equations \citep{cooper1996explosives}. Ripley et al. \citep{ripley2012jetting} reported an as much as $35\%$ velocity deficit to Gurney velocity in experimental measure on explosively dispersed dry and fine aluminium powders. Using numerical experiments based on a 1D continuum model for explosively dispersed porous shells, Milne \citep{milne2016gurney} proposed an extension to the Gurney equation accounting for velocity reduction resulted from payload porosity
+\begin{equation} \label{eq:gurney_poro}
+    \small
+    \begin{aligned}
+        &V_{\Des{G}, \phi} = \sqrt{2E} {\left(\frac{M}{C} \frac{1}{\alpha(\rho_0)} + \frac{n}{n+2}\right)}^{-0.5} * F(\phi)\\
+        &\alpha(\rho_0) = a_0 \rho_0^{a_1}\\
+        &F(\phi) = 1 + (a_2 \mathrm{e}^{(a_3 \phi)} - 0.5) * \log_{10}(\frac{M}{C})
+    \end{aligned}
+\end{equation}
+where, $V_{\Des{G}, \phi}$ is the extended Gurney velocity involving porosity; porosity $\phi = \rho / \rho_0$ with $\rho$ and $\rho_0$ being the bulk density of the porous shell and material density, respectively; constants $a_0 = 0.200$, $a_1 = 0.180$, $a_2 = 0.162$, and $a_3 = 1.127$ for cylindrical charge, and $a_0 = 0.310$, $a_1 = 0.132$, $a_2 = 0.168$, and $a_3 = 1.090$ for spherical charge.
+\begin{figure}[!htbp]
+    \centering
+    \begin{subfigure}[b]{0.40\textwidth}
+        \includegraphics[width=\textwidth]{D1_C1_Lx_VE}
+        %\caption{}
+        %\label{fig:D1_C1_Lx_VE}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.40\textwidth}
+        \includegraphics[width=\textwidth]{D1_C2_Lx_VE}
+        %\caption{}
+        %\label{fig:D1_C2_Lx_VE}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.40\textwidth}
+        \includegraphics[width=\textwidth]{D2_C1_Lx_VE}
+        %\caption{}
+        %\label{fig:D2_C1_Lx_VE}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.40\textwidth}
+        \includegraphics[width=\textwidth]{D2_C2_Lx_VE}
+        %\caption{}
+        %\label{fig:D2_C2_Lx_VE}
+    \end{subfigure}%
+    %\caption{Surface expansion velocity $V_{\Des{E}}$ of the granular payload. (a) $\Des{D}_1-\Des{C}_1-\Des{L}_k$. (b) $\Des{D}_1-\Des{C}_2-\Des{L}_k$. (c) $\Des{D}_2-\Des{C}_1-\Des{L}_k$. (d) $\Des{D}_2-\Des{C}_2-\Des{L}_k$. Legend: {\color[RGB]{0, 0, 0} $\bullet$}, $\Des{L}_3$; {\color[RGB]{31, 119, 180} $+$}, $\Des{L}_4$; {\color[RGB]{214, 39, 40} $\blacktriangledown$}, $\Des{L}_5$; {\color[RGB]{148, 103, 189} $\times$}, $\Des{L}_6$; {\color[RGB]{255, 127, 14} $\blacklozenge$}, $\Des{L}_7$.}
+    \caption{Surface expansion velocity $V_{\Des{E}}$ of the granular payload. Top to bottom: $\Des{D}_1-\Des{C}_1-\Des{L}_k$, $\Des{D}_1-\Des{C}_2-\Des{L}_k$, $\Des{D}_2-\Des{C}_1-\Des{L}_k$, $\Des{D}_2-\Des{C}_2-\Des{L}_k$. Legend: {\color[RGB]{0, 0, 0} $\bullet$}, $\Des{L}_3$; {\color[RGB]{31, 119, 180} $+$}, $\Des{L}_4$; {\color[RGB]{214, 39, 40} $\blacktriangledown$}, $\Des{L}_5$; {\color[RGB]{148, 103, 189} $\times$}, $\Des{L}_6$; {\color[RGB]{255, 127, 14} $\blacklozenge$}, $\Des{L}_7$.}
+    \label{fig:Di_Cj_Lk}
+\end{figure}
+\begin{figure}[!htbp]
+    \centering
+    \begin{subfigure}[b]{0.40\textwidth}
+        \includegraphics[width=\textwidth]{D1_C1_Lx_VG}
+        %\caption{}
+        %\label{fig:D1_C1_Lx_VG}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.40\textwidth}
+        \includegraphics[width=\textwidth]{D1_C2_Lx_VG}
+        %\caption{}
+        %\label{fig:D1_C2_Lx_VG}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.40\textwidth}
+        \includegraphics[width=\textwidth]{D2_C1_Lx_VG}
+        %\caption{}
+        %\label{fig:D2_C1_Lx_VG}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.40\textwidth}
+        \includegraphics[width=\textwidth]{D2_C2_Lx_VG}
+        %\caption{}
+        %\label{fig:D2_C2_Lx_VG}
+    \end{subfigure}%
+    %\caption{Comparison between $V_{\Des{G}}$, $V_{\Des{G},\phi}$, $V_{\Des{E,Max}}$, $V_{\Des{E,Mean}}$, and $V_{\Des{E,Min}}$. (a) $\Des{D}_1-\Des{C}_1-\Des{L}_k$. (b) $\Des{D}_1-\Des{C}_2-\Des{L}_k$. (c) $\Des{D}_2-\Des{C}_1-\Des{L}_k$. (d) $\Des{D}_2-\Des{C}_2-\Des{L}_k$. Legend: {\color[RGB]{0, 0, 0} $\bullet$}, $V_{\Des{G}}$; {\color[RGB]{31, 119, 180} $+$}, $V_{\Des{G},\phi}$; {\color[RGB]{214, 39, 40} $\blacktriangledown$}, $V_{\Des{E,Max}}$; {\color[RGB]{148, 103, 189} $\times$}, $V_{\Des{E,Mean}}$; {\color[RGB]{255, 127, 14} $\blacklozenge$}, $V_{\Des{E,Min}}$.}
+    \caption{Comparison between $V_{\Des{G}}$, $V_{\Des{G},\phi}$, $V_{\Des{E,Max}}$, $V_{\Des{E,Mean}}$, and $V_{\Des{E,Min}}$. Top to bottom: $\Des{D}_1-\Des{C}_1-\Des{L}_k$, $\Des{D}_1-\Des{C}_2-\Des{L}_k$, $\Des{D}_2-\Des{C}_1-\Des{L}_k$, $\Des{D}_2-\Des{C}_2-\Des{L}_k$. Legend: {\color[RGB]{0, 0, 0} $\bullet$}, $V_{\Des{G}}$; {\color[RGB]{31, 119, 180} $+$}, $V_{\Des{G},\phi}$; {\color[RGB]{214, 39, 40} $\blacktriangledown$}, $V_{\Des{E,Max}}$; {\color[RGB]{148, 103, 189} $\times$}, $V_{\Des{E,Mean}}$; {\color[RGB]{255, 127, 14} $\blacklozenge$}, $V_{\Des{E,Min}}$.}
+    \label{fig:Di_Cj_Lk_VG}
+\end{figure}
+
+As shown in Table~\ref{tab:lx_gurney_vel}, the cases cover a range of $M/C$ from about $5.326$ to $18.028$ with a payload porosity of about $\phi = 0.784$, for which the predicted $V_{\Des{G}, \phi}$ is found being close to $80\%$ of $V_{\Des{G}}$ for the two driver states. Note that $V_{\Des{G}, \phi} / V_{\Des{G}}$ remains the same value for different driver states since the $E$ term in Eq.~\eqref{eq:gurney} and Eq.~\eqref{eq:gurney_poro} are the same and eliminated in the ratio. The surface expansion velocity $V_{\Des{E}}$ of the granular payload at the end of solution time is depicted in Fig.~\ref{fig:Di_Cj_Lk} for different cases.
+\begin{table*}[!htbp]
+    \centering
+    \small% fontsize
+    %\setlength{\tabcolsep}{4pt}% column separation
+    %\renewcommand{\arraystretch}{1.5}% row space 
+    \begin{tabular}{lcccccccc}
+        \hline\hline
+        %\multicolumn{num_of_cols_to_merge}{alignment}{contents} \\
+        %\cline{i-j}% partial hline from column i to column j
+        Case & $M / C$ & $\phi$ & $V_{\Des{G}}^{\Des{D}_1} (\Unit{m/s})$ & $V_{\Des{G},\phi}^{\Des{D}_1} (\Unit{m/s})$ & $V_{\Des{G}}^{\Des{D}_2} (\Unit{m/s})$ & $V_{\Des{G},\phi}^{\Des{D}_2} (\Unit{m/s})$ & $V_{\Des{G},\phi}/V_{\Des{G}} \times 100\%$\\
+        \hline
+        $\Des{L}_3$ & $5.326$ & $0.784$ & $2936.474$ & $2482.344$ & $4654.617$ & $3934.773$ & $84.535$\\
+        $\Des{L}_4$ & $7.891$ & $0.784$ & $2446.948$ & $2022.738$ & $3878.668$ & $3206.251$ & $82.664$\\
+        $\Des{L}_5$ & $10.860$ & $0.784$ & $2103.058$ & $1707.514$ & $3333.566$ & $2706.587$ & $81.192$\\
+        $\Des{L}_6$ & $14.237$ & $0.784$ & $1846.410$ & $1476.565$ & $2926.752$ & $2340.510$ & $79.970$\\
+        $\Des{L}_7$ & $18.028$ & $0.784$ & $1646.736$ & $1299.585$ & $2610.248$ & $2059.977$ & $78.919$\\
+        \hline\hline
+    \end{tabular}
+    \caption{Gurney velocities for cases $\Des{D}_i-\Des{L}_k$.}
+    \label{tab:lx_gurney_vel}
+\end{table*}
+
+According to our numerical analysis and test results obtained so far, the collision model \citep{mo2017field} can conserve momentum and solve multibody collisions deterministically as well as some typical multibody collision scenarios analytically through exact pairwise collision. Nonetheless, the elastic assumption is mostly restricted to pairwise, and the collision model may introduce unphysical loss of kinetic energy in extremely complex collision scenarios, particularly for large coefficients of restitution.% Nonetheless, according to Fig.~\ref{fig:Di_Cj_Lk}, a larger velocity fluctuation presents in the elastic cases to their inelastic counterparts, reflecting a physical nature resulting from less dissipative pairwise collisions.
+
+In order to better quantify $V_{\Des{E}}$ in Fig.~\ref{fig:Di_Cj_Lk}, a comparison between Gurney velocity $V_{\Des{G}}$, Gurney velocity with porosity $V_{\Des{G},\phi}$, maximum $V_{\Des{E,Max}}$, mean $V_{\Des{E,Mean}}$, and minimum $V_{\Des{E,Min}}$ of particle velocity in $V_{\Des{E}}$ for all cases is shown in Fig.~\ref{fig:Di_Cj_Lk_VG}. Comparing $V_{\Des{E,Max}}$ with $V_{\Des{G}}$, the results show that a few particles can have velocities close to or even higher than $V_{\Des{G}}$, particularly for elastic cases. Through animating the solutions in time, we find that these particles are detached from the neighboring particles by both inter-grain collisions and the fastest growing buster fluid jets emerged near them and then are effectively accelerated by the surrounding high pressure gradient generated by the burster jets, causing a much higher velocity than other particles, as captured from Fig.~\ref{fig:d2_c1_l7_n24_t050us} to Fig.~\ref{fig:d2_c1_l7_n24_t150us}.
+
+Compared to $V_{\Des{E,Max}}$ and $V_{\Des{E,Min}}$, $V_{\Des{E,Mean}}$ can better represent the collective behavior of grains and hence the payload. Hence, a comparison between $V_{\Des{G}}$, $V_{\Des{G},\phi}$, and $V_{\Des{E,Mean}}$ is further shown in Fig.~\ref{fig:Di_Cj_Lk_VG_Mean}. Comparing $V_{\Des{E,Mean}}$ with $V_{\Des{G},\phi}$, the results show that $V_{\Des{E,Mean}}$ can agree well with $V_{\Des{G},\phi}$ for elastic cases with a relatively large $M/C$. Considering the difference between the 1D continuum modeling for $V_{\Des{G},\phi}$ and our 2D discrete modeling for $V_{\Des{E,Mean}}$, this agreement on large $M/C$ could be the incidentally agreed overall dissipation, mainly due to the solid volume fraction, between the two different modeling approaches for these case settings. The increased discrepancy at smaller $M/C$ is then possibly caused by the inadequate statistics of overall dissipation resulting from a small number of particles with pairwise elastic collisions and the increased early escape of burster fluid.
+
+The results in Fig.~\ref{fig:Di_Cj_Lk_VG_Mean} also show that $V_{\Des{E,Mean}}$ of inelastic cases have a somehow consistent deficit ranging from $219 \Unit{m/s}$ to $347 \Unit{m/s}$ for $\Des{D}_1-\Des{C}_2-\Des{L}_k$ and from $273 \Unit{m/s}$ to $522 \Unit{m/s}$ for $\Des{D}_2-\Des{C}_2-\Des{L}_k$ with $V_{\Des{G},\phi}$ for all the $M/C$, in which the deficit between $V_{\Des{E,Mean}}$ and $V_{\Des{G},\phi}$ can be desirable, as both $V_{\Des{G}}$ and $V_{\Des{G},\phi}$ assume 1D space, while the 2D modeling herein allows the escape of burster fluid, leading to the further loss of driver energy. The improved consistency in velocity deficit can be due to the enhanced consistency in overall dissipation of the multibody inelastic collisions.%, an irreversible energy dissipation which is not included in both the Gurney Equation (Eq.~\eqref{eq:gurney}) and extended Gurney equation with porosity (Eq.~\eqref{eq:gurney_poro}).
+
+Despite of the modeling challenges and issues, a critical property of the Gurney velocity theory that $V_{\Des{G}}$ increases with a decrease in $M/C$ or an increase in $E$ is consistently produced in the direct simulations, as reflected by $V_{\Des{E,Mean}}$. In addition, as shown in Fig.~\ref{fig:Di_Cj_Lk_VG_Mean}, except $\Des{D}_2-\Des{L}_3$ giving a slightly larger value for $\Des{C}_2$, the predicted $V_{\Des{E,Mean}}$ of inelastic collisions is smaller than that of elastic collisions, obeying the effects of more dissipative collisions. Moreover, the predicted $V_{\Des{E,Mean}}$ using a 2D discrete model herein can broadly agree with the $V_{\Des{G},\phi}$ concerning porosity $\phi$ via a 1D continuum model, in which the further velocity deficit can possibly be attributed to the escape of burster fluid in 2D modeling. These findings thus demonstrate a statistical dissipative property in the mesoscale model for the granular payload and the subsequent dense gas-granule flow.
+
+\subsection{Jetting evolution}
+
+The dispersal process of the case $\Des{D}_2-\Des{C}_2-\Des{L}_7$ is captured in Fig.~\ref{fig:jet_evolution}. On the basis of the direct simulations, an explanation for particle jetting instabilities is proposed and applied to explaining established experimental observations in the literature.
+\begin{figure*}[!htbp]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{D1_C1_C2_Lx_VG}
+        %\caption{}
+        %\label{fig:D1_C1_C2_Lx_VG}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{D2_C1_C2_Lx_VG}
+        %\caption{}
+        %\label{fig:D2_C1_C2_Lx_VG}
+    \end{subfigure}%
+    \caption{Comparison between $V_{\Des{G}}$, $V_{\Des{G},\phi}$, and $V_{\Des{E,Mean}}$. Left: $\Des{D}_1-\Des{C}_j-\Des{L}_k$. Right: $\Des{D}_2-\Des{C}_j-\Des{L}_k$. Legend: {\color[RGB]{0, 0, 0} $\bullet$}, $V_{\Des{G}}$; {\color[RGB]{31, 119, 180} $+$}, $V_{\Des{G},\phi}$; {\color[RGB]{214, 39, 40} $\blacktriangledown$}, $V_{\Des{E,Mean}}$ of $\Des{C}_1$; {\color[RGB]{148, 103, 189} $\times$}, $V_{\Des{E,Mean}}$ of $\Des{C}_2$.}
+    \label{fig:Di_Cj_Lk_VG_Mean}
+\end{figure*}
+\begin{figure*}[!htbp]
+    \centering
+    \begin{subfigure}[b]{0.33\textwidth}
+        \includegraphics[trim = 40mm 00mm 40mm 00mm, clip, width=\textwidth]{d2_c1_l7_n24_t000us}
+        \caption{$t = 0 \Unit{us}$}
+        \label{fig:d2_c1_l7_n24_t000us}
+    \end{subfigure}%
+    \begin{subfigure}[b]{0.33\textwidth}
+        \includegraphics[trim = 40mm 00mm 40mm 00mm, clip, width=\textwidth]{d2_c1_l7_n24_t008us}
+        \caption{$t = 8 \Unit{us}$}
+        \label{fig:d2_c1_l7_n24_t008us}
+    \end{subfigure}%
+    \begin{subfigure}[b]{0.33\textwidth}
+        \includegraphics[trim = 40mm 00mm 40mm 00mm, clip, width=\textwidth]{d2_c1_l7_n24_t010us}
+        \caption{$t = 10 \Unit{us}$}
+        \label{fig:d2_c1_l7_n24_t010us}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.33\textwidth}
+        \includegraphics[trim = 40mm 00mm 40mm 00mm, clip, width=\textwidth]{d2_c1_l7_n24_t050us}
+        \caption{$t = 50 \Unit{us}$}
+        \label{fig:d2_c1_l7_n24_t050us}
+    \end{subfigure}%
+    \begin{subfigure}[b]{0.33\textwidth}
+        \includegraphics[trim = 40mm 00mm 40mm 00mm, clip, width=\textwidth]{d2_c1_l7_n24_t075us}
+        \caption{$t = 75 \Unit{us}$}
+        \label{fig:d2_c1_l7_n24_t075us}
+    \end{subfigure}%
+    \begin{subfigure}[b]{0.33\textwidth}
+        \includegraphics[trim = 40mm 00mm 40mm 00mm, clip, width=\textwidth]{d2_c1_l7_n24_t150us}
+        \caption{$t = 150 \Unit{us}$}
+        \label{fig:d2_c1_l7_n24_t150us}
+    \end{subfigure}%
+    \caption{The superimposition of fluid field rendered by density gradient and particle field rendered by velocity to show the dispersal evolution for case $\Des{D}_2-\Des{C}_2-\Des{L}_7$. Density gradient in logarithmic scale: $[\text{White},\ \text{Black}]=[1.0, 2.0 \times 10^6]$. Particle velocity ($\Unit{m/s}$) in linear scale: $[\text{Blue}, \text{Red}]=[0.0, 2223.0]$}
+    \label{fig:jet_evolution}
+\end{figure*}
+\begin{enumerate}
+    \item Shock compaction phase.
+        
+        Under shock compaction, two types of granular regions represented by $R2$ and $R3$ in Fig.~\ref{fig:d2_c1_l7_n24_t008us} can manifest themselves in the generated payload. In regions like $R3$, particles initially are in direct contact both radially and circumferentially, providing force-chain networks for propagating perturbations through inter-grain collisions. In regions like $R2$, particles initially are in direct contact only circumferentially with pores among radial layers. Once the burster expands in space, $R3$ regions are quickly accelerated, while $R2$ regions are radially compacted such that inner particles move outward to occupy the pore spaces and subsequently collide with the next layer particles to build force-chain networks for momentum transfer. As shown from Fig.~\ref{fig:d2_c1_l7_n24_t008us} to Fig.~\ref{fig:d2_c1_l7_n24_t050us}, until the radial compaction propagates throughout the payload, the outer payload-air interface for $R2$ regions almost stays stationary. In a practical payload, the existence of $R2$ and $R3$ type regions may depend on the packing process.
+        
+        At the inner burster-payload interface, as shown in $R1$ in Fig.~\ref{fig:d2_c1_l7_n24_t008us}, shock reflects and diffracts on the irregular surfaces introduced by grains, generating inward density gradients and perturbations. RMI/RTI can then be possibly induced into the burster side, and fine particles can be entrained by the growing perturbations as well as pushed by the inner particles to form inside jets, which are then soon disturbed and compacted by the subsequent expansion of the converging shocks reflected from the burster center, as shown in $R1$ from Fig.~\ref{fig:d2_c1_l7_n24_t008us} to Fig.~\ref{fig:d2_c1_l7_n24_t010us}. This process is more evident when there is an initial gap region between the burster and payload such as in our previous numerical studies \citep{mo2017numerical} or in experiments using Hele-Shaw cells \citep{rodriguez2014external, xue2018dual}, although the flow motions were not captured in the latter. Being able to introduce observable boundary effects on the burster side, the burster-payload gap region is deliberately removed in this study to compare the related effects on particle jetting instabilities.
+
+    \item Jet initiating phase.
+        
+        Under shock compaction, a large pressure gradient exists between the inside and outside of the payload, which accelerates not only the payload but also the burster fluid into the payload.
+        
+        \begin{enumerate}
+            \item Fine jets. The mesoscale simulations show that, under shock compaction, an impulsive acceleration can be imposed on the outer payload-air interface through force-chain networks in the payload, which could induce macroscale RMI into the ambient air through impulsively growing the initial interfacial irregularities. Due to the compacted payload, perturbations at the inner burster-payload interface as well as within the payload can effectively propagate to the outer payload-air interface. Under the continuous acceleration sustained by the pressure gradient, perturbations at the outer payload-air interface that either were enhanced by RMI or propagated from inner payload may grow as a form of RTI, as observed in \citep{xue2018dual}.
+            \item Primary jets. As shown in Fig.~\ref{fig:d2_c1_l7_n24_t008us}, at the inner burster-payload interface, shock diffracts at convex grain surfaces and focuses in concave inter-grain regions. The shock compaction expands the payload and facilitates pore spaces at the inner burster-payload interface, providing entrances for burster fluid and initiating payload fractures. However, the ultimate payload fracture patten is dominated not by the initial pores at the inner burster-payload interface induced by expansion but mainly by the gas-granule interaction and force-chain propagation within the payload, as further explained below.
+
+                As shown in $R1$ region in Fig.~\ref{fig:d2_c1_l7_n24_t010us}, driven by pressure gradient, burster fluid penetrates the payload through the pore spaces at the inner burster-payload interface and then encounter resistance from granular dissipation generated by inter-grain collisions. As illustrated in Fig.~\ref{fig:d2_c1_l7_n24_t050us}, within the force-chain networks of the entire payload, internal sliding lines are regions of weak resistance and function as the attraction points for fractures and burster fluid, while internal colliding lines are effective for momentum transfer among particles and facilitate the formation of particle clusters.
+
+                As the buster fluid penetrates the payload, the particle clusters and their low-pressure interstitial fluid will be contained by the surrounding high-pressure buster fluid. The local pressure gradient between the surrounding flow and interstitial flow can help maintain the stability of the particle clusters and cause more inelastic collisions. The increased collisions effectively induce a more equilibrium momentum distribution in each particle cluster and again maintain the stability of the cluster, as shown from Fig.~\ref{fig:d2_c1_l7_n24_t008us} to Fig.~\ref{fig:d2_c1_l7_n24_t050us}, particularly for $R2$ type regions. The existence of stable clusters introduce a more non-equilibrium momentum distribution in the overall payload, exhibiting as a form of clustering instability, as shown from Fig.~\ref{fig:d2_c1_l7_n24_t050us} to Fig.~\ref{fig:d2_c1_l7_n24_t150us}.%In addition, interstitial fluid with different compressibility can affect the shock compaction phase \citep{xue2014dual} and hence the aggregation level of granular clusters, which could potentially contribute to the dispersal differences between liquids, powders, and liquid-powder mixtures.
+                
+                Comparing the velocity differences between $R2$ with aligned colliding lines and $R3$ with radiated colliding lines, results suggest that mesoscale granular dynamics is dominated by deterministic behaviors. As shown in Fig.~\ref{fig:d2_c1_l7_n24_t008us} to Fig.~\ref{fig:d2_c1_l7_n24_t050us}, $R3$ type clusters initially have a larger innermost surface area to receive driving force and enable direct momentum transfer through aligned colliding force-chain networks all the way to the payload surface. In $R2$ type clusters, only one innermost particle receives the driving force at the early expansion phase, and the received driving force must be transferred outwards to more and more particles in a region bounded by two sliding lines with neighboring $R3$ clusters. As a result, $R3$ type clusters gain greater velocities and therefore emerge outward as primary jets.
+        \end{enumerate}
+
+    \item Jet growing and relaxation phase.
+        
+        The strained expansion of both the burster and payload eventually leads to the complete penetration of buster fluid, as shown in Fig.~\ref{fig:d2_c1_l7_n24_t150us}. The fracture of the payload causes the decrease of overall granular dissipation, and particle clusters are accelerated into the ambient air. Since the early formed fine jets at the outer payload-air interface are not strongly enough, they can be dissipated by aerodynamic interactions or destroyed by the unstable payload front due to fast expansion. After penetrating a granular payload, the blast front can be highly irregular as in Fig.~\ref{fig:d2_c1_l7_n24_t150us}. Nonetheless, allowing a relatively large propagation region, our simulations on case $\Des{D}_i-\Des{L}_3$ reveal that the irregular blast front can be restored to a nearly cylindrical shape later.
+
+        As illustrated in the $R2$ region from Fig.~\ref{fig:d2_c1_l7_n24_t050us} to Fig.~\ref{fig:d2_c1_l7_n24_t150us}, during the acceleration phase of a particle cluster, the surrounding blast flow shears with the cluster boundaries with the shear direction toward the front region of the cluster, causing nearby particles converge to the shear wake at the cluster front. This shear behavior could be responsible for the finger-like shape of particle jets observed in macroscale experiments and introduce Kelvin--Helmholtz instability (KHI) at cluster boundaries. Note that the resulting KHI has an inverse shear direction with the usual KHI accompanying a RTI, in which the latter KHI leads to a mushroom shape due to adverse shear.
+        
+        It is expected that, as the blast expansion continues, the velocity difference between the surrounding flows and the particle clusters gradually reduces, and particle clusters have gained the most of momentum from the blast flow. It is suggested that the relaxation of surrounding flows weakens the local pressure gradients for maintaining particle jets, together with aerodynamic interactions, leading to the relaxation of particle jets.
+
+\end{enumerate}
+
+\section{Conclusion}\label{sec:conclusion}
+
+%In this study, an interface-resolved direct simulation framework has been applied to solve gas-solid flow with shock-shock, shock-particle, and particle-particle interactions. The framework was validated for solving flow with irregular, moving, and colliding non-deformable granular bodies. A statistical dissipative property of the framework in solving explosively dispersed granular materials with respect to Gurney velocity has also been demonstrated. A series of direct simulations have been conducted for helping understand the particle clustering and jetting dynamics, particularly for primary jets, in explosively dispersed granular materials. On the basis of direct simulations, an explanation for particle jetting instabilities has been proposed and applied to explaining established experimental observations in the literature.
+A direct simulation framework for gas-solid flow has been applied. The framework was validated for solving flow with irregular, moving, and colliding non-deformable granular bodies. A statistical dissipative property with respect to Gurney velocity has also been demonstrated. On the basis of direct simulations, an explanation for particle jetting instabilities has been proposed and applied to explaining established experimental observations in the literature.
+
+According to the direct simulations, the mesoscale dynamics of an explosively dispersed granular payload is largely deterministic. The initial payload morphology can be critical for establishing internal sliding and colliding lines in the shock-compacted granular payload. The sliding and colliding force-chain networks can determine the subsequent fracture pattern of the payload. Particle clusters manifested through payload fracture are then maintained by local pressure gradient between surrounding and interstitial flows as well as by dissipative inter-grain collisions. For particle clusters, the ability of receiving driving force and the behavior of internal force-chain propagation can largely determine the process of momentum gain. Clusters with higher efficiency in gaining and transferring momentum from the buster can emerge outward as primary jets.
+
+Under the current assumptions of non-deformable dissipative grains with nearly uniform sizes, the mesoscale granular dynamics largely depends on the payload morphology as a result of packing methods. Each choice of payload packing can give rise to its own set of particle clustering and jetting structures. Statistics collected from a large number of mesoscale computations based on a random choice of payload packing is expected to lead to a better understanding of multiphase flow instability at the macroscale. Apart from payload packing methods, the mesoscale studies can be further applied to various stochastic parameters present in the granular payload, such as particle size and other physical properties of stochastic nature. Under the rapid development of high-performance computing technology, it is suggested that the mesoscale statistical analysis can ultimately evolve into a macroscopic theory of multiphase flow instability for particle clustering and jetting phenomena widely observed in many areas involving dense gas-solid flows. Simulations on stochastic payloads with larger sizes and longer run times are to be performed in future studies. 
+
+%Under the current assumptions of non-deformable dissipative grains with nearly uniform sizes, the mesoscale granular dynamics largely depend on the payload morphology. Considering the stochastic nature of payload packing, particularly in real-world dispersal processes, the particle clustering and jetting phenomena can be regarded as a multiphase instability at the macroscale. From a macroscopic continuum view, as an analogy between RMI and RTI, this shock-enhanced morphology-dominated dynamic fracture behavior might can be seen as an impulsive form of STI, in which, due to the violent compaction and high-level agitation, collisional rather than frictional granular dissipation acts as the stabilizing factor, while pressure gradient functions as the destabilizing opponent. This macroscale behavior then largely agrees with the particle compaction Reynolds number perspective \citep{frost2012particle}.
+
+%Future studies will consider quantitative investigations on physical parameters for modifying the growth rates of particle jetting instabilities and controlling the subsequent mixing of multiphase flows.
+
+%The strength of jets dependent on M/C, the number of major jets dependent on payload morphology, the formation of fine jets dependent on the initial perturbations on the outer surface.
+
+%The high-strain-rate plastic deformation and agglomerate of inner-layer particles can introduce additional interfacial effects, particularly process to form a solid ring with granular dissimilarity and then fragments. As a form of dynamic fragmentation, the introduced effects could change the jetting evolution quantitatively but may not qualitatively.
+\section*{Acknowledgements}
+\small
+Financial support of this work was provided by Natural Sciences and Engineering Research Council of Canada.
+\vspace{-20pt}
+%\section*{References}
+\small
+\setlength{\bibsep}{0.2ex plus 0.2ex minus 0.2ex}% set distance between entries
+\bibliography{ref}
+\end{document}
+%---------------------------------------------------------------------------%

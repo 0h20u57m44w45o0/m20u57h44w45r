@@ -1,0 +1,535 @@
+#### import the simple module from the paraview
+from paraview.simple import *
+#### disable automatic camera reset on 'Show'
+paraview.simple._DisableFirstRenderCameraReset()
+
+# create a new 'STL Reader'
+head_notipstl = STLReader(FileNames=['/scratch/morui/graham/missile/body_short/M192/head_notip.stl'])
+
+# get active view
+renderView1 = GetActiveViewOrCreate('RenderView')
+# uncomment following to set a specific view size
+# renderView1.ViewSize = [977, 638]
+
+# show data in view
+head_notipstlDisplay = Show(head_notipstl, renderView1)
+# trace defaults for the display properties.
+head_notipstlDisplay.AmbientColor = [0.0, 0.0, 0.0]
+head_notipstlDisplay.ColorArrayName = [None, '']
+head_notipstlDisplay.DiffuseColor = [0.0, 0.0, 0.0]
+head_notipstlDisplay.BackfaceDiffuseColor = [0.0, 0.0, 0.0]
+head_notipstlDisplay.OSPRayScaleFunction = 'PiecewiseFunction'
+head_notipstlDisplay.GlyphType = 'Arrow'
+head_notipstlDisplay.SetScaleArray = [None, '']
+head_notipstlDisplay.ScaleTransferFunction = 'PiecewiseFunction'
+head_notipstlDisplay.OpacityArray = [None, '']
+head_notipstlDisplay.OpacityTransferFunction = 'PiecewiseFunction'
+
+# reset view to fit data
+renderView1.ResetCamera()
+
+# Properties modified on head_notipstlDisplay
+head_notipstlDisplay.Scale = [0.001, 0.001, 0.001]
+
+# create a new 'STL Reader'
+bodystl = STLReader(FileNames=['/scratch/morui/graham/missile/body_short/M192/body.stl'])
+
+# show data in view
+bodystlDisplay = Show(bodystl, renderView1)
+# trace defaults for the display properties.
+bodystlDisplay.AmbientColor = [0.0, 0.0, 0.0]
+bodystlDisplay.ColorArrayName = [None, '']
+bodystlDisplay.DiffuseColor = [0.0, 0.0, 0.0]
+bodystlDisplay.BackfaceDiffuseColor = [0.0, 0.0, 0.0]
+bodystlDisplay.OSPRayScaleFunction = 'PiecewiseFunction'
+bodystlDisplay.GlyphType = 'Arrow'
+bodystlDisplay.SetScaleArray = [None, '']
+bodystlDisplay.ScaleTransferFunction = 'PiecewiseFunction'
+bodystlDisplay.OpacityArray = [None, '']
+bodystlDisplay.OpacityTransferFunction = 'PiecewiseFunction'
+
+# Properties modified on bodystlDisplay
+bodystlDisplay.Scale = [0.001, 0.001, 0.001]
+
+# create a new 'STL Reader'
+wingstl = STLReader(FileNames=['/scratch/morui/graham/missile/body_short/M192/wing.stl'])
+
+# show data in view
+wingstlDisplay = Show(wingstl, renderView1)
+# trace defaults for the display properties.
+wingstlDisplay.AmbientColor = [0.0, 0.0, 0.0]
+wingstlDisplay.ColorArrayName = [None, '']
+wingstlDisplay.DiffuseColor = [0.0, 0.0, 0.0]
+wingstlDisplay.BackfaceDiffuseColor = [0.0, 0.0, 0.0]
+wingstlDisplay.OSPRayScaleFunction = 'PiecewiseFunction'
+wingstlDisplay.GlyphType = 'Arrow'
+wingstlDisplay.SetScaleArray = [None, '']
+wingstlDisplay.ScaleTransferFunction = 'PiecewiseFunction'
+wingstlDisplay.OpacityArray = [None, '']
+wingstlDisplay.OpacityTransferFunction = 'PiecewiseFunction'
+
+# reset view to fit data
+renderView1.ResetCamera()
+
+# Properties modified on wingstlDisplay
+wingstlDisplay.Scale = [0.001, 0.001, 0.001]
+
+# set active source
+SetActiveSource(bodystl)
+
+# Properties modified on bodystlDisplay
+bodystlDisplay.Position = [0.5, 0.0, 0.0]
+
+# set active source
+SetActiveSource(wingstl)
+
+# Properties modified on wingstlDisplay
+wingstlDisplay.Position = [0.8, 0.133975, 0.0]
+
+# reset view to fit data
+renderView1.ResetCamera()
+
+# create a new 'STL Reader'
+wingstl_1 = STLReader(FileNames=['/scratch/morui/graham/missile/body_short/M192/wing.stl'])
+
+# show data in view
+wingstl_1Display = Show(wingstl_1, renderView1)
+# trace defaults for the display properties.
+wingstl_1Display.AmbientColor = [0.0, 0.0, 0.0]
+wingstl_1Display.ColorArrayName = [None, '']
+wingstl_1Display.DiffuseColor = [0.0, 0.0, 0.0]
+wingstl_1Display.BackfaceDiffuseColor = [0.0, 0.0, 0.0]
+wingstl_1Display.OSPRayScaleFunction = 'PiecewiseFunction'
+wingstl_1Display.GlyphType = 'Arrow'
+wingstl_1Display.SetScaleArray = [None, '']
+wingstl_1Display.ScaleTransferFunction = 'PiecewiseFunction'
+wingstl_1Display.OpacityArray = [None, '']
+wingstl_1Display.OpacityTransferFunction = 'PiecewiseFunction'
+
+# Properties modified on wingstl_1Display
+wingstl_1Display.Scale = [0.001, 0.001, 0.001]
+
+# Properties modified on wingstl_1Display
+wingstl_1Display.Orientation = [180.0, 0.0, 0.0]
+
+# Properties modified on wingstl_1Display
+wingstl_1Display.Position = [0.8, -0.133975, 0.0]
+
+# create a new 'STL Reader'
+wingstl_2 = STLReader(FileNames=['/scratch/morui/graham/missile/body_short/M192/wing.stl'])
+
+# show data in view
+wingstl_2Display = Show(wingstl_2, renderView1)
+# trace defaults for the display properties.
+wingstl_2Display.AmbientColor = [0.0, 0.0, 0.0]
+wingstl_2Display.ColorArrayName = [None, '']
+wingstl_2Display.DiffuseColor = [0.0, 0.0, 0.0]
+wingstl_2Display.BackfaceDiffuseColor = [0.0, 0.0, 0.0]
+wingstl_2Display.OSPRayScaleFunction = 'PiecewiseFunction'
+wingstl_2Display.GlyphType = 'Arrow'
+wingstl_2Display.SetScaleArray = [None, '']
+wingstl_2Display.ScaleTransferFunction = 'PiecewiseFunction'
+wingstl_2Display.OpacityArray = [None, '']
+wingstl_2Display.OpacityTransferFunction = 'PiecewiseFunction'
+
+# Properties modified on wingstl_2Display
+wingstl_2Display.Scale = [0.001, 0.001, 0.001]
+
+# Properties modified on wingstl_2Display
+wingstl_2Display.Orientation = [90.0, 0.0, 0.0]
+
+# Properties modified on wingstl_2Display
+wingstl_2Display.Position = [0.8, 0.0, 0.133975]
+
+# create a new 'STL Reader'
+wingstl_3 = STLReader(FileNames=['/scratch/morui/graham/missile/body_short/M192/wing.stl'])
+
+# show data in view
+wingstl_3Display = Show(wingstl_3, renderView1)
+# trace defaults for the display properties.
+wingstl_3Display.AmbientColor = [0.0, 0.0, 0.0]
+wingstl_3Display.ColorArrayName = [None, '']
+wingstl_3Display.DiffuseColor = [0.0, 0.0, 0.0]
+wingstl_3Display.BackfaceDiffuseColor = [0.0, 0.0, 0.0]
+wingstl_3Display.OSPRayScaleFunction = 'PiecewiseFunction'
+wingstl_3Display.GlyphType = 'Arrow'
+wingstl_3Display.SetScaleArray = [None, '']
+wingstl_3Display.ScaleTransferFunction = 'PiecewiseFunction'
+wingstl_3Display.OpacityArray = [None, '']
+wingstl_3Display.OpacityTransferFunction = 'PiecewiseFunction'
+
+# Properties modified on wingstl_3Display
+wingstl_3Display.Scale = [0.001, 0.001, 0.001]
+
+# Properties modified on wingstl_3Display
+wingstl_3Display.Orientation = [270.0, 0.0, 0.0]
+
+# Properties modified on wingstl_3Display
+wingstl_3Display.Position = [0.8, 0.0, -0.133975]
+
+# create a new 'Sphere'
+sphere1 = Sphere()
+
+# Properties modified on sphere1
+sphere1.Center = [1.0, 0.0, 0.0]
+sphere1.Radius = 0.134
+sphere1.ThetaResolution = 144
+sphere1.PhiResolution = 72
+
+# show data in view
+sphere1Display = Show(sphere1, renderView1)
+# trace defaults for the display properties.
+sphere1Display.AmbientColor = [0.0, 0.0, 0.0]
+sphere1Display.ColorArrayName = [None, '']
+sphere1Display.DiffuseColor = [0.0, 0.0, 0.0]
+sphere1Display.BackfaceDiffuseColor = [0.0, 0.0, 0.0]
+sphere1Display.OSPRayScaleArray = 'Normals'
+sphere1Display.OSPRayScaleFunction = 'PiecewiseFunction'
+sphere1Display.GlyphType = 'Arrow'
+sphere1Display.SetScaleArray = [None, '']
+sphere1Display.ScaleTransferFunction = 'PiecewiseFunction'
+sphere1Display.OpacityArray = [None, '']
+sphere1Display.OpacityTransferFunction = 'PiecewiseFunction'
+
+# create a new 'STL Reader'
+tunnelstl = STLReader(FileNames=['/scratch/morui/graham/missile/body_short/M192/tunnel.stl'])
+
+# show data in view
+tunnelstlDisplay = Show(tunnelstl, renderView1)
+# trace defaults for the display properties.
+tunnelstlDisplay.AmbientColor = [0.0, 0.0, 0.0]
+tunnelstlDisplay.ColorArrayName = [None, '']
+tunnelstlDisplay.DiffuseColor = [0.0, 0.0, 0.0]
+tunnelstlDisplay.BackfaceDiffuseColor = [0.0, 0.0, 0.0]
+tunnelstlDisplay.OSPRayScaleFunction = 'PiecewiseFunction'
+tunnelstlDisplay.GlyphType = 'Arrow'
+tunnelstlDisplay.SetScaleArray = [None, '']
+tunnelstlDisplay.ScaleTransferFunction = 'PiecewiseFunction'
+tunnelstlDisplay.OpacityArray = [None, '']
+tunnelstlDisplay.OpacityTransferFunction = 'PiecewiseFunction'
+
+# Properties modified on tunnelstlDisplay
+tunnelstlDisplay.Scale = [0.001, 0.001, 0.001]
+
+# Properties modified on tunnelstlDisplay
+tunnelstlDisplay.Position = [-0.5, 0.0, 0.0]
+
+# reset view to fit data
+renderView1.ResetCamera()
+
+# change solid color
+#tunnelstlDisplay.DiffuseColor = [0.6666666666666666, 1.0, 1.0]
+tunnelstlDisplay.DiffuseColor = [0.0, 0.0, 0.0]
+
+# set active source
+SetActiveSource(head_notipstl)
+
+# change solid color
+#head_notipstlDisplay.DiffuseColor = [1.0, 0.0, 0.0]
+head_notipstlDisplay.DiffuseColor = [0.0, 0.0, 0.0]
+
+# set active source
+SetActiveSource(bodystl)
+
+# change solid color
+#bodystlDisplay.DiffuseColor = [1.0, 0.3333333333333333, 0.0]
+bodystlDisplay.DiffuseColor = [0.0, 0.0, 0.0]
+
+# set active source
+SetActiveSource(wingstl)
+
+# change solid color
+#wingstlDisplay.DiffuseColor = [0.6666666666666666, 0.6666666666666666, 1.0]
+wingstlDisplay.DiffuseColor = [0.0, 0.0, 0.0]
+
+# set active source
+SetActiveSource(wingstl_1)
+
+# change solid color
+#wingstl_1Display.DiffuseColor = [0.0, 0.6666666666666666, 1.0]
+wingstl_1Display.DiffuseColor = [0.0, 0.0, 0.0]
+
+# set active source
+SetActiveSource(wingstl_2)
+
+# change solid color
+#wingstl_2Display.DiffuseColor = [0.6666666666666666, 0.3333333333333333, 1.0]
+wingstl_2Display.DiffuseColor = [0.0, 0.0, 0.0]
+
+# set active source
+SetActiveSource(sphere1)
+
+# set active source
+SetActiveSource(wingstl_3)
+
+# change solid color
+#wingstl_3Display.DiffuseColor = [0.0, 0.3333333333333333, 1.0]
+wingstl_3Display.DiffuseColor = [0.0, 0.0, 0.0]
+
+# set active source
+SetActiveSource(sphere1)
+
+# change solid color
+#sphere1Display.DiffuseColor = [0.3333333333333333, 0.0, 0.0]
+sphere1Display.DiffuseColor = [0.0, 0.0, 0.0]
+
+# create a new 'Box'
+box1 = Box()
+
+# Properties modified on box1
+box1.XLength = 2.0
+box1.YLength = 0.55
+box1.ZLength = 0.55
+box1.Center = [0.75, 0.0, 0.0]
+
+# show data in view
+box1Display = Show(box1, renderView1)
+# trace defaults for the display properties.
+box1Display.AmbientColor = [0.0, 0.0, 0.0]
+box1Display.ColorArrayName = [None, '']
+box1Display.DiffuseColor = [0.0, 0.0, 0.0]
+box1Display.BackfaceDiffuseColor = [0.0, 0.0, 0.0]
+box1Display.OSPRayScaleArray = 'Normals'
+box1Display.OSPRayScaleFunction = 'PiecewiseFunction'
+box1Display.GlyphType = 'Arrow'
+box1Display.SetScaleArray = [None, '']
+box1Display.ScaleTransferFunction = 'PiecewiseFunction'
+box1Display.OpacityArray = [None, '']
+box1Display.OpacityTransferFunction = 'PiecewiseFunction'
+
+# change representation type
+box1Display.SetRepresentationType('Outline')
+
+# Properties modified on box1Display
+box1Display.LineWidth = 4.0
+
+# current camera placement for renderView1
+renderView1.CameraPosition = [-1.823750514983333, 2.2131473471002967, 2.5107931179356493]
+renderView1.CameraFocalPoint = [0.5492504626170109, -0.10742335328534115, -0.08740494630381046]
+renderView1.CameraViewUp = [0.31667747568502297, 0.8326039390660271, -0.4544073690484092]
+renderView1.CameraParallelScale = 1.3200378782444087
+
+## get layout
+#layout1 = GetLayout()
+#
+## save screenshot
+#SaveScreenshot('/scratch/morui/graham/missile/missile_demo_integrate.jpg', layout=layout1, magnification=2, quality=100)
+#
+## current camera placement for renderView1
+#renderView1.CameraPosition = [-1.4119073701105456, 1.8104036718267558, 2.059866181166817]
+#renderView1.CameraFocalPoint = [0.5492504626170109, -0.10742335328534115, -0.08740494630381046]
+#renderView1.CameraViewUp = [0.31667747568502297, 0.8326039390660271, -0.4544073690484092]
+#renderView1.CameraParallelScale = 1.3200378782444087
+#
+## save screenshot
+#SaveScreenshot('/scratch/morui/graham/missile/missile_demo_integrate.jpg', layout=layout1, magnification=2, quality=100)
+#
+## set active source
+#SetActiveSource(head_notipstl)
+#
+## Properties modified on head_notipstlDisplay
+#head_notipstlDisplay.Position = [-0.5, 0.0, 0.0]
+#
+## set active source
+#SetActiveSource(bodystl)
+#
+## set active source
+#SetActiveSource(wingstl)
+#
+## Properties modified on wingstlDisplay
+#wingstlDisplay.Position = [0.8, 0.2, 0.0]
+#
+## Properties modified on wingstlDisplay
+#wingstlDisplay.Position = [0.8, 0.25, 0.0]
+#
+## set active source
+#SetActiveSource(wingstl_1)
+#
+## Properties modified on wingstl_1Display
+#wingstl_1Display.Position = [0.8, -0.25, 0.0]
+#
+## set active source
+#SetActiveSource(wingstl_2)
+#
+## Properties modified on wingstl_2Display
+#wingstl_2Display.Position = [0.8, 0.0, 0.25]
+#
+## set active source
+#SetActiveSource(wingstl_3)
+#
+## Properties modified on wingstl_3Display
+#wingstl_3Display.Position = [0.8, 0.0, -0.25]
+#
+## set active source
+#SetActiveSource(sphere1)
+#
+## Properties modified on sphere1Display
+#sphere1Display.Position = [0.5, 0.0, 0.0]
+#
+## set active source
+#SetActiveSource(tunnelstl)
+#
+## Properties modified on tunnelstlDisplay
+#tunnelstlDisplay.Position = [-0.5, 0.0, 0.5]
+#
+## Properties modified on tunnelstlDisplay
+#tunnelstlDisplay.Position = [-0.5, 0.0, -0.5]
+#
+## Properties modified on tunnelstlDisplay
+#tunnelstlDisplay.Position = [-0.5, 0.0, -1.0]
+#
+## set active source
+#SetActiveSource(box1)
+#
+## Properties modified on box1Display
+#box1Display.Position = [0.0, 0.0, 1.0]
+#
+## set active source
+#SetActiveSource(sphere1)
+#
+## set active source
+#SetActiveSource(bodystl)
+#
+## Properties modified on bodystlDisplay
+#bodystlDisplay.Position = [0.25, 0.0, 0.0]
+#
+## set active source
+#SetActiveSource(wingstl)
+#
+## Properties modified on wingstlDisplay
+#wingstlDisplay.Position = [1.0, 0.25, 0.0]
+#
+## set active source
+#SetActiveSource(wingstl_1)
+#
+## Properties modified on wingstl_1Display
+#wingstl_1Display.Position = [1.0, -0.25, 0.0]
+#
+## set active source
+#SetActiveSource(wingstl_2)
+#
+## Properties modified on wingstl_2Display
+#wingstl_2Display.Position = [1.0, 0.0, 0.25]
+#
+## set active source
+#SetActiveSource(wingstl_3)
+#
+## Properties modified on wingstl_3Display
+#wingstl_3Display.Position = [1.0, 0.0, -0.25]
+#
+## set active source
+#SetActiveSource(sphere1)
+#
+## Properties modified on sphere1Display
+#sphere1Display.Position = [0.75, 0.0, 0.0]
+#
+## set active source
+#SetActiveSource(wingstl_3)
+#
+## Properties modified on wingstl_3Display
+#wingstl_3Display.Position = [1.0, 0.0, -0.134]
+#
+## set active source
+#SetActiveSource(wingstl_2)
+#
+## Properties modified on wingstl_2Display
+#wingstl_2Display.Position = [1.0, 0.0, 0.134]
+#
+## set active source
+#SetActiveSource(wingstl_1)
+#
+## Properties modified on wingstl_1Display
+#wingstl_1Display.Position = [1.0, -0.134, 0.0]
+#
+## set active source
+#SetActiveSource(wingstl)
+#
+## Properties modified on wingstlDisplay
+#wingstlDisplay.Position = [1.0, 0.134, 0.0]
+#
+## set active source
+#SetActiveSource(bodystl)
+#
+## current camera placement for renderView1
+#renderView1.CameraPosition = [-1.8668629958279293, 3.336942603334451, 2.8425695800833215]
+#renderView1.CameraFocalPoint = [0.6402050236746327, -0.16408848105073165, 0.10947876188697903]
+#renderView1.CameraViewUp = [0.31834576526162794, 0.7144065620397505, -0.623120564461271]
+#renderView1.CameraParallelScale = 1.3200378782444087
+#
+## save screenshot
+#SaveScreenshot('/scratch/morui/graham/missile/missile_demo_separate.jpg', layout=layout1, magnification=2, quality=100)
+#
+## set active source
+#SetActiveSource(tunnelstl)
+#
+## Properties modified on tunnelstlDisplay
+#tunnelstlDisplay.Position = [-0.5, 0.0, -0.8]
+#
+## set active source
+#SetActiveSource(box1)
+#
+## Properties modified on box1Display
+#box1Display.Position = [0.0, 0.0, 0.8]
+#
+## Properties modified on box1Display
+#box1Display.Position = [0.2, 0.0, 0.8]
+#
+## Properties modified on box1Display
+#box1Display.Position = [0.2, 0.0, 1.0]
+#
+## Properties modified on box1Display
+#box1Display.Position = [0.2, 0.0, 0.9]
+#
+## set active source
+#SetActiveSource(tunnelstl)
+#
+## Properties modified on tunnelstlDisplay
+#tunnelstlDisplay.Position = [-0.7, 0.0, -0.8]
+#
+## Properties modified on tunnelstlDisplay
+#tunnelstlDisplay.Position = [-0.7, 0.0, -0.9]
+#
+## current camera placement for renderView1
+#renderView1.CameraPosition = [-1.5587884442015287, 3.8105985929720037, 2.4883795885119833]
+#renderView1.CameraFocalPoint = [0.6030827281029228, -0.09393319078388015, 0.019910688008809033]
+#renderView1.CameraViewUp = [0.39064331366126753, 0.6366424975021843, -0.6648940756736563]
+#renderView1.CameraParallelScale = 1.3200378782444087
+#
+## save screenshot
+#SaveScreenshot('/scratch/morui/graham/missile/missile_demo_separate.jpg', layout=layout1, magnification=2, quality=100)
+#
+## Properties modified on tunnelstlDisplay
+#tunnelstlDisplay.Position = [-0.8, 0.0, -0.9]
+#
+## Properties modified on tunnelstlDisplay
+#tunnelstlDisplay.Position = [-0.7, 0.0, -0.9]
+#
+## Properties modified on tunnelstlDisplay
+#tunnelstlDisplay.Position = [-0.8, 0.0, -0.9]
+#
+## set active source
+#SetActiveSource(box1)
+#
+## Properties modified on box1Display
+#box1Display.Position = [0.3, 0.0, 0.9]
+#
+## current camera placement for renderView1
+#renderView1.CameraPosition = [-1.5587884442015287, 3.8105985929720037, 2.4883795885119833]
+#renderView1.CameraFocalPoint = [0.6030827281029228, -0.09393319078388015, 0.019910688008809033]
+#renderView1.CameraViewUp = [0.39064331366126753, 0.6366424975021843, -0.6648940756736563]
+#renderView1.CameraParallelScale = 1.3200378782444087
+#
+## save screenshot
+#SaveScreenshot('/scratch/morui/graham/missile/missile_demo_separate.jpg', layout=layout1, magnification=2, quality=100)
+#
+##### saving camera placements for all active views
+#
+## current camera placement for renderView1
+#renderView1.CameraPosition = [-1.5587884442015287, 3.8105985929720037, 2.4883795885119833]
+#renderView1.CameraFocalPoint = [0.6030827281029228, -0.09393319078388015, 0.019910688008809033]
+#renderView1.CameraViewUp = [0.39064331366126753, 0.6366424975021843, -0.6648940756736563]
+#renderView1.CameraParallelScale = 1.3200378782444087
+
+#### uncomment the following to render all views
+# RenderAllViews()
+# alternatively, if you want to write images, you can use SaveScreenshot(...).

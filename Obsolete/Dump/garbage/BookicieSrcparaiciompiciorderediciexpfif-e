@@ -1,0 +1,27 @@
+#include <omp.h> /* parallel header file */
+#include <stdio.h>
+
+int main (int argc, char* argv[])
+{
+    /*
+     * Protect resources with ordered clause
+     */
+    double res = 0.0;
+    double tmp = 0.0;
+    #pragma omp parallel private(tmp)
+    #pragma omp for ordered reduction(+:res)
+    {
+        int id = omp_get_thread_num();
+        int nthrds = omp_get_num_threads();
+        for (int i = id; i < niters; i = i + nthrds) {
+            tmp = neat_stuff(i);
+            /*
+             * The ordered region executes in the sequential order
+             */
+            #pragma omp ordered
+            res += consume(tmp);
+        }
+    }
+    return 0;
+}
+

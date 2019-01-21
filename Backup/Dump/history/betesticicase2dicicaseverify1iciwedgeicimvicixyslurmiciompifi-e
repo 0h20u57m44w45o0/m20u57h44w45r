@@ -1,0 +1,40 @@
+#!/bin/bash
+
+#------------------------------------------------------------
+#-
+#-                  Slurm  Submission System
+#-
+#- submit:        sbatch slurm.sh
+#- list jobs:     squeue -u $USER
+#- cancel jobs:   scancel <jobid>
+#------------------------------------------------------------
+
+#- omp
+#SBATCH --job-name=omp-32
+#SBATCH --account=rrg-fslien     # resource account
+#SBATCH --mail-type=END,FAIL     # Mail events (NONE, BEGIN, END, FAIL, ALL)
+#SBATCH --mail-user=hmo@uwaterloo.ca     # Where to send mail
+#SBATCH --ntasks=1               # number of tasks
+#SBATCH --cpus-per-task=32       # number of processes per task
+#SBATCH --mem=3G                 # memory per node
+#SBATCH --time=0-10:00           # time (DD-HH:MM)
+#SBATCH --output=%x-%j.out       # standard output and error log
+
+#- preprocessing
+export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
+echo "start at  `date +'%F %k:%M:%S'`"
+echo "submit job `pwd`" >> ~/job_list
+echo ""
+echo "running on $SLURM_JOB_NUM_NODES nodes with $SLURM_NTASKS tasks with $SLURM_CPUS_PER_TASK processes each."
+echo "job array id / job id: $SLURM_ARRAY_JOB_ID / $SLURM_JOB_ID"
+echo "this is job $SLURM_ARRAY_TASK_ID out of $SLURM_ARRAY_TASK_COUNT jobs."
+echo ""
+
+#- solve
+
+srun artracfd_omp -m omp -n 1*1*32
+
+#- postprocessing part
+echo "finish at  `date +'%F %k:%M:%S'`"
+echo "complete job `pwd`" >> ~/job_list
+

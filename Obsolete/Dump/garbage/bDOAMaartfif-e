@@ -1,0 +1,57 @@
+#---------------------------------------------------------------------------#
+#-                   Data Operation and Manipulation                       -#
+#-                          <By Huangrui Mo>                               -#
+#- Copyright (C) Huangrui Mo <huangrui.mo@gmail.com>                       -#
+#- This file is part of ArtraDOAM.                                         -#
+#- ArtraDOAM is free software: you can redistribute it and/or modify it    -#
+#- under the terms of the GNU General Public License as published by       -#
+#- the Free Software Foundation, either version 3 of the License, or       -#
+#- (at your option) any later version.                                     -#
+#---------------------------------------------------------------------------#
+
+import matplotlib.patches as mpatches
+import matplotlib.pyplot as plt
+import numpy as np
+
+def colors():
+    """ System color palette.
+    """
+    ctypes = [ # Tableau color types in RGB
+            (0, 0, 0), (31, 119, 180), (214, 39, 40), (148, 103, 189),
+            (255, 127, 14), (140, 86, 75), (44, 160, 44), (227, 119, 194),
+            (188, 189, 34), (23, 190, 207)]
+    #- scale to rgb
+    return [(c[0] / 255, c[1] / 255, c[2] / 255) for c in ctypes]
+
+def arc_patch(ax=None, xy=(0.0, 0.0), width=0.5, height=0.5, theta1=0.0, theta2=180.0, resolution=50, **kwargs):
+    """ Draw arc.
+
+    Draw arc algorithm from stackoverflow.
+    arc_patch(ax, (x, y), width, height, start, end, fill=True, color='k', ...)
+
+    """
+    #- make sure a valid ax
+    if ax is None:
+        ax = plt.gca()
+    #- generate the points
+    theta = np.linspace(np.radians(theta1), np.radians(theta2), resolution)
+    points = np.vstack((width * np.cos(theta) + xy[0], height * np.sin(theta) + xy[1]))
+    #- draw the polygon and add to the axes
+    poly = mpatches.Polygon(points.T, closed=True, **kwargs)
+    ax.add_patch(poly)
+    return poly
+
+def circle_patch(ax=None, xy=(0.0, 0.0), radius=0.5, **kwargs):
+    """ Draw circle.
+    """
+    poly = mpatches.Circle(xy, radius, **kwargs)
+    ax.add_patch(poly)
+    return poly
+
+def ellipse_patch(ax=None, xy=(0.0, 0.0), width=0.5, height=0.5, angle=0.0, **kwargs):
+    """ Draw ellipse.
+    """
+    poly = mpatches.Ellipse(xy, width, height, angle, **kwargs)
+    ax.add_patch(poly)
+    return poly
+

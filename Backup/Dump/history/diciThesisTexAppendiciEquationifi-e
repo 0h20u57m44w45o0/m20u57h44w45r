@@ -1,0 +1,585 @@
+\chapter{3D Navier--Stokes Equations, Jacobian Matrices, and Eigendecompositions}
+\label{cha:equation}
+
+This chapter provides a detailed reference for the 3D Navier--Stokes equations expressed in a variety of mathematical forms, the Jacobian matrices, and their eigendecompositions. This reference can effectively aid the numerical discretization and code implementation for the numerical solution of Navier--Stokes equations. In order to minimize potential errors related to derivation and typography, the presented equations have been carefully examined both theoretically via mathematical derivation and numerically through code implementation.
+
+\section{System of equations}
+
+The Navier--Stokes equations in differential form can be expressed as a system of partial differential equations that consist of the conservation laws of mass, momentum, and energy \citep{laney1998computational}:
+\begin{equation} \label{eq:governings}
+    \begin{cases}
+        \frac{\partial \rho}{\partial t} + \nabla\cdot(\rho\Vector{V}) = 0 \\
+        \frac{\partial (\rho\Vector{V})}{\partial t} + \nabla\cdot(\rho\Vector{V}\Vector{V}) = \nabla\cdot(\Tensor{\tau} - p \unitTensor{I}) + \Vector{f}^{\Des{b}}\\
+        \frac{\partial (\rho e_{\Des{T}})}{\partial t} + \nabla\cdot(\rho e_{\Des{T}}\Vector{V}) = \nabla\cdot(k\nabla T) + \nabla\cdot[(\Tensor{\tau} - p \unitTensor{I})\cdot\Vector{V}] + \Vector{f}^{\Des{b}}\cdot \Vector{V}\\
+    \end{cases}
+\end{equation}
+
+The closure of the system currently considers the Newtonian fluid relation with the Stokes hypothesis
+\begin{equation}
+    \tau_{ij} = \mu\left(\frac{\partial V_i}{\partial x_j} + \frac{\partial V_j}{\partial x_i} - \frac{2}{3}(\nabla\cdot\Vector{V}) \delta_{ij}\right)
+\end{equation}
+and the perfect gas law
+\begin{equation}
+    \begin{gathered}
+        p = \rho R T \\
+        e = C_v T
+    \end{gathered}
+\end{equation}
+
+\section{Vector form}
+
+\subsection{Conservative vector form}
+
+Through introducing the vector of conservative variables $\Vector{U}$, the vector of convective fluxes $\Vector{F}_i$, the vector of diffusive fluxes $\Vector{F}^{\Des{v}}_i$, and the vector of source terms $\Vector{\Phi}$, the system of partial differential equations of conservation laws can be written into a vector form in a conservative manner
+\begin{equation}\label{eq:NS}
+    \frac{\partial \Vector{U}}{\partial t}+\frac{\partial \Vector{F}_x(\Vector{U})}{\partial x}+\frac{\partial \Vector{F}_y(\Vector{U})}{\partial y}+\frac{\partial \Vector{F}_z(\Vector{U})}{\partial z} = \frac{\partial \Vector{F}^{\Des{v}}_x(\Vector{U})}{\partial x}+\frac{\partial \Vector{F}^{\Des{v}}_y(\Vector{U})}{\partial y}+\frac{\partial \Vector{F}^{\Des{v}}_z(\Vector{U})}{\partial z}+\Vector{\Phi}
+\end{equation}
+\[
+    \Vector{U} =
+    \begin{pmatrix}
+        \rho,
+        \rho u,
+        \rho v,
+        \rho w,
+        \rho e_{\Des{T}}
+    \end{pmatrix}^{\Des{T}}
+\]
+\[
+    \Vector{F}_x(\Vector{U}) =
+    \begin{pmatrix}
+        \rho u,
+        \rho uu+p,
+        \rho vu,
+        \rho wu,
+        (\rho e_{\Des{T}}+p)u
+    \end{pmatrix}^{\Des{T}}
+    = u\Vector{U} + p(0, 1, 0, 0, u)^{\Des{T}}
+\]
+\[
+    \Vector{F}_y(\Vector{U}) =
+    \begin{pmatrix}
+        \rho v,
+        \rho uv,
+        \rho vv+p,
+        \rho wv,
+        (\rho e_{\Des{T}}+p)v
+    \end{pmatrix}^{\Des{T}}
+    = v\Vector{U} + p(0, 0, 1, 0, v)^{\Des{T}}
+\]
+\[
+    \Vector{F}_z(\Vector{U}) =
+    \begin{pmatrix}
+        \rho w,
+        \rho uw,
+        \rho vw,
+        \rho ww+p,
+        (\rho e_{\Des{T}}+p)w
+    \end{pmatrix}^{\Des{T}}
+    = w\Vector{U} + p(0, 0, 0, 1, w)^{\Des{T}}
+\]
+\[
+    \Vector{F}^{\Des{v}}_x(\Vector{U}) =
+    \begin{pmatrix}
+        0,
+        \tau_{xx},
+        \tau_{xy},
+        \tau_{xz},
+        k \frac{\partial T}{\partial x}+\tau_{xx} u+\tau_{xy} v+\tau_{xz} w
+    \end{pmatrix}^{\Des{T}}
+\]
+\[
+    \Vector{F}^{\Des{v}}_y(\Vector{U}) =
+    \begin{pmatrix}
+        0,
+        \tau_{yx},
+        \tau_{yy},
+        \tau_{yz},
+        k \frac{\partial T}{\partial y}+\tau_{yx} u+\tau_{yy} v+\tau_{yz} w
+    \end{pmatrix}^{\Des{T}}
+\]
+\[
+    \Vector{F}^{\Des{v}}_z(\Vector{U}) =
+    \begin{pmatrix}
+        0,
+        \tau_{zx},
+        \tau_{zy},
+        \tau_{zz},
+        k \frac{\partial T}{\partial z}+\tau_{zx} u+\tau_{zy} v+\tau_{zz} w
+    \end{pmatrix}^{\Des{T}}
+\]
+\[
+    \Vector{\Phi} =
+    \begin{pmatrix}
+        0,
+        f^{\Des{b}}_x,
+        f^{\Des{b}}_y,
+        f^{\Des{b}}_z,
+        f^{\Des{b}}_x u + f^{\Des{b}}_y v + f^{\Des{b}}_z w
+    \end{pmatrix}^{\Des{T}}
+\]
+\[
+    \tau_{ij} = \mu\left(\frac{\partial V_i}{\partial x_j} + \frac{\partial V_j}{\partial x_i}-
+    \frac{2}{3}(\nabla\cdot\Vector{V}) \delta_{ij}\right)
+\]
+\[
+    e_{\Des{T}} = e+\frac{1}{2}(u^2+v^2+w^2)
+\]
+\[
+    e = C_v T = \frac{p}{(\gamma-1)\rho}
+\]
+\[
+    p = \rho RT
+\]
+\[
+    C_v = \frac{R}{\gamma-1}
+\]
+\[
+    C_p = \gamma C_v
+\]
+\[
+    k = \frac{C_p\mu}{Pr}
+\]
+\[
+    c = \sqrt{\gamma\frac{p}{\rho}}
+\]
+
+\subsubsection{Dimensional form}
+
+To use the equations (Eq.~\eqref{eq:NS}) in a dimensional form, the specific gas constant $R$ and the dynamical viscosity $\mu$ are dimensional parameters.
+
+\subsubsection{Dimensionless form}
+
+Dimensional variables
+\[
+    \tilde{x},\ \tilde{y},\ \tilde{z},\ \tilde{u},\ \tilde{v},\ \tilde{w},\ \tilde{t},\ \tilde{\rho},\ \tilde{T},\ \tilde{p},\ \tilde{e}_{\Des{T}},\ \tilde{e},\ \tilde{f}^{\Des{b}}_x,\ \tilde{f}^{\Des{b}}_y,\ \tilde{f}^{\Des{b}}_z
+\]
+Reference variables
+\[
+    L^*,\ U^*,\ \rho^*,\ T^*
+\]
+Nondimensionalized variables
+\[
+    \begin{gathered}
+        x = \frac{\tilde{x}}{L^*},\ y = \frac{\tilde{y}}{L^*},\ z = \frac{\tilde{z}}{L^*},\ u = \frac{\tilde{u}}{U^*},\ v = \frac{\tilde{v}}{U^*},\ w = \frac{\tilde{w}}{U^*}\\
+        t = \frac{\tilde{t}U^*}{L^*},\ \rho = \frac{\tilde{\rho}}{\rho^*},\ T = \frac{\tilde{T}}{T^*},\ p = \frac{\tilde{p}}{\rho^* {U^*}^2},\ e_{\Des{T}} = \frac{\tilde{e}_{\Des{T}}}{{U^*}^2},\ e = \frac{\tilde{e}}{{U^*}^2}\\
+        f^{\Des{b}}_x = \frac{\tilde{f}^{\Des{b}}_x}{\rho^* {U^*}^2 / L^*},\ f^{\Des{b}}_y = \frac{\tilde{f}^{\Des{b}}_y}{\rho^* {U^*}^2 / L^*},\ f^{\Des{b}}_z = \frac{\tilde{f}^{\Des{b}}_z}{\rho^* {U^*}^2 / L^*}
+    \end{gathered}
+\]
+Dimensional parameters
+\[
+    \tilde{\mu}, \ \tilde{R}
+\]
+Nondimensionalized parameters
+\[
+    \mu,\ R, \ C_v, \ C_p, \ c, \ k 
+\]
+Dimensionless parameters
+\[
+    Re, \ Pr, \ Ma
+\]
+Dimensionless parameters based on reference variables
+\[
+    Re_{\Des{ref}},\ Ma_{\Des{ref}}
+\]
+Constants
+\[
+    \gamma
+\]
+
+While preserving the original form of equations (Eq.~\eqref{eq:NS}) after normalization, the following parameters should be adopted for the nondimensionalized governing equations.
+\[
+    R = \frac{1}{\gamma Ma_{\Des{ref}}^2}
+\]
+\[
+    Ma_{\Des{ref}} = \frac{U^*}{\sqrt{\gamma \tilde{R} T^*}}
+\]
+\[
+    \mu = \frac{1}{Re_{\Des{ref}}}
+\]
+\[
+    Re_{\Des{ref}} = \frac{\rho^*U^*L^*}{\tilde{\mu}}
+\]
+
+
+\subsection{Nonconservative vector-matrix form}
+
+The conservative vector form of Navier--Stokes equations can be transformed into a nonconservative vector-matrix form, which is useful for analyzing the mathematical properties of the equations.
+
+Denote the vector of conservative variables and the vector of fluxes as
+\begin{equation}
+    \Vector{U} =
+    \begin{pmatrix}
+        u_1\\
+        \vdots\\
+        u_m\\
+        \vdots\\
+        u_M\\
+    \end{pmatrix}
+    ,\,\,
+    \Vector{F} = \Vector{F}(\Vector{U}) =
+    \begin{pmatrix}
+        f_1(u_1,\dotsc,u_m,\dotsc,u_M)\\
+        \vdots\\
+        f_m(u_1,\dotsc,u_m,\dotsc,u_M)\\
+        \vdots\\
+        f_M(u_1,\dotsc,u_m,\dotsc,u_M)\\
+    \end{pmatrix}
+\end{equation}
+where $\Vector{F}$ represents either a convective flux or a diffusive flux.
+
+The flux component $f_m$ is a multivariable function. After introducing vector notation for the multiple variables, it gives
+\begin{equation}
+    \mathrm{d} f_m = \frac{\partial f_m}{\partial u_n} \mathrm{d}u_n = (\nabla f_m)^{\Des{T}} \mathrm{d} \Vector{U}
+\end{equation}
+
+Since the flux vector $\Vector{F}$ is the vector notation of the set of multivariable functions, it has
+\begin{equation}
+    \mathrm{d} \Vector{F} = 
+    \begin{pmatrix}
+        \mathrm{d} f_1\\
+        \vdots\\
+        \mathrm{d} f_m\\
+        \vdots\\
+        \mathrm{d} f_M\\
+    \end{pmatrix}
+    =
+    \begin{pmatrix}
+        \frac{\partial f_1}{\partial u_1} & \cdots & \frac{\partial f_1}{\partial u_m} & \cdots & \frac{\partial f_1}{\partial u_M}\\
+        \vdots & \ddots & \vdots & \ddots & \vdots\\                                              
+        \frac{\partial f_m}{\partial u_1} & \cdots & \frac{\partial f_m}{\partial u_m} & \cdots & \frac{\partial f_m}{\partial u_M}\\
+        \vdots & \ddots & \vdots & \ddots & \vdots\\                                              
+        \frac{\partial f_M}{\partial u_1} & \cdots & \frac{\partial f_M}{\partial u_m} & \cdots & \frac{\partial f_M}{\partial u_M}\\
+    \end{pmatrix}
+    \begin{pmatrix}
+        \mathrm{d} u_1\\
+        \vdots\\
+        \mathrm{d} u_m\\
+        \vdots\\
+        \mathrm{d} u_M\\
+    \end{pmatrix}
+\end{equation}
+
+Then, it is straightforward to introduce the Jacobian matrices via vector differentiation
+\begin{equation} \label{eq:jacbian_diff}
+    \Matrix{A} = \frac{\mathrm{d} \Vector{F}(\Vector{U})}{\mathrm{d} \Vector{U}}, \,\, A_{mn} = \frac{\partial F_m}{\partial U_n}
+\end{equation}
+
+A nonconservative vector-matrix form of the governing equations can be obtained as
+\begin{equation}
+    \frac{\partial \Vector{U}}{\partial t} + \Matrix{A}_x\frac{\partial \Vector{U}}{\partial x} + \Matrix{A}_y\frac{\partial \Vector{U}}{\partial y} + \Matrix{A}_z\frac{\partial \Vector{U}}{\partial z} = \frac{\partial \Vector{F}^{\Des{v}}_x(\Vector{U})}{\partial x}+\frac{\partial \Vector{F}^{\Des{v}}_y(\Vector{U})}{\partial y}+\frac{\partial \Vector{F}^{\Des{v}}_z(\Vector{U})}{\partial z}+\Vector{\Phi}\\
+\end{equation}
+
+\section{Jacobian matrices}
+
+\subsection{Transformation}
+\[
+    \Vector{U} =
+    \begin{pmatrix}
+        u_1 \\
+        u_2 \\
+        u_3 \\
+        u_4 \\
+        u_5
+    \end{pmatrix}
+    =
+    \begin{pmatrix}
+        \rho\\
+        \rho u\\
+        \rho v\\
+        \rho w\\
+        \rho e_{\Des{T}}
+    \end{pmatrix}
+\]
+\[
+    \Vector{F}_x(\Vector{U}) =
+    \begin{pmatrix}
+        u_2 \\
+        \frac{u_2^2}{u_1}+(\gamma-1)[u_5-\frac{1}{2}\frac{u_2^2+u_3^2+u_4^2}{u_1}] \\
+        \frac{u_2u_3}{u_1} \\
+        \frac{u_2u_4}{u_1} \\
+        \frac{u_5u_2}{u_1}+(\gamma-1)[u_5-\frac{1}{2}\frac{u_2^2+u_3^2+u_4^2}{u_1}]\frac{u_2}{u_1}
+    \end{pmatrix}
+\]
+\[
+    \Vector{F}_y(\Vector{U}) =
+    \begin{pmatrix}
+        u_3 \\
+        \frac{u_3u_2}{u_1} \\
+        \frac{u_3^2}{u_1}+(\gamma-1)[u_5-\frac{1}{2}\frac{u_2^2+u_3^2+u_4^2}{u_1}] \\
+        \frac{u_3u_4}{u_1} \\
+        \frac{u_5u_3}{u_1}+(\gamma-1)[u_5-\frac{1}{2}\frac{u_2^2+u_3^2+u_4^2}{u_1}]\frac{u_3}{u_1}
+    \end{pmatrix}
+\]
+\[
+    \Vector{F}_z(\Vector{U}) =
+    \begin{pmatrix}
+        u_4 \\
+        \frac{u_4u_2}{u_1} \\
+        \frac{u_4u_3}{u_1} \\
+        \frac{u_4^2}{u_1}+(\gamma-1)[u_5-\frac{1}{2}\frac{u_2^2+u_3^2+u_4^2}{u_1}] \\
+        \frac{u_5u_4}{u_1}+(\gamma-1)[u_5-\frac{1}{2}\frac{u_2^2+u_3^2+u_4^2}{u_1}]\frac{u_4}{u_1}
+    \end{pmatrix}
+\]
+
+\subsection{Definition of parameter}
+\[
+    c = \sqrt{\gamma \frac{p}{\rho}}
+\]
+\[
+    q^2 = u^2 + v^2 + w^2
+\]
+\[
+    e = \frac{c^2}{\gamma(\gamma-1)}
+\]
+\[
+    e_{\Des{T}} = e+\frac{1}{2}q^2= \frac{c^2}{\gamma(\gamma-1)}+\frac{1}{2}q^2
+\]
+\[
+    h = e+\frac{p}{\rho} = \frac{c^2}{\gamma-1} = \gamma e
+\]
+\[
+    h_{\Des{T}} = e_{\Des{T}}+\frac{p}{\rho} = \gamma e + \frac{1}{2}q^2 = \gamma e_{\Des{T}} - \frac{1}{2}q^2(\gamma-1)
+\]
+\[
+    b= \frac{\gamma-1}{2c^2}
+\]
+
+\subsection{Jacobian matrix of convective flux}
+\[
+    \Matrix{A} = \frac{\mathrm{d} \Vector{F}(\Vector{U})} {\mathrm{d} \Vector{U}}, \ \ A_{ij} = \frac{\partial F_{i}}{\partial U_{j}}
+\]
+\[
+    \Matrix{A}_x =
+    \begin{bmatrix}
+        0 & 1 & 0 & 0 & 0 \\
+        -u^2+\frac{\gamma-1}{2}q^2 & 2u -(\gamma-1)u & -(\gamma-1)v & -(\gamma-1)w & \gamma-1 \\
+        -uv & v & u & 0 & 0 \\
+        -uw & w & 0 & u & 0 \\
+        -[\frac{c^2}{\gamma-1}+\frac{2-\gamma}{2}q^2]u & \frac{c^2}{\gamma-1}+\frac{1}{2}q^2-(\gamma-1)u^2 & -(\gamma-1)uv & -(\gamma-1)uw & \gamma u
+    \end{bmatrix}
+\]
+\[
+    \Matrix{A}_y =
+    \begin{bmatrix}
+        0 & 0 & 1 & 0 & 0 \\
+        -vu & v & u & 0 & 0 \\
+        -v^2+\frac{\gamma-1}{2}q^2 & -(\gamma-1)u & 2v-(\gamma-1)v & -(\gamma-1)w & \gamma-1 \\
+        -vw & 0 & w & v & 0 \\
+        -[\frac{c^2}{\gamma-1}+\frac{2-\gamma}{2}q^2]v & -(\gamma-1)vu & \frac{c^2}{\gamma-1}+\frac{1}{2}q^2-(\gamma-1)v^2 & -(\gamma-1)vw & \gamma v
+    \end{bmatrix}
+\]
+\[
+    \Matrix{A}_z =
+    \begin{bmatrix}
+        0 & 0 & 0 & 1 & 0 \\
+        -wu & w & 0 & u & 0 \\
+        -wv & 0 & w & v & 0 \\
+        -w^2+\frac{\gamma-1}{2}q^2 & -(\gamma-1)u & -(\gamma-1)v & 2w-(\gamma-1)w & \gamma-1 \\
+        -[\frac{c^2}{\gamma-1}+\frac{2-\gamma}{2}q^2]w & -(\gamma-1)wu & -(\gamma-1)wv & \frac{c^2}{\gamma-1}+\frac{1}{2}q^2-(\gamma-1)w^2 & \gamma w
+    \end{bmatrix}
+\]
+
+\section{Eigendecompositions}
+
+\subsection{Eigenvalue}
+\[
+    \Matrix{\Lambda}_x = {\Matrix{R}_x}^{-1}\Matrix{A}_x\Matrix{R}_x =
+    \begin{bmatrix}
+        u-c &  &  &  &  \\
+         & u &  &  &  \\
+         &  & u &  &  \\
+         &  &  & u &  \\
+         &  &  &  & u+c
+    \end{bmatrix}
+    \overset{\Def}{=}
+    \begin{bmatrix}
+        \lambda_x^1 &  &  &  &  \\
+         & \lambda_x^2 &  &  &  \\
+         &  & \lambda_x^3 &  &  \\
+         &  &  & \lambda_x^4 &  \\
+         &  &  &  & \lambda_x^5
+    \end{bmatrix}
+\]
+\[
+    \Matrix{\Lambda}_y = {\Matrix{R}_y}^{-1}\Matrix{A}_y\Matrix{R}_y =
+    \begin{bmatrix}
+        v-c &  &  &  &  \\
+         & v &  &  &  \\
+         &  & v &  &  \\
+         &  &  & v &  \\
+         &  &  &  & v+c
+    \end{bmatrix}
+    \overset{\Def}{=}
+    \begin{bmatrix}
+        \lambda_y^1 &  &  &  &  \\
+         & \lambda_y^2 &  &  &  \\
+         &  & \lambda_y^3 &  &  \\
+         &  &  & \lambda_y^4 &  \\
+         &  &  &  & \lambda_y^5
+    \end{bmatrix}
+\]
+\[
+    \Matrix{\Lambda}_z = {\Matrix{R}_z}^{-1}\Matrix{A}_z\Matrix{R}_z =
+    \begin{bmatrix}
+        w-c &  &  &  &  \\
+         & w &  &  &  \\
+         &  & w &  &  \\
+         &  &  & w &  \\
+         &  &  &  & w+c
+    \end{bmatrix}
+    \overset{\Def}{=}
+    \begin{bmatrix}
+        \lambda_z^1 &  &  &  &  \\
+         & \lambda_z^2 &  &  &  \\
+         &  & \lambda_z^3 &  &  \\
+         &  &  & \lambda_z^4 &  \\
+         &  &  &  & \lambda_z^5
+    \end{bmatrix}
+\]
+
+\subsection{Eigenvector}
+\[
+    \Matrix{R}_x = 
+    \begin{bmatrix}
+        1 & 1 & 0 & 0 & 1 \\
+        u-c & u & 0 & 0 & u+c \\
+        v & 0 & 1 & 0 & v \\
+        w & 0 & 0 & 1 & w \\
+        h_{\Des{T}}-uc & u^2-\frac{1}{2}q^2 & v & w & h_{\Des{T}}+uc
+    \end{bmatrix}
+\]
+\[
+    \Matrix{R}_y = 
+    \begin{bmatrix}
+        1 & 0 & 1 & 0 & 1 \\
+        u & 1 & 0 & 0 & u \\
+        v-c & 0 & v & 0 & v+c \\
+        w & 0 & 0 & 1 & w \\
+        h_{\Des{T}}-vc & u & v^2-\frac{1}{2}q^2 & w & h_{\Des{T}}+vc
+    \end{bmatrix}
+\]
+\[
+    \Matrix{R}_z = 
+    \begin{bmatrix}
+        1 & 0 & 0 & 1 & 1 \\
+        u & 1 & 0 & 0 & u \\
+        v & 0 & 1 & 0 & v \\
+        w-c & 0 & 0 & w & w+c \\
+        h_{\Des{T}}-wc & u & v & w^2-\frac{1}{2}q^2 & h_{\Des{T}}+wc
+    \end{bmatrix}
+\]
+
+\[
+    \Matrix{L}_x = {\Matrix{R}_x}^{-1} =
+    \begin{bmatrix}
+        \frac{1}{2}bq^2+\frac{1}{2c}u & -bu-\frac{1}{2c} & -bv & -bw & b \\
+        -bq^2+1 & 2bu & 2bv & 2bw & -2b \\
+        -bq^2v & 2bvu & 2bv^2+1 & 2bwv & -2bv \\
+        -bq^2w & 2bwu & 2bwv & 2bw^2+1 & -2bw \\
+        \frac{1}{2}bq^2 - \frac{1}{2c}u & -bu + \frac{1}{2c} & -bv & -bw & b
+    \end{bmatrix}
+\]
+\[
+    \Matrix{L}_y = {\Matrix{R}_y}^{-1} =
+    \begin{bmatrix}
+        \frac{1}{2}bq^2+\frac{1}{2c}v & -bu & -bv-\frac{1}{2c} & -bw & b \\
+        -bq^2u & 2bu^2+1 & 2bvu & 2bwu & -2bu \\
+        -bq^2+1 & 2bu & 2bv & 2bw & -2b \\
+        -bq^2w & 2bwu & 2bwv & 2bw^2+1 & -2bw \\
+        \frac{1}{2}bq^2 - \frac{1}{2c}v & -bu & -bv + \frac{1}{2c} & -bw & b
+    \end{bmatrix}
+\]
+\[
+    \Matrix{L}_z = {\Matrix{R}_z}^{-1} =
+    \begin{bmatrix}
+        \frac{1}{2}bq^2+\frac{1}{2c}w & -bu & -bv & -bw-\frac{1}{2c} & b \\
+        -bq^2u & 2bu^2+1 & 2bvu & 2bwu & -2bu \\
+        -bq^2v & 2bvu & 2bv^2+1 & 2bwv & -2bv \\
+        -bq^2+1 & 2bu & 2bv & 2bw & -2b \\
+        \frac{1}{2}bq^2 - \frac{1}{2c}w & -bu & -bv & -bw + \frac{1}{2c} & b
+    \end{bmatrix}
+\]
+
+Due to the important role of eigenvalues, it is useful to present the convective flux as a function of eigenvalues according to the relation:
+\[
+    \Vector{F} = \Matrix{A} \Vector{U} = \Matrix{R} \Matrix{\Lambda} \Matrix{R}^{-1} \Vector{U}
+\]
+which can be directly used for splitting the convective flux into subvectors associated with specified eigenvalue spectra \citep{steger1981flux}.
+
+\[
+    \Vector{F}_x =
+    \frac{\rho}{2\gamma}
+    \begin{pmatrix}
+        \lambda_x^1 + 2(\gamma-1)\lambda_x^2 + \lambda_x^5 \\
+        [\lambda_x^1 + 2(\gamma-1)\lambda_x^2 + \lambda_x^5]u + (\lambda_x^5-\lambda_x^1)c \\
+        [\lambda_x^1 + 2(\gamma-1)\lambda_x^3 + \lambda_x^5]v \\
+        [\lambda_x^1 + 2(\gamma-1)\lambda_x^4 + \lambda_x^5]w \\
+        [\lambda_x^1 + 2(\gamma-1)\lambda_x^2 + \lambda_x^5](\frac{1}{2}q^2) + (\lambda_x^1 + \lambda_x^5)h + (\lambda_x^5-\lambda_x^1)cu \\
+    \end{pmatrix}
+\]
+\[
+    \Vector{F}_y =
+    \frac{\rho}{2\gamma}
+    \begin{pmatrix}
+        \lambda_y^1 + 2(\gamma-1)\lambda_y^3 + \lambda_y^5 \\
+        [\lambda_y^1 + 2(\gamma-1)\lambda_y^2 + \lambda_y^5]u \\
+        [\lambda_y^1 + 2(\gamma-1)\lambda_y^3 + \lambda_y^5]v + (\lambda_y^5-\lambda_y^1)c \\
+        [\lambda_y^1 + 2(\gamma-1)\lambda_y^4 + \lambda_y^5]w \\
+        [\lambda_y^1 + 2(\gamma-1)\lambda_y^3 + \lambda_y^5](\frac{1}{2}q^2) + (\lambda_y^1 + \lambda_y^5)h + (\lambda_y^5-\lambda_y^1)cv \\
+    \end{pmatrix}
+\]
+\[
+    \Vector{F}_z =
+    \frac{\rho}{2\gamma}
+    \begin{pmatrix}
+        \lambda_z^1 + 2(\gamma-1)\lambda_z^4 + \lambda_z^5 \\
+        [\lambda_z^1 + 2(\gamma-1)\lambda_z^2 + \lambda_z^5]u \\
+        [\lambda_z^1 + 2(\gamma-1)\lambda_z^3 + \lambda_z^5]v \\
+        [\lambda_z^1 + 2(\gamma-1)\lambda_z^4 + \lambda_z^5]w + (\lambda_z^5-\lambda_z^1)c \\
+        [\lambda_z^1 + 2(\gamma-1)\lambda_z^4 + \lambda_z^5](\frac{1}{2}q^2) + (\lambda_z^1 + \lambda_z^5)h + (\lambda_z^5-\lambda_z^1)cw \\
+    \end{pmatrix}
+\]
+Unified form via a direction vector $\Vector{e} = (e_1, e_2, e_3)$
+\[
+    \Vector{F} =
+    \frac{\rho}{2\gamma}
+    \begin{pmatrix}
+        \lambda^1 + 2(\gamma-1)\lambda^2 + \lambda^5 \\
+        [\lambda^1 + 2(\gamma-1)\lambda^2 + \lambda^5]u + (\lambda^5-\lambda^1)c * e_1 \\
+        [\lambda^1 + 2(\gamma-1)\lambda^3 + \lambda^5]v + (\lambda^5-\lambda^1)c * e_2 \\
+        [\lambda^1 + 2(\gamma-1)\lambda^4 + \lambda^5]w + (\lambda^5-\lambda^1)c * e_3 \\
+        [\lambda^1 + 2(\gamma-1)\lambda^2 + \lambda^5](\frac{1}{2}q^2) + (\lambda^1 + \lambda^5)h + (\lambda^5-\lambda^1)c(u * e_1 + v * e_2 + w * e_3)\\
+    \end{pmatrix}
+\]
+
+\subsection{Vector space}
+
+Eigenvector sets $\{\Vector{L}_m\}$ and $\{\Vector{R}^m\}$ of the Jacobian matrix $\Matrix{A}$ are two orthogonal vector spaces in Euclidean space $\Set{R}^M$ admitting the fact that
+\[
+    \Vector{L}_m \cdot \Vector{R}^n = \delta_m^n, \,\, m, n = 1, \dotsc, M
+\]
+
+The vector $\Delta \Vector{U} = \Vector{U}_{\Des{R}} - \Vector{U}_{\Des{L}}$, which measures the strength of a jump discontinuity comprising a right state $\Vector{U}_{\Des{R}}$ and a left state $\Vector{U}_{\Des{L}}$, belongs to $\Set{R}^M$, therefore, it can be decomposed in the vector space $\{\Vector{R}^m\}$:
+\[
+    \Vector{U}_{\Des{R}} - \Vector{U}_{\Des{L}} = \sum_{m=1}^{M} \alpha_m \Vector{R}^m
+\]
+where $\alpha_m$ are decomposition or projection coefficients, which can be determined by
+\[
+    \alpha_m = \Vector{L}_m \cdot (\Vector{U}_{\Des{R}} - \Vector{U}_{\Des{L}})
+\]
+Define vector $\Vector{\alpha}$ as $\Vector{\alpha} = (\alpha_1, \dotsc, \alpha_M)^{\Des{T}}$, then equivalently,
+\[
+    \Vector{U}_{\Des{R}} - \Vector{U}_{\Des{L}} = \Matrix{R}\Vector{\alpha}
+\]
+Therefore, the jump in flux values has
+\[
+    \begin{aligned}
+        \Vector{F}_{\Des{R}} - \Vector{F}_{\Des{L}} &= \Matrix{A} (\Vector{U}_{\Des{R}} - \Vector{U}_{\Des{L}})\\ 
+                                    &= \Matrix{A} \Matrix{R} \Vector{\alpha} \\
+                                    &= \Matrix{R} \Matrix{\Lambda} \Matrix{R}^{-1} \Matrix{R} \Vector{\alpha} \\
+                                    &= \Matrix{R} \Matrix{\Lambda} \Vector{\alpha}\\
+                                    &= \sum_{m=1}^{M}\lambda_m\alpha_m \Vector{R}^m
+    \end{aligned}
+\]
+
+

@@ -1,0 +1,241 @@
+/****************************************************************************
+ *                              ArtraCFD                                    *
+ *                          <By Huangrui Mo>                                *
+ * Copyright (C) Huangrui Mo <huangrui.mo@gmail.com>                        *
+ * This file is part of ArtraCFD.                                           *
+ * ArtraCFD is free software: you can redistribute it and/or modify it      *
+ * under the terms of the GNU General Public License as published by        *
+ * the Free Software Foundation, either version 3 of the License, or        *
+ * (at your option) any later version.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Header Files
+ ****************************************************************************/
+#include "ensight.h"
+#include <stdio.h> /* standard library for input and output */
+#include <string.h> /* manipulating strings */
+#include "data_stream.h"
+#include "computational_geometry.h"
+#include "cfd_commons.h"
+#include "commons.h"
+/****************************************************************************
+ * Static Function Declarations
+ ****************************************************************************/
+static int ReadCaseFile(Time *, EnSet *);
+static int ReadStructuredData(Space *, const Model *, EnSet *);
+static int PointPolyDataReader(const Time *, Geometry *);
+static int PolygonPolyDataReader(const Time *, Geometry *);
+static int ReadPolygonPolyData(const int, const int, Geometry *, EnSet *);
+static int ReadPolyState(const int, const int, Geometry *, EnSet *);
+/****************************************************************************
+ * Function definitions
+ ****************************************************************************/
+int ReadStructuredDataEnsight(Time *time, Space *space, const Model *model)
+{
+    EnSet enSet = { /* initialize environment */
+        .rname = "field",
+        .bname = {'\0'},
+        .fname = {'\0'},
+        .str = {'\0'},
+        .fmt = "%s%05d",
+        .gtag = {'\0'},
+        .vtag = "*****",
+        .dtype = "block",
+        .part = {PIN, NPARTWRITE},
+        .scaN = 5,
+        .sca = {"rho", "u", "v", "w", "p"},
+        .vecN = 0,
+    };
+    snprintf(enSet.bname, sizeof(EnStr), enSet.fmt, enSet.rname, time->writeC); 
+    ReadCaseFile(time, &enSet);
+    ReadStructuredData(space, model, &enSet);
+    return 0;
+}
+static int ReadCaseFile(Time *time, EnSet *enSet)
+{
+    snprintf(enSet->fname, sizeof(EnStr), "%s.case", enSet->bname); 
+    FILE *filePointer = fopen(enSet->fname, "r");
+    if (NULL == filePointer) {
+        FatalError("failed to open case file...");
+    }
+    /* read information from file */
+    String currentLine = {'\0'}; /* store current line */
+    int nscan = 0; /* read conversion count */
+    ReadInLine(filePointer, "VARIABLE");
+    /* set format specifier according to the type of Real */
+    char format[25] = "%*s %*s %*s %*s %lg"; /* default is double type */
+    if (sizeof(Real) == sizeof(float)) { /* if set Real as float */
+        strncpy(format, "%*s %*s %*s %*s %g", sizeof format); /* float type */
+    }
+    Fgets(currentLine, sizeof currentLine, filePointer);
+    nscan = sscanf(currentLine, format, &(time->now)); 
+    VerifyReadConversion(nscan, 1);
+    Fgets(currentLine, sizeof currentLine, filePointer);
+    nscan = sscanf(currentLine, "%*s %*s %*s %*s %d", &(time->stepC)); 
+    VerifyReadConversion(nscan, 1);
+    fclose(filePointer); /* close current opened file */
+    return 0;
+}
+static int ReadStructuredData(Space *space, const Model *model, EnSet *enSet)
+{
+    FILE *filePointer = NULL;
+    EnReal data = 0.0; /* the Ensight data format */
+    const Partition *restrict part = &(space->part);
+    Node *const node = space->node;
+    Real *restrict U = NULL;
+    int idx = 0; /* linear array index math variable */
+    for (int s = 0; s < enSet->scaN; ++s) {
+        snprintf(enSet->fname, sizeof(EnStr), "%s.%s", enSet->bname, enSet->sca[s]);
+        filePointer = fopen(enSet->fname, "rb");
+        if (NULL == filePointer) {
+            FatalError("failed to open data file...");
+        }
+        Fread(enSet->str, sizeof(char), sizeof(EnStr), filePointer);
+        for (int p = enSet->part[MIN], pn = 1; p < enSet->part[MAX]; ++p, ++pn) {
+            Fread(enSet->str, sizeof(char), sizeof(EnStr), filePointer);
+            Fread(&pn, sizeof(int), 1, filePointer);
+            Fread(enSet->str, sizeof(char), sizeof(EnStr), filePointer);
+            for (int k = part->ns[p][Z][MIN]; k < part->ns[p][Z][MAX]; ++k) {
+                for (int j = part->ns[p][Y][MIN]; j < part->ns[p][Y][MAX]; ++j) {
+                    for (int i = part->ns[p][X][MIN]; i < part->ns[p][X][MAX]; ++i) {
+                        idx = IndexNode(k, j, i, part->n[Y], part->n[X]);
+                        U = node[idx].U[TO];
+                        Fread(&data, sizeof(EnReal), 1, filePointer);
+                        switch (s) {
+                            case 0: /* rho */
+                                U[0] = data;
+                                break;
+                            case 1: /* u */
+                                U[1] = U[0] * data;
+                                break;
+                            case 2: /* v */
+                                U[2] = U[0] * data;
+                                break;
+                            case 3: /* w */
+                                U[3] = U[0] * data;
+                                break;
+                            case 4: /* p */
+                                U[4] = 0.5 * (U[1] * U[1] + U[2] * U[2] + U[3] * U[3]) / U[0] + 
+                                    data / (model->gamma - 1.0);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+        fclose(filePointer); /* close current opened file */
+    }
+    return 0;
+}
+int ReadPolyDataEnsight(const Time *time, Geometry *geo)
+{
+    if (0 != geo->sphN) {
+        PointPolyDataReader(time, geo);
+    }
+    if (0 != geo->stlN) {
+        PolygonPolyDataReader(time, geo);
+    }
+    return 0;
+}
+static int PointPolyDataReader(const Time *time, Geometry *geo)
+{
+    EnSet enSet = { /* initialize environment */
+        .rname = "geo_sph",
+        .bname = {'\0'},
+        .fname = {'\0'},
+        .str = {'\0'},
+        .fmt = "%s%05d",
+        .gtag = "*****",
+        .vtag = "*****",
+        .dtype = "coordinates",
+        .part = {0, 1},
+        .scaN = 0,
+        .vecN = 0,
+    };
+    snprintf(enSet.bname, sizeof(EnStr), enSet.fmt, enSet.rname, time->writeC); 
+    ReadPolyState(0, geo->sphN, geo, &enSet);
+    return 0;
+}
+static int PolygonPolyDataReader(const Time *time, Geometry *geo)
+{
+    EnSet enSet = { /* initialize environment */
+        .rname = "geo_stl",
+        .bname = {'\0'},
+        .fname = {'\0'},
+        .str = {'\0'},
+        .fmt = "%s%05d",
+        .gtag = "*****",
+        .vtag = "*****",
+        .dtype = "coordinates",
+        .part = {geo->sphN, geo->totN},
+        .scaN = 0,
+        .vecN = 0,
+    };
+    snprintf(enSet.bname, sizeof(EnStr), enSet.fmt, enSet.rname, time->writeC); 
+    ReadPolygonPolyData(geo->sphN, geo->totN, geo, &enSet);
+    return 0;
+}
+static int ReadPolygonPolyData(const int start, const int end, Geometry *geo, EnSet *enSet)
+{
+    snprintf(enSet->fname, sizeof(EnStr), "%s.geo", enSet->bname); 
+    FILE *filePointer = fopen(enSet->fname, "rb");
+    if (NULL == filePointer) {
+        FatalError("failed to open data file...");
+    }
+    EnReal data = 0.0; /* the Ensight data format */
+    Polyhedron *poly = NULL;
+    int ne = 0; /* total number of nodes in a part */
+    int nscan = 0; /* read conversion count */
+    Fread(enSet->str, sizeof(char), sizeof(EnStr), filePointer);
+    Fread(enSet->str, sizeof(char), sizeof(EnStr), filePointer);
+    Fread(enSet->str, sizeof(char), sizeof(EnStr), filePointer);
+    Fread(enSet->str, sizeof(char), sizeof(EnStr), filePointer);
+    Fread(enSet->str, sizeof(char), sizeof(EnStr), filePointer);
+    for (int p = enSet->part[MIN], pn = 1; p < enSet->part[MAX]; ++p, ++pn) {
+        poly = geo->poly + p;
+        Fread(enSet->str, sizeof(char), sizeof(EnStr), filePointer);
+        Fread(&pn, sizeof(int), 1, filePointer);
+        Fread(enSet->str, sizeof(char), sizeof(EnStr), filePointer);
+        nscan = sscanf(enSet->str, "%d %d %d", &(poly->vertN), &(poly->edgeN), &(poly->faceN)); 
+        VerifyReadConversion(nscan, 3);
+        Fread(enSet->str, sizeof(char), sizeof(EnStr), filePointer);
+        Fread(&ne, sizeof(int), 1, filePointer);
+        AllocatePolyhedronMemory(poly->vertN, poly->edgeN, poly->faceN, poly);
+        poly->edgeN = 0; /* reset edge count before applying edge adding */
+        for (int s = 0; s < DIMS; ++s) {
+            for (int n = 0; n < poly->vertN; ++n) {
+                Fread(&data, sizeof(EnReal), 1, filePointer);
+                poly->v[n][s] = data;
+            }
+        }
+        Fread(enSet->str, sizeof(char), sizeof(EnStr), filePointer);
+        Fread(&ne, sizeof(int), 1, filePointer);
+        for (int n = 0, m = 0; n < poly->faceN; ++n) {
+            for (int s = 0; s < POLYN; ++s) {
+                Fread(&m, sizeof(int), 1, filePointer);
+                poly->f[n][s] = m - 1;
+            }
+            AddEdge(poly->f[n][0], poly->f[n][1], n, poly); 
+            AddEdge(poly->f[n][1], poly->f[n][2], n, poly); 
+            AddEdge(poly->f[n][2], poly->f[n][0], n, poly); 
+        }
+        QuickSortEdge(poly->edgeN, poly->e);
+    }
+    ReadPolyState(start, end, geo, enSet);
+    return 0;
+}
+static int ReadPolyState(const int start, const int end, Geometry *geo, EnSet *enSet)
+{
+    snprintf(enSet->fname, sizeof(EnStr), "%s.state", enSet->bname); 
+    FILE *filePointer = fopen(enSet->fname, "r");
+    if (NULL == filePointer) {
+        FatalError("failed to open data file...");
+    }
+    ReadPolyhedronStateData(start, end, filePointer, geo);
+    fclose(filePointer); /* close current opened file */
+    return 0;
+}
+/* a good practice: end file with a newline */
+

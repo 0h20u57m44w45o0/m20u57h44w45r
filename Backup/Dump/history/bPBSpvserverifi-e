@@ -1,0 +1,42 @@
+#!/bin/bash
+
+#- start an interactive session on a compute node with salloc
+#- the maximum run time of an interactive job is 3 hours.
+#- run graphical programs interactively by adding the --x11 flag
+#- must first connect with ssh -Y useid@machine_name
+
+#- Step 1: install the same ParaView version as the one on the cluster,
+#- and connect the compute node
+ssh morui@graham.sharcnet.ca
+
+#- Step 2 option 1: start a serial GPU server
+salloc --time=0:30:0 --ntasks=1 --gres=gpu:1 --account=def-fslien
+#- load the ParaView GPU+EGL module, change display variable
+#- to not use the X11 rendering context, and start the ParaView server
+module load paraview-offscreen-gpu/5.4.0
+unset DISPLAY
+pvserver
+
+#- Step 2 option 2: start a MPI CPU server
+salloc --time=0:30:0 --ntasks=4 --account=def-fslien
+#-  "--mesa" to enable automatic detection of the best software rendering option.
+module load paraview-offscreen/5.4.0
+srun pvserver --mesa
+
+#- Step 4: wait for the server to be ready to accept client connection.
+#- Make a note of the node and the port and in another terminal on your laptop
+#- link the port on your laptop and the same port on the compute node. 
+ssh morui@graham.sharcnet.ca -L 11111:gra257:11111
+
+#- Step 5: start ParaView on your laptop, go to File -> Connect -> Add Server ->
+#- name = graham, server type = Client/Server, host = localhost, port = 11111,
+#- then click Configure -> Manual -> Save -> Connect.
+
+#- Step 6: Open a file in ParaView and visualize it as usual. An important setting in
+#- ParaView's preferences is Render View -> Remote/Parallel Rendering Options -> Remote
+#- Render Threshold. If set to default (20MB) or similar, small rendering will be done
+#- on laptop's GPU, the rotation with a mouse will be fast, but anything modestly
+#- intensive (under 20MB) will be shipped to your laptop and visualization might be slow.
+#- If set to 0MB, all rendering will be remote including rotation, so you will be really
+#- using the cluster's GPU for everything, which is good for large data processing but not
+#- so good for interactivity. Experiment with the threshold to find a suitable value.

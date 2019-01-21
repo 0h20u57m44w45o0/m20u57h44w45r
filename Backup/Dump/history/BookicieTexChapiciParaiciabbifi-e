@@ -1,0 +1,577 @@
+\chapter{Serial Programming}
+
+\section{References}
+
+\begin{itemize}
+    \item C wikibook
+    \item Practical C Programming by Steve Oualline
+    \item Expert C Programming: Deep C Secrets by Peter van der Linden
+    \item The Practice of Programming by Brian W. Kernighan and Rob Pike
+    \item Effective C++ by Scott Meyers
+    \item More Effective C++ by Scott Meyers
+    \item Writing Scientific Software: A Guide to Good Style, by Suely Oliveira
+    \item C Header File Guidelines by David Kieras
+    \item Tips for Optimizing C/C++ Code by Clemson
+    \item How to loop through multidimensional arrays quickly by Nadeau software
+    \item How expensive is an operation on a CPU by Vincent Hindriksen
+    \item Performance Tuning with the RESTRICT Keyword by David H Bartley
+\end{itemize}
+
+C Textbooks
+
+\begin{itemize}
+    \item Reference Style
+        \begin{itemize}
+            \item The C Programming Language by Brian W. Kernighan and Dennis M. Ritchie
+        \end{itemize}
+    \item Beginner
+        \begin{itemize}
+            \item C wikibook
+            \item Practical C Programming by Steve Oualline
+            \item C Programming: A Modern Approach by K. N. King
+        \end{itemize}
+    \item Intermediate
+        \begin{itemize}
+            \item Algorithms in C by Robert Sedgewick
+            \item Numeric recipe in C
+        \end{itemize}
+    \item Above intermediate
+        \begin{itemize}
+            \item Expert C Programming: Deep C Secrets by Peter van der Linden
+        \end{itemize}
+    \item Software engineering
+        \begin{itemize}
+            \item The Practice of Programming by Brian W. Kernighan and Rob Pike
+            \item Advanced Programming in the UNIX Environment
+        \end{itemize}
+    \item Writing scientific software
+        \begin{itemize}
+            \item A Guide to Good Style, by Suely Oliveira
+        \end{itemize}
+\end{itemize}
+
+\section{Programming style}
+
+The basic principles-simplicity, clarity, generality-that form the bedrock of good software. These underlying, interrelated principles apply at all levels of computing. These include simplicity, which keeps programs short and manageable; clarity, which makes sure they are easy to understand,for people as well as machines; generality, which means they work well in a broad range of situations and adapt well as new situations arise; and automation, which lets the machine do the work for us, freeing us from mundane tasks.
+
+The purpose of style is to make the code easy to read for yourself and others, and good style is crucial to good programming. The key observation is that good style should be a matter of habit. If you think about style as you write code originally, and if you take the time to revise and improve it, you will develop good habits. Once they become automatic, your subconscious will take care of many of the details for you, and even the code you produce under pressure will be better.
+
+There is more to writing a program than getting the syntax right, fixing the bugs, and making it run fast enough. Programs are read not only by computers but also by programmers. A well-written program is easier to understand and to modify than a poorly-written one. The discipline of writing well leads to code that is more likely to be correct. Fortunately, this discipline is not hard.
+
+The principles of programming style are based on common sense guided by experience, not on arbitrary rules and prescriptions. Code should be clear and simple -- straightforward logic, natural expression, conventional language use, meaningful names, neat formatting, helpful comments -- and it should avoid clever tricks and unusual constructions. Consistency is important because others will find it easier to read your code, and you theirs, if you all stick to the same style. Details may be imposed by local conventions, management edict, or a program, but even if not, it is best to obey a set of widely shared conventions.
+
+\begin{itemize}
+    \item Always immediately initialize variables in their definitions. Use \verb|0| for integers, \verb|0.0| for reals, \verb|NULL| for pointers, \verb|'\0'| for chars, \verb|{'\0'}| for string arrays.
+    \item Put one variable declaration per line, and comment its role. Comment functions and global data. Comments are meant to help the reader of a program. They do not help by saying things the code already plainly says, or by contradicting the code, or by distracting the reader with elaborate typographical displays. The best comments aid the understanding of a program by briefly pointing out salient details or by providing a lager-scale view of the proceedings. Comments should add something that is not immediately evident from the code, or collect into one place information that is spread through the source. When something subtle is happening, a comment may clarify, but if the actions are obvious already, restating them in words is pointless. Comments are meant to help a reader understand pans of the program that are not readily understood from the code itself. As much as possible, write code that is easy to understand; the better you do this, the fewer comments you need. Good code needs fewer comments than bad code.
+    \item Sometimes code is genuinely difficult, perhaps because the algorithm is complicated or the data structures are intricate. In that case, a comment that points to a source of understanding can aid the reader. It may also be valuable to suggest why particular decisions were made. A helpful comment cites the reference, briefly describes the data used, indicates the performance of the algorithm, and tells how and why the original algorithm has been modified.
+    \item Give names to magic numbers. Magic numbers are the constants, array sizes, character positions, conversion factors, and other literal numeric values that appear in programs. As a guideline, any number other than 0 or 1 is likely to be magic and should have a name of its own. A raw number in program source gives no indication of its importance or derivation, making the program harder to understand and modify. At the very least, each name indicates the role of the specific value in the program.
+    \item Define numbers as constants, not macros. The C preprocessor is a powerful but blunt tool, and macros are a dangerous way to program because they change the lexical structure of the program underfoot. For integer numbers, \verb|enum| statement can be used to define constants. An enumerator with $=$ defines its enumeration constant as the value of the constant expression. Using enum member as an array size will not result a variable length array since enumeration constants are constant expressions, and if the size is an integer constant expression and the element type has a known constant size, the resulting array type is not a variable length array type. For decimal numbers, use const definitions and extern declarations to define global constants.
+    \item Avoid function macros. There is a tendency among older C programmers to write macros instead of functions for very short computations that will be executed frequently. This argument was weak even when C was first defined, a time of slow machines and expensive function calls; today it is irrelevant. With modern machines and compilers, the drawbacks of function macros outweigh their benefits.
+    \item Avoid global variables; wherever possible it is better to pass references to all data through function arguments.
+    \item Be aware of pointers. Always assigning a valid memory location to the pointer before dereferencing the pointer. Otherwise, there will be a segmentation error.
+    \item Be aware of string manipulations, most string functions will have undefined behavior if memory locations of input objects overlap.
+    \item The function scanf has poor end-of-line handling. Instead, use fgets to read a line of input and sscanf to process it. Use a large enough number when using fgets to ensure reading a whole line at a time. fgets will get the entire line including the newline character (\verb|\n|). sscanf can correctly handle any space in the target string as well as in the format specifier, therefore, no need to parse those lines that will be processed by sscanf. sscanf treats whitespace as separator rather than character. In fprintf(), the rvalue type promotions are expected. \verb|%f| and \verb|%g| actually correspond to parameters of type double. Thus in fprintf() there is no difference between \verb|%f| and \verb|%lf|, or between \verb|%g| and \verb|%lg|. However, in sscanf() what is passed is a pointer to the variable so no rvalue type promotions occur or are expected. Thus \verb|%f| and \verb|%lf| are quite different in sscanf, but the same in fprintf. Consequently, we need to use \verb|%g| for float and \verb|%lg| for double in sscanf. It doesn't matter which you use for fprintf because the fprintf library function treats them as synonymous, but it's crucial to get it right for sscanf. 
+    \item Assignment operators always have spaces around them, $x \ = \ 0$; Other binary operators usually have spaces around them, $v \ = \ w \ * \ x$; Parentheses should have no internal padding, $v \ = \ w \ * \ (x \ + \ z)$; No spaces separating unary operators and their arguments, $x \ = \ -5$.
+    \item Indent to show structure. A consistent indentation style is the lowest-energy way to make a program's structure self-evident. Use a consistent indentation and brace style.
+    \item Minimize use of vertical whitespace. Don't use blank lines when you don't have to. Blank lines at the beginning or end of a function very rarely help readability.
+    \item When defining a function, parameter order is: inputs, then outputs.
+    \item Avoid side effects, such as do not use assignment statements in \verb|if| condition, should use $++$ and $--$ on lines by themselves.
+    \item Always use the prefix version of $++$ and $--$ ($++x$, $--x$) instead of the postfix version ($x++$, $x--$).
+    \item Remember that there are only two precedence levels to remember in C: multiplication and division come before addition and subtraction. Everything else should be in parentheses. 
+    \item Avoid complex logic like multiple nested \verb|if|s. Consider splitting your code into multiple procedures to decrease the level of complexity.
+    \item Parenthesize to resolve ambiguity. Parentheses specify grouping and can be used to make the intent clear even when they are not required.
+    \item Variables should be declared as locally as possible:
+        \begin{itemize}
+            \item declare non-constant variables used throughout the function at top.
+            \item declare constant variables when their values can be determined.
+            \item declare variables that are used in only a local scope of the function at the point where they are needed, e.g., loop counts.
+        \end{itemize}
+    \item Use \verb|const| whenever possible to provide compiler-enforced protection from unintended writes to read-only data.
+        \begin{itemize}
+            \item Declare variables that should not be changed after initialization as const:
+
+                \verb|const double pi = 3.14;|
+            \item Two ways of declaring a const pointer: 
+                \begin{itemize}
+                    \item The target address which the pointer points to is fixed, but the content in the address can be changed: 
+
+                        \verb|double *const pointer;| /* const pointer but non-const data */ 
+
+                        Use const pointer to a large compound variable type is useful for storage that can be changed in value but not moved in memory, since address of the storage is fixed, then the pointer can be const.
+                    \item The pointer itself can be changed but the data it points to cannot be changed.
+
+                        \verb|const double *pointer;| /* const data but non-const pointer */
+
+                        Large compound user-defined variable types ('structures' in C and 'classes' in C++) should always be passed by reference or pointer instead of as a copy. Use a pointer point to const value can pass the variable without value copying and also prevent the value being altered.
+                    \item Pointer to array with const qualifier: For \verb|int array[9];|, \verb|const int (*arr)[9] = &array;|, C standard says that: If the specification of an array type includes any type qualifiers, the element type is so-qualified, not the array type. Therefore, in case of \verb|const int (*arr)[n]|, const is applied to the elements of the array instead of array arr itself. arr is of type pointer to array[n] of const int while you are passing a parameter of type pointer to array[n] of int. Both types are incompatible. How do I apply const correctness to array pointers passed as parameters? Is it at all possible? It's not possible. There is no way to do this in standard C without using explicit cast.
+                \end{itemize}
+        \end{itemize}
+\end{itemize}
+
+\subsection{Names}
+
+\begin{itemize}
+    \item A variable or function name labels an object and conveys information about its purpose. A name should be informative, concise, memorable, and pronounceable if possible. Much information comes from context and scope; the broader the scope of a variable, the more information should be conveyed by its name.
+    \item The most important consistency rules are those that govern naming. The style of a name immediately informs us what sort of thing the entity is: a type, a variable, a function, a constant, a macro without requiring us to search for the declaration of that entity. The pattern-matching engine in our brains relies a great deal on these naming rules. 
+    \item Use descriptive names for globals, short names for locals. Global variables, by definition, can crop up anywhere in a program, so they need names long enough and descriptive enough to remind the reader of their meaning. It's also helpful to include a brief comment with the declaration of each global. By contrast, shorter names suffice for local variables; within a function, n may be sufficient, npoints is fine, and numberofPoints is overkill. Local variables used in conventional ways can have very short names. The use of i and j for loop indices, p and q for pointers, and s and t for strings is so frequent that there is little profit and perhaps some loss in longer names. Programmers are often encouraged to use long variable names regardless of context. That is a mistake: clarity is often achieved through brevity.
+    \item Function names, structures, and filenames should be descriptive to suggest their role in a program; Eschew abbreviation.
+    \item Use active names for functions. Function names should be based on active verbs, perhaps followed by nouns, such as GetTime(). Functions that return a boolean (true or false) value should be named so that the return value is unambiguous, such as IsOctal(), because it makes clear that the function returns true if the argument is octal and false if not, rather than CheckOctal(), because it does not indicate which value is true and which is false.
+    \item Filenames should be all lowercase and can include underscores.
+    \item The names of all types such as classes, structs, typedefs, and enums have the same naming convention: Type names should start with a capital letter and have a capital letter for each new word. No underscores. For example, MyExcitingStruct, MyExcitingEnum.
+    \item The names of variables and data members are all begin with lowercase and have a capital letter for each new word, with or without underscores.
+    \item The names of vectors and tensors start with a capital letter and only have a single descriptive word.
+    \item Functions should start with a capital letter and have a capital letter for each new word. No underscores.
+    \item Accessors and mutators (get and set functions) should match the name of the variable they are getting and setting.
+\end{itemize}
+
+\section{Algorithms and data structures}
+
+\subsection{Data types}
+
+C provides the programmer with a rich set of data types. Through the use of structures, unions, and enumerated types, the programmer can extend the language with new types. A structure is used to define a compound data type with several data fields. Each field takes up a separate storage location. Structures can be combined with arrays and pointers to create very complex and powerful data structures.
+
+A union is similar to a structure; however, it defines a single location that can be given many different field names. The enumerated data type is designed for variables that contain only a limited set of values. These values are referenced by name (tag). The compiler assigns each tag an integer value internally.
+
+\subsection{Arrays}
+
+In specialized areas like graphics, databases, parsing, numerical analysis, and simulation, the ability to solve problems depends critically on state-of-the-art algorithms and data structures. Every program depends on algorithms and data structures, but few programs depend on the invention of brand new ones. Most of the data structures are arrays, lists, trees, and hash tables. When a program needs something more elaborate, it will likely be based on these simpler ones. Accordingly, for most programmers, the task is to know what appropriate algorithms and data structures are available and to understand how to choose among alternatives.
+
+Nothing beats an array for storing static tabular data. When sorting and searching, for a lager array, it's more efficient to use the quicksort algorithm and the binary search algorithm. The standard libraries for C and C++ include sort and search functions that should be robust against adverse inputs, and tuned to run as fast as possible. In C, the library function for sorting is named qsort and for searching is named bsearch, and we need to provide a comparison function to be called by them whenever it needs to compare two values. Since the values might be of any type, the comparison function is handed by void pointers to the data items to be compared. The function casts the pointers to the proper type, extracts the data values, compares them, and returns the result (negative, zero, or positive according to whether the first value is less than, equal to, or greater than the second).
+
+The arrays have been static, with their size and contents fixed at compile time. If the flabby word or HTML character tables were to be modified at run-time, a hash table would be a more appropriate data structure. Growing a sorted array by inserting n elements one at a time is an $O(n^2)$ operation that should be avoided if n is large. Often, though, we need to keep track of a variable but small number of things, and arrays can still be the method of choice. To minimize the cost of allocation, the array should be resized in chunks, and for cleanliness the array should be gathered together with the information necessary to maintain it. In C, we can achieve this with a struct. memmove is a standard library routine for copying arbitrary-sized blocks of memory. The ANSI C standard defines two functions: memcpy, which is fast but might over- write memory if source and destination overlap; and memmove, which might be slower but will always be correct. We prefer to use memmove because it avoids the easy-to-make mistake of copying the elements in the wrong order. If we were inserting instead of deleting, the loop would need to count down, not up, to avoid overwriting elements. By calling memmove we don't need to think it through each time.
+
+For fixed-size data sets, which can even be constructed at compile time, or for guaranteed small collections of data, arrays are unbeatable. But maintaining a changing set of values in an array can be expensive, so if the number of elements is unpredictable and potentially large, it may be better to use another data structure.
+
+\subsection{Lists}
+
+Next to arrays, lists are the most common data structure in typical programs. There are several important differences between arrays and lists. First, arrays have fixed size but a list is always exactly the size it needs to be to hold its contents, plus some per-item storage overhead to hold the pointers. Second, lists can be rearranged by exchanging a few pointers. which is cheaper than the block move necessary in an array. Finally, when items are inserted or deleted the other items aren't moved; if we store pointers to the elements in some other data structure, they won't be invalidated by changes to the list.  These differences suggest that if the set of items will change frequently, particularly if the number of items is unpredictable, a list is the way to store them; by comparison, an array is better for relatively static data.
+
+The usual way lists are used in C is to start with a struct type for the elements and add a pointer that links to the next element. It's difficult to initialize a non-empty list at compile time, so, unlike arrays, lists are constructed dynamically. Even if the list is sorted, we need to walk along the list to get to a particular element. Binary search does not apply to lists. Besides being suitable for situations where there are insertions and deletions in the middle, lists are good for managing unordered data of fluctuating size, especially when access tends to be last-in-first-out (LIFO), as in a stack. They make more effective use of memory than arrays do when there are multiple stacks that grow and shrink independently. They also behave well when the information is ordered intrinsically as a chain of unknown a priori size, such as the successive words of a document. If you must combine frequent update with random access, however, it would be wiser to use a less insistently linear data structure, such as a tree or hash table.
+
+\subsection{Trees}
+
+A tree is a hierarchical data structure that stores a set of items in which each item has a value, may point to zero or more others, and is pointed to by exactly one other. The root of the tree is the sole exception; no item points to it. There are many types of trees that reflect complex structures, such as parse trees that capture the syntax of a sentence or a program, or family trees that describe relationships among people. We will illustrate the principles with binary search trees, which have two links at each node. They're the easiest to implement, and demon- strate the essential properties of trees. A node in a binary search tree has a value and two pointers, 1 e f t and right, that point to its children. The child pointers may be null if the node has fewer than two children. In a binary search tree, the values at the nodes define the tree: all children to the left of a particular node have lower values, and all children to the right have higher values. Because of this property, we can use a variant of binary search to search the tree quickly for a specific value or determine that it is not present.
+
+With multiple pointers to other elements in each node of a tree, many operations that take time O(n) in lists or arrays require only O(1ogn) time in trees. The multiple pointers at each node reduce the time complexity of operations by reducing the number of nodes one must visit to find an item. A tree in which each path from the root to a leaf has approximately the same length is called balanced. The advantage of a balanced tree is that searching it for an item is an O(1ogn) process, since, as in binary search, the number of possibilities is halved at each step. If items are inserted into a tree as they arrive, the tree might not be balanced; in fact, it might be badly unbalanced. If the elements arrive already sorted, for instance, the code will always descend down one branch of the tree, producing in effect a list down the right links, with all the performance problems of a list. It is complicated to implement trees that are guaranteed to be balanced; this is one reason there are many kinds of trees. For our purposes, we'll just sidestep the issue and assume that incoming data is sufficiently random to keep the tree balanced enough.
+
+There are a couple of things to notice about lookup and insert. First, they look remarkably like the binary search algorithm. This is no accident, since they share an idea with binary search: divide and conquer, the origin of logarithmic-time performance.
+
+\subsection{Hash Tables}
+
+Hash tables are one of the great inventions of computer science. They combine arrays, lists, and some mathematics to create an efficient structure for storing and retrieving dynamic data. The typical application is a symbol table, which associates some value (the data) with each member of a dynamic set of strings (the keys). Your favorite compiler almost certainly uses a hash table to manage information about each variable in your program. Your web browser may well use a hash table to keep track of recently-used pages, and your connection to the Internet probably uses one to cache recently-used domain names and their IP addresses.
+
+The idea is to pass the key through a hash function to generate a hash value that will be evenly distributed through a modest-sized integer range. The hash value is used to index a table where the information is stored. In practice, the hash function is pre-defined and an appropriate size of array is allocated, often at compile time. Each element of the array is a list that chains together the items that share a hash value. In other words, a hash table of n items is an array of lists whose average length is n/(array size). Retrieving an item is an O(1) operation provided we pick a good hash function and the lists don't grow too long.
+
+Hash tables are excellent for symbol tables, since they provide expected O(1) access to any element. They do have a few limitations. If the hash function is poor or the table size is too small, the lists can grow long. Since the lists are unsorted, this leads to O (n) behavior. The elements are not directly accessible in sorted order, but it is easy to count them, allocate an array, fill it with pointers to the elements, and sort that. Still, when used properly, the constant-time lookup, insertion, and deletion properties of a hash table are unmatched by other techniques.
+
+\subsection{Information flow}
+
+\begin{itemize}
+    \item Solving a problem numerically on computers has two key steps
+        \begin{enumerate}
+            \item Algorithm development: Devise a clear step-by-step solution strategy for the problem based on formal logic. This stage may include problem definition, mathematical modeling, numerical discretization. At the end of this stage, the solution is already determined by the algorithm devised but has not be obtained in a specific form.
+            \item Algorithm implementation: Translate the algorithm into source code, which is to express the solution strategy in a way that can be understood by computer. When being executed by computer, the specific form of solution is obtained. Therefore, programming is not to devise the solution strategy but is only to do the "translation". To be a good translator, the information flow and the structure of the code shall resemble those in the original mathematical formulation as closely as possible, to minimize mistakes and to improve readability. In order to obtain a well-structured program with high level of abstraction, a very critical step is to express every major item in the governing equations using a function. Using function calls for computing each major item can greatly simplify the translation process.
+        \end{enumerate}
+    \item There are only two essential elements in any programs: data (variables) $+$ instructions (code or functions). Variables are the basic building blocks of a program. Instructions describe the operations on the input data to obtain the output data. In analogy to Mechanical Engineering, input data is the raw material; instructions are the manufacturing operations; output data is the product.
+
+        {Input data (raw materials) } $\xrightarrow{\text{ Instructions (manufacuring operations) }}$ {Output data (product)}
+
+        {Preprocessing} $\to$ {Solve} $\to$ {Postprocessing}
+
+        The design of the data structures is the central decision in the creation of a program. Once the data structures are laid out, the algorithms tend to fall into place, and the coding is comparatively easy.
+
+        The design of a program is rooted in the layout of its data. The data structures don't define every detail, but they do shape the overall solution. It's hard to design a program completely and then build it; constructing real programs involves iteration and experimentation. The act of building forces one to clarify decisions that had previously been glossed over. As much as possible, start with something simple and evolve it as experience dictates. We find it best to start detailed design with data structures, guided by knowledge of what algorithms might be used; with the data structures settled, the code goes together easily.
+    \item Program should read like an essay. It should be as clear and easy to understand as possible. Always comment your programs, which helps you organize your thoughts while making you work an art rather than a junk.
+    \item A program should be as simple as possible. A programmer should avoid clever tricks. Be clear. Programmers' endless creative energy is sometimes used to write the most concise code possible, or to find clever ways to achieve a result. Sometimes these skills are misapplied, though, since the goal is to write clear code, not clever code.
+\end{itemize}
+
+\subsection{Coding principles for numerical solutions of PDEs}
+
+\begin{itemize}
+    \item The structure of the code should strictly resemble the structure of the mathematical formulation. For example, the data flow in the code should follow the data flow in the mathematical formulation. The function hierarchy in the code should follow the function hierarchy in the mathematical formulation; and the function definition and content in the code should be the same as those in the mathematical formulation. 
+    \item The code verification should be thorough. Start from simple problems that numerical methods could solve exactly, such as uniform or linearly distributed smooth initial data. In these simple problems, the truncation error would be zero since the high order derivatives are all zero. Therefore, numerical methods would solve these problems exactly. 
+    \item Convergence test should be conducted to evaluate convergence rate. The employed grids should be successively refined with grid number successively doubled. The chosen problem should be smooth enough to avoid influence from discontinuities.
+\end{itemize}
+
+\section{Interfaces}
+
+The essence of design is to balance competing goals and constraints. Among the issues to be worked out in a design are
+\begin{itemize}
+    \item Interfaces: what services and access are provided? The interface is in effect a contract between supplier and customer. The desire is to provide services that are uniform and convenient, with enough functionality to be easy to use but not so much as to become unwieldy.
+    \item Information hiding: what information is visible and what is private? An interface must provide straightforward access to the components while hiding details of the implementation so they can be changed without affecting users.
+    \item Resource management: who is responsible for managing memory and other limited resources? Here, the main problems are allocating and freeing storage, and managing shared copies of information.
+    \item Error handling: who detects errors, who reports them, and how? When an error is detected, what recovery is attempted?
+\end{itemize}
+
+Good interfaces follow a set of principles. These are not independent or even consistent, but they help us describe what happens across the boundary between two pieces of software.
+
+Hide implementation details. The implementation behind the interface should be hidden from the rest of the program so it can be changed without affecting or breaking anything. There are several terms for this kind of organizing principle; information hiding, encapsulation, abstraction, modularization, and the like all refer to related ideas. An interface should hide details of the implementation that are irrelevant to the client (user) of the interface. Details that are invisible can be changed without affecting the client, perhaps to extend the interface, make it more efficient, or even replace its implementation altogether.
+
+Choose a small orthogonal set of primitives. An interface should provide as much functionality as necessary but no more, and the functions should not overlap excessively in their capabilities.
+
+Do the same thing the same way everywhere. Consistency and regularity are important. Related things should be achieved by related means.
+
+Detect errors at a low level, handle them at a high level. As a general principle, errors should be detected at as low a level as possible, but handled at a high level. In most cases, the caller should determine how to handle an error, not the callee. Library routines can help in this by failing gracefully; that reasoning led us to return NULL for a non-existent field rather than aborting.
+
+The text of error messages, prompts, and dialog boxes should state the form of valid input. Don't say that a parameter is too large; report the valid range of values. When possible, the text should be valid input itself, such as the full command line with the parameter set properly. In addition to steering users toward proper use, such output can be captured in a file or by a mouse sweep and then used to run some further process. This points out a weakness of dialog boxes: their contents are hard to grab for later use. One effective way to create a good user interface for input is by designing a specialized language for setting parameters, controlling actions, and so on; a good notation can make a program easy to use while it helps organize an implementation.
+
+Defensive programming, that is, making sure that a program is invulnerable to bad input, is important both for protecting users against themselves and also as a security mechanism.
+
+\subsection{Modular programming}
+
+"Modular Programming" is the act of designing and writing programs as interactions among functions. Each function performs a single well-defined functionality and has minimal side-effect interaction with other functions. Put differently, the content of each function is cohesive, and there is low coupling between functions. 
+
+"Modular Programming" tends to encourage splitting of functionality into two types: "Manager" functions control program flow and primarily contain calls to "Worker" functions that handle low-level details, like moving data between structures. All have the same basic principle at heart: "Arrange the program's information in the clearest and simplest way possible, and then try to turn it into code."
+
+Information is a key part of any program. The key to any program is deciding what information is being used and what processing you want to perform on it. Information flow should be analyzed before the design begins.
+
+Information hiding is key to good programming. A module should make public only the minimum number of functions and data needed to do the job. The smaller the interface, the simpler the interface. The simpler the interface the easier it is to use. Also, a simple interface is less risky and less error prone than a complex one. Small, simple interfaces are also easier to design, test, and maintain. Data hiding and good interface design are key to making good modules.
+
+Modular programming uses structured programming in a divide and conquer way: you divide the program into modules, then divide the modules into submodules, then divide the sub-modules into subsubmodules, and so on. 
+\begin{itemize}
+    \item Top-down programming: start at the top (main) and work your way down. The main function acts as the topmost outline.
+    \item Bottom-up programming: write the lowest-level function first, testing it and then building on that working set. Bottom-up techniques is very useful when working with a new and unfamiliar function.
+\end{itemize}
+
+General module design guidelines
+\begin{itemize}
+    \item Structure the code by modules.
+    \item A module is a collection of data and functions that perform related tasks.
+    \item Each module with its .h and .c file should correspond to a clear piece of functionality.
+    \item Modules should be designed to minimize the amount of information that has to pass between them.
+    \item The number of public functions in a module should be small.
+    \item The information passed between modules should be limited.
+    \item All the functions in a module should perform related jobs.
+    \item Modules are divided into two parts: public (header file) and private (source file).
+    \item The public part tells the user the information needed to use the module. These public information is shared between modules. So, what goes in a header file is precisely the information that needs to be communicated. Do not include definitions of structures or prototypes of functions; those private information of the module should go within the source file.
+    \item As a conclusion, the header file contains only declarations, and is included by the .c file for the module. Put only structure type declarations, function prototypes, and global variable extern declarations, in the .h file; put the function definitions and global variable definitions and initializations in the .c file. The .c file for a module must include the .h file; the compiler can detect discrepancies between the two, and thus help ensure consistency. The header file is always used to access the module, it's true even for the source of the module. 
+    \item Set up program-wide global variables with an extern declaration in the header file, and a defining declaration in the .c file. The other modules include only the .h file. The .c file for the module must include this same .h file, and near the beginning of the file, a defining declaration should appear. This declaration both defines and initializes the global variables
+    \item All of the declarations needed to use a module must appear in its header file, and this file is always used to access the module. The header should contain all the public information, such as: 
+        \begin{itemize}
+            \item A comment section describing clearly what the module does and what is available to the user.
+            \item Common structure definitions.
+            \item Prototypes of all the public functions.
+            \item extern declarations for public variables.
+        \end{itemize}
+    \item Anything that is internal to the module is private, such as all the implementations (functions and data) of the module. 
+    \item Everything that is not directly usable by the outside world should be kept private.
+    \item Private information should be put in the source file of the module.
+    \item Private functions that will not be called from outside the module should be declared static. Private external variables (variables declared outside of all functions) that are not used outside the module should be static.
+    \item Obviously, the prototypes for static functions should not be put in the module's header file.
+\end{itemize}
+
+\section{C puzzles}
+
+\begin{itemize}
+    \item Definition VS Declaration: Declaration of a variable/function declares that the variable/function exists somewhere in the program. No memory will be allocated by a declaration. Declaration can occur multiple times and describes the type of an object; It is used to refer to objects defined, since a declaration of a variable/function is always needed to be given before anything that wants to access them. Declarations are subject to scope rule. Definition of a variable/function, apart from the role of declaration, it also allocates memory for that variable/function. It is used to create new objects, example: \verb|int my_array[100]|; A variable/function can only be defined once within its scope.
+
+    \item extern keyword: Here, an object is a variable or a function. In the C language, an external (global) object is an object defined outside any function block (external to all functions). A local object is a object defined inside a function block. External objects are allocated and initialized when the program starts, and the memory is only released when the program ends. External objects are globally accessible and remain in existence permanently, therefore, they can be used to communicate data globally between functions.
+
+        A declaration of an object must be specified before anything to access it. An external object is directly accessible to all the functions in the same module where the external object is defined, since definition also serves as declaration. For functions in other module files to access the object, a declaration is needed to refer to the object, which is done by the extern keyword.
+
+        The extern keyword means "declare without defining". It is a way to explicitly declare an object without a definition. Since all external objects are globally accessible in default, their scope is global and hence they must be defined exactly once in one of the modules of the program. For modules that do not define the external object to access it, a declaration is needed to connect the occurrences of the object, which is greatly facilitated by header files to ensure that all the declarations used are consistent with each other and with the definition. 
+
+        To simplify the declaration of external objects for modules, the usual practice is to collect extern declarations of objects in a separate file called a header, which is included by \verb|#include| at the front of each source file. The normal methodology is for allocation and actual definitions to go into .c files, and mere declarations and prototypes that do not allocate but just describe the types of objects for others to refer to and access should go to .h files.
+
+        The reliable way to declare and define global objects is to use a header file to contain an extern declaration of the object. The header is included by the one source file that defines the object to ensure that the definition and the declaration are consistent and by all the source files that reference the object. For each program, one and only one source file defines the object. One and only one header file should declare the object. Always referring to a module through its header file ensures that only a single set of declarations needs to be maintained, and helps enforce the One Definition Rule.
+
+        Header file guards to avoid interdependence. Header files should be included once-only. A standard way to prevent including a header file more than once is to enclose the entire contents of the file in a conditional guard. Do not start the guard symbol with an underscore. Leading underscore names are reserved for internal use by the C implementation. To guarantee uniqueness, the format of the name should be
+
+        \verb|<PROJECT>_<PATH>_<FILE>_H_|
+
+        \lstinputlisting[language=C]{seri_header_exp.h}
+        \begin{itemize}
+            \item Every header file should explicitly \verb|#include| every other header file that current header file requires to compile correctly, but no more, for instance, do not include header files that only the .c file needs. 
+
+            \item The \verb|#include| directive works by directing the preprocessor to scan the specified file as input before continuing the current source file.
+
+            \item \verb|#include <***.h>| for system header files. It searches for a named file in a standard list of system directories.
+
+            \item \verb|#include "***.h"| for header files of your own program. It searches for a named file in the directory containing the current file, such as 
+
+                \verb|#include "include/foo.h"|.
+
+            \item Names and order of includes: use standard order for readability and to avoid hidden dependencies: 
+                \begin{enumerate}
+                    \item Related header "foo.h" of the "foo.c" file
+                    \item C library
+                    \item C++ library
+                    \item Other libraries' .h
+                    \item Your project's .h
+                \end{enumerate}
+        \end{itemize}
+
+    \item static has two meanings:
+        \begin{itemize}
+            \item For function or global variable, static means "private to this file." If declare a function or global variable as static, it becomes internal. That is, they are global to only the C file they exist in, not outside. You cannot access the function or variable through the extern keyword from other files in your project. Note: extern keyword is default for any functions declared without the keyword "static".
+            \item For data defined inside a function, it means "variable is allocated from static memory (instead of temporary stack)." When you declare a local variable as static, it is created just like any other variable. However, when the variable goes out of scope (i.e. the block it was local to is finished) the variable stays in memory, retaining its value. The variable stays in memory until the program ends. While this behaviour resembles that of global variables, static variables still obey scope rules and therefore cannot be accessed outside of their scope. Hence, you need to pass its address out if access is needed outside its local scope.
+        \end{itemize}
+
+    \item C uses void for two purposes: In a function declaration, void indicates that the function returns no value or takes no arguments. In a pointer declaration, void defines a generic pointer.
+
+    \item In C single quotes identify a single character, while double quotes create a string literal. 'a' is a single a character literal, while "a" is a string literal containing an 'a' and a null terminator (that is a 2 char array). Note that in C, the type of a character literal is int, and not char, that is sizeof 'a' is 4 in an architecture where ints are 32bit (and \verb|CHAR_BIT| is 8), while sizeof(char) is 1 everywhere.
+
+    \item Stack vs heap
+
+        The stack is the memory set aside as scratch space for a thread of execution. When a function is called, a block is reserved on the top of the stack for local variables and some bookkeeping data. When that function returns, the block becomes unused and can be used the next time a function is called. The stack is always reserved in a LIFO (last in first out) order; the most recently reserved block is always the next block to be freed. This makes it really simple to keep track of the stack; freeing a block from the stack is nothing more than adjusting one pointer.
+
+        The heap is memory set aside for dynamic allocation. Unlike the stack, there's no enforced pattern to the allocation and deallocation of blocks from the heap; you can allocate a block at any time and free it at any time. This makes it much more complex to keep track of which parts of the heap are allocated or free at any given time; there are many custom heap allocators available to tune heap performance for different usage patterns.
+
+        Each thread gets a stack, while there's typically only one heap for the application (although it isn't uncommon to have multiple heaps for different types of allocation). The stack is attached to a thread, so when the thread exits the stack is reclaimed. The heap is typically allocated at application startup by the runtime, and is reclaimed when the application (technically process) exits. The size of the stack is set when a thread is created. The size of the heap is set on application startup, but can grow as space is needed (the allocator requests more memory from the operating system).
+
+        The stack is faster because the access pattern makes it trivial to allocate and deallocate memory from it (a pointer/integer is simply incremented or decremented), while the heap has much more complex bookkeeping involved in an allocation or deallocation. Also, each byte in the stack tends to be reused very frequently which means it tends to be mapped to the processor's cache, making it very fast. Another performance hit for the heap is that the heap, being mostly a global resource, typically has to be multi-threading safe, i.e. each allocation and deallocation needs to be - typically - synchronized with "all" other heap accesses in the program.
+
+        The size of the call stack depends on many factors, including the programming language, machine architecture, multi-threading, and amount of available memory. When a program attempts to use more space than is available on the call stack (that is, when it attempts to access memory beyond the call stack's bounds, which is essentially a buffer overflow), the stack is said to overflow, typically resulting in a program crash.
+
+        The most common cause of stack overflow is excessively deep or infinite recursion, in which a function calls itself so many times that the space needed to store the variables and information associated with each call is more than can fit on the stack. However, some compilers implement tail-call optimization, allowing infinite recursion of a specific sort—tail recursion—to occur without stack overflow. This works because tail-recursion calls do not take up additional stack space. Some C compiler options will effectively enable tail-call optimization; for example, compiling the above simple program using gcc with -O1 will result in a segmentation fault, but not when using -O2 or -O3, since these optimization levels imply the -foptimize-sibling-calls compiler option.
+
+        The other major cause of a stack overflow results from an attempt to allocate more memory on the stack than will fit, for example by creating local array variables that are too large. For this reason it is recommended that arrays larger than a few kilobytes should be allocated dynamically instead of as a local variable.
+
+        Stack overflows are made worse by anything that reduces the effective stack size of a given program. For example, the same program being run without multiple threads might work fine, but as soon as multi-threading is enabled the program will crash. This is because most programs with threads have less stack space per thread than a program with no threading support. Because kernels are generally multi-threaded, people new to kernel development are usually discouraged from using recursive algorithms or large stack buffers.
+
+    \item Memory allocation and deallocation.
+        \begin{itemize}
+            \item In C, don't need to cast the return value of malloc. The pointer to void returned by malloc is automatically converted to the correct type. However, if compile with a C++ compiler, a cast is needed. We chose to cast because it makes the program legal in both C and C++; the price is less error-checking from the C compiler, but that is offset by the extra checking available from using two compilers.
+            \item Use the language to calculate the size of an object. Don't use an explicit size for any data type; use sizeof(int) instead of 2 or 4, for instance. For similar reasons, sizeof(array[O]) may be better than sizeof(int) because it's one less thing to change if the type of the array changes.
+            \item The sizeof operator is used to determine the amount of space a designated datatype would occupy in memory. To use sizeof, the keyword "sizeof" is followed by a type name or an expression (which may be merely a variable name). If a type name is used, it must always be enclosed in parentheses, whereas expressions can be specified with or without parentheses. 
+            \item The sizeof is a unary operator (not a function), sizeof gives the size in units of chars. When sizeof is applied to the name of a static array (not allocated through malloc), the result is the size in bytes (in unit of chars) of the whole array, that is, number of elements times the sizeof an array element. This is one of the few exceptions to the rule that the name of an array is converted to a pointer to the first element of the array, and is possible just because the actual array size is fixed and known at compile time, when sizeof operator is evaluated. For an array (not a pointer) whose declaration is visible, this computes the number of elements in the array: sizeof(array)/sizeof(array[0]).
+            \item When returning a pointer from a function, do not return a pointer that points to a value that is local to the function or that is a pointer to a function argument. Pointers to local variables become invalid when the function exits. In a function, the value returned points to a static variable or returning a pointer to dynamically allocated memory can both be valid.
+            \item memset treats any memory buffer as a series of bytes, disregarding with the specific data type. Therefore, it will not set multi-byte types to a specific non-zero value. For example, int a[100]; memset(a, 1, sizeof(a)); will not set each member of a to the value 1 rather it will set every byte in the memory buffer taken up by a to 1, which means every four-byte int is set to the value 0x01010101, which is not the same as 0x00000001.
+            \item Deallocate memory in the reverse order it was allocated. This makes sure that any dependencies between the allocated memory will not result in "dangling pointers". So if one allocated data structure has a pointer to another allocated data structure, the second should be deallocated first.
+            \item For a temporary memory block, deallocate the block before leaving the routine. If the deallocation is not done before the routine ends, access to the memory is lost.
+            \item Prevent access to deallocated memory. This can be done by setting the pointer to null after deallocating. Don't free pointer of storage that not allocated by dynamic allocation. The original pointer becomes to be a wild pointer after being freed. It's a better practice to set pointer back to NULL after calling free.
+        \end{itemize}
+    \item Variable-length argument lists. Functions with variable-length argument lists are functions that can take a varying number of arguments. An example in the C standard library is the printf function, which can take any number of arguments depending on how the programmer wants to use it.
+
+        C programmers rarely find the need to write new functions with variable-length arguments. If they want to pass a bunch of things to a function, they typically define a structure to hold and pack all those things -- perhaps a linked list, or an array -- and pass the reference to that structure as the argument of the function. As a results, adding and deleting data variables only need to modify the structure without affecting the function definition.
+
+        However, you may occasionally find the need to write a new function that supports a variable-length argument list. To create a function that can accept a variable-length argument list, you must first include the standard library header stdarg.h. Next, declare the function as you would normally. Next, add as the last argument an ellipsis ("..."). This indicates to the compiler that a variable list of arguments is to follow.
+
+For example, the following function declaration is for a function that returns the average of a list of numbers:
+\lstinputlisting[language=C]{seri_var_arg.c}
+
+Note that because of the way variable-length arguments work, we must somehow, in the arguments, specify the number of elements in the variable-length part of the arguments. In the average function here, it's done through an argument called \verb|n_args|. In the printf function, it's done with the format codes that you specify in that first string in the arguments you provide.
+
+C supports variable numbers of arguments. But there is no language provided way for finding out total number of arguments passed. User has to handle this in one of the following ways:
+1) By passing first argument as count of arguments.
+2) By passing last argument as NULL (or 0).
+3) Using some printf (or scanf) like mechanism where first argument has placeholders for rest of the arguments.
+
+Now that the function has been declared as using variable-length arguments, we must next write the code that does the actual work in the function. To access the numbers stored in the variable-length argument list for our average function, we must first declare a variable for the list itself: \verb|va_list myList|;
+
+The \verb|va_list| type is a type declared in the stdarg.h header that basically allows you to keep track of your list. To start actually using myList, however, we must first assign it a value. After all, simply declaring it by itself wouldn't do anything. To do this, we must call \verb|va_start|, which is actually a macro defined in stdarg.h. In the arguments to \verb|va_start|, you must provide the \verb|va_list| variable you plan on using, as well as the name of the last variable appearing before the ellipsis in your function declaration:
+
+Now that myList has been prepped for usage, we can finally start accessing the variables stored in it. To do so, use the \verb|va_arg| macro, which pops off the next argument on the list. In the arguments to \verb|va_arg|, provide the \verb|va_list| variable you're using, as well as the primitive data type (e.g. int, char) that the variable you're accessing should be:
+
+By popping \verb|n_args| integers off of the variable-length argument list, we can manage to find the average of the numbers.
+
+vfprintf: 
+
+\verb|int vfprintf ( FILE * stream, const char * format, va_list arg );|
+
+Write formatted data from variable argument list to stream. Writes the C string pointed by format to the stream, replacing any format specifier in the same way as printf does, but using the elements in the variable argument list identified by arg instead of additional function arguments.
+
+Internally, the function retrieves arguments from the list identified by arg as if \verb|va_arg| was used on it, and thus the state of arg is likely altered by the call.
+
+In any case, arg should have been initialized by \verb|va_start| at some point before the call, and it is expected to be released by \verb|va_end| at some point after the call.
+
+fprintf() and friends are for normal use. vfprintf() and friends are for when you want to write your own fprintf()-like function. You'll notice that you can't pass args to fprintf(), since fprintf() takes many arguments, rather than one \verb|va_list| argument. The vfprintf() functions, however, do take a \verb|va_list| argument instead of a variable number of arguments
+
+    \item Keywords such as const are very useful for optimizing compilers to produce efficient code. This is particularly true when used in combination with the restrict keyword from the C99 standard. The const keyword means that the indicated variable cannot be assigned to. This is particularly important for pointers and arrays: to pass an array so that it cannot be changed by a routine. However, the const keyword cannot prevent changes due to aliasing. That is, the same memory location can be referred to through different pointers. This has an effect on optimization of the code: since the compiler cannot be sure that whether the const variable will be changed after aliasing, it has to assume that it can be changed, which prevents the desired optimizations.
+
+    \item The strict aliasing and restrict keyword are introduced to the C99 standard to address the aliasing problem. They are declarations of intent given by the programmer to the compiler.
+        \begin{itemize}
+            \item Strict aliasing means that two objects of incompatible types cannot refer to the same location in memory, which is enabled by passing \verb|-fstrict-aliasing| flag to the compiler. Be sure that all code can safely run with this rule enabled.
+            \item The restrict keyword says that for the lifetime of the pointer, only the pointer itself or a value directly derived from it (such as pointer $+$ 1) will be used to access the object to which it points. This limits the effects of pointer aliasing, that is, each memory block pointed by a restrict pointer is only accessed by the current pointer. 
+            \item Since the strict aliasing rules prohibit aliasing among incompatible types, and different restrict pointers of compatible types always point to different locations, updating one pointer will not affect the other pointers, aiding better optimizations. Whether aliasing does or does not occur is the responsibility of the programmer.
+        \end{itemize}
+\end{itemize}
+
+\section{Best practices for scientific programming}
+
+\begin{itemize}
+    \item Use revision control system. Extremely useful for comparing, recovering, maintenance, etc. Available options: CVS, Subversion, Bitbucket, Github.
+    \item C and C++ programs normally take the form of a collection of separately compiled modules. Thanks to the separate compilation concept, as a big project is developed, an new executable can be built rapidly if only the changed modules need to be recompiled.
+
+        In C, the contents of a module consist of structure type (struct) declarations, global variables, and functions. The functions themselves are normally defined in a source file (a ".c" file). Except for the main module, each source (.c) file has a header file (a ".h" file) associated with it that provides the declarations needed by other modules to make use of this module. The idea is that other modules can access the functionality in module X simply by \verb|#include "X.h"| for the header file, and the linker will do the rest. The code in X.c needs to be compiled only the first time or if it is changed; the rest of the time, the linker will link X's code into the final executable without needing to recompile it, which enables the Unix make utility and IDEs to work very efficiently.
+
+        A well organized C program has a good choice of modules, and properly constructed header files that make it easy to understand and access the functionality in a module. They also help ensure that the program is using the same declarations and definitions of all of the program components. This is important because compilers and linkers need help in enforcing the One Definition Rule.
+
+        Furthermore, well-designed header files reduce the need to recompile the source files for components whenever changes to other components are made. The trick is reduce the amount of “coupling” between components by minimizing the number of header files that a module’s header file itself includes. On very large projects, minimizing coupling can make a huge difference in “build time” as well as simplifying the code organization and debugging.
+
+    \item Compile with make for automatic build procedures
+
+        The make utility automatically determines which pieces of a large program need to be recompiled, and issues commands to recompile them. To prepare to use make, you must write a file called the makefile that describes the relationships among files in your program and provides commands for updating each file. Most often, the makefile tells make how to compile and link a program. In a program, typically, the executable file is updated from object files, which are in turn made by compiling source files. Once a suitable makefile exists, each time you change some source files, this simple shell command: make suffices to perform all necessary recompilations. The make program uses the makefile data base and the last-modification times of the files to decide which of the files need to be updated. For each of those files, it issues the recipes recorded in the data base. 
+
+        A simple makefile consists of "rules" with the following shape:
+        \lstinputlisting[language=C]{makefile_exp}
+
+        A target is usually the name of a file that is generated by a program; examples of targets are executable or object files. A target can also be the name of an action to carry out, such as 'clean' (see Phony Targets).
+
+        A prerequisite is a file that is used as input to create the target. A target often depends on several files.
+
+        A recipe is an action that make carries out. A recipe may have more than one command, either on the same line or each on its own line. Please note: you need to put a tab character at the beginning of every recipe line! This is an obscurity that catches the unwary.
+
+        Usually a recipe is in a rule with prerequisites and serves to create a target file if any of the prerequisites change. However, the rule that specifies a recipe for the target do not need to always have prerequisites. For example, the rule containing the delete command associated with the target 'clean' does not have prerequisites. Some rules not only are not a prerequisite, they also do not have any prerequisites, so the only purpose of these rules is to run the specified recipe. Targets that do not refer to files but are just actions are called phony targets.
+
+        A rule, then, explains how and when to remake certain files which are the targets of the particular rule. make carries out the recipe on the prerequisites to create or update the target. A rule can also explain how and when to carry out an action. 
+
+        When a target is a file, it needs to be recompiled or relinked if any of its prerequisites change. In addition, any prerequisites that are themselves automatically generated should be updated first. It is not necessary to spell out the recipes for compiling the individual C source files, because make can figure them out: it has an implicit rule for updating a '.o' file from a correspondingly named '.c' file using a 'cc -c' command. For example, it will use the recipe 'cc -c main.c -o main.o' to compile main.c into main.o. We can therefore omit the recipes from the rules for the object files. When a '.c' file is used automatically in this way, it is also automatically added to the list of prerequisites. We can therefore omit the '.c' files from the prerequisites, provided we omit the recipe.
+
+        By default, make starts with the first target (not targets whose names start with '.'). This is called the default goal. Goals are the targets that make strives ultimately to update. make reads the makefile in the current directory and begins by processing the first rule. In the example, this rule is for building the executable file; but before make can fully process this rule, it must process the rules for the files that the executable depends on, which in this case are the object files. Each of these files is processed according to its own rule. These rules say to update each '.o' file by compiling its source file. The recompilation must be done if the source file, or any of the header files named as prerequisites, is more recent than the object file, or if the object file does not exist. The other rules are automatically processed if their targets appear as prerequisites of the goal. If some other rule is not depended on by the goal (or anything it depends on, etc.), that rule is not processed, unless you tell make to do so (with a command such as make clean). 
+
+        Before recompiling an object file, make considers updating its prerequisites, the source file and header files. This makefile does not specify anything to be done for them -- the '.c' and '.h' files are not the targets of any rules -- so make does nothing for these files. After recompiling whichever object files, make decides whether to relink executable. This must be done if the executable file does not exist, or if any of the object files are newer than it. If an object file was just recompiled, it is now newer than executable, so the executable is relinked. 
+
+        \begin{itemize}
+            \item http://www.gnu.org/software/make/manual/make.html
+            \item Use make program to compile and link programs.
+            \item Turn on all the warning flags, then make your program warning free.
+            \item When recompiles the program, each changed C source file must be recompiled.
+            \item If a header file has changed, each C source file that includes the header file must be recompiled to be safe.
+            \item Each compilation produces an object file corresponding to the source file.
+            \item Finally, if any source file has been recompiled, all the object files whether newly made or saved from previous compilations, must be linked together to produce the new executable program.
+        \end{itemize}
+    \item Use a robust and exhaustive test suite. Verify the functionality of the software whenever modified. Should be coupled to the build infrastructure with every release.
+\end{itemize}
+
+\section{Code Performance and Optimization}
+
+\begin{itemize}
+    \item Rule of thumb, let the compiler do the job. Code should be compiled with compiler optimizations. ICC does the best for optimization.
+
+    \item High performance coding requires understanding modern computer hardware. The most crucial concept is that of a memory hierarchy. Compilers know more about the target architecture than most programmers, so we should write code that the compiler can make best use of.
+
+    \item keep your code general instead of obsessively optimizing your code with awkward code structure. Hand optimizations can create odd looking code that is harder for a compiler to match up to an optimization template. It is often better to resist the temptation to optimize the code. 
+
+    \item Code performance is not only related to algorithms but also CPU time and memory reading. To get close to CPU peak, codes should be designed to make best use of hardware, especially memory caches. An optimal usage of cache memory through improving data locality and organizing data accesses to minimize cache misses is crucial to code performance.
+
+    \item Note that it is usually not important to make every routine optimal. Often only a small fraction of the code in a large system has a significant impact on efficiency. This is sometimes expressed by the slogan that $95\%$ of the time is spent in $5\%$ of the code. The task is to first identify the $5\%$ code that really matters. If there is a bottleneck in your code, have a close look at it. Ask yourself: could better algorithms be used? Could it be implemented more efficiently? Should a higher level of compiler optimization be used? Should the data structures be re-designed? Repeat the process until the system is performing as expected.
+
+    \item Google gperftools can do program performance checking including heap-checker, heap-profiler and cpu-profiler. Valgrind can be used for memory leak check and cache check. Cachegrind simulates how a program interacts with a machine's cache hierarchy and (optionally) branch predictor. It simulates a machine with independent first-level instruction (I1) and first-level data (D1) caches, last-level instruction (LLi)  and last-level data (LLd) caches, backed by a unified last-level cache (LL). Cachegrind only simulates the first-level (L1) and last-level (LL) caches. The reason for this choice is that the last-level cache has the most influence on runtime, as it masks accesses to main memory, and the first-level caches often have low associativity, so simulating them can detect cases where the code interacts badly with this cache.
+
+        Therefore, Cachegrind always refers to the I1, D1 and LL (last-level) caches. Cachegrind gathers the following statistics (abbreviations used for each statistic is given in parentheses):
+        
+        I cache reads (Ir, which equals the number of instructions executed), I1 cache read misses (I1mr) and LL cache instruction read misses (ILmr).
+        
+        D cache reads (Dr, which equals the number of memory reads), D1 cache read misses (D1mr), and LL cache data read misses (DLmr).
+        
+        D cache writes (Dw, which equals the number of memory writes), D1 cache write misses (D1mw), and LL cache data write misses (DLmw). 
+
+        Note that D1 total accesses is given by D1mr + D1mw, and that LL total accesses is given by ILmr + DLmr + DLmw. 
+
+        On a modern machine, an L1 miss will typically cost around 10 cycles, an LL miss can cost as much as 200 cycles, and a mispredicted branch costs in the region of 10 to 30 cycles. Detailed cache and branch profiling can be very useful for understanding how your program interacts with the machine and thus how to make it faster. Also, since one instruction cache read is performed per instruction executed, you can find out how many instructions are executed per line, which can be useful for traditional profiling. First off, as for normal Valgrind use, you probably want to compile with debugging info (the -g option). But by contrast with normal Valgrind use, you probably do want to turn optimisation on, since you should profile your program as it will be normally run. Then, you need to run Cachegrind itself to gather the profiling information, and then run \verb|cg_annotate| to get a detailed presentation of that information, and differencing profiles with \verb|cg_diff|. The program will execute (slowly). Upon completion, summary statistics that look like this will be printed:
+
+        Cache accesses for instruction fetches are summarised first, giving the number of fetches made (this is the number of instructions executed, which can be useful to know in its own right), the number of I1 misses, and the number of LL instruction (LLi) misses.
+
+        Cache accesses for data follow. The information is similar to that of the instruction fetches, except that the values are also shown split between reads and writes (note each row's rd and wr values add up to the row's total).
+
+        Combined instruction and data figures for the LL cache follow that. Note that the LL miss rate is computed relative to the total number of memory accesses, not the number of L1 misses. I.e. it is (ILmr + DLmr + DLmw) / (Ir + Dr + Dw) not (ILmr + DLmr + DLmw) / (I1mr + D1mr + D1mw) 
+
+        Instruction vs data cache usage: there are instructions that don't access the data cache, but it's impossible to access the data cache without using an instruction, so by definition the instruction cache is used more often. Instruction and data cache misses will highly depend on the number and arrangement of functions and operations and will be highly program specific. A tight loop that accesses a gigabyte of memory will have zero instruction misses and a ton of data misses. A large program consisting entirely of register operations will have a ton of instruction misses and no data misses.
+
+    \item Premature optimization is the root of all evil. By using modern compilers, you do NOT need to concern about:
+        \begin{itemize}
+            \item Register allocation. Assign commonly used variables to registers for rapid access.
+            \item Common sub-expression elimination. If an expression appears several times, evaluate it once and store the result.
+        \end{itemize}
+    \item But, there are things that you should optimize at a low level:
+        \begin{itemize}
+            \item Spatial locality: Define structures for packing compound data used at nearby calculations. For instance, when we need to store a set of different field variables at each node $(k,j,i)$, a node data structure can be defined to pack data for each node and to achieve high locality of data management.
+
+                To reduce padding required for data alignment of structures, arranging members of a structure in increasing order by size is desirable. In addition, fields shall be sorted by their frequency or by memory access pattern. Put frequently accessed elements to small offsets, and if two elements are used at the same time, put them closely to reduce cache misses per structure.
+
+                Data Structure Declarations: Data structures with heterogeneous elements (i.e., elements of different types) can be defined as struct in C. Combining data used for a common purpose into a single data structure can provide some level of abstraction which can simplify interfaces and other routines. Use struct to pass a bunch of data at a time, it's simple and elegant. However, make sure about these:
+                \begin{itemize}
+                    \item Always pass structures by reference. That is, use pointers to structures as function arguments even when nothing in the struct will be modified in the function (at this circumstance, const modifier should be used). Should never do value passing to avoid copying the complete contents of the structure onto the stack.
+                    \item Make sure assigning a valid memory location to the pointer before dereferencing a pointer.
+                \end{itemize}
+
+            \item Temporal locality: Nearby memory accesses in time should be to nearby locations in memory. Accessing far-apart memory locations means that each time a new memory location is accessed, memory within the CPU has to be filled with values at and around that memory location. C stores its arrays in row-major order. That is, for array $a[j][i]$, consecutive memory locations hold $a[0][0]$, $a[0][1]$, $a[0][2]$, $\dotsc$ To keep our memory references close together, we should make: the later position the index in the array, the inner position the index in the loop. That is, $i$ is the inner loop for $a[j][i]$.
+
+            \item Linearization of multidimensional arrays: 
+
+                Using high order pointers for multidimensional arrays wastes space and the malloc calls are expensive, and it is also very time-consuming for nested loops because of causing lots of cache misses.
+
+                Maintaining a multidimensional array within a single linear array is a common performance technique. High-performance code instead implements a multidimensional array as a single linear array with hand-authored array indexing math to keep track of what values are where:
+                \lstinputlisting[language=C]{seri_index_math.c}
+
+                Since the linearised array is a single contiguous chunk of memory, sweeping through it creates a regular access pattern that processor prefetchers can easily recognize, which enables them to load caches in the background. The result is fewer cache misses and much better performance. In addition, this linear array can be passed freely between functions without knowing the size of the array at compile time, and its dimensions can be implicitly embedded in its corresponding index math function.
+
+            \item Memory usage: Try to re-use dynamically allocated memory. This is not only helpful for avoiding memory leaks, but also avoids time allocating and freeing memory.
+            \item When there is a need to copy data around in memory, try to figure out a way of not copying data around, such as swapping pointers rather than the data itself. A great compiler, like ICC, can optimize loops to have comparable performance.
+            \item Using the const and restrict keyword wherever possible. Retrofit old code as soon as possible. Only use restricted leaf pointers. Use of parent pointers may break the restrict contract.
+            \item Keep loads and stores separated from calculations. This results in better scheduling in compilers, and makes the relationship between the output assembly and the original source clearer.
+            \item Don't store what you can easily recompute. Changes like these are minor, however; they are analogous to code tuning. Major improvements are more likely to come from better data structures, perhaps coupled with algorithm changes. For example, a matrix contains integer values, most of which were zero, This immediately suggested a representation in which only the non-zero elements of the matrix were stored, and each matrix access like m[i][j] would be replaced by a function call m(i,j). There are several ways to store the data; the easiest is probably an array of pointers, one for each row, each of which points to a compact array of column numbers and corresponding values. This has higher space overhead per non-zero item but requires much less space overall.
+
+                Variations on this theme are frequent, and so are specific representations, but all share the same basic idea: store the common value or values implicitly or in a compact form, and spend more time and space on the remaining values. If the most common values are really common, this is a win.
+
+                The program should be organized so that the specific data representation of complex types is hidden in a class or set of functions operating on a private data type.This precaution ensures that the rest of the program will not be affected if the representation changes.
+            \item The inline specifier is a hint to the compiler that it should attempt to generate code for a call of fac() inline rather than laying down the code for the function once and then calling through the usual function call mechanism. The inline instructs the compiler to attempt to embed the function content into the calling code instead of executing an actual call, as the function content sometimes is actually significantly less than the code the compiler needs to put to perform the call. For small functions that are called frequently that can make a big performance difference for skipping the actual function call and return. Most compilers will try to "inline" even when the keyword is not used, as part of the optimizations, where its possible. For a compiler, the inliner classifies routines as small, medium, or large. A size boundary between what the inliner considers to be medium and large-size routines is specified in the inliner. The inliner prefers to inline small routines. It has a preference against inlining large routines. So, any large routine is highly unlikely to be inlined. Inlining large functions leads to larger executables, which significantly impairs performance regardless of the faster execution that results from the calling overhead. About performance, the wise approach is (as always) to profile the application, then eventually inline a set of functions representing a bottleneck.
+        \end{itemize}
+\end{itemize}
+
+\section{Issues related to numerical computing}
+
+\begin{itemize}
+    \item Rise the concern about numerical accuracy and reliability whenever conduct an algorithm or even an operation. Be aware of catastrophic cancellation in operations, numerical stability of the algorithms.
+    \item Recommend double rather than float type for floating point variables. 
+    \item Don't subtract nearly equal quantities and then divide by something small. This often results in catastrophic cancellation and all digits of accuracy are lost. In general, if you subtract numbers where the first k digits are equal, you lose k digits of accuracy.
+    \item Avoid using floating point numbers as loop counters if exact loop behaviors are required. Round off errors are unreliable.
+    \item Priorities in writing scientific software should be
+        \begin{itemize}
+            \item correctness,
+            \item numerical stability,
+            \item accurate discretization (including estimating accuracy),
+            \item flexibility,
+            \item efficiency (speed and memory).
+        \end{itemize}
+    \item What Every Computer Scientist Should Know About Floating-Point Arithmetic: assign a value which is beyond the maximum value of that data type compiler will assign \verb|+INF| if number is positive and \verb|-INF| if number is negative. If assign a value witch is less than minimum value of that data type then complier will assign a garbage value or zero.
+    \item Floating-point exception handling. When code generates an overflow, underflow, or divide-by-zero error, the result will simply be an infinite (\verb|inf|) or not-a-number (\verb|NaN|) value. If undefined values are used in other operations, new undefined values are generated. Then the program gives inf or NaN as a result. One can use the floating point exception facilities provided by C in fenv.h to determine and track a floating-point exceptional condition when it first occurred. These illegal events can be used to trigger exceptions, which will stop the code right at the point it happens; then if you run the code through a debugger, you can find the line where it happens.
+    \item Comparing for float equality:
+
+        When comparing against zero, relative epsilons based comparisons are meaningless, an absolute epsilon is needed. When comparing against a non-zero number, relative epsilons based comparisons are desirable. The most generic way is to use a mixture of absolute and relative epsilons.
+
+        Floating point math is not exact. Simple values like 0.1 cannot be precisely represented using binary floating point numbers, and the limited precision of floating point numbers means that slight changes in the order of operations or the precision of intermediates can change the result. 
+
+        There is a clear difference between 0.1, float(0.1), and double(0.1).  In C/C++ the numbers 0.1 and double(0.1) are the same thing, but here "0.1" in text meaning the exact base-10 number, whereas float(0.1) and double(0.1) are rounded versions of 0.1. And, to be clear, float(0.1) and double(0.1) do not have the same value, because float(0.1) has fewer binary digits, and therefore has more error. 
+
+        If you do a series of operations with floating-point numbers then, since they have finite precision, it is normal and expected that some error will creep in. If you do the same calculation in a slightly different way then it is normal and expected that you might get slightly different results. In that case a thoughtful comparison of the two results with a carefully chosen relative and/or absolute epsilon value is entirely appropriate.
+
+        However if you start adding epsilons carelessly - if you allow for error where there should be none - then you get a chaotic explosion of uncertainty where you can't tell truth from fiction.
+
+        Sometimes people think that floating-point numbers are magically error prone. There seems to be a belief that if you redo the exact same calculation with the exact same inputs then you might get a different answer. Now this can happen if you change compilers or use instructions like fsin whose value is not precisely defined. But if you stick to the basic five operations (plus, minus, divide, multiply, square root) and you haven't recompiled your code then you should absolutely expect the same results.
+
+        Constants compared to themselves: float x = 1.1; if (x != 1.1) \{Fatally flawed floats\}
+
+        The problem is that there are two main floating-point types in most C/C++ implementations. These are float (32 bits) and double (64 bits). Floating-point constants in C/C++ are double precision, the code above is equivalent to: if (float(1.1) != double(1.1)); which is flawed. In other words, it tests whether 1.1 when stored as a float is the same as the one when stored as a double, which is frequently false given that there are twice as many bits in a double as there are in a float. Two reasonable ways to fix the initial code would be: float x = 1.1f; (float constant) if (x != 1.1f) or: double x = 1.1; (double constant) if (x != 1.1).
+
+    \item As a personal choice, we tend not to use debuggers beyond getting a stack trace or the value of a variable or two. One reason is that it is easy to get lost in details of complicated data structures and control flow; we find stepping through a program less productive than thinking harder and adding output statements and self-checking code at critical places. Clicking over statements takes longer than scanning the output of judiciously-placed displays. It takes less time to decide where to put print statements than to single-step to the critical section of code, even assuming we know where that is. More important, debugging statements stay with the program; debugger sessions are transient.
+
+        Blind probing with a debugger is not likely to be productive. It is more helpful to use the debugger to discover the state of the program when it fails, then think about how the failure could have happened. Fortunately, most bugs are simple and can be found with simple techniques.  Examine the evidence in the erroneous output and try to infer how it could have been produced. Look at any debugging output before the crash; if possible get a stack trace from a debugger. Now you know something of what happened, and where. Pause to reflect. How could that happen? Reason back from the state of the crashed program to determine what could have caused this.
+
+        Debugging involves backwards reasoning, like solving murder mysteries. Something impossible occurred, and the only solid information is that it really did occur. So we must think backwards from the result to discover the reasons. Once we have a full explanation, we'll know what to fix and, along the way, likely discover a few other things we hadn't expected.
+
+        Make the bug reproducible. The first step is to make sure you can make the bug appear on demand.
+
+        Divide and conquer. Can the input that causes the program to fail be made smaller or more focused? Narrow down the possibilities by creating the smallest input where the bug still shows up. What changes make the error go away? Try to find crucial test cases that focus on the error. Each test case should aim at a definitive outcome that confirms or denies a specific hypothesis about what is wrong. All of these are instances of a general strategy, divide and conquer, which is as effective in debugging as it is in politics and war.
+
+        Proceed by binary search. Throw away half the input and see if the output is still wrong; if not, go back to the previous state and discard the other half of the input. The same binary search process can be used on the program text itself: eliminate some part of the program that should have no relationship to the bug and see if the bug is still there.
+
+        Display output to localize your search. If you don't understand what the program is doing, adding statements to display more information can be the easiest, most cost-effective way to find out. Put them in to verify your understanding or refine your ideas of what's wrong.
+
+        Write a log file. Another tactic is to write a log file containing a fixed-format stream of debugging output. When a crash occurs, the log records what happened just before the crash.
+
+        Get a stack trace. Although debuggers can probe running programs, one of their most common uses is to examine the state of a program after death. The source line number of the failure, often part of a stack trace, is the most useful single piece of debugging information; improbable values of arguments are also a big clue (zero pointers, integers that are huge when they should be small, or negative when they should be positive, character strings that aren't alphabetic). A debugger can also be used to display values of local or global variables that will give additional information about what went wrong.
+
+        Read before typing. One effective but under-appreciated debugging technique is to read the code very carefully and think about it for a while without making changes. There's a powerful urge to get to the keyboard and start modifying the program to see if the bug goes away. But chances are that you don't know what's really broken and will change the wrong thing, perhaps breaking something else. Take a break for a while; sometimes what you see in the source code is what you meant rather than what you wrote, and an interval away from it can soften your misconceptions and help the code speak for itself when you return. Resist the urge to start typing; thinking is a worthwhile alternative.
+
+        Explain your code to someone else. Another effective technique is to explain your code to someone else. This will often cause you to explain the bug to yourself. Sometimes it takes no more than a few sentences, followed by an embarrassed "Never mind, I see what's wrong. Sorry to bother you." This works remarkably well; you can even use non-programmers as listeners. One university computer center kept a teddy bear near the help desk. Students with mysterious bugs were required to explain them to the bear before they could speak to a human counselor.
+
+        Test code at its boundaries. One technique is boundary condition testing: as each small piece of code is written-a loop or a conditional statement, for example, check right then that the condition branches the right way or that the loop goes through the proper number of times. This process is called boundary condition testing because you are probing at the natural boundaries within the program and data, such as non-existent or empty input, a single input item, an exactly full array, and s o on. The idea is that most bugs occur at boundaries. If a piece of code is going to fail, it will likely fail at a boundary. Conversely, if it works at its boundaries, it's likely to work elsewhere too.
+\end{itemize}
+
+\section{Performance Tuning}
+
+You cannot improve what you cannot measure. Performance tuning is an iterative process between running an instrumented version of your code, getting data on performance throughout the code, and attempting to make chances to the code that will make it run more efficiently.
+
+There are three main ways of instrumenting a code to find its performance. The first is manually adding timers around important parts of the code to find out how much time is spent in each part. This is worth thinking about doing when putting together a new code, as it means that you'll have a very robust way of finding out how well the different parts of the code perform on different platforms and with different compiler options, etc.. The results are, however, necessarily very coarse-grained; they are very useful for comparing performance under different situations, but give very little information about whether or not there are performance problems or what they might be. The second technique is sampling, sometimes called `program counter sampling' or `statistical sampling'. A related method is the use of hardware counters --- counters within the CPU itself which keep track of performance-related information, such as the number of cache misses or branch mis-predictions within your code. Using this information, either regularly throughout the code or once for the entire code run can give very specific information about performance problems.

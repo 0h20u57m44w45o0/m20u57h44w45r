@@ -1,0 +1,33 @@
+#### import the simple module from the paraview
+from paraview.simple import *
+#### disable automatic camera reset on 'Show'
+paraview.simple._DisableFirstRenderCameraReset()
+
+# get active view
+renderView1 = GetActiveViewOrCreate('RenderView')
+# uncomment following to set a specific view size
+#renderView1.ViewSize = [1920, 1080]
+
+# current camera placement for renderView1
+renderView1.CameraPosition = [-0.5908406536314931, -1.413145887691599, -0.2380384302368594]
+renderView1.CameraFocalPoint = [0.8363913634654664, 0.03183067519004265, 0.022084569795899567]
+renderView1.CameraViewUp = [0.3472966718035393, -0.487266797214313, 0.8012216235765798]
+renderView1.CameraParallelScale = 0.9388467398737068
+
+# get layout
+layout1 = GetLayout()
+
+# save screenshot
+#SaveScreenshot('/scratch/morui/graham/missile/missile_long_schlieren_m192.jpg', layout=layout1, magnification=2, quality=100)
+
+#### saving camera placements for all active views
+
+# current camera placement for renderView1
+renderView1.CameraPosition = [-0.5908406536314931, -1.413145887691599, -0.2380384302368594]
+renderView1.CameraFocalPoint = [0.8363913634654664, 0.03183067519004265, 0.022084569795899567]
+renderView1.CameraViewUp = [0.3472966718035393, -0.487266797214313, 0.8012216235765798]
+renderView1.CameraParallelScale = 0.9388467398737068
+
+#### uncomment the following to render all views
+# RenderAllViews()
+# alternatively, if you want to write images, you can use SaveScreenshot(...).

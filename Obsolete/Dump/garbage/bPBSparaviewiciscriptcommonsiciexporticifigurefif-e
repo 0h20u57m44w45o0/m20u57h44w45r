@@ -1,0 +1,36 @@
+#### import the simple module from the paraview
+from paraview.simple import *
+#### disable automatic camera reset on 'Show'
+paraview.simple._DisableFirstRenderCameraReset()
+
+# get active view
+renderView1 = GetActiveViewOrCreate('RenderView')
+# uncomment following to set a specific view size
+renderView1.ViewSize = [1192, 894]
+
+# current camera placement for renderView1
+renderView1.InteractionMode = '2D'
+renderView1.CameraPosition = [0.27309579687468943, -9.998679161071777e-06, -9.998679161071777e-06]
+renderView1.CameraFocalPoint = [0.0, -9.998679161071777e-06, -9.998679161071777e-06]
+renderView1.CameraViewUp = [0.0, 0.0, 1.0]
+renderView1.CameraParallelScale = 0.080415201131090146
+
+# get layout
+layout1 = GetLayout()
+
+# save screenshot
+SaveScreenshot('/scratch/morui/graham/jet_random/L2_001_B1_C2_t25us.jpg', layout=layout1, magnification=2, quality=100)
+
+#### saving camera placements for all active views
+
+# current camera placement for renderView1
+renderView1.InteractionMode = '2D'
+renderView1.CameraPosition = [0.27309579687468943, -9.998679161071777e-06, -9.998679161071777e-06]
+renderView1.CameraFocalPoint = [0.0, -9.998679161071777e-06, -9.998679161071777e-06]
+renderView1.CameraViewUp = [0.0, 0.0, 1.0]
+renderView1.CameraParallelScale = 0.080415201131090146
+
+#### uncomment the following to render all views
+# RenderAllViews()
+# alternatively, if you want to write images, you can use SaveScreenshot(...).
+

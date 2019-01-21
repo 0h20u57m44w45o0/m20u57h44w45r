@@ -1,0 +1,176 @@
+#include <omp.h> /* parallel header file */
+#include <stdio.h>
+
+int main (int argc, char* argv[])
+{
+    /*
+     * Parallelization of a stencil operation: a directive-based parallelism.
+     * The parallelism is implemented by applying the parallel loop directive
+     * to the outer loop.
+     */
+    #pragma omp parallel for default(none) shared(a, b, nk, nj, ni)
+    for (int k = 0; k < nk; ++k) {
+        for (int j = 0; j < nj; ++j) {
+            for (int i = 0; i < ni; ++i) {
+                a[k, j, i] = a[k, j, i] + 0.25 * (b[k-1, j, i-1] + b[k+1, j + 1, i]);
+            }
+        }
+    }
+    /*
+     * Parallelization of a stencil operation: a SPMD parallelism.
+     * The example assumes that a cubic number of threads is available.
+     * Loop bounds are explicitly calculated based on the thread ID.
+     * This allows the programmer to control the assignment of work.
+     *
+     * The following design decisions were critical to achieving high
+     * performance and ensuring scalability to hundreds of threads.
+     *
+     * Domain Decomposition Approach: Each thread is assigned its own 
+     * subdomain with a certain number of cells. The thread is responsible
+     * for updating its set of cells, an action referred to as the owner 
+     * computes rule. There are a number of cells in surrounding subdomains
+     * whose values are needed in order to perform the stencil operations 
+     * for all cells within the subdomain. These are referred to as overlap
+     * cells, and their values must be obtained from the thread responsible for them.
+     *
+     * Explicit Data Exchange: The calculations within each subdomain can
+     * proceed fairly independently from each other. The threads do not update
+     * their overlap cells, but they receive updated values from their neighbors.
+     * At this point, information needs to be exchanged among neighboring subdomains,
+     * requiring synchronization. After performing each chunk of computation 
+     * within each subdomain, the updated values of the overlap cells need 
+     * to be exchanged. Rather than making calls to a communication library 
+     * as required in a messagepassing implementation, here the data exchange
+     * is implemented by directly taking advantage of shared memory. For each
+     * overlap cell, the location of the updated values is computed once and
+     * saved. A pointer into the corresponding subdomain is used to access the values.
+     * Nevertheless, the MPIbased approach requires matching send and receive
+     * pairs as well as the packing and unpacking of message buffers.
+     *
+     * Data Replication: In order for the calculations on the cells within each
+     * subdomain to proceed independently for some time, a number of overlap cells
+     * are replicated on neighboring subdomains. Traditionally, shared-memory 
+     * implementations would define one large array of cells. Each thread is 
+     * assigned a range of indices to work on, using the neighboring cells as 
+     * needed. This approach does not require explicit communication. However, 
+     * it does not leave the opportunity to control memory locality for each subdomain.
+     */
+    /*
+     * A small shared array of pointers to each subdomain structure for a particular thread.
+     */
+    Node *p = malloc(nt * sizeof(Node));
+    #pragma omp parallel default(none) shared(p, a, b, nk, nj, ni, nt, ntk, ntj, nti)
+    {
+        /*
+         * psub is a pointer to a chunk of data of the subdomain for a
+         * particular thread. The memory is allocated within a parallel region
+         * and therefore private to each thread.
+         */
+        Node *psub;
+        /*
+         * Perform the domain decomposition.
+         * It is more flexible to read in the domain decomposition parameters
+         * (ntk,ntj,nti) from the case file.
+         */
+        #pragma omp single
+        {
+            nt = omp_get_num_threads();
+            ntk = min(int(pow(nt, 1.0/3.0)), nk);
+            ntj = min(int(pow(nt, 1.0/3.0)), nj);
+            nti = min(int(pow(nt, 1.0/3.0)), ni);
+        }
+        /*
+         * The domain decomposition happens on the fly, in that the number of
+         * subdomains is determined at run time based on the value of the 
+         * OMP_NUM_THREADS environment variable. The number of cells per thread
+         * is calculated by using a workload balancing scheme. Each thread 
+         * operates on its own private data. The only shared data structure is
+         * a small array of pointers to the subdomain structures. If there are 
+         * N subdomains, this will be an array of N pointers to the N subdomain 
+         * structures on the different processors.
+         */
+        int id = omp_get_thread_num();
+        for (int k = 0; k < ntk; ++k) {
+            for (int j = 0; j < ntj; ++j) {
+                for (int i = 0; i < nti; ++i) {
+                    if ((k + 1) * (j + 1) * (i + 1) == (id + 1)) {
+                        k_min = (k * nk) / ntk;
+                        k_max = ((k + 1) * nk) / ntk;
+                        j_min = (j * nj) / ntj;
+                        j_max = ((j + 1) * nj) / ntj;
+                        i_min = (i * ni) / nti;
+                        i_max = ((i + 1) * ni) / nti;
+                        psub = malloc(sizeof(subdomain)); /* memory for data of each subdomain */
+                        p[id] = psub; /* save the addresses of all the subdomainds */
+                    }
+                }
+            }
+        }
+        /*
+         * Perform calculations
+         */
+        for (int k = k_min; k < k_max; ++k) {
+            for (int j = j_min; j < j_max; ++j) {
+                for (int i = i_min; i < i_max; ++i) {
+                    a[k, j, i] = a[k, j, i] + 0.25 * (b[k-1, j, i-1] + b[k+1, j + 1, i]);
+                }
+            }
+        }
+        /*
+         * Boundary treatment
+         */
+        if (min or max locate on global boundary) {
+            boundary_treatment();
+        } else {
+            /*
+             * OpenMP-based boundary exchange
+             * Use share pointers to access and copy data
+             */
+            #pragma omp barrier
+            for (k=0; k<Neighbors; k++){
+                for (j = 0; j < overlapCells; j++) {
+                    set_pointers(pNeighborGrid);
+                    XchangeIndex = pNeighborGrid->index;
+                    /* actual copying takes place here */
+                    pMyGrid->a[j] = pNeighborGrid->a[XchangeIndex];
+                }
+            }
+            /*
+             * MPI-based boundary exchange
+             * pack ghost data into a contiguous buffer and send;
+             * receive ghost data and mapping back;
+             */
+            /* allocate send and receive buffers */
+            malloc(sbuf);
+            malloc(rbuf);
+            /* fill up the send buffers */
+            for (k=0; k<Neighbors; k++){
+                ncount = 0;
+                for (j=0; j < overlapCells; j++) {
+                    set_pointers(pMyGrid, k);
+                    XchangeIndex = pMyGrid->index;
+                    sbuf[ncount]= pMyGrid->a[XchangeIndex];
+                    ncount++;
+                }
+                /* send buffer */
+                Size = ncount;
+                MPI_Isend(sbuf, Size, Type, recvID, Tag, MPI_COMM_WORLD, &(rbuf[k]));
+            }
+            for (k=0; k<Neighbors; k++){
+                /* receive data from any source that has sent data */
+                MPI_Recv(rbuf, Size, Type, MPI_ANY_SOURCE, MPI_COMM_WORLD, &status);
+                ncount = 0;
+                /* unpacking data */
+                for (j=0; j < overlapCells; j++) {
+                    pMyGrid->a[j] = rbuf[ncount];
+                    ncount++;
+                }
+            }
+            if (Neighbors > 0) {
+                MPI_Waitall(Neighbors);
+            }
+        }
+    }
+    return 0;
+}
+

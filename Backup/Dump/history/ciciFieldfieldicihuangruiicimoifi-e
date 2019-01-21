@@ -1,0 +1,631 @@
+%---------------------------------------------------------------------------%
+%->> Document class declaration
+%---------------------------------------------------------------------------%
+\documentclass[]{interact}
+%---------------------------------------------------------------------------%
+%->> Document settings
+%---------------------------------------------------------------------------%
+\usepackage{microtype}% improves general appearance of the text
+\usepackage{amsmath,amssymb,amstext}% math support
+\usepackage{newtxtext,newtxmath}% font support
+\usepackage{graphicx}% graphics support
+\usepackage{xcolor}% color support
+\usepackage{natbib}% citation support
+\bibpunct[, ]{(}{)}{;}{a}{}{,}% Citation support using natbib.sty
+\renewcommand\bibfont{\fontsize{10}{12}\selectfont}% Bibliography support using natbib.sty
+\usepackage{enumitem}% customizing enumerated lists
+\usepackage{subcaption}% subfigures
+\captionsetup{compatibility=false}
+%\usepackage[section]{placeins}% to prevent floats from being moved over section
+\graphicspath{{./}{./img/}}
+\usepackage{hyperref}% hyperlink support
+
+\theoremstyle{plain}% Theorem-like structures provided by amsthm.sty
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+\newtheorem{notation}{Notation}
+
+%---------------------------------------------------------------------------%
+%->> User defined commands
+%---------------------------------------------------------------------------%
+\providecommand{\Vector}[1]{\boldsymbol{#1}}% General vectors in bold italic
+\providecommand{\unitVector}[1]{\boldsymbol{\mathbf{#1}}}% Unit vectors in bold roman
+\providecommand{\Tensor}[1]{\boldsymbol{\mathsf{#1}}}% Tensor in sans-serif bold italic
+\providecommand{\unitTensor}[1]{\boldsymbol{{\mathsf{#1}}}}% Identity tensor in sans-serif bold
+\providecommand{\Matrix}[1]{\boldsymbol{\mathbf{#1}}}% Matrix in bold roman
+\providecommand{\unitMatrix}[1]{\boldsymbol{\mathbf{#1}}}% Identity matrix in bold roman
+\providecommand{\Unit}[1]{\,\mathrm{#1}}% Units in roman
+\providecommand{\Const}[1]{\mathrm{#1}}% Math constants, functions
+\providecommand{\Set}[1]{\mathbb{#1}}% Special sets (e.g. real numbers) in blackboard bold
+\providecommand{\Des}[1]{\mathrm{#1}}% description
+\providecommand{\Div}{\operatorname{div}}% divergence operator
+\providecommand{\Order}{\operatorname{O}}% order operator
+\providecommand{\Trace}{\operatorname{tr}}% trace operator
+\providecommand{\Diag}{\operatorname{diag}}% diagonal
+\providecommand{\Def}{\operatorname{def}}% define
+\providecommand{\Loptr}{\operatorname{\mathcal{L}}}% spatial operator
+\providecommand{\Toptr}{\operatorname{\mathcal{LL}}}% temporal operator
+\providecommand{\Soptr}{\operatorname{\mathcal{S}}}% solution operator
+\providecommand{\Rev}[1]{\begingroup\color{blue}{#1}\endgroup}% revision highlight
+%---------------------------------------------------------------------------%
+%->> Document content
+%---------------------------------------------------------------------------%
+\begin{document}
+
+\articletype{ARTICLE TEMPLATE}
+
+\title{A simple field function for solving complex and dynamic fluid-solid system on Cartesian grid}
+
+\author{%
+    \name{Huangrui Mo\textsuperscript{a}\thanks{CONTACT Huangrui Mo. Email: huangrui.mo@uwaterloo.ca} and Fue-Sang Lien\textsuperscript{a} and Duane S. Cronin\textsuperscript{a} and Fan Zhang\textsuperscript{b}}
+    \affil{\textsuperscript{a}Department of Mechanical Engineering, University of Waterloo, 200 University Avenue West, Waterloo, ON N2L 3G1, Canada; \textsuperscript{b}Defence Research and Development Canada, P.O. Box 4000, Station Main, Medicine Hat, AB T1A 8K6, Canada}
+}
+
+%\date{Received: date / Accepted: date}
+
+\maketitle
+
+\begin{abstract}
+    Addressing coupled fluid-solid and solid-solid interactions is essential for solving complex and dynamic fluid-solid systems. In this study, a simple field function is presented for facilitating the solution of fluid-solid systems on Cartesian grids using immersed boundary treatment. For a Cartesian-grid-discretized computational domain segmented by a set of irregular, moving, and colliding solid bodies, the proposed field function can uniquely track all the subdomains with multiple layers of interfacial nodes using only one integer field in total. As a result, the present field function enables single-integer-based multidomain node mapping, efficient node remapping, and linear-time collision detection. Implementation algorithms for the field function and its associated functionalities are presented. Numerical experiments involving complex and dynamic fluid-solid systems are conducted to validate and demonstrate the applicability of the proposed field function.
+\end{abstract}
+
+\begin{keywords}
+    Cartesian grid; Field function; Immersed boundary; Multidomain node mapping; Fluid-structure interaction; Multibody collision
+\end{keywords}
+
+\section{Introduction}\label{sec:intro}
+
+Complex and dynamic fluid-solid systems arise in many applications such as fluidized bed \citep{glowinski2001fictitious, van2008numerical}, blood flow \citep{peskin1972flow}, particle-added explosives \citep{zhang2001explosive, das2017sharp}, aerodynamic flow \citep{murman2003simulations, anderson2015aerodynamic, chiew2018efficient}, and computer graphics \citep{guendelman2003nonconvex, robinson2008two}. These systems usually involve interactions that comprise the coupled motions of solid and fluid flow. When a predictive modeling approach that resolves the fluid-solid interfaces is employed, in addition to addressing the coupled fluid-solid and solid-solid interactions, one inherent challenge can be the numerical discretization complicated by a set of irregular and moving geometries.
+
+The development of Cartesian-grid methods \citep{peskin1972flow, fedkiw1999non, leveque1997immersed, sethian2000structural, gilmanov2003general, wang2011algorithms} has provided a feasible way to enforce boundary conditions at phase interfaces that are not conforming to the computational grid, which can effectively simplify the grid generation for irregular geometries and grid regeneration for moving geometries \citep{mittal2005immersed, sotiropoulos2014immersed}. In addition, a solid object immersed in the computational grid can be described by the STereoLithography (STL) representation, which approximates the object as a closed triangulated surface and is a standard format for rapid prototyping and computer-aided design (CAD) systems. When equipped with a suitable Cartesian grid-based numerical framework, the STL represented solid can be directly inputted into the numerical solver without the need of CAD/CFD geometric translations to effectively enable automated mesh generation and numerical solution \citep{aftosmis1998robust, iaccarino2003immersed, murman2004automated}.
+
+In applications involving multiple independent and irregular solid bodies, as each immersed body occupies a corresponding spatial region, the computational domain is therefore segmented into a set of subdomains. The subsequent implementation of numerical discretization and boundary conditions requires a node map that correctly classifies the type and region of computational nodes and identifies domain boundaries \citep{iaccarino2003immersed, zhang2014immersed, das2017sharp}. In addition, when the solids move in space, the requirement for node remapping also arises during the solution process. For problems without the need of differentiating a solid domain from the other solid domains, a binary node map that distinguishes fluid and solid domains through flagging the nodes inside any solid as $0$ and nodes outside the solids as $1$, or vice versa, has been popularly utilized to aid the enforcement of boundary conditions at solid boundaries \citep{iaccarino2003immersed, sambasivan2009ghostb, kapahi2013three, zhang2014immersed}. When further considering interactions such as collisions among solids or different material properties and/or boundary conditions for some solid domains, uniquely tracking and identifying each solid domain are then necessary, for which a possible solution can be employing an individual binary node map for each solid.
+
+In computing a fluid-solid system with dense solids, collisions among solids can exert a strong influence on the stresses in the fluid-solid mixture \citep{walton1993numerical}. Therefore, collision modeling can be an essential element. Models based on experimental correlations \citep{walton1993numerical, glowinski1999distributed, moreno20123d} often have limited description for flow with dense-to-dilute transitions. Short-range repulsive-force collisions \citep{hu2001direct, glowinski2001fictitious} usually consider the position of solids and omit size and shape effects. An interface-resolved collision model can provide a more comprehensive description of collision dynamics and thus a wider applicability. Nonetheless, additional challenges from collision detection and response are introduced and need to be addressed.
+
+For each object in a solid system, collision detection is to determine the collision status of the current solid with regard to other solids, which can include colliding or non-colliding state, the list of colliding solids, and the line of impact for each colliding pair. Collision response is to solve the post-collision velocity under a detected collision status. In a system of moving solids, simultaneous multibody collisions are much less common than binary collisions. Nonetheless, when the system contains dense solids with spherical geometries or with sustained contacts among solids to transmit impulses, the presence of multibody collisions can increase greatly. Remaining as an unsolved problem \citep{ivanov1995multiple}, multibody collision is often approximated by sequential pairwise collisions \citep{gidaspow1994multiphase, guendelman2003nonconvex, brilliantov2010kinetic}. Due to sequential collision, a temporal priority can be introduced into pairwise collisions in the process of choosing which pair collides first, and the collision process may no longer be deterministic.
+
+In collision detection, when the surfaces of solids are only explicitly represented by triangulated meshes, checking every solid against every other solid can be inefficient if the number of solids is large and the geometry is complex. Considerable research has been devoted to optimizing the problem with strategies focusing on hierarchical object representation, orientation-based pruning criteria, spatial partitioning schemes, and distance computation algorithms \citep{lin1998collision, jimenez20013d, guendelman2003nonconvex, wald2007ray}. A multilevel algorithm that integrates temporal coherence exploitation, pairwise pruning, and exact pairwise collision-detection techniques can effectively reduce the collision-detection operations for a dense solid system with convex shapes but can still be expensive for non-convex objects \citep{jimenez20013d, ericson2004real}. Employing implicit surfaces defined by field functions such as signed distance functions has shown success in collision-related modeling \citep{jones20063d, guendelman2003nonconvex, kapahi2013three}. While triangulated surface representation is used for normal calculation and the determination of the line of impact, a signed distance function per solid object can map the point-inclusion state for each computational node with regard to the solid object. As a result, using the layer of nodes that is nearest to the zero isocontour of a signed distance function as sample points, the collision status of a solid object can be determined by testing the values of the sample points with regard to the signed distance functions of other solids \citep{guendelman2003nonconvex}. Since the surface resolution of implicitly defined surfaces is proportional to the grid resolution for field functions, high accuracy can be obtained when a well-resolved grid is employed.
+
+Considering that using a binary node-mapping function for a multidomain problem usually requires one field function per object and can consume memory that is proportional to the number of involved solids, the development of a field function that can compress the multidomain node mapping information into a single field to reduce memory requirement can be useful. To facilitate the solution of complex and dynamic fluid-solid systems on Cartesian grids, an integer-type field function that solves multidomain node mapping is proposed. For a Cartesian-grid-discretized computational domain segmented by a set of irregular, moving, and colliding solid bodies, compared with a binary node-mapping function that produces node mapping information using one field function per subdomain, the proposed field function can uniquely track all the subdomains with multiple layers of interfacial nodes using only one integer field in total. As a result, the present field function enables single-integer-based multidomain node mapping, efficient node remapping, and linear-time collision detection. Implementation algorithms for the field function and its associated functionalities are presented. Numerical experiments involving complex and dynamic fluid-solid systems are conducted to validate and demonstrate the applicability of the proposed field function.
+
+\section{Method development}
+
+\subsection{Field function description}
+
+As illustrated in Fig.~\ref{fig:n_domain_basis_demo}, for a set of solids represented by triangulated polyhedrons $\{\Omega_p: \ p = 1, \dotsc, P\}$ and distributed in a spatial domain $\Omega$, an additional subdomain $\Omega_0$ can be introduced as
+\begin{equation}
+    \Omega_0 = \{\Vector{x} \in \Omega: \Vector{x} \notin \cup_{p=1}^P\Omega_p\}
+\end{equation}
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.48\textwidth]{n_domain_basis_demo}
+    \caption{A schematic diagram illustrating a set of polyhedron domains distributed in a spatial domain discretized by a Cartesian grid.}
+    \label{fig:n_domain_basis_demo}
+\end{figure}
+
+When a Cartesian grid $I \times J \times K$ is used to discretize the spatial domain $\Omega$, it is necessary to build a node map for defining the spatial relation between computational nodes and the individual polyhedral subdomains. In this study, a two-component integer-type field function is developed to classify each node with regard to $\Omega_m$ and also to identify $R$ layers of interfacial nodes for each $\Omega_m$, $m = 0, \dotsc, P$:
+\begin{equation}
+    \Vector{\Phi} = \{(\phi, \varphi): \phi \in \{0, \dotsc, P\}, \varphi \in \{0, \dotsc, R\}\}
+\end{equation}
+in which $\phi$ is the domain identifier and is determined by the point inclusion state:
+\begin{equation} \label{eq:phicondition}
+    \phi_{i,j,k} = m, \ \text{if}\ \Vector{x}_{i,j,k} \in \Omega_m
+\end{equation}
+and $\varphi$ is the interfacial layer identifier and is determined by the existence of a heterogeneous node $(i', j', k')$, that is, a node with a different $\phi$ value, in the range $L(r)$ surrounding the processing node $(i, j, k)$:
+\begin{equation} \label{eq:varphicondition}
+    \varphi_{i,j,k} = 
+    \begin{cases}
+        \min{\{r\}}, &\ \text{if}\ \exists \, \phi_{i',j',k'} \neq \phi_{i,j,k} \ \text{in range}\ $L(r)$\\
+        0, &\ \text{if}\ r > R 
+    \end{cases}
+\end{equation}
+here $\Vector{x}_{i,j,k}$ is the position vector of the node $(i, j, k)$, and $R$ represents the maximum layers of interfacial nodes that needs to be identified. The range $L(r)$ is the size of numerical stencils used for the spatial discretization of the governing equations at the node $(i, j, k)$. Therefore, the range $L(r)$ needs to be adapted according to the involved differential operators and spatial schemes. For example, the discretization of non-mixed and mixed derivatives requires $L(r)$ to be the line-type stencils in Eq.~\eqref{eq:linetypeq} and the plane-type stencils in Eq.~\eqref{eq:mixedtypeq}, respectively. Note that the determination of the last three criteria in Eq.~\eqref{eq:mixedtypeq} is to maximize the overlap between the first three criteria and the last three ones.
+\begin{equation} \label{eq:linetypeq}
+    \begin{cases}
+        |i'-i| = r, \, |j'- j| = 0, \, |k'- k| = 0 &\ \text{or}\\
+        |i'-i| = 0, \, |j'- j| = r, \, |k'- k| = 0 &\ \text{or}\\
+        |i'-i| = 0, \, |j'- j| = 0, \, |k'- k| = r
+    \end{cases}
+\end{equation}
+\begin{equation} \label{eq:mixedtypeq}
+    \begin{cases}
+        |i'-i| = r, \, |j'- j| = 0, \, |k'- k| = 0 &\ \text{or}\\
+        |i'-i| = 0, \, |j'- j| = r, \, |k'- k| = 0 &\ \text{or}\\
+        |i'-i| = 0, \, |j'- j| = 0, \, |k'- k| = r &\ \text{or}\\
+        |i'-i| = r-1, \, |j'- j| = r-1, \, |k'- k| = 0 &\ \text{or}\\
+        |i'-i| = r-1, \, |j'- j| = 0, \, |k'- k| = r-1 &\ \text{or}\\
+        |i'-i| = 0, \, |j'- j| = r-1, \, |k'- k| = r-1
+    \end{cases}
+\end{equation}
+
+\subsection{Single-integer-based multidomain node mapping}
+
+The field function $\Vector{\Phi}(\phi,\varphi)$ can produce a complete node map for the numerical discretization of complex fluid-solid systems. As shown in Fig.~\ref{fig:n_domain_demo}, for each node $(i,j,k)$, $\phi_{i,j,k}$ and $\varphi_{i,j,k}$ can provide the subdomain and interfacial state, respectively.
+
+In general, when $\Omega_m$ is a solution domain, two approaches are available to compute the solutions in $\Omega_m$. 1) a non-ghost-cell approach, in which $\Vector{\Phi}_{i,j,k}(\phi=m, \varphi=0)$ represents a normal solution node, and $\Vector{\Phi}_{i,j,k}(\phi=m, \varphi>0)$ represents a node locating at the numerical boundary of $\Omega_m$. 2) a ghost-cell approach, in which $\Vector{\Phi}_{i,j,k}(\phi=m, \varphi \ge 0)$ represents a normal solution node, and $\Vector{\Phi}_{i,j,k}(\phi \neq m, \varphi>0)$ with a node $\Vector{\Phi}_{i',j',k'}(\phi = m, \varphi \ge 0)$ existing in the range $L(r)$ of the node $(i,j,k)$ represents a node locating at the numerical boundary of $\Omega_m$.
+
+When the space occupied by $\Omega_m$ changes in time, interfacial nodes of another domain $\Omega_n$ can change their corresponding domain and become interfacial nodes of $\Omega_m$. In a non-ghost-cell approach, the newly joined interfacial nodes of $\Omega_m$ always become boundary nodes, whose values will be constructed by boundary treatment. However, in a ghost-cell approach, the newly joined interfacial nodes of $\Omega_m$ directly become normal solution nodes of the solution domain $\Omega_m$. Therefore, a special treatment, such as a reconstruction for the values of the newly joined nodes from the values of the original normal solution nodes of $\Omega_m$ is required to deal with these newly joined nodes.
+
+For a computational domain segmented by a set of solid bodies, the proposed field function $\Vector{\Phi}(\phi,\varphi)$ uniquely identifies all the subdomains with multiple layers of interfacial nodes. Therefore, it is straightforward to apply designated governing equations, constitutive models, numerical schemes, and boundary conditions for each subdomain. In the practical implementation, the two-component $\Vector{\Phi}(\phi,\varphi)$ can be mapped onto a single scalar $\Phi = \phi + \varphi * (P+1)$, from which individual components can be extracted through $\varphi = \Phi \Des{\,mod\,} (P+1)$ and $\phi = \Phi - \varphi * (P+1)$, respectively. As an integer-type field function that can be stored on a single grid, the proposed field function herein enables single-integer-based multidomain node mapping and consumes memory that is independent of the number of represented objects. For instance, assume that the number of nodes for defining a field function is $M$ and the number of represented objects is $P$, the estimated memory consumption for using the proposed field function is then about $1/P$ of that for using a binary node-mapping function. This low-memory requirement can be particularly useful for applications involving a large set of solid bodies, such as in solving fluid-solid systems with thousands of colliding particles.
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.48\textwidth]{n_domain_demo}
+    \caption{A schematic diagram illustrating the field function $\Vector{\Phi}(\phi,\varphi)$ for multidomain node mapping. The value of $\phi$ is represented by \emph{shapes}: $\circ = 0$; $\bigtriangleup = 1$; $\star = p$; $\square = P$. The value of $\varphi$ is represented by \emph{colors}: ${\color{gray} \bullet} = 0$; ${\color{red} \bullet} = 1$. $R = 1$ is adopted here for clarification.}
+    \label{fig:n_domain_demo}
+\end{figure}
+
+\subsection{Efficient node remapping} \label{sec:remap}
+
+During the solution process, when the positions of polyhedrons keep changing, the requirement for node remapping arises. As illustrated in Fig.~\ref{fig:node_remapping_demo}, the field function $\Vector{\Phi}(\phi,\varphi)$ enables efficient node remapping: From time $t^n$ to $t^{n+1}$, suppose the domain occupied by $\Omega_p$ changing from $\Omega_p^n$ to $\Omega_p^{n+1}$. When the computational time step size is restricted by a stability condition such as the Courant--Friedrichs--Lewy (CFL) condition \citep{courant1927partial}, the boundary of $\Omega_p$ will correspondingly have restricted travelling distance. If the stability condition restricts the value of travelling distance to no more than one grid size, and the maximum number of identified interfacial layers has $R \ge 2$, it is safe to assume that a node $(i,j,k)$ with $\Vector{\Phi}_{i,j,k}(\phi=p,\varphi=0)$ in $\Omega_p^n$ will remain in $\Omega_p^{n+1}$, and then only the interfacial nodes need to be reset. As a result of this temporal coherence, nodes with $\Vector{\Phi}_{i,j,k}(\phi=p,\varphi=0)$ can be exempted from future point-inclusion tests. As these non-interfacial nodes constitute the major fraction of the computational nodes in a practical grid, this exemption from the expensive point-inclusion test can significantly reduce the costs of node remapping to obtain an acceleration rate inversely proportional to the surface-to-volume ratio of polyhedrons. An efficient node remapping algorithm adopting the described temporal coherence is proposed in the present study as the following:
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.48\textwidth]{node_remapping_demo}
+    \caption{A schematic diagram illustrating the field function $\Vector{\Phi}(\phi,\varphi)$ for efficient node remapping. The value of $\phi$ is represented by \emph{shapes}: $\circ = 0$; $\star = p$. The value of $\varphi$ is represented by \emph{colors}: ${\color{gray} \bullet} = 0$; ${\color{red} \bullet} = 1$; ${\color{blue} \bullet} = 2$. $R=2$ is adopted, and the interfacial nodes of $\Omega_0$ are not shown for clarification.}
+    \label{fig:node_remapping_demo}
+\end{figure}
+\begin{enumerate}
+    \item \emph{Initialization}. Sweep each node $(i,j,k)$ in $I \times J \times K$: if $\varphi_{i,j,k} > 0$, set $\Vector{\Phi}_{i,j,k}(\phi,\varphi) = (0,0)$.
+    \item \emph{Compute the domain identifier $\phi$}. Sweep each polyhedron $\Omega_p$ in $\{\Omega_p: \ p = 1, \dotsc, P\}$:
+        \begin{enumerate}
+            \item Find the bounding box $B_p=[I_{\Des{min}}, I_{\Des{max}}] \times [J_{\Des{min}}, J_{\Des{max}}] \times [K_{\Des{min}}, K_{\Des{max}}]$. 
+            \item Sweep each node $(i,j,k)$ in $B_p$: if $\phi_{i,j,k} = 0$, do point-in-polyhedron test for the node $(i,j,k)$ over $\Omega_p$ to determine the value of $\phi_{i,j,k}$ using Eq.~\eqref{eq:phicondition}.
+        \end{enumerate}
+    \item \emph{Compute the interfacial layer identifier $\varphi$}. Sweep each node $(i,j,k)$ in $I \times J \times K$: determine the value of $\varphi_{i,j,k}$ using Eq.~\eqref{eq:varphicondition}.
+\end{enumerate}
+
+In the described algorithm, the point-in-polyhedron test for the node $(i,j,k)$ over $\Omega_p$ is a point-inclusion test with regard to a single polyhedron. A variety of established methods, such as the ray-crossing methods \citep{o1998computational}, angular methods \citep{carvalho1995point}, winding number methods \citep{haines1994point}, and signed distance methods \citep{jones20063d}, are available. The angle weighted pseudonormal signed distance computation method \citep{baerentzen2005signed} is employed herein for a balance of efficiency and robustness. Meanwhile, it finds the closest point, the distance to surface, and the surface normal for a computational node with regard to the solid geometry, which is essential for implementing a Cartesian grid-based boundary treatment method.
+
+The proposed algorithm herein effectively solves the node classification and boundary identification issues simultaneously for a Cartesian grid segmented by a set of polyhedrons in space, which involves a set of points together with a set of polyhedrons and represents a generalized point-in-polyhedron problem. In addition, since $\Vector{\Phi}(\phi,\varphi) = (0,0)$ is true initially, the presented algorithm successfully unifies the procedures of the initial multidomain node mapping and the subsequent node remapping for moving objects. This unification can simplify the code structure and reduce the complexity of implementation.
+
+\subsection{Linear-time collision detection}
+
+As captured in Fig.~\ref{fig:n_domain_collide_demo}, employing the field function $\Vector{\Phi}(\phi,\varphi)$, polyhedrons $\{\Omega_{n}\}$ colliding with $\Omega_p$ can be detected efficiently via sweeping through nodes $(i,j,k)$ with $\Vector{\Phi}_{i,j,k}(\phi=p,\varphi=1)$ in the bounding box of $\Omega_p$ to detect nodes $(i',j',k')$ with $\Vector{\Phi}_{i',j',k'}(\phi \neq p, \varphi=1)$ in the range $|i-i'| \leq 1$, $|j-j'| \leq 1$, and $|k-k'| \leq 1$. 
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.48\textwidth]{n_domain_collide_demo}
+    \caption{A schematic diagram illustrating the field function $\Vector{\Phi}(\phi,\varphi)$ for collision detection. The value of $\phi$ is represented by \emph{shapes}: $\circ = 0$; $\bigtriangleup = 1$; $\star = n$; $\square = N$; $\diamond = p$. The value of $\varphi$ is represented by \emph{colors}: ${\color{gray} \bullet} = 0$; ${\color{red} \bullet} = 1$. $R=1$ is adopted, and the interfacial nodes of $\Omega_0$ are not shown here for clarification.}
+    \label{fig:n_domain_collide_demo}
+\end{figure}
+
+Comparing to explicit surfaces such as triangulated meshes, implicit surfaces, such as the binary node-mapping functions and the proposed integer field function herein, for collision detection have algorithm efficiency and complexity that are much less sensitive to geometric complexity. This is because collision detection for implicit surfaces uses point-wise data comparison rather than facet-wise distance calculation as the basic operator and is independent of the number of facets and the level of concavity.
+
+On a given Cartesian grid, let $\Soptr_{\Des{cd}}$ represent the collision detection operator for an interfacial node $(i,j,k)$ in a polyhedron $\Omega_p$. $\Soptr_{\Des{cd}}$ based on a binary node mapping involves fetching and comparing of about $P$ floating-point or integer data scattered in $P$ field functions, while $\Soptr_{\Des{cd}}$ based on $\Vector{\Phi}$ requires fetching and comparing of about $2$ integer data per spatial dimension locally located on one Cartesian grid. Therefore, the algorithm complexity of collision detection for $P$ polyhedrons can be $\Order(P^2)$ for using a binary node mapping but only $\Order(P)$ for using the proposed field function $\Vector{\Phi}$ herein.
+
+During $\Omega_p$ colliding with $\Omega_n$, it is possible that several geometric elements, such as vertices, edges, and faces, of $\Omega_p$ and $\Omega_n$ can be in contact simultaneously. In addition, one element of $\Omega_p$ could come into contact with a few elements of $\Omega_n$ at the same time. This multicontact issue imposes challenges in finding the line of impact for collision modeling. 
+
+Approximating the line of impact via the proposed field function $\Vector{\Phi}(\phi,\varphi)$ can then provide an alternative perspective to the approximation via explicit surfaces defined by triangulated meshes. Suppose $C$ nodes $(i_c,j_c,k_c)$, $c = 1, \dotsc, C$, in $\Omega_p$ satisfying $\Vector{\Phi}_{i_c,j_c,k_c}(\phi = p, \varphi=1)$, and each $(i_c,j_c,k_c)$ comes with $D$ neighboring nodes $(i'_d,j'_d,k'_d)$, $d = 1, \dotsc, D$, such that $\Vector{\Phi}_{i'_d,j'_d,k'_d}(\phi = n, \varphi=1)$, the suggested approximation of the line of impact between $\Omega_p$ and $\Omega_n$ is defined as
+\begin{equation}
+    \unitVector{e}_{pn} = \frac{\sum^{C}_{c=1}\sum^{D}_{d=1} [(i'_d - i_c)\unitVector{e}_1 + (j'_d - j_c)\unitVector{e}_2 + (k'_d - k_c)\unitVector{e}_3]}{|\sum^{C}_{c=1}\sum^{D}_{d=1} [(i'_d - i_c)\unitVector{e}_1 + (j'_d - j_c)\unitVector{e}_2 + (k'_d - k_c)\unitVector{e}_3]|}
+\end{equation}
+where $\unitVector{e}_1$, $\unitVector{e}_2$, $\unitVector{e}_3$ are the unit vectors in the $x$, $y$, and $z$ directions, respectively. This approximation of the line of impact via the field function can simplify the multicontact problem with adequate accuracy, as to be demonstrated in the numerical experiments later.
+
+\section{Governing equations and discretization}
+
+\subsection{Fluid-solid coupling}
+
+The coupling between fluid and solid motions is based on Strang splitting \citep{strang1968construction}:
+\begin{equation}
+    \Vector{U}^{n+1} = \Soptr_{\Des{s}}(\frac{\Delta t}{2})\Soptr_{\Des{f}}(\frac{\Delta t}{2})\Soptr_{\Des{f}}(\frac{\Delta t}{2})\Soptr_{\Des{s}}(\frac{\Delta t}{2}) \Vector{U}^n
+\end{equation}
+where $\Vector{U}^{n}$ and $\Vector{U}^{n+1}$ are the solution vectors at time $t^n$ and $t^{n+1}$, respectively; $\Soptr_{\Des{f}}$ and $\Soptr_{\Des{s}}$ are the solution operators of fluid and solid dynamics, respectively.
+
+\subsection{Fluid dynamics}
+
+The fluid motion is governed by the Euler equations in Cartesian coordinates: 
+\begin{equation}
+    \frac{\partial \Vector{U}}{\partial t}+\frac{\partial \Vector{F}_i}{\partial x_i} = 0
+\end{equation}
+where the vectors of conservative variables $\Vector{U}$ and convective fluxes $\Vector{F}_i$ are as follows:
+\begin{equation}
+    \Vector{U} =
+    \begin{pmatrix}
+        \rho\\
+        \rho V_j\\
+        \rho e_{\Des{T}}
+    \end{pmatrix}
+    ,\,\,
+    \Vector{F}_i =
+    \begin{pmatrix}
+        \rho V_i\\
+        \rho V_i V_j + p \delta_{ij}\\
+        (\rho e_{\Des{T}}+p) V_i
+    \end{pmatrix}
+\end{equation}
+in which $\rho$, $\Vector{V}$, $e_{\Des{T}}$, $p$, $T$, and $k$ are the density, velocity, specific total energy, thermodynamic pressure, temperature, and thermal conductivity, respectively. $i$ is a free index, and $j$ is an enumerator. The closure of the system is through the perfect gas law
+\begin{equation}
+    \begin{gathered}
+        p = \rho R T \\
+        e = C_v T
+    \end{gathered}
+\end{equation}
+here $R$, $e$, and $C_v$ are the specific gas constant, specific internal energy, and specific heat capacity at constant volume, respectively.
+
+The temporal integration of the Euler equations is performed using the third-order SSP Runge--Kutta method \citep{shu1988efficient, gottlieb2001strong}. Dimension splitting \citep{strang1968construction} is adopted to treat the system of conservation laws in multidimensional space. Conservative discretization is applied for the convective fluxes to ensure discrete mass conservation. The fifth-order WENO scheme \citep{jiang1996efficient} is then used for the reconstruction of convective fluxes. The interface boundary treatment is conducted via an immersed boundary method \citep{mo2018immersed} using the ghost-cell approach.
+
+\subsection{Solid dynamics}
+
+The governing equations of solid motion consist of the Newton's second law of translational motion and the Euler equations of rotational motion:
+\begin{equation}
+    \frac{\mathrm{d} \Vector{U}}{\mathrm{d} t} = \Vector{\Phi}
+    ,\,\,
+    \Vector{U} =
+    \begin{pmatrix}
+        \Vector{V}\\
+        \Vector{x}_{\Des{c}}\\
+        \Matrix{I}_{\Des{c}} \Vector{\omega}\\
+        \Vector{\theta}
+    \end{pmatrix}
+    ,\,\,
+    \Vector{\Phi} =
+    \begin{pmatrix}
+        \frac{1}{m}\int\limits_{\partial\Omega} \unitVector{n} \cdot (-p \unitTensor{I}) \, \mathrm{d}S \\
+        \Vector{V}\\
+        \int\limits_{\partial\Omega} (\Vector{x} - \Vector{x}_{\Des{c}}) \times [\unitVector{n} \cdot (-p \unitTensor{I})] \, \mathrm{d}S\\
+        \Vector{\omega}
+    \end{pmatrix}
+\end{equation}
+in which $\Vector{x}$ is position vector, $\Omega$ is the spatial domain occupied by a solid, $\Vector{x}_{\Des{c}}$ is the position vector of the solid centroid, $\Vector{\theta}$ is the orientation of the solid, $\Vector{V}$ and $\Vector{\omega}$ are the translational and angular velocities, respectively, $m$ is the mass of the solid, $\Matrix{I}_{\Des{c}}$ is the moment of inertia matrix, $\unitVector{n}$ is the unit outward surface normal vector, $p$ is the pressure exerted on the solid surface via fluid. The time integration of this ordinary differential equation system is performed via a second-order Runge--Kutta scheme.
+
+For the collision responses of colliding solids, as illustrated in Fig.~\ref{fig:n_domain_collide_demo}, assume $N$ polyhedrons $\{\Omega_n\}$, $n=1,\dotsc,N$, colliding with $\Omega_p$ simultaneously, the pre- and post-collision velocity of $\Omega_p$ as $\Vector{V}_p$ and $\Vector{V}_p'$, respectively, and the pre-collision velocity of $\Omega_n$ as $\Vector{V}_n$. A collision model that approximates multibody collision without introducing temporal priority and also extends the applicability of the model in \citep{mo2018numerical} to a wider range of multibody collision scenarios is employed herein:
+\begin{enumerate}
+    \item Conduct the $n$-th pairwise collision $(\Omega_p, \Omega_n)$ with the pre-collision velocity $(\Vector{V}_p,\Vector{V}_n)$ to solve the corresponding post-collision velocity $\Vector{V}_{p,n}'$ and the velocity change $\Delta \Vector{V}_{p,n}'$ of $\Omega_p$:
+        \begin{equation}
+            \begin{aligned}
+                \Delta \Vector{V}_{p,n}' &= \Vector{V}_{p,n}' - \Vector{V}_p = - \frac{m_n}{m_p+m_n} (1+C_{\Des{R}}) (\Vector{V}_{pn} \cdot \unitVector{e}_{pn}) \unitVector{e}_{pn}\\
+                & - C_{\Des{f}} [\Vector{V}_{pn} - (\Vector{V}_{pn} \cdot \unitVector{e}_{pn}) \unitVector{e}_{pn}]
+            \end{aligned}
+        \end{equation}
+        in which $\Vector{V}_{pn}= (\Vector{V}_p - \Vector{V}_n)$, $C_{\Des{R}}$ is the coefficient of restitution in the normal direction ($C_{\Des{R}} = 0$, $0 < C_{\Des{R}} < 1$, and $C_{\Des{R}} = 1$ corresponds to perfectly inelastic collision, partially inelastic collision, and elastic collision, respectively), $C_{\Des{f}}$ represents the effect of sliding friction, $m_p$ and $m_n$ are the mass of $\Omega_p$ and $\Omega_n$, respectively.
+
+    \item Next, approximate the post-collision velocity of $\Omega_p$ under the multibody collision via a vector summation of the pre-collision velocity and velocity changes:
+        \begin{equation}
+            \Vector{V}_p' = \Vector{V}_p + \sum_{n=1}^{N} \Delta \Vector{V}_{p,n}'
+        \end{equation}
+
+    \item Apply the above procedures to each $\Omega_p$, $p=1,\dotsc,P$, in the solid system to obtain a post-collision velocity $\Vector{V}_p'$ after multibody collision.
+    \item Update the velocity state of each $\Omega_p$ through replacing the pre-collision velocity $\Vector{V}_p$ by the post-collision velocity $\Vector{V}_p'$. 
+\end{enumerate}
+
+Avoiding any temporal priority in each polyhedron and each collision, the proposed multibody collision algorithm based on exact pairwise collision is deterministic and can be parallelized.
+
+\section{Numerical experiments}
+
+\subsection{A wind tunnel test constructed via field function}
+
+A numerical wind tunnel test is constructed to illustrate the proposed field function for complex multidomain node mapping. As shown in Fig.~\ref{fig:missile_short_demo_divide_note}, $8$ triangulated polyhedrons $\{\Omega_p: \ p = 1, \dotsc, 8\}$ and a spatial domain $\Omega$ are used. $\Omega_1$ is a cone with an opening angle $\theta_1 = 30^{\circ}$ and height $h_1 = 0.5 \Unit{m}$. $\Omega_2$ is a cylinder with length $l_2 = h_1$ and radius $r_2 = h_1 \tan{(\theta_1 / 2)}$. $\Omega_{3-6}$ are four irregular polyhedrons with an identical geometry, of which the thickness is $w_3 = 0.02 \Unit{m}$ and the lengths of the other five edges counting from the shortest one clockwise are $0.01 \Unit{m}$, $0.1\sqrt{2} \Unit{m}$, $0.1 \Unit{m}$, $0.11 \Unit{m}$, and $0.2 \Unit{m}$, respectively. $\Omega_7$ is a sphere of radius $r_7 = r_2$. $\Omega_8$ is a polyhedron whose outer profile is a box of size $l_8 \times h_8 \times w_8 = 2.5 \Unit{m} \times 0.6 \Unit{m} \times 0.6 \Unit{m}$ and inner profile is a cylindrical cavity with length $l_8$ and radius $r_8 = 0.25 \Unit{m}$. The spatial domain $\Omega$ is a box of size $l \times h \times w = 2.0 \Unit{m} \times 0.55 \Unit{m} \times 0.55 \Unit{m}$.
+\begin{figure*}[!htbp]
+    \centering
+    \begin{subfigure}[b]{0.44\textwidth}
+        \includegraphics[width=\textwidth]{missile_short_demo_divide_note}
+        \caption{}
+        \label{fig:missile_short_demo_divide_note}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.44\textwidth}
+        \includegraphics[width=\textwidth]{missile_short_demo_assemble}
+        \caption{}
+        \label{fig:missile_short_demo_assemble}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.44\textwidth}
+        \includegraphics[width=\textwidth]{missile_short_demo_did_main}
+        \caption{}
+        \label{fig:missile_short_demo_did_main}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.44\textwidth}
+        \includegraphics[width=\textwidth]{missile_short_demo_did_all}
+        \caption{}
+        \label{fig:missile_short_demo_did_all}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.44\textwidth}
+        \includegraphics[width=\textwidth]{missile_short_demo_lid}
+        \caption{}
+        \label{fig:missile_short_demo_lid}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.44\textwidth}
+        \includegraphics[width=\textwidth]{missile_short_demo_gst}
+        \caption{}
+        \label{fig:missile_short_demo_gst}
+    \end{subfigure}%
+    \caption{The construction of a numerical wind tunnel test via the field function $\Vector{\Phi}(\phi,\varphi)$. (a) The employed polyhedrons $\{\Omega_p: \ p = 1, \dotsc, 8\}$ and spatial domain $\Omega$. (b) The constructed wind tunnel test. (c) The computational nodes with $\Vector{\Phi}_{i,j,k}(\phi=0, \varphi)$. (d) The computational nodes with $\Vector{\Phi}_{i,j,k}(8 \ge \phi \ge 1, \varphi)$. (e) A slice plane capturing the layers of interfacial nodes. (f) A slice plane capturing the layers of ghost nodes.}
+    \label{fig:missile_demo}
+\end{figure*}
+\begin{figure*}[!htbp]
+    \centering
+    \begin{subfigure}[b]{0.32\textwidth}
+        \includegraphics[width=\textwidth]{missile_short_schlieren_volume_m192_t0d02}
+        \caption{$t = 0.02 \Unit{s}$}
+        \label{fig:missile_short_schlieren_volume_m192_t0d02}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.32\textwidth}
+        \includegraphics[width=\textwidth]{missile_short_schlieren_volume_m192_t0d03}
+        \caption{$t = 0.03 \Unit{s}$}
+        \label{fig:missile_short_schlieren_volume_m192_t0d03}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.32\textwidth}
+        \includegraphics[width=\textwidth]{missile_short_schlieren_volume_m192_t0d04}
+        \caption{$t = 0.04 \Unit{s}$}
+        \label{fig:missile_short_schlieren_volume_m192_t0d04}
+    \end{subfigure}%
+    \caption{The time evolution of the wind tunnel test illustrated by the volume rendering of the numerical Schlieren field solved on the grid $I_3 \times J_3 \times K_3$.}
+    \label{fig:missile_evolve}
+\end{figure*}
+\begin{figure*}[!htbp]
+    \centering
+    \begin{subfigure}[b]{0.32\textwidth}
+        \includegraphics[trim = 0mm 100mm 0mm 100mm, clip, width=\textwidth]{missile_short_schlieren_slice_m096}
+        \caption{}
+        \label{fig:missile_short_schlieren_slice_m096}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.32\textwidth}
+        \includegraphics[trim = 0mm 100mm 0mm 100mm, clip, width=\textwidth]{missile_short_schlieren_slice_m144}
+        \caption{}
+        \label{fig:missile_short_schlieren_slice_m144}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.32\textwidth}
+        \includegraphics[trim = 0mm 100mm 0mm 100mm, clip, width=\textwidth]{missile_short_schlieren_slice_m192}
+        \caption{}
+        \label{fig:missile_short_schlieren_slice_m192}
+    \end{subfigure}%
+    \caption{The predicted conical shock angles on three different grids at $t = 0.04 \Unit{s}$. (a) $I_1 \times J_1 \times K_1$. (b) $I_2 \times J_2 \times K_2$. (c) $I_3 \times J_3 \times K_3$. Lines denoted by square marks represent the analytical solutions.}
+    \label{fig:missile_shock}
+\end{figure*}
+
+In order to construct the wind tunnel test shown in Fig.~\ref{fig:missile_short_demo_assemble}, the central axes of $\Omega_1$, $\Omega_2$, $\Omega_8$, and $\Omega$ are all positioned along the $x$-axis. The apex of $\Omega_1$ is at $O=(0, 0, 0)$; the centers of $\Omega_2$, $\Omega_8$, and $\Omega$ are located at $(h_1 + l_2/2, 0, 0)$. $\Omega_{3-6}$ are shifted to align with the rear end of $\Omega_2$ with the shortest edge being completely immersed into $\Omega_2$, and the center of $\Omega_7$ is at $(h_1 + l_2, 0, 0)$ so that half of $\Omega_7$ is immersed into $\Omega_2$. In addition, the spatial domain $\Omega$ is discretized by Cartesian grids.
+
+The proposed field function $\Vector{\Phi}(\phi,\varphi)$ is then applied to building a node map for the numerical discretization of the assembled domain in Fig.~\ref{fig:missile_short_demo_assemble}. As shown in Fig.~\ref{fig:missile_short_demo_did_main} for nodes in the solution domain $\Omega_0$ and in Fig.~\ref{fig:missile_short_demo_did_all} for nodes in $\Omega_p$, $p = 1, \dotsc, 8$, the field function $\Vector{\Phi}(\phi,\varphi)$ can uniquely track all the subdomains. As illustrated via the slice plane in Fig.~\ref{fig:missile_short_demo_lid}, the field function can also resolve multiple interfacial layers for each subdomain $\Omega_p$, $p = 0, \dotsc, 8$. In the multidomain node mapping algorithm described in Section~\ref{sec:remap}, nodes inside the overlapped regions between two polyhedrons will be mapped into the polyhedron that is indexed earlier for node mapping and then be exempted from the point-in-polyhedron tests for the one that is indexed later. For instance, the results in Fig.~\ref{fig:missile_short_demo_did_all} present the case that $\Omega_2$ is indexed earlier than $\Omega_{3-6}$ but later than $\Omega_7$ during node mapping. Therefore, the field function $\Vector{\Phi}(\phi,\varphi)$ enables an automatic boolean treatment for geometric intersections. Due to that $\Omega_{3-6}$ are relatively very thin objects, all nodes inside them become interfacial nodes. Since $\Omega_0$ is the desired solution domain, numerical boundary treatment can be conducted at the interfacial nodes of $\Omega_0$ shown in Fig.~\ref{fig:missile_short_demo_lid} for a non-ghost-cell approach or at the ghost nodes of $\Omega_0$ shown in Fig.~\ref{fig:missile_short_demo_gst} for a ghost-cell approach. Only related to the outer profile of the assembled object, both the interfacial nodes and ghost nodes of $\Omega_0$ will not be affected by the index sequence of polyhedrons in node mapping.
+
+Three Cartesian grids $I_1 \times J_1 \times K_1 = 350 \times 96 \times 96$, $I_2 \times J_2 \times K_2 = 525 \times 145 \times 145$, and $I_3 \times J_3 \times K_3 = 700 \times 192 \times 192$ are used to discretize $\Omega$. The initial flow condition in $\Omega$ is $(\rho_0, u_0, v_0, p_0)=(1.4 \Unit{kg/m^3}, 0, 0, 400 \Unit{Pa})$ with the speed of sound being $a_0=20 \Unit{m/s}$. A hypersonic inflow with condition $(\rho_{\infty}, u_{\infty}, v_{\infty}, p_{\infty})=(\rho_0, M_{\infty} a_0, 0, p_0)$ and $M_{\infty} = 5$ is imposed at the front end of $\Omega$, and an outflow boundary condition is used at the rear end of $\Omega$. The slip wall condition is enforced on the surfaces of $\Omega_p$, $p = 1, \dotsc, 8$. The evolution of the system is solved to $t = 2l/(M_{\infty}a_0) = 0.04 \Unit{s}$ and is illustrated in Fig.~\ref{fig:missile_evolve}. The obtained steady conical shocks around the cone region on three grids are captured in Fig.~\ref{fig:missile_shock} and are compared with the analytical solution derived by the Taylor-Maccoll analysis \citep{taylor1933air}. The predicted shock angles on $I_n \times J_n \times K_n$, $n=1,2,3$, are about $20.526^{\circ}$, $20.487^{\circ}$, and $20.118^{\circ}$, respectively, which agree very well with the analytical solution $20.051^{\circ}$ and demonstrate the success of applying the proposed field function for constructing complex fluid-solid systems via multidomain node mapping.
+
+\subsection{A multibody contact and collision system}
+
+As illustrated in Fig.~\ref{fig:multibody_collision_demo}, a fluid-solid system is employed to demonstrate the field function for multibody contact and collision applications. In a $L \times H = [-5D, 5D] \times [-5D, 5D]$ domain with an initial flow state $(\rho_0, u_0, v_0, p_0)=(1.4 \Unit{kg/m^3}, 0, 0, 400 \Unit{Pa})$, five circular solids with diameter $D=1 \Unit{m}$ are placed with the centers being $C_1(-4D,0)$, $C_2(0,4D)$, $C_3(0,0)$, $C_4(2D, -2D)$, and $C_5(2D+1/\sqrt{2}D, -2D-1/\sqrt{2}D)$, respectively. Extending the collision system in \citep{mo2018numerical}, a $90^{\circ}$-angled wall with the inner corner locating at $W_6(2.5D+\sqrt{2}D, -2.5D-\sqrt{2}D)$ is added to introduce a multicontact problem between $C_5$ and $W_6$. During collision, both $C_5$ and $W_6$ will have two contact regions occurring simultaneously. As a difficult problem to solve in rigid-body dynamics \citep{jimenez20013d}, the multicontact collision between $C_5$ and $W_6$ is used to further demonstrate the collision detection of the proposed field function.
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.45\textwidth]{multibody_collision_demo}
+    \caption{A fluid-solid system with analytically solvable multibody contact and collisions.}
+    \label{fig:multibody_collision_demo}
+\end{figure}
+
+Initially, $C_1$ and $C_2$ move with $V=\Unit{50m/s}$ and Mach number $M=2.5$. $C_3$, $C_4$, and $C_5$ are stationary, and the wall $W_6$ is fixed in space. If all the collisions are assumed to be elastic and fluid forces acting on solids are neglected, then the motions of the solids are analytically solvable. The fluid-solid system is solved to $t=200 \Unit{ms}$ on three grids $G_1 = 300\times300$, $G_2 = 600\times600$, and $G_3 = 1200\times1200$, and the evolution is captured in Fig.~\ref{fig:multibody_collision} using results obtained on $G_3$. As shown from Fig.~\ref{fig:multi_col_wall_m1200_t000ms} to Fig.~\ref{fig:multi_col_wall_m1200_t060ms}, once colliding with $C_3$ simultaneously at $t=60 \Unit{ms}$, $C_1$ and $C_2$ pass their momentum to $C_3$. From Fig.~\ref{fig:multi_col_wall_m1200_t080ms} to Fig.~\ref{fig:multi_col_wall_m1200_t090ms}, $C_3$ moves with $(u,v)=(50 \Unit{m/s}, 50 \Unit{m/s})$ and collides with $C_4$ at $t=100 - 10\sqrt{2} \Unit{ms}$. As a result, a colliding chain is formed between $C_3$, $C_4$, and $C_5$ to instantly pass momentum from $C_3$ to $C_5$. From Fig.~\ref{fig:multi_col_wall_m1200_t096ms} to Fig.~\ref{fig:multi_col_wall_m1200_t104ms}, $C_5$ collides with the wall $W_6$ and then bounces back, causing the collision sequence to be inverted. From Fig.~\ref{fig:multi_col_wall_m1200_t110ms} to Fig.~\ref{fig:multi_col_wall_m1200_t120ms}, $C_5$ moves with $(u,v)=(50 \Unit{m/s}, 50 \Unit{m/s})$ and collides with $C_4$ at $t=100 + 10\sqrt{2} \Unit{ms}$ to reform the colliding chain between $C_5$, $C_4$, and $C_3$ and instantly transfer the momentum to $C_3$. From Fig.~\ref{fig:multi_col_wall_m1200_t140ms} to Fig.~\ref{fig:multi_col_wall_m1200_t200ms}, $C_3$ collides with $C_1$ and $C_2$ simultaneously and completely transfer its $x$-momentum to $C_1$ and $y$-momentum to $C_2$. Then, $C_1$ and $C_2$ travel back to their initial positions.
+\begin{figure*}[!htbp]
+    \centering
+    \begin{subfigure}[b]{0.22\textwidth}
+        \includegraphics[trim = 40mm 0mm 40mm 0mm, clip, width=\textwidth]{multi_col_wall_m1200_t000ms}
+        \caption{$t = 0 \Unit{ms}$}
+        \label{fig:multi_col_wall_m1200_t000ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.22\textwidth}
+        \includegraphics[trim = 40mm 0mm 40mm 0mm, clip, width=\textwidth]{multi_col_wall_m1200_t030ms}
+        \caption{$t = 30 \Unit{ms}$}
+        \label{fig:multi_col_wall_m1200_t030ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.22\textwidth}
+        \includegraphics[trim = 40mm 0mm 40mm 0mm, clip, width=\textwidth]{multi_col_wall_m1200_t060ms}
+        \caption{$t = 60 \Unit{ms}$}
+        \label{fig:multi_col_wall_m1200_t060ms}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.22\textwidth}
+        \includegraphics[trim = 40mm 0mm 40mm 0mm, clip, width=\textwidth]{multi_col_wall_m1200_t080ms}
+        \caption{$t = 80 \Unit{ms}$}
+        \label{fig:multi_col_wall_m1200_t080ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.22\textwidth}
+        \includegraphics[trim = 40mm 0mm 40mm 0mm, clip, width=\textwidth]{multi_col_wall_m1200_t086ms}
+        \caption{$t = 86 \Unit{ms}$}
+        \label{fig:multi_col_wall_m1200_t086ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.22\textwidth}
+        \includegraphics[trim = 40mm 0mm 40mm 0mm, clip, width=\textwidth]{multi_col_wall_m1200_t090ms}
+        \caption{$t = 90 \Unit{ms}$}
+        \label{fig:multi_col_wall_m1200_t090ms}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.22\textwidth}
+        \includegraphics[trim = 40mm 0mm 40mm 0mm, clip, width=\textwidth]{multi_col_wall_m1200_t096ms}
+        \caption{$t = 96 \Unit{ms}$}
+        \label{fig:multi_col_wall_m1200_t096ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.22\textwidth}
+        \includegraphics[trim = 40mm 0mm 40mm 0mm, clip, width=\textwidth]{multi_col_wall_m1200_t100ms}
+        \caption{$t = 100 \Unit{ms}$}
+        \label{fig:multi_col_wall_m1200_t100ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.22\textwidth}
+        \includegraphics[trim = 40mm 0mm 40mm 0mm, clip, width=\textwidth]{multi_col_wall_m1200_t104ms}
+        \caption{$t = 104 \Unit{ms}$}
+        \label{fig:multi_col_wall_m1200_t104ms}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.22\textwidth}
+        \includegraphics[trim = 40mm 0mm 40mm 0mm, clip, width=\textwidth]{multi_col_wall_m1200_t110ms}
+        \caption{$t = 110 \Unit{ms}$}
+        \label{fig:multi_col_wall_m1200_t110ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.22\textwidth}
+        \includegraphics[trim = 40mm 0mm 40mm 0mm, clip, width=\textwidth]{multi_col_wall_m1200_t114ms}
+        \caption{$t = 114 \Unit{ms}$}
+        \label{fig:multi_col_wall_m1200_t114ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.22\textwidth}
+        \includegraphics[trim = 40mm 0mm 40mm 0mm, clip, width=\textwidth]{multi_col_wall_m1200_t120ms}
+        \caption{$t = 120 \Unit{ms}$}
+        \label{fig:multi_col_wall_m1200_t120ms}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.22\textwidth}
+        \includegraphics[trim = 40mm 0mm 40mm 0mm, clip, width=\textwidth]{multi_col_wall_m1200_t140ms}
+        \caption{$t = 140 \Unit{ms}$}
+        \label{fig:multi_col_wall_m1200_t140ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.22\textwidth}
+        \includegraphics[trim = 40mm 0mm 40mm 0mm, clip, width=\textwidth]{multi_col_wall_m1200_t170ms}
+        \caption{$t = 170 \Unit{ms}$}
+        \label{fig:multi_col_wall_m1200_t170ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.22\textwidth}
+        \includegraphics[trim = 40mm 0mm 40mm 0mm, clip, width=\textwidth]{multi_col_wall_m1200_t200ms}
+        \caption{$t = 200 \Unit{ms}$}
+        \label{fig:multi_col_wall_m1200_t200ms}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.50\textwidth}
+        \includegraphics[trim = 40mm 150mm 40mm 120mm, clip, width=\textwidth]{multi_col_wall_m1200_legend}
+    \end{subfigure}%
+    \caption{Numerical solution of a fluid-solid system with analytically solvable multibody contact and collisions.}
+    \label{fig:multibody_collision}
+\end{figure*}
+
+The evolution process involves multibody collisions with momentum transfer at both aligned (Fig.~\ref{fig:multi_col_wall_m1200_t086ms} and Fig.~\ref{fig:multi_col_wall_m1200_t114ms}) and angled (Fig.~\ref{fig:multi_col_wall_m1200_t060ms} and Fig.~\ref{fig:multi_col_wall_m1200_t140ms}) directions, as well as a multicontact collision between $C_5$ and $W_6$ (Fig.~\ref{fig:multi_col_wall_m1200_t100ms}). During the collisions, solid states can instantly switch between $M=0$ and $M=5\sqrt{2}$, introducing computational challenges.
+\begin{figure*}[!htbp]
+    \centering
+    \begin{subfigure}[b]{0.32\textwidth}
+        \includegraphics[trim = 40mm 0mm 40mm 0mm, clip, width=\textwidth]{multi_col_wall_m0300_t200ms}
+        \caption{}
+        \label{fig:multi_col_wall_m030s}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.32\textwidth}
+        \includegraphics[trim = 40mm 0mm 40mm 0mm, clip, width=\textwidth]{multi_col_wall_m0600_t200ms}
+        \caption{}
+        \label{fig:multi_col_wall_m060s}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.32\textwidth}
+        \includegraphics[trim = 40mm 0mm 40mm 0mm, clip, width=\textwidth]{multi_col_wall_m1200_t200ms}
+        \caption{}
+        \label{fig:multi_col_wall_m1200}
+    \end{subfigure}%
+    \caption{Grid sensitivity study on the solution of the fluid-solid system with multibody contact and collisions. (a) $G_1$. (b) $G_2$. (c) $G_3$.}
+    \label{fig:multibody_collision_compare}
+\end{figure*}
+
+The solutions obtained on $G_n$, $n=1,2,3$, are compared in Fig.~\ref{fig:multibody_collision_compare}. The collision dynamics, including collision detections, the lines of impacts, and collision velocities are solved exactly on each grid. Table~\ref{tab:multibody_collision_pos} presents the predicted position errors of solid centers on $G_n$. The maximum position errors of the solid centers happen at $C_1$ and $C_2$ and are about $11\%$, $5.7\%$, and $2.8\%$ relative to the diameter $D$ for $G_1$, $G_2$, and $G_3$, respectively. The obtained results demonstrate that the proposed field function can successfully facilitate the solution of complex and dynamic fluid-solid system, and the collision detection and response algorithms based on the field function can correctly resolve the multibody contact and collisions present in the current fluid-solid system. Although not being able to solve multibody collisions in general exactly, the current collision model provides a deterministic approach for approximating multibody collision response with parameterized elasticity and friction and effectively supports the validation of the collision detection capability of the proposed field function.
+\begin{table*}[!htbp]
+    \centering
+    \footnotesize
+    %\footnotesize% fontsize
+    %\setlength{\tabcolsep}{4pt}% column separation
+    %\renewcommand{\arraystretch}{1.5}% row space 
+    \begin{tabular}{lccccc}
+        \hline\hline
+        %\multicolumn{num_of_cols_to_merge}{alignment}{contents} \\
+        %\cline{i-j}% partial hline from column i to column j
+        & $C_1$ & $C_2$ & $C_3$ & $C_4$ & $C_5$\\
+        \hline
+        Exact & $(-4, 0)$ & $(0, 4)$ & $(0, 0)$ & $(2, -2)$ & $(2+\frac{1}{\sqrt{2}}, -2-\frac{1}{\sqrt{2}})$\\
+        $G_1$ Error & $(-1.1\mathrm{e}{-1}, 0)$ & $(0, 1.1\mathrm{e}{-1})$ & $(-3.6\mathrm{e}{-3}, 3.6\mathrm{e}{-3})$ & $(0, 0)$ & $(1.0\mathrm{e}{-2}, -1.0\mathrm{e}{-2})$\\ 
+        $G_2$ Error & $(-5.7\mathrm{e}{-2}, 0)$ & $(0, 5.7\mathrm{e}{-2})$ & $(-7.8\mathrm{e}{-4}, 7.8\mathrm{e}{-4})$ & $(3.0\mathrm{e}{-4}, -3.0\mathrm{e}{-4})$ & $(2.9\mathrm{e}{-3}, -2.9\mathrm{e}{-3})$\\ 
+        $G_3$ Error & $(-2.8\mathrm{e}{-2}, 0)$ & $(0, 2.8\mathrm{e}{-2})$ & $(-6.6\mathrm{e}{-4}, 6.6\mathrm{e}{-4})$ & $(-4.0\mathrm{e}{-5}, 4.0\mathrm{e}{-5})$ & $(4.6\mathrm{e}{-3}, -4.6\mathrm{e}{-3})$\\ 
+        \hline\hline
+    \end{tabular}
+    \caption{The predicted position errors of solid centers at the end of solution time for the fluid-solid system.}
+    \label{tab:multibody_collision_pos}
+\end{table*}
+
+\subsection{Supersonic wedge penetrating a particle bed}
+
+A supersonic wedge penetrating a particle bed is simulated to further demonstrate the applicability of the field function for solving complex and dynamic fluid-solid systems. As illustrated in Fig.~\ref{fig:wedge_penetrating_demo}, in a $L \times H = [-0.5D, 13.5D] \times [-3.5D, 3.5D]$ domain, a wedge with length $D=1 \Unit{m}$ and deflection angle $\theta=15^{\circ}$ is horizontally positioned in the domain, and the front vertex of the wedge locates at $O(12D, 0)$. In addition, in the $w \times h = [2D, 4D] \times [-1D, 1D]$ region, $64$ identical circular particles with diameter $d=0.25D$ are tightly packed.
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.48\textwidth]{flow_wedge_demo_e}
+    \caption{A schematic diagram for the supersonic wedge penetrating a particle bed problem. [Nomenclature: $M_{\infty}$, Mach number of the moving wedge; $S$, oblique shock; $\theta$, deflection angle; $\beta$, shock angle; $D$, length of wedge; $O$, the front vertex of wedge; $L$, domain length; $H$, domain height; $w$, particle bed width; $h$, particle bed height.]}
+    \label{fig:wedge_penetrating_demo}
+\end{figure}
+
+Initially, the gas in the domain has the state $(\rho_0, u_0, v_0, p_0)=(1.4 \Unit{kg/m^3}, 0, 0, 400 \Unit{Pa})$, in which the speed of sound is $a_0=20 \Unit{m/s}$. The wedge has a density $\rho_{\Des{s}}=2700 \Unit{kg/m^3}$, a coefficient of restitution $C_R=0.5$, and an initial velocity $M_{\Des{\infty}}=3$. Particles have a density $\rho_{\Des{s}}$, a coefficient of restitution $C_R=0.0$, and zero initial velocity. Flow inside the domain is assumed to be inviscid. The slip-wall condition is imposed at the top and bottom domain boundaries as well as at the wedge and particle surfaces, while the outflow boundary condition is enforced at the left and right domain boundaries. The evolution of this fluid-solid system is solved to $t=0.25 \Unit{s}$ on a $2800\times1400$ Cartesian grid.
+
+During the solution process, before the wedge collides with the particle bed (for $t \le 4/30 \Unit{s}$), the fluid forces acting on the wedge are deactivated such that the wedge can move with a constant supersonic speed. As a result, oblique shock waves generated at the nose of the moving wedge can reach a steady state with a constant shock angle $\beta$. The simulated time evolution of the system is captured in Fig.~\ref{fig:1_wedge_impact_deg15_mach3_cr0d00_t}, in which the lines denoted by square marks represent the analytical solutions of the oblique shock angles at position $(4.5D, 0)$. As shown in Fig.~\ref{fig:1_wedge_impact_deg15_mach3_cr0d00_t125ms}, the predicted oblique shock angle $\beta_n = 32.259^{\circ}$ agrees very well with the analytical solution $\beta_{e}= 32.240^{\circ}$ computed from the $M_{\infty}-\theta-\beta$ relation \citep{anderson2010fundamentals}.
+
+After the wedge collides with the particle bed, a force chain within the contacted particles is created due to the penetrating wedge. This force chain accelerates the particles and fractures the particle bed. The suddenly destabilized particle bed generates strong flow disturbances at the surrounding area, which interact with the wedge generated shocks and waves, forming complex wave diffraction and interference patterns in space. During the wedge penetrating the particle bed, intensive multibody contact and collisions are successfully simulated, and an intuitive dynamic process is captured in the solution. These results illustrate the ability of the proposed field function for facilitating the solution of complex and dynamic fluid-solid systems involving coupled fluid-solid and solid-solid interactions.
+\begin{figure*}[!htbp]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{1_wedge_impact_deg15_mach3_cr0d00_t000ms}
+        \caption{$t = 0 \Unit{ms}$}
+        \label{fig:1_wedge_impact_deg15_mach3_cr0d00_t000ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{1_wedge_impact_deg15_mach3_cr0d00_t050ms}
+        \caption{$t = 50 \Unit{ms}$}
+        \label{fig:1_wedge_impact_deg15_mach3_cr0d00_t050ms}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{1_wedge_impact_deg15_mach3_cr0d00_t125ms}
+        \caption{$t = 125 \Unit{ms}$}
+        \label{fig:1_wedge_impact_deg15_mach3_cr0d00_t125ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{1_wedge_impact_deg15_mach3_cr0d00_t150ms}
+        \caption{$t = 150 \Unit{ms}$}
+        \label{fig:1_wedge_impact_deg15_mach3_cr0d00_t150ms}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{1_wedge_impact_deg15_mach3_cr0d00_t200ms}
+        \caption{$t = 200 \Unit{ms}$}
+        \label{fig:1_wedge_impact_deg15_mach3_cr0d00_t200ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{1_wedge_impact_deg15_mach3_cr0d00_t250ms}
+        \caption{$t = 250 \Unit{ms}$}
+        \label{fig:1_wedge_impact_deg15_mach3_cr0d00_t250ms}
+    \end{subfigure}%
+    \caption{Time evolution of a supersonic wedge penetrating a particle bed. Lines denoted by square marks represent the analytical solutions of the oblique shocks.}
+    \label{fig:1_wedge_impact_deg15_mach3_cr0d00_t}
+\end{figure*}
+
+\section{Conclusion}
+
+A new integer-type field function has been developed to facilitate the solution of complex and dynamic fluid-solid systems on Cartesian grids with interface-resolved fluid-solid and solid-solid interactions. The main conclusions are summarized as follows:
+\begin{itemize}
+    \item For a Cartesian-grid-discretized computational domain segmented by a set of irregular, moving, and colliding solid bodies, the proposed field function can uniquely track all the subdomains with multiple layers of interfacial nodes. Employing the proposed field function, it is straightforward to apply designated governing equations, constitutive models, numerical schemes, and boundary conditions for each subdomain.
+
+    \item Benefiting from the ability to uniquely track all the subdomains with multiple layers of interfacial nodes using only one integer field in total, the proposed field function can enable several useful functionalities. 1) Providing single-integer-based multidomain node mapping to minimize memory usage and maximize information set. For instance, in providing node mapping information for $P$ subdomains, the memory consumption for using the proposed field function can be about $1/P$ of that for using a binary node-mapping function. 2) Enabling efficient node remapping that employs a temporal coherence to obtain an acceleration rate inversely proportional to the surface-to-volume ratio of subdomains. 3) Performing collision detection for determining collision queues and lines of impacts with linear time complexity, instead of the quadric time complexity required by a binary node-mapping function. Easy-to-implement algorithms for the field function and its associated functionalities have also been presented.
+
+    \item Equipped with a deterministic multibody collision model, the applicability of the developed field function for solving complex and dynamic fluid-solid systems has been validated and demonstrated through a set of numerical experiments, such as a complex wind tunnel test efficiently constructed via the field function to demonstrate multidomain node mapping, a multibody contact and collision system and a supersonic wedge penetrating a particle bed to demonstrate collision detection and node remapping for dynamic fluid-solid systems. The obtained numerical results are in close agreement with the corresponding published numerical data, experimental observations, or analytical solutions.
+\end{itemize}
+
+Future research will consider the application of the proposed field function for solving fluid-solid systems with deformable bodies and fragmentation behavior.
+
+\section*{Acknowledgements}
+
+Financial support of this work was provided by Natural Sciences and Engineering Research Council of Canada (NSERC). This work was made possible by the facilities of the Shared Hierarchical Academic Research Computing Network (SHARCNET: www.sharcnet.ca) and Compute/Calcul Canada.
+
+\bibliographystyle{tfcad}
+\bibliography{ref}
+
+\end{document}
+%---------------------------------------------------------------------------%

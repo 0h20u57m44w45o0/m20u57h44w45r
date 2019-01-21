@@ -1,0 +1,22 @@
+#include <omp.h> /* parallel header file */
+#include <stdio.h>
+
+int main (int argc, char* argv[])
+{
+    /*
+     * Protect resources with locks
+     */
+    omp_lock_t lck;
+    omp_init_lock(&lck);
+    #pragma omp parallel private (tmp, id)
+    {
+        id = omp_get_thread_num();
+        tmp = do_lots_of_work(id);
+        omp_set_lock(&lck); /* wait here for your turn */
+        printf("%d %d", id, tmp);
+        omp_unset_lock(&lck); /* release the lock so the next thread gets a turn */
+    }
+    omp_destroy_lock(&lck); /* free storage when done */
+    return 0;
+}
+

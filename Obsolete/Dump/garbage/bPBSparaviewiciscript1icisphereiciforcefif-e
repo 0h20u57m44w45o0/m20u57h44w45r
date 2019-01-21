@@ -1,0 +1,312 @@
+#### import the simple module from the paraview
+from paraview.simple import *
+#### disable automatic camera reset on 'Show'
+paraview.simple._DisableFirstRenderCameraReset()
+
+# create a new 'EnSight Reader'
+fieldcase = EnSightReader(CaseFileName='/scratch/morui/orca/1_sphere_force/invis/m400/field.case')
+fieldcase.PointArrays = ['rho', 'u', 'v', 'w', 'p', 'T', 'did', 'Vel']
+
+# get animation scene
+animationScene1 = GetAnimationScene()
+
+# update animation scene based on data timesteps
+animationScene1.UpdateAnimationUsingDataTimeSteps()
+
+# Properties modified on fieldcase
+fieldcase.PointArrays = ['rho', 'did']
+
+# get active view
+renderView1 = GetActiveViewOrCreate('RenderView')
+# uncomment following to set a specific view size
+# renderView1.ViewSize = [977, 638]
+
+# show data in view
+fieldcaseDisplay = Show(fieldcase, renderView1)
+# trace defaults for the display properties.
+fieldcaseDisplay.Representation = 'Outline'
+fieldcaseDisplay.AmbientColor = [0.0, 0.0, 0.0]
+fieldcaseDisplay.ColorArrayName = ['POINTS', '']
+fieldcaseDisplay.DiffuseColor = [0.0, 0.0, 0.0]
+fieldcaseDisplay.BackfaceDiffuseColor = [0.0, 0.0, 0.0]
+fieldcaseDisplay.OSPRayScaleArray = 'rho'
+fieldcaseDisplay.OSPRayScaleFunction = 'PiecewiseFunction'
+fieldcaseDisplay.GlyphType = 'Arrow'
+fieldcaseDisplay.ScalarOpacityUnitDistance = 0.0023064079139887518
+
+# reset view to fit data
+renderView1.ResetCamera()
+
+# create a new 'Compute Derivatives'
+computeDerivatives1 = ComputeDerivatives(Input=fieldcase)
+computeDerivatives1.Scalars = ['POINTS', 'rho']
+computeDerivatives1.Vectors = [None, '1']
+
+# Properties modified on computeDerivatives1
+computeDerivatives1.Vectors = [None, '']
+computeDerivatives1.OutputTensorType = 'Nothing'
+
+# show data in view
+computeDerivatives1Display = Show(computeDerivatives1, renderView1)
+# trace defaults for the display properties.
+computeDerivatives1Display.Representation = 'Outline'
+computeDerivatives1Display.AmbientColor = [0.0, 0.0, 0.0]
+computeDerivatives1Display.ColorArrayName = ['POINTS', '']
+computeDerivatives1Display.DiffuseColor = [0.0, 0.0, 0.0]
+computeDerivatives1Display.BackfaceDiffuseColor = [0.0, 0.0, 0.0]
+computeDerivatives1Display.OSPRayScaleArray = 'rho'
+computeDerivatives1Display.OSPRayScaleFunction = 'PiecewiseFunction'
+computeDerivatives1Display.GlyphType = 'Arrow'
+computeDerivatives1Display.ScalarOpacityUnitDistance = 0.0023064079139887518
+
+# hide data in view
+Hide(fieldcase, renderView1)
+
+# create a new 'Cell Data to Point Data'
+cellDatatoPointData1 = CellDatatoPointData(Input=computeDerivatives1)
+
+# show data in view
+cellDatatoPointData1Display = Show(cellDatatoPointData1, renderView1)
+# trace defaults for the display properties.
+cellDatatoPointData1Display.Representation = 'Outline'
+cellDatatoPointData1Display.AmbientColor = [0.0, 0.0, 0.0]
+cellDatatoPointData1Display.ColorArrayName = ['POINTS', '']
+cellDatatoPointData1Display.DiffuseColor = [0.0, 0.0, 0.0]
+cellDatatoPointData1Display.BackfaceDiffuseColor = [0.0, 0.0, 0.0]
+cellDatatoPointData1Display.OSPRayScaleArray = 'rho'
+cellDatatoPointData1Display.OSPRayScaleFunction = 'PiecewiseFunction'
+cellDatatoPointData1Display.GlyphType = 'Arrow'
+cellDatatoPointData1Display.ScalarOpacityUnitDistance = 0.0023064079139887518
+
+# hide data in view
+Hide(computeDerivatives1, renderView1)
+
+# create a new 'Calculator'
+calculator1 = Calculator(Input=cellDatatoPointData1)
+calculator1.Function = ''
+
+# Properties modified on calculator1
+calculator1.ResultArrayName = 'drho'
+calculator1.Function = 'mag(ScalarGradient)'
+
+# show data in view
+calculator1Display = Show(calculator1, renderView1)
+# trace defaults for the display properties.
+calculator1Display.Representation = 'Outline'
+calculator1Display.AmbientColor = [0.0, 0.0, 0.0]
+calculator1Display.ColorArrayName = ['POINTS', '']
+calculator1Display.DiffuseColor = [0.0, 0.0, 0.0]
+calculator1Display.BackfaceDiffuseColor = [0.0, 0.0, 0.0]
+calculator1Display.OSPRayScaleArray = 'drho'
+calculator1Display.OSPRayScaleFunction = 'PiecewiseFunction'
+calculator1Display.GlyphType = 'Arrow'
+calculator1Display.ScalarOpacityUnitDistance = 0.0023064079139887518
+
+# hide data in view
+Hide(cellDatatoPointData1, renderView1)
+
+# create a new 'Threshold'
+threshold1 = Threshold(Input=calculator1)
+threshold1.Scalars = ['POINTS', 'did']
+threshold1.ThresholdRange = [0.0, 0.0]
+
+# get color transfer function/color map for 'drho'
+drhoLUT = GetColorTransferFunction('drho')
+
+# show data in view
+threshold1Display = Show(threshold1, renderView1)
+# trace defaults for the display properties.
+threshold1Display.AmbientColor = [0.0, 0.0, 0.0]
+threshold1Display.ColorArrayName = ['POINTS', 'drho']
+threshold1Display.DiffuseColor = [0.0, 0.0, 0.0]
+threshold1Display.LookupTable = drhoLUT
+threshold1Display.BackfaceDiffuseColor = [0.0, 0.0, 0.0]
+threshold1Display.OSPRayScaleArray = 'drho'
+threshold1Display.OSPRayScaleFunction = 'PiecewiseFunction'
+threshold1Display.GlyphType = 'Arrow'
+threshold1Display.ScalarOpacityUnitDistance = 0.00231143852205196
+threshold1Display.SetScaleArray = ['POINTS', 'drho']
+threshold1Display.ScaleTransferFunction = 'PiecewiseFunction'
+threshold1Display.OpacityArray = ['POINTS', 'drho']
+threshold1Display.OpacityTransferFunction = 'PiecewiseFunction'
+
+# show color bar/color legend
+threshold1Display.SetScalarBarVisibility(renderView1, True)
+
+# get opacity transfer function/opacity map for 'drho'
+drhoPWF = GetOpacityTransferFunction('drho')
+
+# hide data in view
+Hide(calculator1, renderView1)
+
+# rescale color and/or opacity maps used to exactly fit the current data range
+threshold1Display.RescaleTransferFunctionToDataRange(False)
+
+# rescale color and/or opacity maps used to exactly fit the current data range
+threshold1Display.RescaleTransferFunctionToDataRange(False)
+
+# rescale color and/or opacity maps used to exactly fit the current data range
+threshold1Display.RescaleTransferFunctionToDataRange(False)
+
+# rescale color and/or opacity maps used to exactly fit the current data range
+threshold1Display.RescaleTransferFunctionToDataRange(False)
+
+# Rescale transfer function
+drhoLUT.RescaleTransferFunction(1.0, 180.0)
+
+# Rescale transfer function
+drhoPWF.RescaleTransferFunction(1.0, 180.0)
+
+# create a new 'Iso Volume'
+isoVolume1 = IsoVolume(Input=threshold1)
+isoVolume1.InputScalars = ['POINTS', 'drho']
+isoVolume1.ThresholdRange = [1.0, 180.0]
+
+# show data in view
+isoVolume1Display = Show(isoVolume1, renderView1)
+# trace defaults for the display properties.
+isoVolume1Display.AmbientColor = [0.0, 0.0, 0.0]
+isoVolume1Display.ColorArrayName = ['POINTS', 'drho']
+isoVolume1Display.DiffuseColor = [0.0, 0.0, 0.0]
+isoVolume1Display.LookupTable = drhoLUT
+isoVolume1Display.BackfaceDiffuseColor = [0.0, 0.0, 0.0]
+isoVolume1Display.OSPRayScaleArray = 'drho'
+isoVolume1Display.OSPRayScaleFunction = 'PiecewiseFunction'
+isoVolume1Display.GlyphType = 'Arrow'
+isoVolume1Display.ScalarOpacityUnitDistance = 0.008695431586957621
+isoVolume1Display.SetScaleArray = ['POINTS', 'drho']
+isoVolume1Display.ScaleTransferFunction = 'PiecewiseFunction'
+isoVolume1Display.OpacityArray = ['POINTS', 'drho']
+isoVolume1Display.OpacityTransferFunction = 'PiecewiseFunction'
+
+# hide data in view
+Hide(threshold1, renderView1)
+
+# show color bar/color legend
+isoVolume1Display.SetScalarBarVisibility(renderView1, True)
+
+# rescale color and/or opacity maps used to exactly fit the current data range
+isoVolume1Display.RescaleTransferFunctionToDataRange(False)
+
+# rescale color and/or opacity maps used to exactly fit the current data range
+isoVolume1Display.RescaleTransferFunctionToDataRange(False)
+
+# rescale color and/or opacity maps used to exactly fit the current data range
+isoVolume1Display.RescaleTransferFunctionToDataRange(False)
+
+# rescale color and/or opacity maps used to exactly fit the current data range
+isoVolume1Display.RescaleTransferFunctionToDataRange(False)
+
+# rescale color and/or opacity maps used to exactly fit the current data range
+isoVolume1Display.RescaleTransferFunctionToDataRange(False)
+
+# change representation type
+isoVolume1Display.SetRepresentationType('Volume')
+
+# change representation type
+isoVolume1Display.SetRepresentationType('Surface')
+
+# hide color bar/color legend
+isoVolume1Display.SetScalarBarVisibility(renderView1, False)
+
+# Rescale transfer function
+drhoLUT.RescaleTransferFunction(1.0, 180.0)
+
+# Rescale transfer function
+drhoPWF.RescaleTransferFunction(1.0, 180.0)
+
+# convert to log space
+drhoLUT.MapControlPointsToLogSpace()
+
+# Properties modified on drhoLUT
+drhoLUT.UseLogScale = 1
+
+# Apply a preset using its name. Note this may not work as expected when presets have duplicate names.
+drhoLUT.ApplyPreset('Black-Body Radiation', True)
+
+# create a new 'Sphere'
+sphere1 = Sphere()
+
+# Properties modified on sphere1
+sphere1.Radius = 0.04
+sphere1.ThetaResolution = 180
+sphere1.PhiResolution = 90
+
+# show data in view
+sphere1Display = Show(sphere1, renderView1)
+# trace defaults for the display properties.
+sphere1Display.AmbientColor = [0.0, 0.0, 0.0]
+sphere1Display.ColorArrayName = [None, '']
+sphere1Display.DiffuseColor = [0.0, 0.0, 0.0]
+sphere1Display.BackfaceDiffuseColor = [0.0, 0.0, 0.0]
+sphere1Display.OSPRayScaleArray = 'Normals'
+sphere1Display.OSPRayScaleFunction = 'PiecewiseFunction'
+sphere1Display.GlyphType = 'Arrow'
+sphere1Display.SetScaleArray = [None, '']
+sphere1Display.ScaleTransferFunction = 'PiecewiseFunction'
+sphere1Display.OpacityArray = [None, '']
+sphere1Display.OpacityTransferFunction = 'PiecewiseFunction'
+
+# hide data in view
+Hide(isoVolume1, renderView1)
+
+# set active source
+SetActiveSource(isoVolume1)
+
+# show data in view
+isoVolume1Display = Show(isoVolume1, renderView1)
+
+# show color bar/color legend
+isoVolume1Display.SetScalarBarVisibility(renderView1, True)
+
+# set active source
+SetActiveSource(sphere1)
+
+# hide data in view
+Hide(isoVolume1, renderView1)
+
+# set active source
+SetActiveSource(fieldcase)
+
+# show data in view
+fieldcaseDisplay = Show(fieldcase, renderView1)
+
+# hide data in view
+Hide(fieldcase, renderView1)
+
+# set active source
+SetActiveSource(isoVolume1)
+
+# show data in view
+isoVolume1Display = Show(isoVolume1, renderView1)
+
+# show color bar/color legend
+isoVolume1Display.SetScalarBarVisibility(renderView1, True)
+
+# hide color bar/color legend
+isoVolume1Display.SetScalarBarVisibility(renderView1, False)
+
+# change representation type
+isoVolume1Display.SetRepresentationType('Volume')
+
+# change representation type
+isoVolume1Display.SetRepresentationType('Surface')
+
+# change representation type
+isoVolume1Display.SetRepresentationType('Volume')
+
+# Rescale transfer function
+drhoLUT.RescaleTransferFunction(1.0, 20.0)
+
+# Rescale transfer function
+drhoPWF.RescaleTransferFunction(1.0, 20.0)
+
+# current camera placement for renderView1
+renderView1.CameraPosition = [-0.40568496511720953, 0.5039217891989779, 0.8149207117337568]
+renderView1.CameraFocalPoint = [0.012287127271068832, -0.012057285382765383, 0.014183152924137545]
+renderView1.CameraViewUp = [0.21841731938926076, 0.8682457357002046, -0.4454696589322559]
+renderView1.CameraParallelScale = 0.3257755244778803
+
+#### uncomment the following to render all views
+# RenderAllViews()
+# alternatively, if you want to write images, you can use SaveScreenshot(...).

@@ -1,0 +1,106 @@
+%---------------------------------------------------------------------------%
+%->> Titlepage information
+%---------------------------------------------------------------------------%
+%-
+%-> Title info
+%-
+\title{Mesoscale modeling and direct simulation of explosively dispersed granular materials}% \title[short title for headers]{Long title of thesis}
+\author{Huangrui Mo}
+\degree{Doctor of Philosophy}
+\discipline{Mechanical and Mechatronics Engineering}
+\maketitle
+%-
+%-> Examining Committee Membership
+%-
+\intotoc{Examining Committee Membership}% add a corresponding item to the contents table and bookmark
+\begin{committee}
+    \noindent
+    The following served on the Examining Committee for this thesis. The decision of the Examining Committee is by majority vote.
+
+    \begin{center}
+        %\footnotesize% fontsize
+        \setlength{\tabcolsep}{10pt}% column separation
+        \renewcommand{\arraystretch}{3}% row space 
+        \begin{tabular}{lc}
+            External Examiner & \parbox[t]{10cm}{Dr. Luc Bauwens\\Professor, Mechanical and Manufacturing Engineering\\University of 
+Calgary}\\
+            Supervisors & \parbox[t]{10cm}{Dr. Fue-Sang Lien\\Professor, Mechanical and Mechatronics Engineering\\University of Waterloo}\\
+             & \parbox[t]{10cm}{Dr. Fan Zhang\\Senior Scientist, Advanced Energetics Group\\Defence Research and Development Canada}\\
+             & \parbox[t]{10cm}{Dr. Duane Cronin\\Professor, Mechanical and Mechatronics Engineering\\University of Waterloo}\\
+            Internal Members & \parbox[t]{10cm}{Dr. Cecile Devaud\\Professor, Mechanical and Mechatronics Engineering\\University of Waterloo}\\
+             & \parbox[t]{10cm}{Dr. Jean-Pierre Hickey\\Professor, Mechanical and Mechatronics Engineering\\University of Waterloo}\\
+            Internal-External Member & \parbox[t]{10cm}{Dr. Lilia Krivodonova\\Professor, Applied Mathematics\\University of Waterloo}\\
+        \end{tabular}
+    \end{center}
+\end{committee}
+%-
+%-> Author's declaration
+%-
+\intotoc{Author's Declaration}% add a corresponding item to the contents table and bookmark
+\begin{declaration}
+    \noindent
+    I hereby declare that I am the sole author of this thesis. This is a true copy of the thesis, including any required final revisions, as accepted by my examiners.
+
+    \bigskip
+
+    \noindent
+    I understand that my thesis may be made electronically available to the public.
+\end{declaration}
+%-
+%-> Statement of Contributions
+%-
+%\intotoc{Statement of Contributions}% add a corresponding item to the contents table and bookmark
+%\begin{contribute}
+%\end{contribute}
+%-
+%-> Permissions
+%-
+\intotoc{Permissions}% add a corresponding item to the contents table and bookmark
+\begin{permission}
+    \noindent
+
+    Figure \ref{fig:jet_SL_exp_lat_time} was reprinted with kind permission from Springer Nature: International Symposium on Shock Waves, Rodriguez V., Saurel R., Jourdan G., and Houas L. (2017), "Study on the jet formation during dispersal of solid particles by shock and blast waves", Volume 1, Page 747, Figure 3.
+
+    Figures~\ref{fig:jet_formation} and \ref{fig:large_scale_jet_formation} are property of the Government of Canada, and were used with permission from Defence Research and Development Canada (DRDC).
+
+    Chapter~\ref{cha:method} contains content of an article published by Springer Nature. Mo, H., Lien, F.-S., Zhang, F., and Cronin, D., "A numerical framework for the direct simulation of dense particulate flow under explosive dispersal", Shock Waves (2018), Volume 28, Issue 3, Page 559-577. This article was published with the permission of the Minister of National Defence, and is protected by copyright and all rights are held exclusively by Her Majesty the Queen in Right of Canada.
+
+    Chapter~\ref{cha:field} contains content of a preprint released on arXiv. Mo, H., Lien, F.-S., Zhang, F., and Cronin, D., "A simple field function for solving complex and dynamic fluid-solid system on Cartesian grid", arXiv:1702.02474.
+
+    Chapter~\ref{cha:ibm} is part of an article published by Wiley. Mo, H., Lien, F.-S., Zhang, F., and Cronin, D., "An immersed boundary method for solving compressible flow with arbitrarily irregular and moving geometry", International Journal for Numerical Methods in Fluids (2018), Volume 88, Issue 5, Page 239-563. This article was published with the permission of the Minister of National Defence, and is protected by copyright and all rights are held exclusively by Her Majesty the Queen in Right of Canada.
+
+\end{permission}
+%-
+%-> Abstract
+%-
+\intotoc{Abstract}% add a corresponding item to the contents table and bookmark
+\begin{abstract}
+    Explosively dispersed granular materials frequently exhibit macroscale coherent particle clustering and jetting structures. The underlying mechanism is of significant interest to study instability and mixing in high-speed gas-solid flows but remains unclear, primarily attributed to the complex mesoscale multiphase interactions involved in the dispersal process. In order to advance the understanding of particle clustering and jetting instabilities, this thesis establishes a numerical framework for solving interface-resolved gas-solid flows with non-deforming bodies that are able to move, contact, and collide. The developed framework is implemented to create a computational solver and then verified using a variety of gas-solid flow problems at different geometric scales. Employing the developed framework and solver, this thesis further studies the particle clustering and jetting instabilities in explosively dispersed granular materials.
+
+    A Cartesian, 3D, high-resolution, parallelized, gas-solid flow solver is created with the capability of tackling shocked flow conditions, irregular and moving geometries, and multibody collisions. The underlying numerical framework integrates operator splitting for partitioned fluid-solid interaction in the time domain, 2nd/3rd order strong stability-preserving Runge--Kutta methods and 3rd/5th order weighted essentially nonoscillatory schemes for high-resolution tempo-spatial discretization, the front-tracking method for evolving phase interfaces, a new field function developed for facilitating the solution of complex and dynamic fluid-solid systems on Cartesian grids, a new collision model developed for deterministic multibody contact and collision with parameterized coefficients of restitution and friction, and a new immersed boundary method developed for treating arbitrarily irregular and moving boundaries. The developed framework and solver are able to accurately, efficiently, and robustly solve coupled fluid-fluid, fluid-solid, and solid-solid interactions with flow conditions ranging from subsonic to hypersonic states.
+
+     Employing the developed framework and solver, direct simulations that capture interface-resolved multiphase interactions and deterministic mesoscale granular dynamics are conducted to investigate particle clustering and jetting instabilities. A random sampling algorithm is employed to generate stochastic payload morphologies with randomly distributed particle positions and sizes. Through solving and analyzing cases that cover a set of stochastic payloads, burster states, and coefficients of restitution, a valid statistical dissipative property of the framework in solving explosively dispersed granular materials with respect to Gurney velocity is demonstrated. The predicted surface expansion velocities can extend the time range of the velocity scaling law with regard to Gurney energy in the Gurney theory from the steady-state termination phase to the unsteady evolution phase. When considering the mean surface expansion velocities, the maximum error of the unsteady velocity scaling law is about $0.792\%$ among the investigated Gurney energies. In addition, a dissipation analysis of the current discrete modeling of granular payloads suggests that incorporating the effects of porosity can enhance the prediction of Gurney velocity for explosively dispersed granular payloads. On the basis of direct simulations, an explanation for particle clustering and jetting instabilities is proposed to increase the understanding of established experimental observations in the literature. Results suggest that the development of internal sliding and colliding lines in the shock-compacted granular payload can be critical to the subsequent fracture pattern of the payload. Particle clusters manifested through payload fracture are then maintained by local pressure gradient between surrounding and interstitial flows as well as by dissipative inter-grain collisions. The existence of stable clusters introduce a more non-equilibrium momentum distribution in the overall payload, exhibiting as a form of clustering instability.
+
+    Under the current assumptions of non-deformable grains, the mesoscale granular dynamics largely depends on the payload morphology as a result of packing methods. Different payload morphologies can develop varied sliding and colliding lines, which lead to a corresponding pattern for payload fracturing and particle clustering. With the rapid development of high-performance computing technology, future direct simulations on stochastic payloads with significantly increased domain sizes, number of particles, and solution times are expected to lead to a better understanding of the flow instability in explosively dispersed granular payloads. It is suggested that statistics collected from a large number of mesoscale computations based on random payload morphologies can potentially evolve into a macroscopic theory of multiphase flow instability for particle clustering and jetting phenomena widely observed in many areas involving dense gas-solid flows.
+\end{abstract}
+%-
+%-> Acknowledgements
+%-
+\intotoc{Acknowledgements}% add a corresponding item to the contents table and bookmark
+\begin{acknowledgements}
+
+    I owe my deepest gratitude and appreciation to my doctoral advisors: Dr. Fue-Sang Lien, Dr. Fan Zhang, and Dr. Duane Cronin. Dr. Fue-Sang Lien has always been supportive, approachable, and helpful throughout my doctoral study. His encouragement and understanding helped me go through the difficulties and created the space for me to develop research ideas. Working with Dr. Fan Zhang has been the most amazing experience in my life. I have always been fascinated by his insights on physics and the ability to instantly and accurately identify the key problems based on a set of fragmented information. His keen and open-minded guidance inspired my interests in the field of my doctoral study, shaped my critical thinking, and challenged me to be a higher level thinker. It was an enlightening and enriching experience to collaborate with Dr. Duane Cronin. Whenever I needed advice, he was ready and patient to help. He was always kind to teach me and willing to share his experience and vision on how to be a professional, rigorous, and persuasive researcher. The moments I interacted with and the knowledge I learned from my outstanding advisors will be remembered by me throughout the rest of my life.
+
+    I am grateful to Natural Sciences and Engineering Research Council of Canada (NSERC), Defence Research and Development Canada (DRDC), and Waterloo CFD Engineering Consulting Inc (WATCFD) for the financial support of this research project. This work was made possible by the facilities of the Shared Hierarchical Academic Research Computing Network (SHARCNET: www.sharcnet.ca) and Compute/Calcul Canada.
+
+    I would like to thank the official members of my examining committee for their efforts in reviewing my thesis and providing helpful suggestions. In addition, I want to express my gratitude to Dr. Jean-Pierre Hickey for his kind help with my teaching practice, to Dr. Cecile Devaud for her helpful comments on my comprehensive examination report, to Dr. Lilia Krivodonova for her thoughtful teaching on numerical solutions of partial differential equations, and to Dr. Luc Bauwens for taking his time to come and attend my examination in person. I also want to thank my colleagues in the Energy Research Center for their support and discussions and the faculty and staff in the Mechanical and Mechatronics Engineering department for their assistance and help throughout my doctoral study. Finally, I am indebted to my family for their continuous support and understanding with my pursuit of scientific research.
+
+\end{acknowledgements}
+%-
+%-> Dedication
+%-
+%\intotoc{Dedication}% add a corresponding item to the contents table and bookmark
+%\begin{dedication}
+%    Dedication (included if necessary)
+%\end{dedication}
+%---------------------------------------------------------------------------%

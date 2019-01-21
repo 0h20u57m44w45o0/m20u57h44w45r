@@ -1,0 +1,50 @@
+#include <omp.h> /* parallel header file */
+#include <stdio.h>
+#include <stdio.h>
+
+int main (int argc, char* argv[])
+{
+    double *A = malloc(N * sizeof(double));
+    double sum = 0.0;
+    int nthrds = 0;
+    int flag = 0;
+    double runtime = omp_get_wtime();
+    #pragma omp parallel sections
+    {
+        #pragma omp section
+        {
+            fill_rand(N, A); /* producer: fill an array of data */
+            /*
+             * Flush forces refresh to memory. Guarantees that the other thread
+             * sees the value of A
+             */
+            #pragma omp flush
+            /*
+             * Use flag to signal when the "produced" value is ready
+             */
+            flag = 1;
+            #pragma omp flush (flag) 
+        }
+        #pragma omp section
+        {
+            /*
+             * Flush needed on both "reader" and "writer" sides of the
+             * communication
+             */
+            #pragma omp flush (flag) 
+            while (1 != flag) {
+                /*
+                 * Must put the flush inside the while loop to make sure the
+                 * updated flag variable is seen
+                 */
+                #pragma omp flush (flag) 
+            }
+            #pragma omp flush
+            sum = sum_array(N, A); /* consumer: sum the array */
+        }
+    }
+    runtime = omp_get_wtime() - runtime;
+    printf("In %lf seconds, the sum is %lf\n", runtime, sum);
+    return 0;
+}
+

@@ -1,0 +1,42 @@
+#include <omp.h> /* parallel header file */
+#include <stdio.h>
+
+static double a[1000], b[1000];
+void update_a(void)
+{ 
+    int i;
+    #pragma omp for
+    for (i=0;i<1000;i++)
+        a[i]= b[i] + (double)i/2.0;
+}
+int main(void){
+    #pragma omp parallel
+    {
+        init_all();
+        compute_b();
+        update_a();
+    }
+}
+
+/* Implementation of orphan directive by Compiler */
+. . . .
+__ompv_in_parallel = __ompc_in_parallel();
+if( (__ompv_in_parallel == 1) )
+{
+    /* We are in parallel region: execute for loop in parallel */
+    mytid = __ompc_get_thread_num(); /* get threadid */
+    /* next invoke static scheduler */
+    __ompc_static_init(mytid, STATIC, mylower, myupper, mystride,);
+    /* execute loop body using assigned iteration space */
+    for(myloci = mylower; myloci<= myupper; myloci++)
+    {
+        a[myloci]= b[myloci] + (double)myloci/2.0;
+    }
+    __ompc_barrier(); /* Implicit BARRIER after worksharing */
+}
+else
+{
+    /* Perform sequential version */
+    for (i=0;i<1000;i++)
+        a[i]= b[i] + (double)i/2.0;
+}

@@ -1,0 +1,150 @@
+/****************************************************************************
+ *                              ArtraCFD                                    *
+ *                          <By Huangrui Mo>                                *
+ * Copyright (C) Huangrui Mo <huangrui.mo@gmail.com>                        *
+ * This file is part of ArtraCFD.                                           *
+ * ArtraCFD is free software: you can redistribute it and/or modify it      *
+ * under the terms of the GNU General Public License as published by        *
+ * the Free Software Foundation, either version 3 of the License, or        *
+ * (at your option) any later version.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Header Files
+ ****************************************************************************/
+#include "numerical_test.h"
+#include <stdio.h> /* standard library for input and output */
+#include <math.h> /* common mathematical functions */
+#include "initialization.h"
+#include "cfd_commons.h"
+#include "commons.h"
+/****************************************************************************
+ * Data Structure Declarations
+ ****************************************************************************/
+typedef enum {
+    SL = -2, /* left offset of stencil index */
+    SR = 2, /* right offset of stencil index */
+    SN = SR - SL + 1, /* number of all potential stencils */
+    CN = -SL, /* position index of center node in stencil */
+} TestConst;
+/****************************************************************************
+ * Static Function Declarations
+ ****************************************************************************/
+static void LocalVariable(const int [restrict], const int, const int, const int, const int,
+        const int, const int [restrict], const Node *const, Real [restrict][DIMS]);
+static void Calc_dV(const int, const Real, Real [restrict][DIMS], Real [restrict][DIMS]);
+/****************************************************************************
+ * Function definitions
+ ****************************************************************************/
+void ComputeSolutionError(Space *space, const Model *model)
+{
+    FILE *fp = Fopen("solution_error.csv", "w");
+    const Partition *const part = &(space->part);
+    Node *const node = space->node;
+    Real *restrict Us = NULL; /* numerical solution */
+    Real *restrict Ue = NULL; /* exact solution */
+    int idx = 0; /* linear array index math variable */
+    RealVec pc = {0.0}; /* coordinates of current node */
+    const int meshN = MaxInt(part->m[X], MaxInt(part->m[Y], part->m[Z]));
+    Real norm[3] = {0.0}; /* Lp norms: L1, L2, Lmax */
+    int N = 0; /* number of nodes */
+    Real err = 0.0; /* solution error */
+    for (int k = part->ns[PIN][Z][MIN]; k < part->ns[PIN][Z][MAX]; ++k) {
+        for (int j = part->ns[PIN][Y][MIN]; j < part->ns[PIN][Y][MAX]; ++j) {
+            for (int i = part->ns[PIN][X][MIN]; i < part->ns[PIN][X][MAX]; ++i) {
+                idx = IndexNode(k, j, i, part->n[Y], part->n[X]);
+                if (0 != node[idx].did) {
+                    continue;
+                }
+                pc[X] = MapPoint(i, part->domain[X][MIN], part->d[X], part->ng[X]);
+                pc[Y] = MapPoint(j, part->domain[Y][MIN], part->d[Y], part->ng[Y]);
+                pc[Z] = MapPoint(k, part->domain[Z][MIN], part->d[Z], part->ng[Z]);
+                Us = node[idx].U[TO];
+                Ue = node[idx].U[TN];
+                for (int n = 0; n < part->nIC; ++n) {
+                    ApplyInitializer(n, pc, Ue, part, model);
+                }
+                err = fabs(Us[0] - Ue[0]);
+                norm[0] = MaxReal(norm[0], err);
+                norm[1] = norm[1] + err;
+                norm[2] = norm[2] + err * err;
+                ++N;
+            }
+        }
+    }
+    norm[1] = norm[1] / N;
+    norm[2] = sqrt(norm[2] / N);
+    fprintf(fp, "# mesh, l1 norm, l2 norm, max norm\n");
+    fprintf(fp, "%d, %.6g, %.6g, %.6g\n", meshN, norm[1], norm[2], norm[0]);
+    fclose(fp);
+}
+void WriteFunctionalData(const Time *time, const Space *space, const Model *model)
+{
+    FILE *fp = Fopen("solution_functional.csv", "a");
+    if (0 == time->stepC) { /* initialization step */
+        fprintf(fp, "# time, kinetic energy, enstrophy \n");
+    }
+    const Partition *const part = &(space->part);
+    const Node *const node = space->node;
+    const Real *restrict U = NULL; /* numerical solution */
+    int idx = 0; /* linear array index math variable */
+    const IntVec partn = {part->n[X], part->n[Y], part->n[Z]};
+    const RealVec d = {part->d[X], part->d[Y], part->d[Z]};
+    Real rho = 0.0; /* density */
+    RealVec V = {0.0}; /* velocity */
+    RealVec W = {0.0}; /* vorticity */
+    Real Vs[SN][DIMS] = {{0.0}}; /* velocity stencil for the s direction */
+    Real dV[DIMS][DIMS] = {{0.0}}; /* velocity gradient dV[r][s] = dVr/ds */
+    Real Ek = 0.0; /* kinetic energy */
+    Real Ee = 0.0; /* enstrophy */
+    int N = 0; /* number of nodes */
+    for (int k = part->ns[PIN][Z][MIN]; k < part->ns[PIN][Z][MAX]; ++k) {
+        for (int j = part->ns[PIN][Y][MIN]; j < part->ns[PIN][Y][MAX]; ++j) {
+            for (int i = part->ns[PIN][X][MIN]; i < part->ns[PIN][X][MAX]; ++i) {
+                idx = IndexNode(k, j, i, part->n[Y], part->n[X]);
+                if (0 != node[idx].did) {
+                    continue;
+                }
+                for (int s = 0; s < DIMS; ++s) {
+                    LocalVariable(model->e[s], k, j, i, SL, SR, partn, node, Vs);
+                    Calc_dV(s, d[s], Vs, dV);
+                }
+                U = node[idx].U[TO];
+                rho = U[0];
+                V[X] = U[1] / U[0];
+                V[Y] = U[2] / U[0];
+                V[Z] = U[3] / U[0];
+                W[X] = dV[Z][Y] - dV[Y][Z];
+                W[Y] = dV[X][Z] - dV[Z][X];
+                W[Z] = dV[Y][X] - dV[X][Y];
+                Ek = Ek + rho * Dot(V,V);
+                Ee = Ee + rho * Dot(W,W);
+                ++N;
+            }
+        }
+    }
+    Ek = 0.5 * Ek / N;
+    Ee = 0.5 * Ee / N;
+    fprintf(fp, "%.6g, %.6g, %.6g\n", time->now, Ek, Ee);
+    fclose(fp);
+}
+static void LocalVariable(const int e[restrict], const int k, const int j, const int i, const int sL,
+        const int sR, const int partn[restrict], const Node *const node, Real V[restrict][DIMS])
+{
+    int idx = 0; /* linear array index math variable */
+    const Real *restrict U = NULL;
+    for (int n = sL, m = 0; n <= sR; ++n, ++m) {
+        idx = IndexNode(k + n * e[Z], j + n * e[Y], i + n * e[X], partn[Y], partn[X]);
+        U = node[idx].U[TO];
+        for (int r = 0; r < DIMS; ++r) {
+            V[m][r] = U[r+1] / U[0];
+        }
+    }
+}
+static void Calc_dV(const int s, const Real ds, Real V[restrict][DIMS], Real dV[restrict][DIMS])
+{
+    for (int r = 0; r < DIMS; ++r) {
+        dV[r][s] = (-V[CN+2][r] + 8.0 * V[CN+1][r] - 8.0 * V[CN-1][r] + V[CN-2][r]) / (12.0 * ds);
+    }
+}
+/* a good practice: end file with a newline */
+

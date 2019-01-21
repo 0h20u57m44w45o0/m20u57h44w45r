@@ -1,0 +1,441 @@
+#### import the simple module from the paraview
+from paraview.simple import *
+#### disable automatic camera reset on 'Show'
+paraview.simple._DisableFirstRenderCameraReset()
+
+# create a new 'EnSight Reader'
+fieldcase = EnSightReader(CaseFileName='/scratch/morui/graham/1_cyn_nomv/slip/field.case')
+fieldcase.PointArrays = ['rho', 'u', 'v', 'w', 'p', 'T', 'did', 'Vel']
+
+# get animation scene
+animationScene1 = GetAnimationScene()
+
+# update animation scene based on data timesteps
+animationScene1.UpdateAnimationUsingDataTimeSteps()
+
+# Properties modified on fieldcase
+fieldcase.PointArrays = ['rho']
+
+# get active view
+renderView1 = GetActiveViewOrCreate('RenderView')
+# uncomment following to set a specific view size
+# renderView1.ViewSize = [977, 638]
+
+# get color transfer function/color map for 'rho'
+rhoLUT = GetColorTransferFunction('rho')
+
+# show data in view
+fieldcaseDisplay = Show(fieldcase, renderView1)
+# trace defaults for the display properties.
+fieldcaseDisplay.AmbientColor = [0.0, 0.0, 0.0]
+fieldcaseDisplay.ColorArrayName = ['POINTS', 'rho']
+fieldcaseDisplay.DiffuseColor = [0.0, 0.0, 0.0]
+fieldcaseDisplay.LookupTable = rhoLUT
+fieldcaseDisplay.BackfaceDiffuseColor = [0.0, 0.0, 0.0]
+fieldcaseDisplay.OSPRayScaleArray = 'rho'
+fieldcaseDisplay.OSPRayScaleFunction = 'PiecewiseFunction'
+fieldcaseDisplay.GlyphType = 'Arrow'
+fieldcaseDisplay.ScalarOpacityUnitDistance = 0.0246106136139205
+
+# reset view to fit data
+renderView1.ResetCamera()
+
+#changing interaction mode based on data extents
+renderView1.InteractionMode = '2D'
+renderView1.CameraPosition = [10000.0, 0.0, 0.0]
+renderView1.CameraViewUp = [0.0, 0.0, 1.0]
+
+# show color bar/color legend
+fieldcaseDisplay.SetScalarBarVisibility(renderView1, True)
+
+# get opacity transfer function/opacity map for 'rho'
+rhoPWF = GetOpacityTransferFunction('rho')
+
+# rescale color and/or opacity maps used to exactly fit the current data range
+fieldcaseDisplay.RescaleTransferFunctionToDataRange(False)
+
+# create a new 'Compute Derivatives'
+computeDerivatives1 = ComputeDerivatives(Input=fieldcase)
+computeDerivatives1.Scalars = ['POINTS', 'rho']
+computeDerivatives1.Vectors = [None, '1']
+
+# Properties modified on computeDerivatives1
+computeDerivatives1.Vectors = [None, '']
+computeDerivatives1.OutputTensorType = 'Nothing'
+
+# show data in view
+computeDerivatives1Display = Show(computeDerivatives1, renderView1)
+# trace defaults for the display properties.
+computeDerivatives1Display.AmbientColor = [0.0, 0.0, 0.0]
+computeDerivatives1Display.ColorArrayName = ['POINTS', 'rho']
+computeDerivatives1Display.DiffuseColor = [0.0, 0.0, 0.0]
+computeDerivatives1Display.LookupTable = rhoLUT
+computeDerivatives1Display.BackfaceDiffuseColor = [0.0, 0.0, 0.0]
+computeDerivatives1Display.OSPRayScaleArray = 'rho'
+computeDerivatives1Display.OSPRayScaleFunction = 'PiecewiseFunction'
+computeDerivatives1Display.GlyphType = 'Arrow'
+computeDerivatives1Display.ScalarOpacityUnitDistance = 0.0246106136139205
+
+# hide data in view
+Hide(fieldcase, renderView1)
+
+# show color bar/color legend
+computeDerivatives1Display.SetScalarBarVisibility(renderView1, True)
+
+# set scalar coloring
+ColorBy(computeDerivatives1Display, ('CELLS', 'ScalarGradient'))
+
+# rescale color and/or opacity maps used to include current data range
+computeDerivatives1Display.RescaleTransferFunctionToDataRange(True)
+
+# show color bar/color legend
+computeDerivatives1Display.SetScalarBarVisibility(renderView1, True)
+
+# get color transfer function/color map for 'ScalarGradient'
+scalarGradientLUT = GetColorTransferFunction('ScalarGradient')
+
+# get opacity transfer function/opacity map for 'ScalarGradient'
+scalarGradientPWF = GetOpacityTransferFunction('ScalarGradient')
+
+# Rescale transfer function
+scalarGradientLUT.RescaleTransferFunction(2.0, 100.0)
+
+# convert to log space
+scalarGradientLUT.MapControlPointsToLogSpace()
+
+# Properties modified on scalarGradientLUT
+scalarGradientLUT.UseLogScale = 1
+
+# Apply a preset using its name. Note this may not work as expected when presets have duplicate names.
+scalarGradientLUT.ApplyPreset('X Ray', True)
+
+# get color legend/bar for scalarGradientLUT in view renderView1
+scalarGradientLUTColorBar = GetScalarBar(scalarGradientLUT, renderView1)
+
+# Properties modified on scalarGradientLUTColorBar
+scalarGradientLUTColorBar.Title = 'Schlieren'
+
+# Properties modified on scalarGradientLUTColorBar
+scalarGradientLUTColorBar.ComponentTitle = ''
+scalarGradientLUTColorBar.AutomaticLabelFormat = 1
+
+# Properties modified on scalarGradientLUTColorBar
+scalarGradientLUTColorBar.AutomaticLabelFormat = 0
+
+# Properties modified on computeDerivatives1Display
+computeDerivatives1Display.Specular = 1.0
+
+# reset view to fit data
+renderView1.ResetCamera()
+
+# set active source
+SetActiveSource(fieldcase)
+
+# show data in view
+fieldcaseDisplay = Show(fieldcase, renderView1)
+
+# show color bar/color legend
+fieldcaseDisplay.SetScalarBarVisibility(renderView1, True)
+
+# hide data in view
+Hide(computeDerivatives1, renderView1)
+
+# set active source
+SetActiveSource(computeDerivatives1)
+
+# show data in view
+computeDerivatives1Display = Show(computeDerivatives1, renderView1)
+
+# show color bar/color legend
+computeDerivatives1Display.SetScalarBarVisibility(renderView1, True)
+
+# hide data in view
+Hide(computeDerivatives1, renderView1)
+
+# convert from log to linear
+scalarGradientLUT.MapControlPointsToLinearSpace()
+
+# Properties modified on scalarGradientLUT
+scalarGradientLUT.UseLogScale = 0
+
+# convert to log space
+scalarGradientLUT.MapControlPointsToLogSpace()
+
+# Properties modified on scalarGradientLUT
+scalarGradientLUT.UseLogScale = 1
+
+# convert from log to linear
+scalarGradientLUT.MapControlPointsToLinearSpace()
+
+# Properties modified on scalarGradientLUT
+scalarGradientLUT.UseLogScale = 0
+
+# convert to log space
+scalarGradientLUT.MapControlPointsToLogSpace()
+
+# Properties modified on scalarGradientLUT
+scalarGradientLUT.UseLogScale = 1
+
+# set active source
+SetActiveSource(fieldcase)
+
+# convert to log space
+rhoLUT.MapControlPointsToLogSpace()
+
+# Properties modified on rhoLUT
+rhoLUT.UseLogScale = 1
+
+# Apply a preset using its name. Note this may not work as expected when presets have duplicate names.
+rhoLUT.ApplyPreset('X Ray', True)
+
+# convert from log to linear
+rhoLUT.MapControlPointsToLinearSpace()
+
+# Properties modified on rhoLUT
+rhoLUT.UseLogScale = 0
+
+# set active source
+SetActiveSource(computeDerivatives1)
+
+# show data in view
+computeDerivatives1Display = Show(computeDerivatives1, renderView1)
+
+# show color bar/color legend
+computeDerivatives1Display.SetScalarBarVisibility(renderView1, True)
+
+# hide data in view
+Hide(fieldcase, renderView1)
+
+# set active source
+SetActiveSource(fieldcase)
+
+# set active source
+SetActiveSource(computeDerivatives1)
+
+# set active source
+SetActiveSource(fieldcase)
+
+# create a new 'Contour'
+contour1 = Contour(Input=fieldcase)
+contour1.ContourBy = ['POINTS', 'rho']
+contour1.Isosurfaces = [3.999648407101631]
+contour1.PointMergeMethod = 'Uniform Binning'
+
+# Properties modified on contour1
+contour1.Isosurfaces = [0.225632, 1.0643017777777777, 1.9029715555555555, 2.7416413333333334, 3.580311111111111, 4.418980888888889, 5.257650666666667, 6.096320444444444, 6.934990222222222, 7.77366]
+
+# show data in view
+contour1Display = Show(contour1, renderView1)
+# trace defaults for the display properties.
+contour1Display.AmbientColor = [0.0, 0.0, 0.0]
+contour1Display.ColorArrayName = [None, '']
+contour1Display.DiffuseColor = [0.0, 0.0, 0.0]
+contour1Display.BackfaceDiffuseColor = [0.0, 0.0, 0.0]
+contour1Display.OSPRayScaleFunction = 'PiecewiseFunction'
+contour1Display.GlyphType = 'Arrow'
+contour1Display.SetScaleArray = [None, '']
+contour1Display.ScaleTransferFunction = 'PiecewiseFunction'
+contour1Display.OpacityArray = [None, '']
+contour1Display.OpacityTransferFunction = 'PiecewiseFunction'
+
+# hide data in view
+Hide(fieldcase, renderView1)
+
+# hide data in view
+Hide(computeDerivatives1, renderView1)
+
+# Properties modified on contour1
+contour1.Isosurfaces = [0.225632, 0.30111228, 0.37659255999999997, 0.4520728399999999, 0.52755312, 0.6030333999999999, 0.6785136799999999, 0.75399396, 0.82947424, 0.90495452, 0.9804348, 1.05591508, 1.13139536, 1.20687564, 1.2823559199999999, 1.3578362, 1.43331648, 1.50879676, 1.58427704, 1.6597573199999998, 1.7352376, 1.81071788, 1.88619816, 1.96167844, 2.03715872, 2.1126389999999997, 2.18811928, 2.2635995600000003, 2.33907984, 2.4145601199999995, 2.4900404, 2.56552068, 2.64100096, 2.71648124, 2.79196152, 2.8674417999999995, 2.9429220799999998, 3.01840236, 3.0938826399999995, 3.1693629199999998, 3.2448432, 3.32032348, 3.3958037599999997, 3.4712840399999996, 3.54676432, 3.6222445999999997, 3.69772488, 3.77320516, 3.8486854399999997, 3.9241657199999995, 3.999646, 4.07512628, 4.15060656, 4.22608684, 4.3015671200000005, 4.3770474, 4.45252768, 4.528007959999999, 4.603488239999999, 4.67896852, 4.7544488, 4.829929079999999, 4.90540936, 4.98088964, 5.05636992, 5.1318502, 5.2073304799999995, 5.28281076, 5.35829104, 5.43377132, 5.509251599999999, 5.584731879999999, 5.6602121599999995, 5.735692439999999, 5.81117272, 5.886653, 5.96213328, 6.03761356, 6.1130938399999994, 6.18857412, 6.2640544, 6.33953468, 6.41501496, 6.4904952399999996, 6.565975519999999, 6.641455799999999, 6.716936079999999, 6.79241636, 6.86789664, 6.94337692, 7.018857199999999, 7.094337479999999, 7.16981776, 7.24529804, 7.32077832, 7.3962585999999995, 7.471738879999999, 7.547219159999999, 7.622699439999999, 7.69817972, 7.77366]
+
+# reset view to fit data
+renderView1.ResetCamera()
+
+# reset view to fit data
+renderView1.ResetCamera()
+
+# reset view to fit data
+renderView1.ResetCamera()
+
+# reset view to fit data
+renderView1.ResetCamera()
+
+# create a new 'Line'
+line1 = Line()
+
+# Properties modified on line1
+line1.Point1 = [0.0, -0.27232, 0.419335]
+line1.Point2 = [0.0, 2.5, 2.2197]
+
+# show data in view
+line1Display = Show(line1, renderView1)
+# trace defaults for the display properties.
+line1Display.AmbientColor = [0.0, 0.0, 0.0]
+line1Display.ColorArrayName = [None, '']
+line1Display.DiffuseColor = [0.0, 0.0, 0.0]
+line1Display.BackfaceDiffuseColor = [0.0, 0.0, 0.0]
+line1Display.OSPRayScaleArray = 'Texture Coordinates'
+line1Display.OSPRayScaleFunction = 'PiecewiseFunction'
+line1Display.GlyphType = 'Arrow'
+line1Display.SetScaleArray = [None, '']
+line1Display.ScaleTransferFunction = 'PiecewiseFunction'
+line1Display.OpacityArray = [None, '']
+line1Display.OpacityTransferFunction = 'PiecewiseFunction'
+
+# Properties modified on line1Display
+line1Display.LineWidth = 4.0
+
+# change solid color
+line1Display.DiffuseColor = [1.0, 0.0, 0.0]
+
+# create a new 'Line'
+line2 = Line()
+
+# Properties modified on line2
+line2.Point1 = [0.0, -0.27232, -0.419335]
+line2.Point2 = [0.0, 2.5, -2.2197]
+
+# show data in view
+line2Display = Show(line2, renderView1)
+# trace defaults for the display properties.
+line2Display.AmbientColor = [0.0, 0.0, 0.0]
+line2Display.ColorArrayName = [None, '']
+line2Display.DiffuseColor = [0.0, 0.0, 0.0]
+line2Display.BackfaceDiffuseColor = [0.0, 0.0, 0.0]
+line2Display.OSPRayScaleArray = 'Texture Coordinates'
+line2Display.OSPRayScaleFunction = 'PiecewiseFunction'
+line2Display.GlyphType = 'Arrow'
+line2Display.SetScaleArray = [None, '']
+line2Display.ScaleTransferFunction = 'PiecewiseFunction'
+line2Display.OpacityArray = [None, '']
+line2Display.OpacityTransferFunction = 'PiecewiseFunction'
+
+# Properties modified on line2Display
+line2Display.LineWidth = 4.0
+
+# change solid color
+line2Display.DiffuseColor = [1.0, 0.0, 0.0]
+
+# set active source
+SetActiveSource(contour1)
+
+# create a new 'EnSight Reader'
+geo_sphcase = EnSightReader(CaseFileName='/scratch/morui/graham/1_cyn_nomv/slip/geo_sph.case')
+geo_sphcase.PointArrays = ['r', 'did', 'Vel']
+
+# get color transfer function/color map for 'r'
+rLUT = GetColorTransferFunction('r')
+
+# show data in view
+geo_sphcaseDisplay = Show(geo_sphcase, renderView1)
+# trace defaults for the display properties.
+geo_sphcaseDisplay.AmbientColor = [0.0, 0.0, 0.0]
+geo_sphcaseDisplay.ColorArrayName = ['POINTS', 'r']
+geo_sphcaseDisplay.DiffuseColor = [0.0, 0.0, 0.0]
+geo_sphcaseDisplay.LookupTable = rLUT
+geo_sphcaseDisplay.BackfaceDiffuseColor = [0.0, 0.0, 0.0]
+geo_sphcaseDisplay.OSPRayScaleArray = 'r'
+geo_sphcaseDisplay.OSPRayScaleFunction = 'PiecewiseFunction'
+geo_sphcaseDisplay.GlyphType = 'Arrow'
+geo_sphcaseDisplay.ScalarOpacityUnitDistance = 0.0
+geo_sphcaseDisplay.SetScaleArray = ['POINTS', 'r']
+geo_sphcaseDisplay.ScaleTransferFunction = 'PiecewiseFunction'
+geo_sphcaseDisplay.OpacityArray = ['POINTS', 'r']
+geo_sphcaseDisplay.OpacityTransferFunction = 'PiecewiseFunction'
+
+# show color bar/color legend
+geo_sphcaseDisplay.SetScalarBarVisibility(renderView1, True)
+
+# get opacity transfer function/opacity map for 'r'
+rPWF = GetOpacityTransferFunction('r')
+
+# create a new 'Glyph'
+glyph1 = Glyph(Input=geo_sphcase,
+    GlyphType='Cylinder')
+glyph1.Scalars = ['POINTS', 'r']
+glyph1.Vectors = ['POINTS', 'None']
+glyph1.ScaleMode = 'scalar'
+glyph1.ScaleFactor = 1.0
+glyph1.GlyphTransform = 'Transform2'
+glyph1.GlyphMode = 'All Points'
+
+# Properties modified on glyph1.GlyphType
+glyph1.GlyphType.Resolution = 144
+glyph1.GlyphType.Height = 0.0
+glyph1.GlyphType.Radius = 1.0
+
+# Properties modified on glyph1.GlyphTransform
+glyph1.GlyphTransform.Rotate = [0.0, 0.0, 90.0] # yz
+
+# show data in view
+contour1Display = Show(contour1, renderView1)
+
+# current camera placement for renderView1
+renderView1.InteractionMode = '2D'
+renderView1.CameraPosition = [13.503700517288031, 0.7053543925285339, 0.0]
+renderView1.CameraFocalPoint = [0.0, 0.7053543925285339, 0.0]
+renderView1.CameraViewUp = [0.0, 0.0, 1.0]
+renderView1.CameraParallelScale = 2.3871421851204855
+
+# get layout
+layout1 = GetLayout()
+
+# save screenshot
+SaveScreenshot('/scratch/morui/graham/1_cyn_nomv/slip/1_cyn_nomv_slip_n6400_t1000ms.jpg', layout=layout1, magnification=2, quality=100)
+
+# current camera placement for renderView1
+renderView1.InteractionMode = '2D'
+renderView1.CameraPosition = [13.503700517288031, 0.7053543925285339, 0.0]
+renderView1.CameraFocalPoint = [0.0, 0.7053543925285339, 0.0]
+renderView1.CameraViewUp = [0.0, 0.0, 1.0]
+renderView1.CameraParallelScale = 1.1136194469686955
+
+# save screenshot
+SaveScreenshot('/scratch/morui/graham/1_cyn_nomv/slip/1_cyn_nomv_slip_n6400_t1000ms_zoom.jpg', layout=layout1, magnification=2, quality=100)
+
+# hide data in view
+Hide(contour1, renderView1)
+
+# set active source
+SetActiveSource(computeDerivatives1)
+
+# show data in view
+computeDerivatives1Display = Show(computeDerivatives1, renderView1)
+
+# show color bar/color legend
+computeDerivatives1Display.SetScalarBarVisibility(renderView1, True)
+
+# hide color bar/color legend
+computeDerivatives1Display.SetScalarBarVisibility(renderView1, False)
+
+# current camera placement for renderView1
+renderView1.InteractionMode = '2D'
+renderView1.CameraPosition = [13.503700517288031, 0.7053543925285339, 0.0]
+renderView1.CameraFocalPoint = [0.0, 0.7053543925285339, 0.0]
+renderView1.CameraViewUp = [0.0, 0.0, 1.0]
+renderView1.CameraParallelScale = 2.387142185120485
+
+# save screenshot
+SaveScreenshot('/scratch/morui/graham/1_cyn_nomv/slip/1_cyn_nomv_slip_n6400_t1000ms_schlieren.jpg', layout=layout1, magnification=2, quality=100)
+
+# current camera placement for renderView1
+renderView1.InteractionMode = '2D'
+renderView1.CameraPosition = [13.503700517288031, 0.7053543925285339, 0.0]
+renderView1.CameraFocalPoint = [0.0, 0.7053543925285339, 0.0]
+renderView1.CameraViewUp = [0.0, 0.0, 1.0]
+renderView1.CameraParallelScale = 1.1136194469686953
+
+# save screenshot
+SaveScreenshot('/scratch/morui/graham/1_cyn_nomv/slip/1_cyn_nomv_slip_n6400_t1000ms_zoom_schlieren.jpg', layout=layout1, magnification=2, quality=100)
+
+#### saving camera placements for all active views
+
+# current camera placement for renderView1
+renderView1.InteractionMode = '2D'
+renderView1.CameraPosition = [13.503700517288031, 0.7053543925285339, 0.0]
+renderView1.CameraFocalPoint = [0.0, 0.7053543925285339, 0.0]
+renderView1.CameraViewUp = [0.0, 0.0, 1.0]
+renderView1.CameraParallelScale = 1.1136194469686953
+
+#### uncomment the following to render all views
+# RenderAllViews()
+# alternatively, if you want to write images, you can use SaveScreenshot(...).

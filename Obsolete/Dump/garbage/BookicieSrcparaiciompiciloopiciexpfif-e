@@ -1,0 +1,57 @@
+#include <omp.h> /* parallel header file */
+#include <stdio.h>
+
+int main (int argc, char* argv[])
+{
+    const int N = 1000;
+    int a[N];
+    int j = 10;
+
+    /*
+     * Sequential code
+     */
+    for (int i = 0; i < N; ++i) {
+        j += 2;
+        a[i] = a[i] + j;
+    }
+    /*
+     * OpenMP parallel region
+     */
+    #pragma omp parallel
+    { /* structured block entry */
+        int id, i, Nthrds, istart, iend;
+        id = omp_get_thread_num();
+        Nthrds = omp_get_num_threads();
+        istart = id * N / Nthrds;
+        iend = (id + 1) * N / Nthrds;
+        if (Nthrds - 1 == id) {
+            iend = N;
+        }
+        for (int i = istart; i < iend; ++i) {
+            int j = 10 + 2 * i; /* remove loop carried dependence */
+            a[i] = a[i] + j;
+        }
+    } /* structured block exit */
+    /*
+     * OpenMP parallel region and worksharing for construct
+     */
+    #pragma omp parallel
+    { /* structured block entry */
+        #pragma omp for
+        for (int i = 0; i < N; ++i) {
+            int j = 10 + 2 * i; /* remove loop carried dependence */
+            a[i] = a[i] + j;
+        }
+    } /* structured block exit */
+    /*
+     * OpenMP combined parallel region and worksharing for construct
+     */
+    #pragma omp parallel for
+    for (int i = 0; i < N; ++i) {
+        int j = 10 + 2 * i; /* remove loop carried dependence */
+        a[i] = a[i] + j;
+    }
+
+    return 0;
+}
+

@@ -1,0 +1,22 @@
+#include <omp.h> /* parallel header file */
+#include <stdio.h>
+
+int main (int argc, char* argv[])
+{
+    /*
+     * Example of a loop variable that is implicitly shared.
+     * Loop variable i is private by default, but this is not 
+     * the case for j: it is shared by default. This results
+     * in undefined runtime behavior.
+     */
+    int i, j;
+    #pragma omp parallel for
+    for (i=0; i<n; i++)
+    {
+        for (j=0; j<m; j++) {
+            a[i][j] = compute(i,j);
+        }
+    }
+    return 0;
+}
+

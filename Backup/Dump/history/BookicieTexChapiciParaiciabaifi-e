@@ -1,0 +1,213 @@
+\chapter{Message passing interface}
+
+The message passing model that an application passes messages among processes in order to perform a task is the most commonly adopted model for parallel programming due to its generality. With the success of the message passing model, a standard interface for performing message passing is defined: the Message Passing Interface (MPI). MPI is a standardized and portable library of message-passing routines aimed for creating programmes for distributed computing systems.
+
+\section{MPI basics}
+
+A parallel computation on distributed memory architectures consists of a number of processes with each process working on its local data. Separate processes have purely local variables and share no memory variables for directly exchanging information. Instead, they use MPI communication routines via point-to-point communications or collective operations to exchange and synchronize data. That is, information sharing between processes is achieved by explicitly sending and receiving data between processes.
+
+Library calls for communication in message passing programs can be roughly divided into four classes \citep{pacheco1997parallel}.
+\begin{itemize}
+    \item Calls to initialize, manage, and finally terminate communications.
+    \item Calls to communicate between pairs of processes.
+    \item Calls to perform communication operations among groups of processes.
+    \item Calls to construct arbitrary data types.
+\end{itemize}
+
+Messages communicated among processes consist of two parts: the envelope and the message body. The envelope of an MPI message is analogous to the paper envelope around a letter mailed at the post office, and the message body is the letter \citep{pacheco1997parallel}.
+
+The envelope of an MPI message has four parts.
+\begin{itemize}
+    \item Source: the sending process.
+    \item Destination: the receiving process.
+    \item Communicator: a group of processes to which both source and destination belong.
+    \item Tag: used to classify messages.
+\end{itemize}
+
+The message body has three parts.
+\begin{itemize}
+    \item Buffer: the message data.
+    \item Datatype: the type of the message data.
+    \item Count: the number of items of type datatype in buffer.
+\end{itemize}
+
+Some auxiliary parameters are occupied for message communication.
+\begin{itemize}
+    \item Status: a structure contains information, such as the source, tag, and actual count of received data, about the message that was received; or contains an error code for the message that was sent.
+    \item Request handles: identify the posted operation by the posting process after posting a send or receive with a call to nonblocking routines.
+\end{itemize}
+
+\section{MPI Hello World example of C language}
+\begin{footnotesize}
+  \begin{verbatim}
+    #include <mpi.h> /* MPI header file */
+    #include <stdio.h>
+
+    int main (int argc, char* argv[])
+    {
+        int rank = 0;
+        int size = 0;
+        /* serial code ends, parallel code begins */
+        MPI_Init(&argc, &argv); /* initialize MPI environment */
+        MPI_Comm_rank(MPI_COMM_WORLD, &rank); /* determine current process rank */
+        MPI_Comm_size(MPI_COMM_WORLD, &size); /* query number of processes */
+        printf("Hello world! I'm process %d out of %d processes\n", rank, size);
+        MPI_Finalize(); /* terminate MPI environment */
+        /* parallel code ends, serial code begins */
+        return 0;
+    }
+  \end{verbatim}
+\end{footnotesize}
+
+The program first starts on a process called the "parent", "root", or "master" process. When the routine \path{MPI_Init} executes within the root process, it initializes a MPI environment and causes the creation of additional processes, called "child" processes, to reach the number of processes (\path{np}) specified on the \path{mpirun} command line. From this point on, every process executes a separate copy of the program, and no variables are shared.
+
+MPI employs the concept of communicator to group and manage processes. A communicator represents a group of processes that are able to communicate with each other. A given process can be a member of many different communicators. To identify each process, processes are numbered consecutively starting from $0$ within each communicator. This identifying number of each process is called the rank of the process in that communicator.
+
+MPI automatically creates a default communicator called \path{MPI_COMM_WORLD}, which consists of the entire allocated processes and provides the environment that all processes can communicate with each other. In addition, a process can call \path{MPI_Comm_rank} to determine its rank in a specific communicator and \path{MPI_Comm_size} to query the size (number of processes) of a communicator. 
+
+At last, \path{MPI_Finalize} must be called by all processes to clean up all MPI data structures, cancel uncompleted operations, and terminate MPI environment. After this function call, no other MPI functions including \path{MPI_Init} may be called in the program.
+
+\section{Point-to-point communication}
+
+Point-to-point communication, a fundamental communication facility provided by the MPI library, is two-sided communication that one process called the source sends a message and another process called the destination receives it.
+
+\paragraph{Blocking send and receive}
+
+Blocking send and receive functions block the calling process and do not return until the communication operation it invoked is completed. The requirement for the communication operation to complete can cause delays and even deadlock. Deadlock occurs when two or more processes are blocked and each is waiting for the other to make progress. However, neither process is able to make progress because each depends on the other to make progress first.
+
+\subparagraph{Send}
+\begin{footnotesize}
+    \begin{verbatim}
+    int MPI_Send(void *buf, int count, MPI_Datatype dtype,
+              int dest, int tag, MPI_Comm comm);
+    \end{verbatim}
+\end{footnotesize}
+
+\subparagraph{Receive}
+\begin{footnotesize}
+    \begin{verbatim}
+    int MPI_Recv(void *buf, int count, MPI_Datatype dtype,
+              int source, int tag, MPI_Comm comm,
+              MPI_Status *status);
+    \end{verbatim}
+\end{footnotesize}
+
+\subparagraph{Example}
+
+In this program, process $0$ exchanges messages with process $1$. Process $0$ receives, then send; process $1$ sends, then receives. Process rank is used in conditional statements to limit execution of code to a particular process. The protocol is safe and the program always runs to completion.
+\begin{footnotesize}
+    \begin{verbatim}
+    #include <mpi.h> /* MPI header file */
+    #include <stdio.h>
+
+    int main (int argc, char* argv[])
+    {
+        int rank = 0;
+        int size = 0;
+        MPI_Status status;
+        double arrayA[100] = {0.0};
+        double arrayB[100] = {0.0};
+        /* serial code ends, parallel code begins */
+        MPI_Init(&argc, &argv); /* initialize MPI environment */
+        MPI_Comm_rank(MPI_COMM_WORLD, &rank); /* determine current process rank */
+        MPI_Comm_size(MPI_COMM_WORLD, &size); /* query number of processes */
+        if (0 == rank) {
+            /* receive a message, then send one */
+            MPI_Recv(arrayB, 100, MPI_DOUBLE, 1, 19, MPI_COMM_WORLD, &status);
+            MPI_Send(arrayA, 100, MPI_DOUBLE, 1, 17, MPI_COMM_WORLD);
+        } else {
+            if (1 == rank) {
+                /* send a message, then receive one */
+                MPI_Send(arrayA, 100, MPI_DOUBLE, 0, 19, MPI_COMM_WORLD);
+                MPI_Recv(arrayB, 100, MPI_DOUBLE, 0, 17, MPI_COMM_WORLD, &status);
+            }
+        }
+        MPI_Finalize(); /* terminate MPI environment */
+        /* parallel code ends, serial code begins */
+        return 0;
+    }
+    \end{verbatim}
+\end{footnotesize}
+
+\paragraph{Nonblocking send and receive}
+
+Making independent calls to MPI for initiation and completion to separate the initiation of a send or receive operation from its completion is another way to invoke send and receive operation. Between the two calls, the program is free to do other things. Although the interface to the library is different, the underlying communication operations are the same whether communications are invoked by a single call, or by two separate calls for initiation and completion.
+
+In nonblocking interface, a send or receive operation requires one call to initiate the operation and a second call to complete the operation. Sends and receives are posted by calling nonblocking routines and are identified by request handles, with which processes can check the status of posted operations or wait for their completion. Selective use of nonblocking interface is a good way to produce deadlock-free code.
+
+\subparagraph{Posting send without blocking}
+\begin{footnotesize}
+    \begin{verbatim}
+    int MPI_Isend(void *buf, int count, MPI_Datatype dtype,
+              int dest, int tag, MPI_Comm comm,
+              MPI_Request *request);
+    \end{verbatim}
+\end{footnotesize}
+
+\subparagraph{Posting receive without blocking}
+\begin{footnotesize}
+    \begin{verbatim}
+    int MPI_Irecv(void *buf, int count, MPI_Datatype dtype,
+              int source, int tag, MPI_Comm comm,
+              MPI_Request *request);
+    \end{verbatim}
+\end{footnotesize}
+
+\subparagraph{Completion wait with blocking}
+\begin{footnotesize}
+    \begin{verbatim}
+    int MPI_Wait(MPI_Request *request, MPI_Status *status);
+    \end{verbatim}
+\end{footnotesize}
+
+\subparagraph{Completion test without blocking}
+\begin{footnotesize}
+    \begin{verbatim}
+    int MPI_Test(MPI_Request *request, int *flag, MPI_Status *status);
+    \end{verbatim}
+\end{footnotesize}
+
+\subparagraph{Example}
+
+Process 0 attempts to exchange messages with process 1. Each process begins by posting a receive for a message from the other. Then, each process blocks on a send. Finally, each process waits for its previously posted receive to complete.
+
+Each process completes its send because the other process has posted a matching receive. Each process completes its receive because the other process sends a message that matches. Except for system failure, the program runs to completion.
+
+Note: the variables passed to \path{MPI_Isend} cannot be used (should not even be read) until the send operation invoked by the call has completed. A call to \path{MPI_Test}, \path{MPI_Wait} or one of their variants is needed to determine completion status.
+\begin{footnotesize}
+    \begin{verbatim}
+    #include <mpi.h> /* MPI header file */
+    #include <stdio.h>
+
+    int main (int argc, char* argv[])
+    {
+        int rank = 0;
+        int size = 0;
+        MPI_Status status;
+        MPI_Request request;
+        double arrayA[100] = {0.0};
+        double arrayB[100] = {0.0};
+        /* serial code ends, parallel code begins */
+        MPI_Init(&argc, &argv); /* initialize MPI environment */
+        MPI_Comm_rank(MPI_COMM_WORLD, &rank); /* determine current process rank */
+        MPI_Comm_size(MPI_COMM_WORLD, &size); /* query number of processes */
+        if (0 == rank) {
+            /* post a receive, send a message, then wait */
+            MPI_Irecv(arrayB, 100, MPI_DOUBLE, 1, 19, MPI_COMM_WORLD, &request);
+            MPI_Send(arrayA, 100, MPI_DOUBLE, 1, 17, MPI_COMM_WORLD);
+            MPI_Wait(&request, &status);
+        } else {
+            if (1 == rank) {
+                /* post a receive, send a message, then wait */
+                MPI_Irecv(arrayB, 100, MPI_DOUBLE, 0, 17, MPI_COMM_WORLD, &request);
+                MPI_Send(arrayA, 100, MPI_DOUBLE, 0, 19, MPI_COMM_WORLD);
+                MPI_Wait(&request, &status);
+            }
+        }
+        MPI_Finalize(); /* terminate MPI environment */
+        /* parallel code ends, serial code begins */
+        return 0;
+    }
+    \end{verbatim}
+\end{footnotesize}
+

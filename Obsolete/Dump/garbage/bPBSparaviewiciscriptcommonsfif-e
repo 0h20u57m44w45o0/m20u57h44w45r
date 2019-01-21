@@ -1,0 +1,66 @@
+#---------------------------------------------------
+#- View settings
+#---------------------------------------------------
+
+SetScalarBarVisibility(renderView1, False)
+
+#---------------------------------------------------
+#- Glyph error correction
+#---------------------------------------------------
+
+#-> Cylinder
+
+# create a new 'Glyph'
+
+#-----
+glyph1 = Glyph(Input=geo_sphcase,
+    GlyphType='Cylinder')
+glyph1.Scalars = ['POINTS', 'r']
+glyph1.Vectors = ['POINTS', 'None']
+glyph1.ScaleMode = 'scalar'
+glyph1.ScaleFactor = 1.0
+glyph1.GlyphTransform = 'Transform2'
+glyph1.GlyphMode = 'All Points'
+
+# Properties modified on glyph1.GlyphType
+glyph1.GlyphType.Resolution = 144
+glyph1.GlyphType.Height = 0.0
+glyph1.GlyphType.Radius = 1.0
+
+# Properties modified on glyph1.GlyphTransform
+#glyph1.GlyphTransform.Rotate = [90.0, 0.0, 0.0] # xy
+glyph1.GlyphTransform.Rotate = [0.0, 0.0, 90.0] # yz
+#-----
+
+# show data in view
+glyph1Display = Show(glyph1, renderView1)
+
+#-> Sphere
+
+# create a new 'Glyph'
+
+#-----
+glyph1 = Glyph(Input=geo_sphcase,
+    GlyphType='Sphere')
+glyph1.Scalars = ['POINTS', 'r']
+glyph1.Vectors = ['POINTS', 'Vel']
+glyph1.ScaleMode = 'scalar'
+glyph1.ScaleFactor = 1.0
+glyph1.GlyphMode = 'All Points'
+
+# Properties modified on glyph1.GlyphType
+glyph1.GlyphType.Radius = 1.0
+glyph1.GlyphType.ThetaResolution = 36
+glyph1.GlyphType.PhiResolution = 36
+#-----
+
+# show data in view
+glyph1Display = Show(glyph1, renderView1)
+
+#---------------------------------------------------
+#- Glyph display
+#---------------------------------------------------
+
+# trace defaults for the display properties.
+glyph1Display.Interpolation = 'Flat'
+glyph1Display.Specular = 1.0

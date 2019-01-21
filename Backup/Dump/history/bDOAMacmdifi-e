@@ -1,0 +1,90 @@
+#!/bin/bash
+set -e
+
+#---------------------------------------------------------------------------#
+#-               Automated  Data Operation and Manipulation                -#
+#-                          <By Huangrui Mo>                               -#
+#- Copyright (C) Huangrui Mo <huangrui.mo@gmail.com>                       -#
+#- This file is part of ArtraDOAM.                                         -#
+#- ArtraDOAM is free software: you can redistribute it and/or modify it    -#
+#- under the terms of the GNU General Public License as published by       -#
+#- the Free Software Foundation, either version 3 of the License, or       -#
+#- (at your option) any later version.                                     -#
+#---------------------------------------------------------------------------#
+
+#---------------------------------------------------------------------------#
+#-                            Methodology
+#- Stream data --> Process data --> Export result
+#---------------------------------------------------------------------------#
+
+#---------------------------------------------------------------------------#
+#->> Data processor
+#---------------------------------------------------------------------------#
+
+data_processor="artradoam.sh"
+
+#---------------------------------------------------------------------------#
+#->> Configuration
+#---------------------------------------------------------------------------#
+
+#- set data directories
+dir_data_src=~/"Work/dispersal/2d_random/data_collector"
+dir_data_key="L"
+dir_data_dest=~/"Work/dispersal/2d_random/data_processed/scaling_law"
+
+#- set processor directories
+dir_work="$(pwd)"
+importer="importer"
+processor="processor"
+exporter="exporter"
+operator="operator"
+plotter="plotter"
+recorder="recorder"
+case_list="case.list"
+case_info="case.info"
+run_log="run.log"
+
+cd "$dir_data_src"
+dir_list=$(ls -d "$dir_data_key"*)
+cd "$dir_work"
+for dir in $dir_list
+do
+    if [[ ! -d "$dir_data_src"/"$dir" ]]; then
+        echo "warning: $dir is not a directory and is skipped..."
+        continue
+    fi
+    cas_key="$dir"
+    cp "$dir_data_src"/"$dir"/* "$importer"/
+    ./"$data_processor" -cmd 8
+    cp "$exporter"/* "$importer"/
+    fname="S"$cas_key"_VE_t"
+    fbase="base"
+    ./"$data_processor" -cmd 4
+    if [[ -n "$(grep 'nan' "$processor"/"$run_log")" ]]; then
+        echo "warning: $dir contains 'nan' and is skipped..." | tee -a "$dir_data_src"/"nan_case_list"
+        continue
+    fi
+    #- ignore leading spaces and extract data
+    grep '^[[:blank:]]*[+-]\{0,1\}[[:digit:]]' "$processor"/"$run_log" >  "$importer"/"$fname"
+    #- delete leading space and extract data
+    #sed 's/^[[:space:]]*//g' "$processor"/"$run_log" | grep '^[+-]\{0,1\}[[:digit:]]' > "$importer"/"$fname"
+    #- extract data and form rows
+    for fdat in $(grep '^[[:blank:]]*[+-]\{0,1\}[[:digit:]]' "$dir_data_src"/""$cas_key"_field.case")
+    do
+        echo "$fdat" >> "$importer"/"$fbase"
+    done
+    #- extract the last row
+    data_var=$(tail -n1 "$importer"/"$fname")
+    echo "$fname  $data_var" >> "$dir_data_dest"/"VG_list"
+    #- get number of rows and columns
+    nrow_a=$(wc -l "$importer"/"$fname" | awk '{print $1}')
+    ncol_a=$(head -1 "$importer"/"$fname" | wc -w)
+    nrow_b=$(wc -l "$importer"/"$fbase" | awk '{print $1}')
+    ncol_b=$(head -1 "$importer"/"$fbase" | wc -w)
+    if [[ "$nrow_a" -ne "$nrow_b" ]]; then
+        echo "warning: $fname and $fbase cannot match the number of rows..."
+    fi
+    ./"$data_processor" -cmd 3
+    cp "$exporter"/"$fname" "$dir_data_dest"/"$fname"
+done
+

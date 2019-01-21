@@ -1,0 +1,20 @@
+#include <omp.h> /* parallel header file */
+#include <stdio.h>
+
+int main (int argc, char* argv[])
+{
+    #pragma omp parallel
+    {
+        #pragma omp sections
+        {
+            #pragma omp section
+            x_calculations();
+            #pragma omp section
+            y_calculations();
+            #pragma omp section
+            z_calculations();
+        }
+    }
+    return 0;
+}
+

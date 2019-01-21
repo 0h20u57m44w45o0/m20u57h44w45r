@@ -1,0 +1,438 @@
+/****************************************************************************
+ *                              ArtraCFD                                    *
+ *                          <By Huangrui Mo>                                *
+ * Copyright (C) Huangrui Mo <huangrui.mo@gmail.com>                        *
+ * This file is part of ArtraCFD.                                           *
+ * ArtraCFD is free software: you can redistribute it and/or modify it      *
+ * under the terms of the GNU General Public License as published by        *
+ * the Free Software Foundation, either version 3 of the License, or        *
+ * (at your option) any later version.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Header Files
+ ****************************************************************************/
+#include "paraview.h"
+#include <stdio.h> /* standard library for input and output */
+#include <string.h> /* manipulating strings */
+#include "data_stream.h"
+#include "cfd_commons.h"
+#include "commons.h"
+/****************************************************************************
+ * Static Function Declarations
+ ****************************************************************************/
+static int InitializeTransientCaseFile(PvSet *);
+static int WriteCaseFile(const Time *, PvSet *);
+static int WriteStructuredData(const Space *, const Model *, PvSet *);
+static int PointPolyDataWriter(const Time *, const Geometry *);
+static int WritePointPolyData(const int, const int, const Geometry *, PvSet *);
+static int PolygonPolyDataWriter(const Time *, const Geometry *);
+static int WritePolygonPolyData(const int, const int, const Geometry *, PvSet *);
+/****************************************************************************
+ * Function definitions
+ ****************************************************************************/
+int WriteStructuredDataParaview(const Time *time, const Space *space, const Model *model)
+{
+    PvSet pvSet = { /* initialize environment */
+        .rname = "field",
+        .bname = {'\0'},
+        .fname = {'\0'},
+        .fext = ".vts",
+        .fmt = "%s%05d",
+        .intType = "Int32",
+        .floatType = "Float32",
+        .byteOrder = "LittleEndian",
+        .scaN = 10,
+        .sca = {"rho", "u", "v", "w", "p", "T", "gid", "fid", "lid", "gst"},
+        .vecN = 1,
+        .vec = {"Vel"},
+    };
+    snprintf(pvSet.bname, sizeof(PvStr), pvSet.fmt, pvSet.rname, time->writeC); 
+    if (0 == time->stepC) { /* this is the initialization step */
+        InitializeTransientCaseFile(&pvSet);
+    }
+    WriteCaseFile(time, &pvSet);
+    WriteStructuredData(space, model, &pvSet);
+    return 0;
+}
+static int InitializeTransientCaseFile(PvSet *pvSet)
+{
+    snprintf(pvSet->fname, sizeof(PvStr), "%s.pvd", pvSet->rname); 
+    FILE *filePointer = fopen(pvSet->fname, "w");
+    if (NULL == filePointer) {
+        FatalError("failed to initialize transient case file...");
+    }
+    /* output information to file */
+    fprintf(filePointer, "<?xml version=\"1.0\"?>\n");
+    fprintf(filePointer, "<VTKFile type=\"Collection\" version=\"1.0\"\n");
+    fprintf(filePointer, "         byte_order=\"%s\">\n", pvSet->byteOrder);
+    fprintf(filePointer, "  <Collection>\n");
+    fprintf(filePointer, "  </Collection>\n");
+    fprintf(filePointer, "</VTKFile>\n");
+    fclose(filePointer); /* close current opened file */
+    return 0;
+}
+static int WriteCaseFile(const Time *time, PvSet *pvSet)
+{
+    snprintf(pvSet->fname, sizeof(PvStr), "%s.pvd", pvSet->bname); 
+    FILE *filePointer = fopen(pvSet->fname, "w");
+    if (NULL == filePointer) {
+        FatalError("failed to open case file...");
+    }
+    /* output information to file */
+    fprintf(filePointer, "<?xml version=\"1.0\"?>\n");
+    fprintf(filePointer, "<VTKFile type=\"Collection\" version=\"1.0\"\n");
+    fprintf(filePointer, "         byte_order=\"%s\">\n", pvSet->byteOrder);
+    fprintf(filePointer, "  <Collection>\n");
+    fprintf(filePointer, "    <DataSet timestep=\"%.6g\" group=\"\" part=\"0\"\n", time->now);
+    fprintf(filePointer, "             file=\"%s%s\"/>\n", pvSet->bname, pvSet->fext);
+    fprintf(filePointer, "  </Collection>\n");
+    fprintf(filePointer, "</VTKFile>\n");
+    fprintf(filePointer, "<!--\n");
+    fprintf(filePointer, "  Time %.6g\n", time->now);
+    fprintf(filePointer, "  Step %d\n", time->stepC);
+    fprintf(filePointer, "-->\n");
+    fclose(filePointer); /* close current opened file */
+    /*
+     * Add the current export to the transient case
+     */
+    snprintf(pvSet->fname, sizeof(PvStr), "%s.pvd", pvSet->rname); 
+    filePointer = fopen(pvSet->fname, "r+");
+    if (NULL == filePointer) {
+        FatalError("failed to add data to transient case file...");
+    }
+    /* seek the target line for adding information */
+    WriteToLine(filePointer, "</Collection>");
+    /* append informatiom */
+    fprintf(filePointer, "    <DataSet timestep=\"%.6g\" group=\"\" part=\"0\"\n", time->now);
+    fprintf(filePointer, "             file=\"%s%s\"/>\n", pvSet->bname, pvSet->fext);
+    fprintf(filePointer, "  </Collection>\n");
+    fprintf(filePointer, "</VTKFile>\n");
+    fclose(filePointer); /* close current opened file */
+    return 0;
+}
+static int WriteStructuredData(const Space *space, const Model *model, PvSet *pvSet)
+{
+    snprintf(pvSet->fname, sizeof(PvStr), "%s%s", pvSet->bname, pvSet->fext); 
+    FILE *filePointer = fopen(pvSet->fname, "w");
+    if (NULL == filePointer) {
+        FatalError("failed to open data file...");
+    }
+    PvReal data = 0.0; /* paraview scalar data */
+    PvReal Vec[3] = {0.0}; /* paraview vector data */
+    const Partition *restrict part = &(space->part);
+    const Node *const node = space->node;
+    const Real *restrict U = NULL;
+    int idx = 0; /* linear array index math variable */
+    IntVec ne = {0}; /* i, j, k node number in each part */
+    ne[X] = part->ns[PIN][X][MAX] - part->ns[PIN][X][MIN] - 1; 
+    ne[Y] = part->ns[PIN][Y][MAX] - part->ns[PIN][Y][MIN] - 1; 
+    ne[Z] = part->ns[PIN][Z][MAX] - part->ns[PIN][Z][MIN] - 1; 
+    fprintf(filePointer, "<?xml version=\"1.0\"?>\n");
+    fprintf(filePointer, "<VTKFile type=\"StructuredGrid\" version=\"1.0\"\n");
+    fprintf(filePointer, "         byte_order=\"%s\">\n", pvSet->byteOrder);
+    fprintf(filePointer, "  <StructuredGrid WholeExtent=\"%d %d %d %d %d %d\">\n", 
+            0, ne[X], 0, ne[Y], 0, ne[Z]);
+    fprintf(filePointer, "    <Piece Extent=\"%d %d %d %d %d %d\">\n", 
+            0, ne[X], 0, ne[Y], 0, ne[Z]);
+    fprintf(filePointer, "      <PointData>\n");
+    for (int s = 0; s < pvSet->scaN; ++s) {
+        fprintf(filePointer, "        <DataArray type=\"%s\" Name=\"%s\" format=\"ascii\">\n", 
+                pvSet->floatType, pvSet->sca[s]);
+        fprintf(filePointer, "          ");
+        for (int k = part->ns[PIN][Z][MIN]; k < part->ns[PIN][Z][MAX]; ++k) {
+            for (int j = part->ns[PIN][Y][MIN]; j < part->ns[PIN][Y][MAX]; ++j) {
+                for (int i = part->ns[PIN][X][MIN]; i < part->ns[PIN][X][MAX]; ++i) {
+                    idx = IndexNode(k, j, i, part->n[Y], part->n[X]);
+                    U = node[idx].U[TO];
+                    switch (s) {
+                        case 0: /* rho */
+                            data = U[0];
+                            break;
+                        case 1: /* u */
+                            data = U[1] / U[0];
+                            break;
+                        case 2: /* v */
+                            data = U[2] / U[0];
+                            break;
+                        case 3: /* w */
+                            data = U[3] / U[0];
+                            break;
+                        case 4: /* p */
+                            data = ComputePressure(model->gamma, U);
+                            break;
+                        case 5: /* T */
+                            data = ComputeTemperature(model->cv, U);
+                            break;
+                        case 6: /* node flag */
+                            data = node[idx].gid;
+                            break;
+                        case 7: /* face flag */
+                            data = node[idx].fid;
+                            break;
+                        case 8: /* layer flag */
+                            data = node[idx].lid;
+                            break;
+                        case 9: /* ghost flag */
+                            data = node[idx].gst;
+                            break;
+                        default:
+                            break;
+                    }
+                    fprintf(filePointer, "%.6g ", data);
+                }
+            }
+        }
+        fprintf(filePointer, "\n        </DataArray>\n");
+    }
+    for (int s = 0; s < pvSet->vecN; ++s) {
+        fprintf(filePointer, "        <DataArray type=\"%s\" Name=\"%s\"\n", 
+                pvSet->floatType, pvSet->vec[s]);
+        fprintf(filePointer, "                   NumberOfComponents=\"3\" format=\"ascii\">\n");
+        fprintf(filePointer, "          ");
+        for (int k = part->ns[PIN][Z][MIN]; k < part->ns[PIN][Z][MAX]; ++k) {
+            for (int j = part->ns[PIN][Y][MIN]; j < part->ns[PIN][Y][MAX]; ++j) {
+                for (int i = part->ns[PIN][X][MIN]; i < part->ns[PIN][X][MAX]; ++i) {
+                    idx = IndexNode(k, j, i, part->n[Y], part->n[X]);
+                    U = node[idx].U[TO];
+                    Vec[X] = U[1] / U[0];
+                    Vec[Y] = U[2] / U[0];
+                    Vec[Z] = U[3] / U[0];
+                    fprintf(filePointer, "%.6g %.6g %.6g ", Vec[X], Vec[Y], Vec[Z]);
+                }
+            }
+        }
+        fprintf(filePointer, "\n        </DataArray>\n");
+    }
+    fprintf(filePointer, "      </PointData>\n");
+    fprintf(filePointer, "      <CellData>\n");
+    fprintf(filePointer, "      </CellData>\n");
+    fprintf(filePointer, "      <Points>\n");
+    fprintf(filePointer, "        <DataArray type=\"%s\" Name=\"points\"\n", pvSet->floatType);
+    fprintf(filePointer, "                   NumberOfComponents=\"3\" format=\"ascii\">\n");
+    fprintf(filePointer, "          ");
+    for (int k = part->ns[PIN][Z][MIN]; k < part->ns[PIN][Z][MAX]; ++k) {
+        for (int j = part->ns[PIN][Y][MIN]; j < part->ns[PIN][Y][MAX]; ++j) {
+            for (int i = part->ns[PIN][X][MIN]; i < part->ns[PIN][X][MAX]; ++i) {
+                Vec[X] = PointSpace(i, part->domain[X][MIN], part->d[X], part->ng[X]);
+                Vec[Y] = PointSpace(j, part->domain[Y][MIN], part->d[Y], part->ng[Y]);
+                Vec[Z] = PointSpace(k, part->domain[Z][MIN], part->d[Z], part->ng[Z]);
+                fprintf(filePointer, "%.6g %.6g %.6g ", Vec[X], Vec[Y], Vec[Z]);
+            }
+        }
+    }
+    fprintf(filePointer, "\n        </DataArray>\n");
+    fprintf(filePointer, "      </Points>\n");
+    fprintf(filePointer, "    </Piece>\n");
+    fprintf(filePointer, "  </StructuredGrid>\n");
+    fprintf(filePointer, "</VTKFile>\n");
+    fclose(filePointer); /* close current opened file */
+    return 0;
+}
+int WritePolyDataParaview(const Time *time, const Geometry *geo)
+{
+    if (0 != geo->sphN) {
+        PointPolyDataWriter(time, geo);
+    }
+    if (0 != geo->stlN) {
+        PolygonPolyDataWriter(time, geo);
+    }
+    return 0;
+}
+static int PointPolyDataWriter(const Time *time, const Geometry *geo)
+{
+    PvSet pvSet = { /* initialize environment */
+        .rname = "geo_sph",
+        .bname = {'\0'},
+        .fname = {'\0'},
+        .fext = ".vtp",
+        .fmt = "%s%05d",
+        .intType = "Int32",
+        .floatType = "Float32",
+        .byteOrder = "LittleEndian",
+        .scaN = 2,
+        .sca = {"r", "gid"},
+        .vecN = 1,
+        .vec = {"Vel"},
+    };
+    snprintf(pvSet.bname, sizeof(PvStr), pvSet.fmt, pvSet.rname, time->writeC); 
+    if (0 == time->stepC) { /* this is the initialization step */
+        InitializeTransientCaseFile(&pvSet);
+    }
+    WriteCaseFile(time, &pvSet);
+    WritePointPolyData(0, geo->sphN, geo, &pvSet);
+    return 0;
+}
+static int WritePointPolyData(const int start, const int end, const Geometry *geo, PvSet *pvSet)
+{
+    snprintf(pvSet->fname, sizeof(PvStr), "%s%s", pvSet->bname, pvSet->fext); 
+    FILE *filePointer = fopen(pvSet->fname, "w");
+    if (NULL == filePointer) {
+        FatalError("failed to open data file...");
+    }
+    PvReal data = 0.0; /* paraview scalar data */
+    PvReal Vec[3] = {0.0}; /* paraview vector data */
+    fprintf(filePointer, "<?xml version=\"1.0\"?>\n");
+    fprintf(filePointer, "<VTKFile type=\"PolyData\" version=\"1.0\"\n");
+    fprintf(filePointer, "         byte_order=\"%s\">\n", pvSet->byteOrder);
+    fprintf(filePointer, "  <PolyData>\n");
+    fprintf(filePointer, "    <Piece NumberOfPoints=\"%d\" NumberOfVerts=\"1\" NumberOfPolys=\"0\">\n", (end - start));
+    fprintf(filePointer, "      <PointData>\n");
+    for (int s = 0; s < pvSet->scaN; ++s) {
+        fprintf(filePointer, "        <DataArray type=\"%s\" Name=\"%s\" format=\"ascii\">\n", 
+                pvSet->floatType, pvSet->sca[s]);
+        fprintf(filePointer, "          ");
+        for (int n = start; n < end; ++n) {
+            switch (s) {
+                case 0: /* r */
+                    data = geo->poly[n].r;
+                    break;
+                case 1: /* gid */
+                    data = n + 1;
+                    break;
+                default:
+                    break;
+            }
+            fprintf(filePointer, "%.6g ", data);
+        }
+        fprintf(filePointer, "\n        </DataArray>\n");
+    }
+    for (int s = 0; s < pvSet->vecN; ++s) {
+        fprintf(filePointer, "        <DataArray type=\"%s\" Name=\"%s\"\n", 
+                pvSet->floatType, pvSet->vec[s]);
+        fprintf(filePointer, "                   NumberOfComponents=\"3\" format=\"ascii\">\n");
+        fprintf(filePointer, "          ");
+        for (int n = start; n < end; ++n) {
+            Vec[X] = geo->poly[n].V[TO][X];
+            Vec[Y] = geo->poly[n].V[TO][Y];
+            Vec[Z] = geo->poly[n].V[TO][Z];
+            fprintf(filePointer, "%.6g %.6g %.6g ", Vec[X], Vec[Y], Vec[Z]);
+        }
+        fprintf(filePointer, "\n        </DataArray>\n");
+    }
+    fprintf(filePointer, "      </PointData>\n");
+    fprintf(filePointer, "      <CellData>\n");
+    fprintf(filePointer, "      </CellData>\n");
+    fprintf(filePointer, "      <Points>\n");
+    fprintf(filePointer, "        <DataArray type=\"%s\" Name=\"points\"\n", pvSet->floatType);
+    fprintf(filePointer, "                   NumberOfComponents=\"3\" format=\"ascii\">\n");
+    fprintf(filePointer, "          ");
+    for (int n = start; n < end; ++n) {
+        Vec[X] = geo->poly[n].O[X];
+        Vec[Y] = geo->poly[n].O[Y];
+        Vec[Z] = geo->poly[n].O[Z];
+        fprintf(filePointer, "%.6g %.6g %.6g ", Vec[X], Vec[Y], Vec[Z]);
+    }
+    fprintf(filePointer, "\n        </DataArray>\n");
+    fprintf(filePointer, "      </Points>\n");
+    fprintf(filePointer, "      <Verts>\n");
+    fprintf(filePointer, "        <DataArray type=\"%s\" Name=\"connectivity\" format=\"ascii\">\n", pvSet->intType);
+    fprintf(filePointer, "          ");
+    for (int n = start; n < end; ++n) {
+        fprintf(filePointer, "%d ", n);
+    }
+    fprintf(filePointer, "\n        </DataArray>\n");
+    fprintf(filePointer, "        <DataArray type=\"%s\" Name=\"offsets\" format=\"ascii\">\n", pvSet->intType);
+    fprintf(filePointer, "          ");
+    fprintf(filePointer, "%d ", (end - start));
+    fprintf(filePointer, "\n        </DataArray>\n");
+    fprintf(filePointer, "      </Verts>\n");
+    fprintf(filePointer, "      <Polys>\n");
+    fprintf(filePointer, "      </Polys>\n");
+    fprintf(filePointer, "    </Piece>\n");
+    fprintf(filePointer, "  </PolyData>\n");
+    fprintf(filePointer, "</VTKFile>\n");
+    fprintf(filePointer, "<!--\n");
+    WritePolyhedronStateData(start, end, filePointer, geo);
+    fprintf(filePointer, "-->\n");
+    fclose(filePointer); /* close current opened file */
+    return 0;
+}
+static int PolygonPolyDataWriter(const Time *time, const Geometry *geo)
+{
+    PvSet pvSet = { /* initialize environment */
+        .rname = "geo_stl",
+        .bname = {'\0'},
+        .fname = {'\0'},
+        .fext = ".vtp",
+        .fmt = "%s%05d",
+        .intType = "Int32",
+        .floatType = "Float32",
+        .byteOrder = "LittleEndian",
+        .scaN = 0,
+        .vecN = 0,
+    };
+    snprintf(pvSet.bname, sizeof(PvStr), pvSet.fmt, pvSet.rname, time->writeC); 
+    if (0 == time->stepC) { /* this is the initialization step */
+        InitializeTransientCaseFile(&pvSet);
+    }
+    WriteCaseFile(time, &pvSet);
+    WritePolygonPolyData(geo->sphN, geo->totN, geo, &pvSet);
+    return 0;
+}
+static int WritePolygonPolyData(const int start, const int end, const Geometry *geo, PvSet *pvSet)
+{
+    snprintf(pvSet->fname, sizeof(PvStr), "%s%s", pvSet->bname, pvSet->fext); 
+    FILE *filePointer = fopen(pvSet->fname, "w");
+    if (NULL == filePointer) {
+        FatalError("failed to open data file...");
+    }
+    PvReal Vec[3] = {0.0}; /* paraview vector data */
+    const Polyhedron *poly = NULL;
+    fprintf(filePointer, "<?xml version=\"1.0\"?>\n");
+    fprintf(filePointer, "<VTKFile type=\"PolyData\" version=\"1.0\"\n");
+    fprintf(filePointer, "         byte_order=\"%s\">\n", pvSet->byteOrder);
+    fprintf(filePointer, "  <PolyData>\n");
+    for (int m = start; m < end; ++m) {
+        poly = geo->poly + m;
+        fprintf(filePointer, "    <Piece NumberOfPoints=\"%d\" NumberOfVerts=\"0\" NumberOfPolys=\"%d\">\n",
+                poly->vertN, poly->faceN);
+        fprintf(filePointer, "      <!--\n");
+        fprintf(filePointer, "        vertN = %d\n", poly->vertN);
+        fprintf(filePointer, "        edgeN = %d\n", poly->edgeN);
+        fprintf(filePointer, "        faceN = %d\n", poly->faceN);
+        fprintf(filePointer, "      -->\n");
+        fprintf(filePointer, "      <PointData>\n");
+        fprintf(filePointer, "      </PointData>\n");
+        fprintf(filePointer, "      <CellData>\n");
+        fprintf(filePointer, "      </CellData>\n");
+        fprintf(filePointer, "      <Points>\n");
+        fprintf(filePointer, "        <DataArray type=\"%s\" Name=\"points\"\n", pvSet->floatType);
+        fprintf(filePointer, "                   NumberOfComponents=\"3\" format=\"ascii\">\n");
+        fprintf(filePointer, "          ");
+        for (int n = 0; n < poly->vertN; ++n) {
+            Vec[X] = poly->v[n][X];
+            Vec[Y] = poly->v[n][Y];
+            Vec[Z] = poly->v[n][Z];
+            fprintf(filePointer, "%.6g %.6g %.6g ", Vec[X], Vec[Y], Vec[Z]);
+        }
+        fprintf(filePointer, "\n        </DataArray>\n");
+        fprintf(filePointer, "      </Points>\n");
+        fprintf(filePointer, "      <Verts>\n");
+        fprintf(filePointer, "      </Verts>\n");
+        fprintf(filePointer, "      <Polys>\n");
+        fprintf(filePointer, "        <DataArray type=\"%s\" Name=\"connectivity\" format=\"ascii\">\n",
+                pvSet->intType);
+        fprintf(filePointer, "          ");
+        for (int n = 0; n < poly->faceN; ++n) {
+            fprintf(filePointer, "%d %d %d ", poly->f[n][0], poly->f[n][1], poly->f[n][2]);
+        }
+        fprintf(filePointer, "\n        </DataArray>\n");
+        fprintf(filePointer, "        <DataArray type=\"%s\" Name=\"offsets\" format=\"ascii\">\n", pvSet->intType);
+        fprintf(filePointer, "          ");
+        for (int n = 0; n < poly->faceN; ++n) {
+            fprintf(filePointer, "%d ", 3 * (n + 1));
+        }
+        fprintf(filePointer, "\n        </DataArray>\n");
+        fprintf(filePointer, "      </Polys>\n");
+        fprintf(filePointer, "    </Piece>\n");
+    }
+    fprintf(filePointer, "  </PolyData>\n");
+    fprintf(filePointer, "</VTKFile>\n");
+    fprintf(filePointer, "<!--\n");
+    WritePolyhedronStateData(start, end, filePointer, geo);
+    fprintf(filePointer, "-->\n");
+    fclose(filePointer); /* close current opened file */
+    return 0;
+}
+/* a good practice: end file with a newline */
+

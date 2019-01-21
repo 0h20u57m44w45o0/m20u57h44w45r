@@ -1,0 +1,1382 @@
+\chapter{Mathematical Model}
+\label{cha:equation}
+
+\section{Conservation laws of continuum material}
+
+Motions of materials along with other physical phenomena such as heat transfer and chemical reactions are subject to the physical conservation laws of mass, momentum, and energy. Conservation of a physical quantity requires that this quantity is neither created nor destroyed but is only redistributed or converted from one form to another with the redistributions and conversions satisfying the entropy condition stated by the second law of thermodynamics. By introducing mathematical description and modeling, physical phenomena and their underlying physical principles are able to be embodied in an equation set called governing equations. Solving this equation set in conjunction with physical boundary conditions, properties of the material motion and related physical phenomena can then be quantified. To derive the governing equations for describing the state of continuous moving materials, a predefined control volume, which is either finite or infinitesimal in space and time, is utilized to apply physical conservation laws.
+
+There are various approaches to implement the deviation. For example, the reference frame used to describe the material field can be Eulerian frame (a fixed observer observing the material motion at fixed spatial positions with a spatial position identified coordinate system) or Lagrangian frame (a moving observer at the same velocity of local material parcel observing the trajectories of specific material parcels with a material parcel identified coordinate system); the control volume used to enforce conservation laws can be Eulerian type (a control volume that is fixed in space and has a constant shape, material can freely pass through the boundary) and Lagrangian type (a control volume that is attached to the material and deforming with material, no material passes through the boundary), and the mathematical framework used to derive equations can be integral or differential.
+
+Compared with the motions of solids that are often confined in a small space, the motions of fluids often occupies a large space. Therefore, when using a Lagrangian frame to track the motions of fixed particles, the particles often move out of the region of interest very soon. Since one is usually interested in the motions of fluids in a target region rather than the motions of fixed particles, an Eulerian frame is generally the preferred reference frame in describing the motions of fluids. Consider a Lagrangian control volume in a material field that is described by an Eulerian frame, the conservation of a physical quantity $u$ in this control volume over space and time sates that
+\begin{equation} \label{eq:NS_derive}
+    \frac{\mathrm{d} I}{\mathrm{d} t} = \dot{\phi}, \ \ I(t) = \int\limits_{\Omega(\Vector{x},t)} u(\Vector{x},t) \,\mathrm{d}\Omega
+\end{equation}
+where $u(\Vector{x},t)$ represents the spatial distribution of the conserved quantity at time $t$, $I(t)$ denotes the total amount of this conserved quantity within the control volume at time $t$, $\Omega(\Vector{x},t)$ is the spatial domain of the control volume at time $t$, $\Vector{x}=\Vector{x}(x_i)$ is the position vector, $x_i$ is the $i$-th Eulerian coordinate, $\dot{\phi}$ is the exchange rate of quantity $\phi$ between the control volume and the exterior environment, and $\phi$ represents any quantities causing the change of the quantity $u$ in the control volume.
+
+In an Eulerian frame, the spatial domain of a Lagrangian control volume, $\Omega(\Vector{x}(x_i),t)$, is a function of time. To decouple the total time derivative with the time dependent domain of integration, a transformation from Eulerian frame to Lagrangian frame can be introduced as
+\begin{equation} \label{eq:transeulertolagrange}
+    \mathrm{d}\Omega(x_i,t) = \Matrix{J} \, \mathrm{d}\Omega_0(\xi_i,t_0)
+\end{equation}
+where $\xi_i$ is the $i$-th Lagrangian coordinate, $\Matrix{J}$ is the Jacobian matrix from Eulerian frame to Lagrangian frame.
+
+The Jacobian matrix $\Matrix{J}$ is a function of time and satisfies
+\begin{equation} \label{eq:jocabian}
+    \frac{\mathrm{d} \Matrix{J}}{\mathrm{d} t} = (\nabla \cdot \Vector{V}) \Matrix{J}
+\end{equation}
+where $\Vector{V}$ is the velocity field describing the macroscopic kinetic state of a material, $\nabla \cdot \Vector{V}$ represents the rate of dilation of the control volume.
+
+Using the coordinate transformation relations, the rate of change of the total amount of $u(\Vector{x},t)$ within the control volume can be rewritten as
+\begin{equation} \label{eq:rateofchangea}
+    \begin{aligned}
+        \frac{\mathrm{d} }{\mathrm{d} t} \int\limits_{\Omega(x_i,t)} u \, \mathrm{d}\Omega 
+        &= \frac{\mathrm{d} }{\mathrm{d} t} \int\limits_{\Omega_0(\xi_i,t_0)} u \Matrix{J} \, \mathrm{d}\Omega_0\\
+        &= \int\limits_{\Omega_0(\xi_i,t_0)} \frac{\mathrm{d} u}{\mathrm{d} t}\Matrix{J} + u \frac{\mathrm{d} \Matrix{J}}{\mathrm{d} t} \, \mathrm{d}\Omega_0\\
+        &= \int\limits_{\Omega_0(\xi_i,t_0)} \frac{\mathrm{d} u}{\mathrm{d} t} \Matrix{J} + u (\nabla \cdot \Vector{V}) \Matrix{J} \, \mathrm{d}\Omega_0\\
+        &= \int\limits_{\Omega_0(\xi_i,t_0)} \left(\frac{\mathrm{d} u}{\mathrm{d} t} + u (\nabla \cdot \Vector{V}) \right) \Matrix{J} \, \mathrm{d}\Omega_0\\
+        &= \int\limits_{\Omega(x_i,t)} \frac{\mathrm{d} u}{\mathrm{d} t} + u (\nabla \cdot \Vector{V}) \, \mathrm{d}\Omega\\
+    \end{aligned}
+\end{equation}
+
+Using the relation between total time derivative and local time derivative, it gives
+\begin{equation} \label{eq:rateofchangeb}
+    \begin{aligned}
+        \frac{\mathrm{d} }{\mathrm{d} t} \int\limits_{\Omega(x_i,t)} u \, \mathrm{d}\Omega 
+        &= \int\limits_{\Omega(x_i,t)} \frac{\partial u}{\partial t} + (\Vector{V} \cdot \nabla) u + u (\nabla \cdot \Vector{V}) \, \mathrm{d}\Omega\\
+        &= \int\limits_{\Omega(x_i,t)} \frac{\partial u}{\partial t} + \nabla \cdot (u\Vector{V}) \, \mathrm{d}\Omega\\
+        &= \int\limits_{\Omega(x_i,t)} \frac{\partial u}{\partial t} \, \mathrm{d}\Omega + \int\limits_{\Omega(x_i,t)} \nabla \cdot (u\Vector{V}) \,\mathrm{d}\Omega\\
+        &= \frac{\partial }{\partial t}\int\limits_{\Omega} u \, \mathrm{d}\Omega + \int\limits_{S} \unitVector{n} \cdot (u\Vector{V}) \, \mathrm{d}S
+    \end{aligned}
+\end{equation}
+where $\unitVector{n}$ is the unit outward normal vector of the boundary surface $S=\partial\Omega$. 
+
+Therefore, the law of conservation over a specified control volume has the integral form
+\begin{equation}
+    \frac{\partial }{\partial t}\int\limits_{\Omega} u \, \mathrm{d}\Omega + \int\limits_{S} \unitVector{n}\cdot(u\Vector{V}) \, \mathrm{d}S = \dot{\phi}
+\end{equation}
+
+By employing an infinitesimal control volume and assuming smooth field functions, the divergence theorem can be applied, and a corresponding differential form of the law of conservation can be obtained as
+\begin{equation}
+    \frac{\partial u}{\partial t} + \nabla\cdot(u\Vector{V}) = \dot{\phi}^{\Des{b}}
+\end{equation}
+where $\dot{\phi}^{\Des{b}}$ is the exchange rate of quantity $\phi$ per unit volume.
+
+The differential form is widely adopted in theoretical and numerical applications due to its relative simplicity for analyzing mathematical properties. However, there is a subtle difference between the integral and differential form of equations regarding function differentiability. The integral form of equations allows the presence of discontinuities inside the control volume without any inherent assumptions on mathematical continuity. In contrast, in the differential form of equations, field functions are assumed to be differentiable in space. 
+
+The derivation of conservation laws from physical principles essentially leads to the integral form of equations, in which discontinuities are admitted. After transforming the integral form into differential form via the divergence theorem, the admissibility of discontinuous solutions is lost and only smooth solutions are allowed. Hence, numerically solving the differential form of nonlinear hyperbolic systems, in which discontinuities may arise in the solution even the initial conditions and boundary conditions are completely smooth and continuous, requires incorporating special techniques.
+
+Since the differential equation continues to hold except at discontinuities, one technique is to supplement the differential equation by additional "jump conditions" that must be satisfied across discontinuities, which are derived by appealing to the integral form. In order to impose the jump conditions, the location of discontinuities requires to be explicitly tracked. Therefore, this kind of method is referred to as a shock-fitting approach.
+
+To avoid explicitly tracking and imposing jump conditions, one may consider introducing artificial viscosity to diminish discontinuities \citep{vonneumann1950method, moretti1987computation}, which is an analogy to the fact that diffusive effects are inherent in any physical systems and will prevent the formation of discontinuities. One may also consider defining a generalized solution of the differential equation that does not require differentiability by introducing a weak form of the differential equation \citep{lax1957hyperbolic, woodward1984numerical}. A weak form is to rewrite a differential equation in a form where less smoothness is required to define a solution. The basic idea is to multiply the differential equation by a smooth test function and integrate one or more times over some domain, during which the integration by parts is applied to move derivatives off the solution function and onto the smooth test function. The resulting equation then involves fewer derivations on the solution function and hence imposes less smooth conditions on solutions. These type of methods, which either automatically produce sharp approximations to discontinuous solutions or admit discontinuous solutions, are referred to as a shock-capturing approach. 
+
+More generally, the integral form of equations is equivalent to requiring the differential form of equations to be viewed in distribution theory \citep{lax1957hyperbolic}. The differential form of equations is usually referred to as a strong formulation, whose solutions are called strong solutions. Meanwhile, the integral form of equations is referred to as a weak formulation, whose solutions are called weak solutions or generalized solutions. A weak solution with smoothness is a strong solution. By integrating the differential form over space and time with different test functions, one can obtain various weak formulations of the governing equations, from which different numerical frameworks, such as finite volume method and finite element method, are devised.
+
+Another mathematical difficulty in solving the equations of conservation law is the possible nonuniqueness of solutions. There may be more than one weak solution to the conservation law with the same initial data, particularly for hyperbolic conservation laws that do not include diffusive or viscous effects. The existence of spurious solutions is due to the fact that the equations are only a model of the reality and some physical effects have been ignored. For instance, when modeling gas dynamics, although viscous effects may be negligible throughout the smooth regions of the flow, near discontinuities the effect is always strong since discontinuities in reality are thin regions with very steep gradients. The steep gradients make the viscous effects comparable to the other terms, which keeps the solution smooth and prevents the formation of discontinuities that occurs for the hyperbolic system. When the flow is modeled by hyperbolic conservation laws excluding viscous effects, what we are looking for is the limit of the smooth solution as the viscosity parameter approaches zero, which will be one weak solution of the hyperbolic system.
+
+However, there may be other weak solutions satisfying the given conservation laws. In order to recognize the correct weak solution, we must use our knowledge of what is being ignored, which suggests the following general approach to defining a unique weak solution to the hyperbolic conservation law \citep{leveque1992numerical}: introduce an diffusive term into the hyperbolic equation to obtain an equation with a unique smooth solution, and then let the coefficient of the diffusive term go to zero. This "vanishing viscosity" method has some direct uses in the analysis of conservation laws, but is clearly not optimal since it requires studying a more complicated equation system. Therefore, it is better to derive other conditions that can be imposed directly on weak solutions of the hyperbolic system to recognize the physically correct solution. For fluid dynamics, one can appeal to the second law of thermodynamics, which states that entropy is nondecreasing. In particular, as molecules of fluid pass through a shock, the entropy of the flow should increase. It turns out that this entropy condition is sufficient to precisely recognize discontinuities that are physically correct and specify a unique solution. Armed with the notion of weak solutions and an appropriate entropy condition, a unique solution to the system of conservation laws at physically correct inviscid limit can then be mathematically defined.
+
+\subsection{Governing equations of conservation laws}
+
+\paragraph{Conservation of mass}
+
+To apply the conservation law of mass, let the conserved quantity be the mass per unit volume $\rho$. The total amount of mass within a Lagrangian control volume is always a constant.
+\begin{equation} \label{eq:conmass}
+    \frac{\partial \rho}{\partial t} + \nabla\cdot(\rho\Vector{V}) = 0
+\end{equation}
+
+\paragraph{Conservation of momentum}
+
+To apply the conservation law of momentum, let the conserved quantity be the momentum per unit volume $\rho \Vector{V}$. By applying Newton's second law of motion to the Lagrangian control volume in an inertial reference frame, the rate of change of momentum is equal to the sum of external forces, including surface forces and body forces, exerted on the control volume.
+\begin{equation} \label{eq:conmomentum}
+    \frac{\partial (\rho\Vector{V})}{\partial t} + \nabla\cdot(\rho\Vector{V}\Vector{V}) = \nabla\cdot\Tensor{\sigma} + \Vector{f}^{\Des{b}}
+\end{equation}
+where $\Tensor{\sigma}$ is the surface stress tensor, $\Vector{f}^{\Des{b}}$ represents external body forces, such as gravity and electromagnetic forces, per unit volume.
+
+The stress tensor $\Tensor{\sigma}$ is a second-order tensor that completely defines the stress state of the material. $\Tensor{\sigma}$ comprises a deviatoric component called the deviatoric stress tensor, $\Tensor{S}$, and a dilatational component called the mean hydrostatic stress tensor, $-\hat{p} \unitTensor{I}$.
+\begin{equation} \label{eq:cauchystress}
+    \Tensor{\sigma} = \Tensor{S} - \hat{p} \unitTensor{I}
+\end{equation}
+where $\unitTensor{I}$ is the second-order identity tensor such that $I_{ij}=\delta_{ij}$, $\delta_{ij}$ is the Kronecker tensor, $\hat{p}$ is the hydrostatic pressure given as the negative mean normal stress
+\begin{equation} \label{eq:normalstress}
+    \hat{p}=-\frac{1}{3}\Trace(\Tensor{\sigma})=-\frac{\sigma_{ii}}{3}
+\end{equation}
+The thermodynamic pressure, $p$, is generally defined as
+\begin{equation} \label{eq:pressuredefine}
+    p = \hat{p} + \hat{\kappa} \nabla \cdot \Vector{V}
+\end{equation}
+where $\hat{\kappa}$ is a proportionality constant.
+Hence, the stress tensor $\Tensor{\sigma}$ can also be written as
+\begin{equation} \label{eq:viscousstressform}
+    \Tensor{\sigma} = \Tensor{\tau} - p \unitTensor{I}
+\end{equation}
+where $\Tensor{\tau}$ is the viscous stress tensor, which satisfies
+\begin{equation} \label{eq:deviatoricandviscous}
+    \tau_{ij} = S_{ij} + (\hat{\kappa} \nabla \cdot \Vector{V}) \delta_{ij}
+\end{equation}
+
+\paragraph{Conservation of energy}
+
+To apply the conservation law of energy, let the conserved quantity be the total energy per unit volume $\rho e_{\Des{T}}$, where $e_{\Des{T}}$ is the total energy per unit mass, i.e., specific total energy. By applying the law of conservation of energy to the Lagrangian control volume, the change in the total energy of this isolated system is equal to the amount of heat supplied to the system plus the amount of work done on the system by its surroundings.
+\begin{equation} \label{eq:comenergy}
+    \frac{\partial (\rho e_{\Des{T}})}{\partial t} + \nabla\cdot(\rho e_{\Des{T}}\Vector{V}) = \nabla\cdot(k\nabla T) + \nabla\cdot(\Tensor{\sigma}\cdot\Vector{V}) + \Vector{f}^{\Des{b}}\cdot \Vector{V}
+\end{equation}
+where $T$ is the temperature field, $k$ is the thermal conductivity of the material.
+
+The specific total energy, $e_{\Des{T}}$, represents the total energy per unit mass stored in both microscopic and macroscopic motions, that is,
+\begin{equation} \label{eq:specifictotal}
+    e_{\Des{T}} = e + \Vector{V}\cdot\Vector{V}/2
+\end{equation}
+where $e$ is the specific internal energy, which represents the energy per unit mass contained in the microscopic random motions of individual molecules, and $\Vector{V}\cdot\Vector{V}/2$ is the specific kinetic energy, which represents the energy per unit mass contained in the macroscopic translational motions of the overall element. Meanwhile, a specific total enthalpy $h_{\Des{T}}$ can be introduced as $h_{\Des{T}} = h+\Vector{V}\cdot\Vector{V}/2 = e_{\Des{T}}+p/\rho$, with the meaning that it is the energy per unit mass contained in the microscopic and macroscopic motions plus the potential energy stored by compression.
+
+\paragraph{System of conservation laws}
+
+Combining the conservation laws of mass, momentum, and energy, the governing equations in differential form can be expressed as a system of partial differential equations
+\begin{equation} \label{eq:governings}
+    \begin{cases}
+        \frac{\partial \rho}{\partial t} + \nabla\cdot(\rho\Vector{V}) = 0 \\
+        \frac{\partial (\rho\Vector{V})}{\partial t} + \nabla\cdot(\rho\Vector{V}\Vector{V}) = \nabla\cdot\Tensor{\sigma} + \Vector{f}^{\Des{b}}\\
+        \frac{\partial (\rho e_{\Des{T}})}{\partial t} + \nabla\cdot(\rho e_{\Des{T}}\Vector{V}) = \nabla\cdot(k\nabla T) + \nabla\cdot(\Tensor{\sigma}\cdot\Vector{V}) + \Vector{f}^{\Des{b}}\cdot \Vector{V}\\
+    \end{cases}
+\end{equation}
+
+\subsection{Governing equations in vector form}
+
+\subsubsection{Conservative vector form}
+
+Introduce the vector of conservative variables $\Vector{U}$, the vector of convective fluxes $\Vector{F}_i$, the vector of diffusive fluxes $\Vector{F}^{\Des{v}}_i$, and the vector of source terms $\Vector{\Phi}$ as follows:
+\begin{equation}
+    \Vector{U} =
+    \begin{pmatrix}
+        \rho\\
+        \rho V_j\\
+        \rho e_{\Des{T}}
+    \end{pmatrix}
+    ,\,\,
+    \Vector{F}_i =
+    \begin{pmatrix}
+        \rho V_i\\
+        \rho V_i V_j + p \delta_{ij}\\
+        (\rho e_{\Des{T}}+p) V_i
+    \end{pmatrix}
+    ,\,\,
+    \Vector{F}^{\Des{v}}_i =
+    \begin{pmatrix}
+        0\\
+        \tau_{ij}\\
+        k \frac{\partial T}{\partial x_i} + \tau_{il} V_l
+    \end{pmatrix}
+    ,\,\,
+    \Vector{\Phi} =
+    \begin{pmatrix}
+        0\\
+        f^{\Des{b}}_j\\
+        f^{\Des{b}}_l V_l
+    \end{pmatrix}
+\end{equation}
+where $i$ is a free index, $j$ is an enumerator, $l$ is a dummy index.
+
+The system of partial differential equations of conservation laws can be written into a vector form in a conservative manner
+\begin{equation} \label{eq:vector_conservative_form}
+    \frac{\partial \Vector{U}}{\partial t}+\frac{\partial \Vector{F}_i}{\partial x_i} = \frac{\partial \Vector{F}^{\Des{v}}_i}{\partial x_i}+\Vector{\Phi}
+\end{equation}
+
+Define a tensor $\Tensor{E}$ with a convective component $\Tensor{F}$ and a diffusive component $\Tensor{F}^{\Des{v}}$:
+\begin{equation} \label{eq:tensorflux}
+    \Tensor{E} = \Tensor{F}-\Tensor{F}^{\Des{v}} 
+\end{equation}
+where the convective component $\Tensor{F} = \Vector{F}_i \unitVector{e}_i$, the diffusive component $\Tensor{F}^{\Des{v}} = \Vector{F}^{\Des{v}}_i \unitVector{e}_i$, $\unitVector{e}_i$ is the unit direction vector of the coordinate $x_i$.
+
+A compact form the governing equations can be obtained as
+\begin{equation}
+    \frac{\partial \Vector{U}}{\partial t}+\nabla\cdot\Tensor{E} = \Vector{\Phi}
+\end{equation}
+
+\subsubsection{Nonconservative vector-matrix form}
+
+The conservative vector form of governing equations can be transformed into a nonconservative vector-matrix form, which is useful for analyzing the mathematical properties of the equations.
+
+Denote the vector of conservative variables and the vector of fluxes as
+\begin{equation}
+    \Vector{U} =
+    \begin{pmatrix}
+        u_1\\
+        \vdots\\
+        u_m\\
+        \vdots\\
+        u_M\\
+    \end{pmatrix}
+    ,\,\,
+    \Vector{F} = \Vector{F}(\Vector{U}) =
+    \begin{pmatrix}
+        f_1(u_1,\dotsc,u_m,\dotsc,u_M)\\
+        \vdots\\
+        f_m(u_1,\dotsc,u_m,\dotsc,u_M)\\
+        \vdots\\
+        f_M(u_1,\dotsc,u_m,\dotsc,u_M)\\
+    \end{pmatrix}
+\end{equation}
+where $\Vector{F}$ represents either a convective flux or a diffusive flux.
+
+The flux component $f_m$ is a multivariable function. After introducing vector notation for the multiple variables, it gives
+\begin{equation}
+    \mathrm{d} f_m = \frac{\partial f_m}{\partial u_n} \mathrm{d}u_n = (\nabla f_m)^{\Des{T}} \mathrm{d} \Vector{U}
+\end{equation}
+
+Since the flux vector $\Vector{F}$ is the vector notation of the set of multivariable functions, it has
+\begin{equation}
+    \mathrm{d} \Vector{F} = 
+    \begin{pmatrix}
+        \mathrm{d} f_1\\
+        \vdots\\
+        \mathrm{d} f_m\\
+        \vdots\\
+        \mathrm{d} f_M\\
+    \end{pmatrix}
+    =
+    \begin{pmatrix}
+        \frac{\partial f_1}{\partial u_1} & \cdots & \frac{\partial f_1}{\partial u_m} & \cdots & \frac{\partial f_1}{\partial u_M}\\
+        \vdots & \ddots & \vdots & \ddots & \vdots\\                                              
+        \frac{\partial f_m}{\partial u_1} & \cdots & \frac{\partial f_m}{\partial u_m} & \cdots & \frac{\partial f_m}{\partial u_M}\\
+        \vdots & \ddots & \vdots & \ddots & \vdots\\                                              
+        \frac{\partial f_M}{\partial u_1} & \cdots & \frac{\partial f_M}{\partial u_m} & \cdots & \frac{\partial f_M}{\partial u_M}\\
+    \end{pmatrix}
+    \begin{pmatrix}
+        \mathrm{d} u_1\\
+        \vdots\\
+        \mathrm{d} u_m\\
+        \vdots\\
+        \mathrm{d} u_M\\
+    \end{pmatrix}
+\end{equation}
+
+Then, it is straightforward to introduce the Jacobian matrices via vector differentiation
+\begin{equation} \label{eq:jacbian_diff}
+    \Matrix{A} = \frac{\mathrm{d} \Vector{F}(\Vector{U})}{\mathrm{d} \Vector{U}}, \,\, A_{mn} = \frac{\partial F_m}{\partial U_n}
+\end{equation}
+
+A nonconservative vector-matrix form of the governing equations can be obtained as
+\begin{equation} \label{eq:noncon_vector_form}
+    \frac{\partial \Vector{U}}{\partial t}+ \Matrix{A}_i\frac{\partial \Vector{U}}{\partial x_i} = \Matrix{A}^v_i\frac{\partial \Vector{U}}{\partial x_i}+\Vector{\Phi}
+\end{equation}
+
+Now, let vector $\Vector{F}$ denote any one of the convective fluxes. It can be shown that the convective flux vector \(\Vector{F}\) is a homogeneous function of the vector of conservative variables \(\Vector{U}\) with a homogeneity of degree one, in other words, for arbitrary factor \(\beta\), the flux vector \(\Vector{F}\) satisfies
+\begin{equation}\label{eq:homo}
+    \Vector{F}(\beta\Vector{U}) = \beta\Vector{F}(\Vector{U})
+\end{equation}
+Apply derivations to the both sides with respect to \(\beta\),
+\begin{equation}\label{eq:homoderi}
+    \frac{\mathrm{d} \Vector{F}(\beta\Vector{U})}{\mathrm{d} (\beta\Vector{U})}\cdot \Vector{U} = \Vector{F}(\Vector{U})
+\end{equation}
+Let \(\beta = 1\), gives
+\begin{equation}
+    \frac{\mathrm{d} \Vector{F}(\Vector{U})}{\mathrm{d} \Vector{U}}\cdot \Vector{U} = \Vector{F}(\Vector{U})
+\end{equation}
+Therefore,
+\begin{equation}\label{eq:homoresult}
+    \Matrix{A}\Vector{U} = \Vector{F}
+\end{equation}
+Apply derivations to the both sides with respect to \(x\):
+\begin{equation}
+    \frac{\partial \Matrix{A}}{\partial x}\cdot\Vector{U}+\Matrix{A}\cdot \frac{\partial \Vector{U}}{\partial x} = \Matrix{A}\cdot \frac{\partial \Vector{U}}{\partial x}
+\end{equation}
+Hence,
+\begin{equation}\label{homofinal}
+    \frac{\partial \Matrix{A}}{\partial x}\cdot\Vector{U} = 0
+\end{equation}
+Therefore, the Jacobian matrix \(\Matrix{A}\) acts like a "constant" with respect to \(x\), as in
+\begin{equation} \label{eq:homoproperty}
+    \Matrix{A}\frac{\partial \Vector{U}}{\partial x} = \frac{\partial (\Matrix{A}\Vector{U})}{\partial x}
+\end{equation}
+
+For any system of differential equations of arbitrary order, it can always be converted into a system of first-order differential equations by applying changing of variables to decrease the high-order derivatives. Then, by introducing the vector of solution variables, the system of first-order differential equations can further be rearranged into a vector-matrix form, which can be uniformly expressed as
+\begin{equation}
+    \frac{\partial \Vector{U}}{\partial t} + \Matrix{A}_i\frac{\partial \Vector{U}}{\partial x_i} = \Vector{\Phi}
+\end{equation}
+where $\Vector{U}$ represents the vector of solution variables with $M$ components, $\{\Matrix{A}_i\}$ represent general coefficient matrices with a dimension of $M \times M$, $\Vector{\Phi}$ is the vector of source terms.
+
+When the matrix $\Matrix{A}=\xi_i \Matrix{A}_i$ is diagonalizable and has $M$ real eigenvalues for all $\xi_i \in \Set{R}$, the system of partial differential equations is called a hyperbolic system, in which a set of real characteristic curves or surfaces describe the propagation of information in the system. When there are less than $M$ real eigenvalues and no complex eigenvalues, it is called a parabolic system. When there are no real eigenvalues, it is called an elliptic system, in which no meaningful sense of information propagation can be established, since no curves or surfaces in the space are found to be characteristic.
+
+\subsubsection{Hyperbolic system and shock formation}
+
+To illustrate the hyperbolic property, consider the homogeneous case of two independent variables $t$ and $x$:
+\begin{equation}
+    \frac{\partial \Vector{U}}{\partial t}+\Matrix{A}\frac{\partial \Vector{U}}{\partial x} = 0
+\end{equation}
+A new form of the hyperbolic system can be obtained by using any linear combinations of the individual equations, that is, by multiplying the system by an invertible matrix
+\begin{equation}
+    \Matrix{R}^{-1}\frac{\partial \Vector{U}}{\partial t}+\Matrix{R}^{-1}\Matrix{A}\frac{\partial \Vector{U}}{\partial x} = 0
+\end{equation}
+If further rewrite as
+\begin{equation}
+    \Matrix{R}^{-1}\frac{\partial \Vector{U}}{\partial t}+\Matrix{R}^{-1}\Matrix{A}\Matrix{R}\Matrix{R}^{-1}\frac{\partial \Vector{U}}{\partial x} = 0
+\end{equation}
+then, it is convenient to introduce new dependent variables by the linear change of dependent variables
+\begin{equation}
+    \mathrm{d}\Vector{W} = \Matrix{R}^{-1} \mathrm{d}\Vector{U}
+\end{equation}
+or equivalently
+\begin{equation}
+    \begin{cases}
+        \frac{\partial \Vector{W}}{\partial t} = \Matrix{R}^{-1} \frac{\partial \Vector{U}}{\partial t}\\
+        \frac{\partial \Vector{W}}{\partial x} = \Matrix{R}^{-1} \frac{\partial \Vector{U}}{\partial x}
+    \end{cases}
+\end{equation}
+By using the new dependent variables, the system becomes
+\begin{equation}
+    \frac{\partial \Vector{W}}{\partial t}+\Matrix{R}^{-1}\Matrix{A}\Matrix{R}\frac{\partial \Vector{W}}{\partial x} = 0
+\end{equation}
+If the invertible matrix $\Matrix{R}$ is chosen as the matrix of the characteristic vectors of the coefficient matrix $\Matrix{A}$ such that 
+\begin{equation}
+    \Matrix{A} = \Matrix{R} \Matrix{\Lambda} \Matrix{R}^{-1}, \,\, \Matrix{\Lambda} = \Diag\{{\lambda}_m\}
+\end{equation}
+then, the new dependent variables $\Vector{W}$ are called the characteristic variables of the system, as it gives a diagonalized system
+\begin{equation}
+    \frac{\partial \Vector{W}}{\partial t}+\Matrix{\Lambda}\frac{\partial \Vector{W}}{\partial x} = 0
+\end{equation}
+where there are $M$ decoupled scalar advection equations in terms of the characteristic variables 
+\begin{equation}
+    \frac{\partial w_m}{\partial t}+\lambda_m \frac{\partial w_m}{\partial x} = 0, \,\, m = 1, \dotsc, M
+\end{equation}
+
+In practice, the equation $\mathrm{d}\Vector{W} = \Matrix{R}^{-1} \mathrm{d}\Vector{U}$ defining the characteristic variables is not always integrable. Although $\mathrm{d}\Vector{W}$ is always analytically defined, the characteristic variables $\Vector{W}$ may not be solved to find a well-defined form. When the system is linear or is locally linearized, then the characteristic variables can be directly solved as
+\begin{equation}
+    \Vector{W} = \Matrix{R}^{-1}\Vector{U}
+\end{equation}
+
+Despite the difficulties in obtaining the specific form of the characteristic variables, the main advantage of introducing characteristic variables is that, when being considered on each curve $\mathrm{d}x/\mathrm{d}t = \lambda_m$ in the $x-t$ space, the corresponding partial differential equation of each characteristic variable reduces to an ordinary differential equation on the curve
+\begin{equation}
+    \frac{\mathrm{d} w_m}{\mathrm{d} t}=\frac{\partial w_m}{\partial t} + \frac{\partial w_m}{\partial x}\frac{\mathrm{d} x}{\mathrm{d} t}=\frac{\partial w_m}{\partial t} + \lambda_m\frac{\partial w_m}{\partial x}=0 \ \text{for}\ \frac{\mathrm{d} x}{\mathrm{d} t} = \lambda_m
+\end{equation}
+
+Therefore, the $m$-th characteristic variable $w_m$ has a constant value $C_m$ on the $m$-th curve $\mathrm{d}x/\mathrm{d}t = \lambda_m$. This constant value property greatly facilitates the analysis of the solution behaviors of hyperbolic systems. In general, the curves $\{\mathrm{d}x/\mathrm{d}t = \lambda_m\}$ are referred to as characteristic curves or simply characteristics; the characteristic variables $\{w_m\}$ are information carried by and propagating on the characteristics; $\{\lambda_m\}$ are the information propagation speeds called characteristic speeds or wave speeds.
+\begin{figure}[!htbp]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{system_chara_demo}
+        \caption{}
+        \label{fig:system_chara_demo}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{system_shock_demo}
+        \caption{}
+        \label{fig:system_shock_demo}
+    \end{subfigure}%
+    \caption{Characteristics of a hyperbolic system. (a) Bounded domain of dependence and range of influence. (b) Formation of shock by the intersection of characteristics in the same family. [Nomenclature: $\Omega_{\Des{D}}$, domain of dependence; $\Omega_I$, range of influence; $IC$, initial conditions; $BC$, boundary conditions.] The schematic diagrams are adapted from the work of \citet{laney1998computational}.}
+    \label{fig:system_chara}
+\end{figure}
+
+For a hyperbolic system of $M$ equations, there are $M$ characteristics passing through each point in the $x-t$ plane. As illustrated in Fig.~\ref{fig:system_chara_demo}, when information propagates in time and space, a point in the $x-t$ plane can only be influenced by points at earlier times and can only influence points at later times. Due to information spreading at finite wave speeds, the domain of dependence and the range of influence of each point are bounded by the characteristics with the greatest and least wave speeds.
+
+For well-posed problems, initial conditions should be specified at the entire flow space as the initial domain of dependence. In addition, boundary conditions should be properly supplied at boundaries acting as the domain of dependence of the flow and should be avoided at boundaries acting as the range of influence of the flow. Inappropriate specifications of boundary conditions introduce unphysical waves into the solution domain and cause solution errors.
+
+As illustrated in Fig.~\ref{fig:system_shock_demo}, when an intersection happens within the same family of characteristics rather than among different families of characteristics, a conflict occurs among the information carried by different characteristics. This multivalued conflict at the intersection position requires to be resolved by a jump discontinuity in the solution, known as a shock wave. Resulting from characteristics coalescing and merging, shock waves absorb any waves they meet and effectively destroy the characteristics as well as the information carried on them, acting as the "black holes" of waves.
+
+As jump discontinuities, shock waves are not governed by the differential form of characteristic equations but by the integral form of the governing equations. Hence, weak formulations, such as Rankine--Hugoniot conditions, are required to be adopted for describing shocks.
+\begin{figure}[!htbp]
+    \centering
+    \begin{subfigure}[b]{0.32\textwidth}
+        \includegraphics[width=\textwidth]{jump_condition_demo}
+        \caption{}
+        \label{fig:jump_condition_demo}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.32\textwidth}
+        \includegraphics[width=\textwidth]{jump_conserve_demo}
+        \caption{}
+        \label{fig:jump_conserve_demo}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.32\textwidth}
+        \includegraphics[width=\textwidth]{shock_demo}
+        \caption{}
+        \label{fig:shock_demo}
+    \end{subfigure}%
+    \caption{Scalar conservation law with a jump discontinuity. (a) A jump discontinuity in a scalar field. (b) Continuity of discontinuity position. (c) Formation of shock resulting from the intersection of characteristics.}
+    \label{fig:jump_scalar}
+\end{figure}
+
+Consider a jump discontinuity in a scalar field $u(x,t)$ that is governed by integral conservation law
+\begin{equation} \label{eq:scalarlaw}
+    \frac{\partial }{\partial t}\int_{x_1}^{x_2} u \,\mathrm{d}x = -f(u)|_{x_1}^{x_2}
+\end{equation}
+where $x_1$ and $x_2$ are spatial positions with $x_1 < x_2$, $f(u)$ is the flux field.
+
+As illustrated in Fig.~\ref{fig:jump_condition_demo}, assume a jump discontinuity at $x=x_{\xi}(t)$ where $x_{\xi} \in [x_{\alpha},x_{\beta}]$, then,
+\begin{equation}
+    \frac{\partial }{\partial t}\int_{x_{\alpha}}^{x_{\beta}} u \,\mathrm{d}x = -f(u)|_{x_{\alpha}}^{x_{\beta}}
+\end{equation}
+Splitting the integral at the discontinuity, it gives
+\begin{equation}
+    \frac{\partial }{\partial t}\left(\int_{x_{\alpha}}^{x_{\xi}^-} u \,\mathrm{d}x + \int^{x_{\beta}}_{x_{\xi}^+} u \,\mathrm{d}x\right) = -f(u)|_{x_{\alpha}}^{x_{\beta}}
+\end{equation}
+\begin{equation}
+    \frac{\mathrm{d} x_{\xi}^-}{\mathrm{d} t}u^- + \int_{x_{\alpha}}^{x_{\xi}^-} \frac{\partial u}{\partial t} \,\mathrm{d}x - \frac{\mathrm{d} x_{\xi}^+}{\mathrm{d} t}u^+ + \int^{x_{\beta}}_{x_{\xi}^+} \frac{\partial u}{\partial t} \,\mathrm{d}x = -f(u)|_{x_{\alpha}}^{x_{\beta}}
+\end{equation}
+As illustrated in Fig.~\ref{fig:jump_conserve_demo}, the continuity of the discontinuity position gives that the speed of the jump satisfies
+\begin{equation}
+    V_{\Des{D}} = \frac{\mathrm{d} x_{\xi}}{\mathrm{d} t} = \frac{\mathrm{d} x_{\xi}^-}{\mathrm{d} t} = \frac{\mathrm{d} x_{\xi}^+}{\mathrm{d} t}
+\end{equation}
+Therefore,
+\begin{equation}
+    -(u^+ - u^-)V_{\Des{D}} + \int_{x_{\alpha}}^{x_{\xi}^-} \frac{\partial u}{\partial t} \,\mathrm{d}x + \int^{x_{\beta}}_{x_{\xi}^+} \frac{\partial u}{\partial t} \,\mathrm{d}x = -f(u)|_{x_{\alpha}}^{x_{\beta}}
+\end{equation}
+Let $x_{\alpha} \to x_{\xi}^-$ and $x_{\beta} \to x_{\xi}^+$, the Rankine--Hugoniot condition for scalar conservation law is given as
+\begin{equation}
+    V_{\Des{D}} = \frac{f(u^+) - f(u^-)}{u^+ - u^-}
+\end{equation}
+
+As illustrated in Fig.~\ref{fig:shock_demo}, jump discontinuities only arise at positions where the characteristic curves of the system intersect. As a result, a physical jump speed should satisfy the entropy condition 
+\begin{equation}
+    \left.\frac{\mathrm{d} f}{\mathrm{d} u}\right|_{u^+}= \lambda(u^+) < V_{\Des{D}} < \lambda(u^-) = \left.\frac{\mathrm{d} f}{\mathrm{d} u}\right|_{u^-}
+\end{equation}
+where $\lambda(u^+)$ and $\lambda(u^-)$ are the characteristic speeds at the downstream and upstream states, respectively.
+
+Since all discontinuities in the solution of the integral conservation law should satisfy the entropy condition, no characteristic curves intersect in the direction of decreasing $t$ to form a line of discontinuity. Therefore, every point in the $x-t$ space can be connected backward to a point on the initial line via a characteristic curve.
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.45\textwidth]{system_jump_demo}
+    \caption{System of conservation law with a jump discontinuity separating the upstream and downstream flow states.}
+    \label{fig:system_jump_demo}
+\end{figure}
+
+In the case of system of conservation laws, the upstream and downstream flow states are described by a vector of variables $(\rho, u, p, T)^{\Des{T}}$, as illustrated in Fig.~\ref{fig:system_jump_demo}. By the integration over a finite control volume, the conservation of mass, momentum, and energy crossing a jump discontinuity gives
+\begin{equation} \label{eq:integral_system}
+    \begin{cases}
+        \rho_{\Des{L}}(u_{\Des{L}}-V_{\Des{D}}) = \rho_{\Des{R}}(u_{\Des{R}}-V_{\Des{D}})\\
+        \rho_{\Des{L}}u_{\Des{L}}(u_{\Des{L}}-V_{\Des{D}}) + p_{\Des{L}} = \rho_{\Des{R}}u_{\Des{R}}(u_{\Des{R}}-V_{\Des{D}}) + p_{\Des{R}}\\
+        \rho_{\Des{L}}e_{\Des{TL}}(u_{\Des{L}}-V_{\Des{D}}) + p_{\Des{L}}u_{\Des{L}} = \rho_{\Des{R}}e_{\Des{TR}}(u_{\Des{R}}-V_{\Des{D}}) + p_{\Des{R}}u_{\Des{R}}
+    \end{cases}
+\end{equation}
+where $\rho$, $\rho u$, and $\rho e_{\Des{T}}$ represent the total mass, momentum, and energy per unit volume, respectively.
+
+Define the vector of conserved quantities as $\Vector{U}=(\rho, \rho u, \rho e_{\Des{T}})^{\Des{T}}$ and the vector of flux as $\Vector{F}=(\rho u, \rho u^2 + p, (\rho e_{\Des{T}} + p)u)^{\Des{T}}$. Eq.~\eqref{eq:integral_system} can be rearranged into the Rankine--Hugoniot conditions for the system of conservation laws, which establishes a relation between the upstream and downstream states across a shock wave
+\begin{equation} \label{eq:rankinehugoirtsystem}
+    V_{\Des{D}}(\Vector{U}_{\Des{R}}-\Vector{U}_{\Des{L}}) = \Vector{F}_{\Des{R}} - \Vector{F}_{\Des{L}}
+\end{equation}
+
+By manipulating the equations, another useful equation called the Hugoniot relation can also be yielded as
+\begin{equation}
+    e_{\Des{R}} - e_{\Des{L}} = \frac{p_{\Des{R}} + p_{\Des{L}}}{2} (\frac{1}{\rho_{\Des{L}}} - \frac{1}{\rho_{\Des{R}}})
+\end{equation}
+
+Introduce the Mach number of the shock, $M_s$, as the ratio of the shock speed $V_{\Des{D}}$ to the downstream sound speed $c_{\Des{R}}$ and the Mach number of the pre-shock state, $M_{\Des{R}}$, as the ratio of the downstream speed $u_{\Des{R}}$ to the downstream sound speed $c_{\Des{R}}$
+\begin{equation}
+    M_s = \frac{V_{\Des{D}}}{c_{\Des{R}}}, \ M_{\Des{R}} = \frac{u_{\Des{R}}}{c_{\Des{R}}}, \ c_{\Des{R}} = \sqrt{\gamma\frac{p_{\Des{R}}}{\rho_{\Des{R}}}}
+\end{equation}
+The relations among primitive variables can be derived as \citep{toro1999riemann}
+\begin{equation}
+    \frac{\rho_{\Des{L}}}{\rho_{\Des{R}}} = \frac{u_{\Des{R}} - V_{\Des{D}}}{u_{\Des{L}} - V_{\Des{D}}} = \frac{(\gamma+1)(M_s - M_{\Des{R}})^2}{(\gamma-1)(M_s - M_{\Des{R}})^2+2}
+\end{equation}
+\begin{equation}
+    \frac{p_{\Des{L}}}{p_{\Des{R}}} = \frac{2\gamma (M_s - M_{\Des{R}})^2 - (\gamma-1)}{\gamma+1}
+\end{equation}
+If set pre-shock state as
+\begin{equation}
+    \begin{pmatrix}
+        \rho_{\Des{R}}\\
+        u_{\Des{R}}\\
+        p_{\Des{R}}
+    \end{pmatrix}
+    =
+    \begin{pmatrix}
+        1\\
+        0\\
+        1
+    \end{pmatrix}
+\end{equation}
+Then, the post-shock state is given as
+\begin{equation}
+    \begin{pmatrix}
+        \rho_{\Des{L}}\\
+        u_{\Des{L}}\\
+        p_{\Des{L}}
+    \end{pmatrix}
+    =
+    \begin{pmatrix}
+        \frac{(\gamma+1)M_s^2}{(\gamma-1)M_s^2+2}\\
+        \frac{2\sqrt{\gamma}(M_s^2 - 1)}{(\gamma+1)M_s}\\
+        \frac{2\gamma M_s^2 - (\gamma-1)}{\gamma+1}
+    \end{pmatrix}
+\end{equation}
+
+A simple example that illustrates the solution behavior of a jump discontinuity governed by system of conservation laws is the "shock tube problem" of gas dynamics. The physical set-up is a tube filled with gas and initially divided by a membrane into two sections. The gas on one side is compressed into a higher density and pressure but maintaining zero velocity state. At time $t=0$, the membrane is suddenly broken, and the gas starts to flow, which is expected in the direction of lower pressure. Since the flow is uniform in the cross section, variation only exists in the longitudinal direction and hence the one-dimensional system of conservation laws apply.
+
+Mathematically, the shock tube problem is a Riemann problem for the Euler equations. A Riemann problem refers to an initial value problem comprising two constant states \(U_{\Des{L}}\) and \(U_{\Des{R}}\) separated by a jump discontinuity at an interface
+\begin{equation}\label{eq:Riemann}
+    \frac{\partial \Vector{U}}{\partial t}+\frac{\partial \Vector{F}}{\partial x} = 0, \ \Vector{U}(x,0) = 
+    \begin{cases}
+        \Vector{U}_{\Des{L}}, &\ \text{if}\ x\le0\\
+        \Vector{U}_{\Des{R}}, &\ \text{if}\ x>0
+    \end{cases}
+\end{equation}
+
+In reality, the structure of the flow turns out to be not unidirectional but involving three distinct wave regions in which the state variables are constant. Across these waves there are discontinuities in some state variables. As illustrated in  Fig.~\ref{fig:shock_tube}, a shock wave, across which all state variables are discontinuous, propagates into the region of lower pressure. A contact discontinuity, across which the density is discontinuous but the pressure and velocity are continuous, follows the propagating shock. The third wave moves in the opposite direction and has a structure that all of the state variables are continuous and experience smooth transition. This wave is called a rarefaction wave since the density of the flow decreases (the flow is rarefied) as this wave passes through. There exist another discontinuity called slip surface in 3D or slip line in 2D, across which the tangent velocity is discontinuous, while pressure and normal velocity are continuous. At a slip line, which is a shear layer often generated by shock-on-shock interactions, the discontinuity in tangent velocity causes sheared flow and often leads to Kelvin--Helmholtz instability.
+
+If setting the initial discontinuity at $x=0$, then the resulting solution is a similarity solution in the variable $x/t$, which means that the solution can be expressed as a function of $x/t$ alone. This also means that the waves propagate at constant speed and the solution is constant along any ray $x/t = constant$ in the $x-t$ plane.
+\begin{figure}[!htbp]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{shock_tube_state}
+        \caption{}
+        \label{fig:shock_tube_state}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{shock_tube_solu}
+        \caption{}
+        \label{fig:shock_tube_solu}
+    \end{subfigure}%
+    \caption{Solution to a shock tube problem. (a) Wave structure in $x-t$ plane.  (b) Spatial distribution of state variables at a time instant.}
+    \label{fig:shock_tube}
+\end{figure}
+
+The solution behavior of the Euler system can largely be analyzed through characteristics. For the one-dimensional Euler system, the characteristic speeds are
+\begin{equation}
+    \lambda_1 = u - c \ \lambda_2 = u, \ \lambda_3 = u + c
+\end{equation}
+
+Although the analytical forms of the characteristic variables $w_1$ and $w_3$ are not able to be found through integration, the characteristic variable $w_2$ that corresponds to the characteristic speed $\lambda_2$ can be integrated analytically and is the entropy
+\begin{equation}
+    s = C_v \mathrm{ln} p - C_p \mathrm{ln} \rho + C
+\end{equation}
+where $C$ is an additive constant that is usually unobtainable and unimportant.
+
+Therefore, for the Euler system, the entropy is governed by
+\begin{equation}
+    \frac{\mathrm{d} s}{\mathrm{d} t} = \frac{\partial s}{\partial t} + u \frac{\partial s}{\partial x} = 0 \ \text{for}\ \frac{\mathrm{d} x}{\mathrm{d} t} = u
+\end{equation}
+which states that the entropy propagates with the local flow velocity and is constant along the flow motion. The constant entropy is a consequence of disregarding viscosity and other entropy-generating effects in the Euler equations. As the characteristic equation is valid except for regions near shocks, the Euler equations imply the second law of thermodynamics except at shocks. When a shock wave passes through matter, energy is preserved but entropy increases. Therefore, at shocks, the second law of thermodynamics, which states that entropy should never decrease, requires to be explicitly supplied as a companion principle to the Euler equations to restrict the redistribution and conversion of conserved quantities otherwise allowed by the conservation laws.
+
+Since the characteristics of the entropy equal to the pathlines, the entropy travels with the fluid. Thus, waves with characteristic speeds that equal to the flow speed are often referred to as entropy waves. The other two families of characteristics travel at the local speed of sound relative to the local flow and are called acoustic waves. Except for shock waves, all information in the flow field travels at one of these three characteristic wave speeds. Different from that of the entropy waves, the information carried by acoustic waves is difficult to describe and does not correspond to any well-known physical quantity. 
+
+The formation of shock wave is due to the disparity of wave speeds that leads to merging characteristics. The local speed of sound in a medium is the fastest speed that disturbance can propagate against the local medium. When an object such as a blunt body or another fluid medium with a different state passes through the fluid medium, it creates a series of disturbance waves around it. As the speed of the object approaches the local sound speed, the created disturbances reach a point that they cannot travel away from the object and are forced together, and the pressure progressively builds in the region that disturbance waves accumulate. This amplification effect of merging waves eventually creates an intensive shock wave acting like a barrier. When an object moves faster than the local speed of sound, the properties of the ambient fluid is undisturbed before the object arrives and change abruptly and instantaneously upon the passing of the object, again causing the formation of discontinuities. 
+
+In a real experimental shock tube or when the flow is modeled by the Navier--Stokes equations, the state variables would not be discontinuous across the shock wave or contact discontinuity due to effects from viscosity and heat conduction. However, these smooth solutions would be nearly discontinuous since the rise in density would occur over a distance that is microscopic and is on the same order of magnitude as the mean free gas molecule path.
+
+\section{Constitutive relation and equation of state}
+
+The number of unknowns in the governing equation system exceeds the number of equations, which results in a under-determined system. Therefore, extra equations providing mathematical relation between field variables are required for the closure of the mathematical model. These equations, which generally describe the properties of a specific material and are combined with other governing equations of physical laws to solve physical problems, are commonly referred to as constitutive equations. A constitutive equation providing relation between state variables, such as density $\rho$, internal energy $e$, pressure $p$, and temperature $T$, is called an equation of state, which describes the thermodynamic state of a material and is a result of conservation on microscopic level.
+
+\subsection{Stress, strain, and strain rate}
+
+Materials, such as gases, liquids, and solids, are composed of molecules. On a microscopic scale, materials are discontinuous. However, when physical phenomena are modeled on a macroscopic scale, a continuum assumption that assumes continuous distribution of the material in the region of space it occupies simplifies the modeling process and is well adequate. A continuum, which can be continually sub-divided into infinitesimal elements maintaining properties of the bulk material, is usually established via statistical homogeneity and ergodicity.
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.45\textwidth]{continuum_demo}
+    \caption{Configuration of a continuum material body.}
+    \label{fig:continuum_demo}
+\end{figure}
+
+As illustrated in Fig.~\ref{fig:continuum_demo}, a continuum model assigns a region $\Omega(B)$ in three-dimensional Euclidean space to the material body $B$. Different configurations or states of the material body correspond to different regions in space. The region corresponding to the body's configuration at time $t$ is labeled as $\Omega_t(B)$. The points within the region are called particles or material points. A particular particle within the body in a particular configuration is characterized by a position vector
+\begin{equation}
+    \Vector{x}=x_i \unitVector{e}_i
+\end{equation}
+where $\unitVector{e}_i$ are the coordinate vectors in a chosen frame of reference. The position vector can be expressed as a function of a chosen reference configuration $\hat{\Vector{x}}$, which is usually the initial configuration $\Omega_0(B)$, so that
+\begin{equation}
+    \Vector{x} = \Omega_t(\hat{\Vector{x}})
+\end{equation}
+
+In a continuous material, the internal forces that neighboring particles exert on each other are measured by a physical quantity called stress. A stress field may be generated by balancing actions from external influences or internal physical processes, such as applied external contact forces or changes of the temperature field inside the material. Under a stress state, the deformation of the material in terms of relative displacement of particles that excludes rigid-body motions is described by a physical quantity called strain. The relation between stresses and induced strains is expressed by constitutive relations, which mathematically describe the kinematic and mechanical behaviors of the material.
+
+As illustrated in Fig.~\ref{fig:stress_vector_demo}, in a continuous material, the stress at an internal material point $Q$ is quantitatively expressed by a stress vector $\Vector{T}^{(\unitVector{n})}$, which relates an imaginary surface and the force acting on the surface:
+\begin{equation} \label{eq:stressvector}
+    \Vector{T}^{(\unitVector{n})} = \lim_{\Delta s \to 0} \frac{\Delta \Vector{f}}{\Delta s}
+\end{equation}
+where $\Delta s$ is an element on an imaginary separating surface, $S$, which divides the continuous material into two segments, $\Delta \Vector{f}$ is the traction force between adjacent parts of the material across $\Delta s$, $\unitVector{n}$ is the separating surface's unit outward normal vector. The notation $\Vector{T}^{(\unitVector{n})}$ means that the stress vector continuously depends on $\unitVector{n}$, as the direction and magnitude of the stress vector depend on the orientation of plane on which the stress is acting.
+\begin{figure}[!htbp]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{stress_vector_demo}
+        \caption{}
+        \label{fig:stress_vector_demo}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{stress_tensor_demo}
+        \caption{}
+        \label{fig:stress_tensor_demo}
+    \end{subfigure}%
+    \caption{Schematic diagrams illustrating stress vector and stress tensor in a continuous material. (a) Stress vector. (b) Stress tensor.}
+    \label{fig:stress_demo}
+\end{figure}
+
+The stress state at a material point is defined by the set of stress vectors associated with all planes passing through that point. However, stress vectors on different planes are subject to coordinate transformation rule. The Cauchy's stress theorem states that the stress vector $\Vector{T}^{(\unitVector{n})}$ is a linear function of $\unitVector{n}$:
+\begin{equation} \label{eq:stresstensordefine}
+    \Vector{T}^{(\unitVector{n})} = \unitVector{n} \cdot \Tensor{\sigma}
+\end{equation}
+where $\Tensor{\sigma}$ is a second-order tensor called stress tensor.
+
+The stress tensor $\Tensor{\sigma}$ comprises three normal stresses, stress components that are perpendicular to the surface, and six shear stresses, stress components that are parallel to the surface, as illustrated in Fig.~\ref{fig:stress_tensor_demo}. Moreover, $\Tensor{\sigma}$ is independent of plane orientation, $\unitVector{n}$, and completely defines the stress state at a material point. 
+
+In a continuous material, the presence of stress usually induces deformation of the material. When the stress field is removed, deformations that are recoverable are called elastic deformations; deformations that remain are called irreversible deformations. One common type of irreversible deformation is plastic deformation, which occurs when stresses reach the yield stress of the material.
+
+As a measure of deformation, strain quantifies the displacement between material particles relative to a reference configuration. The strain sate at a material point is defined as the set of length changes in all orientations, which is able to be completely defined by a second-order strain tensor:
+\begin{equation} \label{eq:straindefine}
+    \Tensor{\varepsilon} = \frac{\partial }{\partial \hat{\Vector{x}}}(\Vector{x} - \hat{\Vector{x}})
+\end{equation}
+where $\Vector{x}$ expresses positions of material points under a given deformation, $\hat{\Vector{x}}$ is the reference position of material points, $\Tensor{\varepsilon}$ is the strain tensor, measuring the relative displacement between particles that excludes rigid-body motions.
+
+The rate of change of deformation with respect to time is measured by strain rate, which comprises an expansion rate, at which the material is expanding or shrinking, and a shear rate, at which the material is progressively deforming without changing its volume. Similarly to stress and strain, the complete strain rate at a material point requires to be expressed as a strain rate tensor, which is defined as the derivative of the strain tensor with respect to time.
+\begin{equation} \label{eq:define_strain_rate}
+    \Tensor{e}=\frac{\mathrm{d} \Tensor{\varepsilon}}{\mathrm{d} t}
+\end{equation}
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{strain_rate_demo}
+    \caption{A schematic diagram for two-dimensional geometric deformation of an infinitesimal material element.}
+    \label{fig:strain_rate_demo}
+\end{figure}
+
+A geometric deformation of an infinitesimal material element in two-dimensional space is illustrated in Fig.~\ref{fig:strain_rate_demo}. The dimensions of the rectangular material element at the initial time $t$ are $\mathrm{d}x_1$ and $\mathrm{d}x_2$. After deformation, the dimensions of the deformed element at time $t+\mathrm{d}t$ have
+\begin{equation} \label{eq:length_ab}
+    \begin{aligned}
+        l_{ab}&=\sqrt{\big(\mathrm{d}x_1 + \frac{\partial V_1}{\partial x_1}\mathrm{d}x_1\mathrm{d}t\big)^2 + \big(\frac{\partial V_2}{\partial x_1}\mathrm{d}x_1\mathrm{d}t\big)^2}\\
+              &=\mathrm{d}x_1 \sqrt{1+2 \frac{\partial V_1}{\partial x_1}\mathrm{d}t+\big(\frac{\partial V_1}{\partial x_1}\mathrm{d}t\big)^2 + \big(\frac{\partial V_2}{\partial x_1}\mathrm{d}t\big)^2}
+    \end{aligned}
+\end{equation}
+Under infinitesimal strain assumption, the relative displacements of the material points are assumed to be infinitesimally small. Therefore, the high-order terms are negligible:
+\begin{equation} \label{eq:length_ab_approx}
+    l_{ab}\approx \mathrm{d}x_1+ \frac{\partial V_1}{\partial x_1}\mathrm{d}x_1\mathrm{d}t
+\end{equation}
+The normal strain rate in the $x_1$ direction is then given by
+\begin{equation} \label{eq:strain_normal}
+    e_{11} = \frac{\mathrm{d} }{\mathrm{d} t}(\frac{l_{ab}-l_{AB}}{l_{AB}})=\frac{\partial V_1}{\partial x_1}
+\end{equation}
+The shear strain rate is defined as the rate of change in angle
+\begin{equation} \label{eq:shear_strain}
+    e_{12} = \frac{\mathrm{d} }{\mathrm{d} t}(\frac{1}{2}(\alpha + \beta))
+\end{equation}
+where
+\begin{equation} \label{eq:alpha_angle}
+    \tan\alpha = \frac{\frac{\partial V_2}{\partial x_1}\mathrm{d}x_1 \mathrm{d}t}{\mathrm{d}x_1 + \frac{\partial V_1}{\partial x_1}\mathrm{d}x_1\mathrm{d}t}
+\end{equation}
+\begin{equation} \label{eq:beta_angle}
+    \tan\beta = \frac{\frac{\partial V_1}{\partial x_2}\mathrm{d}x_2 \mathrm{d}t}{\mathrm{d}x_2 + \frac{\partial V_2}{\partial x_2}\mathrm{d}x_2\mathrm{d}t}
+\end{equation}
+For small relative displacements and rotations,
+\begin{equation} \label{eq:small_assumption}
+    \tan\alpha \approx \alpha, \ \tan\beta \approx \beta, \ \frac{\partial V_1}{\partial x_1}\mathrm{d}t \ll 1, \ \frac{\partial V_2}{\partial x_2}\mathrm{d}t \ll 1
+\end{equation}
+Therefore,
+\begin{equation} \label{eq:stran_shear}
+    e_{12} = \frac{\mathrm{d} }{\mathrm{d} t}(\frac{1}{2}(\alpha + \beta)) = \frac{1}{2}(\frac{\partial V_2}{\partial x_1} + \frac{\partial V_1}{\partial x_2})
+\end{equation}
+Thus, the general form of strain rate tensor under infinitesimal deformation assumption is
+\begin{equation} \label{eq:tensor_strain_rate}
+    e_{ij} = \frac{1}{2}(\frac{\partial V_i}{\partial x_j} + \frac{\partial V_j}{\partial x_i})
+\end{equation}
+Or in vector form:
+\begin{equation} \label{eq:tensor_strain_vector}
+    \Tensor{e} = \frac{1}{2} (\nabla \Vector{V} + (\nabla \Vector{V})^{\Des{T}})
+\end{equation}
+Since velocity gradient has
+\begin{equation} \label{eq:vel_gradient}
+    \frac{\partial V_i}{\partial x_j}=\frac{1}{2}(\frac{\partial V_i}{\partial x_j} + \frac{\partial V_j}{\partial x_i}) + \frac{1}{2}(\frac{\partial V_i}{\partial x_j} - \frac{\partial V_j}{\partial x_i})
+\end{equation}
+Introduce the infinitesimal rotation tensor
+\begin{equation} \label{eq:vorticity_tensor}
+    \omega_{ij} = \frac{1}{2}(\frac{\partial V_i}{\partial x_j} - \frac{\partial V_j}{\partial x_i})
+\end{equation}
+Then,
+\begin{equation} \label{eq:relation_vel}
+    \frac{\partial V_i}{\partial x_j}= e_{ij} + \omega_{ij}
+\end{equation}
+
+\subsection{Constitutive relation and equation of state for fluid}
+
+\subsubsection{Constitutive relation for Newtonian fluid}
+
+In general, the viscous stress tensor is assumed to be a linear function of velocity gradient:
+\begin{equation} \label{eq:stress_vel_gradient}
+    \tau_{ij} = C_{ijkl} \frac{\partial V_k}{\partial x_l}
+\end{equation}
+where $C_{ijkl}$ is the viscosity tensor.
+
+In a Newtonian fluid, the viscosity tensor is a constant tensor that is independent on the velocity field and stress state. If the mechanical properties of the fluid are the same along each direction, that is, the fluid is isotropic, the viscous stress tensor shall be a symmetric combination of the components of velocity gradient. As a result, the viscosity tensor reduces to two real coefficients: $\kappa$ and $\mu$. The former is related to dilation, and the latter is related to continuous shear deformation.
+\begin{equation} \label{eq:constitutive}
+    \tau_{ij} = \kappa (\nabla\cdot\Vector{V}) \delta_{ij} + \mu\left(\frac{\partial V_i}{\partial x_j} + \frac{\partial V_j}{\partial x_i}\right)
+\end{equation}
+The constitutive law can be rearranged to ensure a zero trace for the second term
+\begin{equation} \label{eq:netonian_re}
+    \tau_{ij} = \hat{\kappa} (\nabla\cdot\Vector{V}) \delta_{ij} + \mu\left(\frac{\partial V_i}{\partial x_j} + \frac{\partial V_j}{\partial x_i} - \frac{2}{3}(\nabla\cdot\Vector{V}) \delta_{ij}\right)
+\end{equation}
+where the coefficient $\hat{\kappa}$ is called the bulk or volumetric viscosity coefficient, the coefficient $\mu$ is called the dynamical viscosity coefficient.
+
+The Stokes hypothesis assumes that the thermodynamic pressure of a fluid is equal to its hydrostatic pressure, which is equivalent to a zero bulk viscosity assumption
+\begin{equation} \label{eq:label}
+    \hat{\kappa} = \kappa + \frac{2}{3}\mu = 0
+\end{equation}
+
+The zero bulk viscosity assumption is an adequate approximation for gases but is not valid for most liquids, in which the value of $\kappa$ is generally greater than zero. However, since most motions of liquids are modeled as incompressible flows, $\nabla\cdot\Vector{V}=0$, the Stokes hypothesis equivalently holds for liquids.
+
+The dynamical viscosity measures the resistance of a fluid to gradual deformation by shear stress. For an ideal gas, the dynamical viscosity is a function of temperature and is commonly expressed by the Sutherland viscosity law
+\begin{equation}
+    \mu = \frac{C_1T^{\frac{3}{2}}}{T+C_2}
+\end{equation}
+where $C_1$ and $C_2$ are two constant coefficients. For air at moderate temperature and pressure, $C_1=1.458\times10^{-6} \Unit{kg \cdot m^{-1} \cdot s^{-1} \cdot K^{-1/2}}$, and $C_2=110.4 \Unit{K}$.
+
+The dynamical viscosity of water as a function of temperature is formulated as
+\begin{equation}
+    \mu = A \times 10^{\frac{B}{T-C}}
+\end{equation}
+where $A=2.414\times10^{-5} \Unit{kg \cdot m^{-1} \cdot s^{-1}}$, $B=247.8 \Unit{K}$, and $C=140 \Unit{K}$.
+
+A kinematic viscosity is frequently introduced as the ratio of the dynamical viscosity to the density of the fluid
+\begin{equation}
+    \nu = \frac{\mu}{\rho}
+\end{equation}
+
+The kinematic viscosity is also referred to as momentum diffusivity. To measure the relative dominance of convection over thermal conduction, a dimensionless number called Prandtl number is introduced as the ratio of momentum diffusivity, $\nu$, to thermal diffusivity, $\alpha$,
+\begin{equation}
+    Pr = \frac{\nu}{\alpha}
+\end{equation}
+
+For most gases, the $Pr$ approximately remains as a constant over a wide range of temperature and pressure. $Pr=0.71$ is commonly adopted for air. For water at $293.15 \Unit{K}$, $Pr = 6.587$. 
+
+\subsubsection{Equation of state for ideal gas}
+
+\begin{equation} \label{eq:gaslaw}
+    p = \rho R T, \ \  e = C_v T, \ \  h = C_p T
+\end{equation}
+where $R$ is the specific gas constant, which is given by the universal gas constant divided by the molar mass of the gas. Therefore, $R$ is constant for a given gas but is different for different gases. For sea-level air, a typical value is $R = 287.058\Unit{m^2 \cdot s^{-2} \cdot K^{-1}}$, the specific heat capacity at constant volume $C_v = {R}/{(\gamma-1)}$, specific heat capacity at constant pressure $C_p = \gamma C_v$, the heat capacity ratio $\gamma = 1.4$.
+
+The ideal gas law is roughly accurate for weakly polar gases with moderate temperatures and low pressures, while being increasingly inaccurate at low temperatures and high pressures.
+
+\subsubsection{Equation of state for detonation product}
+
+The thermodynamics of the gaseous detonation products under isentropic expansion is described by the Jones--Wilkins--Lee \citep{lee1968adiabatic} (JWL) equation of state (EOS) in the C-term form \citep{souers2000jwl, souers2002ignition}.
+\begin{equation} \label{eq:jwleos}
+    p = A \, exp(-R_1 \upsilon) + B \, exp(-R_2 \upsilon) + C \, \upsilon^{-\omega -1}
+\end{equation}
+where the fitting coefficients $A$, $B$, $C$, $R_1$, $R_2$, and $\omega$ are constants for a given explosive, the ratio $\upsilon=\rho_e/\rho$ is the relative volume, in which $\rho_e$ represents the density of the explosive and $\rho$ represents the density of detonation products. The application range of the JWL EOS is governed by the detonation speed $V_{\Des{D}}$ and the time after ignition.
+\begin{table}[!htbp]
+    \centering
+    \caption{Material and JWL parameters [\citet{souers2000jwl, ripley2012acceleration}].}
+    \label{tab:jwlpara}
+    \footnotesize
+    \begin{tabular}{lcccccccc}
+        \hline\hline
+        Material & $\rho_e\Unit{(g \cdot cm^{-1})}$ & $A\Unit{(GPa)}$ & $B\Unit{(GPa)}$ & $C\Unit{(GPa)}$ & $R_1$ & $R_2$ & $\omega$ & $V_{\Des{D}}\Unit{(ms^{-1})}$\\
+        \hline
+        Nitromethane & $1.128$ & $277.200$ & $4.934$ & $1.223$ & $4.617$ & $1.073$ & $0.379$ & $6350$\\
+        ANFO & $1.160$ & $298.767$ & $4.117$ & $0.721$ & $4.950$ & $1.150$ & $0.350$ & $5900$\\
+        \hline\hline
+    \end{tabular}
+\end{table}
+
+The sound speed for detonation products with the JWL EOS is given by
+\begin{equation} \label{eq:soundspeedjwl}
+    \begin{aligned}
+        c^2 &= - \frac{\upsilon^2}{\rho_e} \frac{dp}{d\upsilon} \\
+            &= \frac{\upsilon^2}{\rho_e}[A R_1 \, exp(-R_1 \upsilon) + BR_2 \, exp(-R_2 \upsilon) + C(1+\omega) \upsilon^{-2-\omega}]
+    \end{aligned}
+\end{equation}
+
+The JWL EOS only describes the thermodynamics of the detonation products, that is, the reacted explosive. If the time dependence of the explosive's chemical reaction requires to be considered, a simple reactive flow model named JWL++ \citep{souers2000jwl} may be employed. The JWL++ model comprises a Murnahan EOS for unreacted explosive, a JWL EOS in the C-term form for reacted explosive, a mixer for the two EOS, and a simple exponential reaction rate. The JWL++ incorporates time-dependent reaction in prompt detonation and is able to reproduces size effect and detonation front curvature.
+
+\subsection{Constitutive relation and equation of state for solid}
+
+\subsubsection{Constitutive relation for strain hardening material}
+
+The thermal softening Johnson-Cook material model \citep{johnson1985fracture} is used as a constitutive relation for strain hardening materials.
+\begin{equation} \label{eq:johnsoncook}
+    \sigma_Y = \left[ A + B \bar{\varepsilon}_{\hat{p}}^N \right] \left[ 1 + C \mathrm{ln} \frac{{\dot{\bar{\varepsilon}}}_{\hat{p}}}{{\dot{\bar{\varepsilon}}}_{\hat{p}_0}} \right] \left[1-\theta^M \right]
+\end{equation}
+where $\sigma_Y$ is the flow stress, ${\dot{\bar{\varepsilon}}}_{\hat{p}}$ is the effective plastic strain, $A$, $B$, $C$, $N$, $M$, ${\dot{\bar{\varepsilon}}}_{\hat{p}_0}$ are model constants, and
+\begin{equation} \label{eq:theta}
+    \theta=\frac{T-T_0}{T_{\Des{m}}-T_0}
+\end{equation}
+where $T_{\Des{m}}$ and $T_0$ are the material melting temperature and the reference room temperature, respectively.
+\begin{table}[!htbp]
+    \centering
+    \caption{Material and Johnson-Cook material model parameters [\citet{kapahi2013three}].}
+    \label{tab:jhonsoncookpara}
+    \tiny
+    \begin{tabular}{lccccccccc}
+        \hline\hline
+        Material & $A\Unit{(GPa)}$ & $B\Unit{(GPa)}$ & $C$ & $N$ & $M$ & $G$ & $T_{\Des{m}}\Unit{(K)}$ & $T_0\Unit{(K)}$ & ${{\dot{\bar{\varepsilon}}}_{\hat{p}_0}}\Unit{(s^{-1})}$\\
+        \hline
+        Aluminum \citep{camacho1997adaptive} & $0.324$ & $0.114$ & $0.002$ & $0.420$ & $1.340$ & $26.000$ & $925$ & $298$ & $1.000$ \\
+        Mild Steel \citep{paik2006parallel} & $0.530$ & $0.229$ & $0.027$ & $0.302$ & $1.000$ & $81.800$ & $1836$ & $298$ & $1.000$ \\
+        \hline\hline
+    \end{tabular}
+\end{table}
+
+\subsubsection{Equation of state for solid}
+
+The Mie--Gruneisen \citep{mie1908beitrage, gruneisen1912theorie} equation of state describes the thermodynamic relation among pressure ($p$), specific volume $\upsilon=1/\rho$, and specific internal energy ($e$) for solids at a given temperature. It is commonly employed to determine the pressure in solids undergoing high-pressure physics such as shock compression.
+\begin{equation} \label{eq:miegruneisen}
+    p(e, \upsilon) \approx \Gamma(\upsilon)\frac{(e-e_0(\upsilon))}{\upsilon} + p_0(\upsilon) = \Gamma \frac{e}{\upsilon} + f(\upsilon)
+\end{equation}
+where $e_0$ and $p_0$ are the internal energy and pressure at a reference state such as the $0\, K$ isotherm, respectively, $\Gamma$ is the Gruneisen parameters representing the thermal pressure from a set of vibrating atoms.
+
+By incorporating constitutive relations and equations of state, the system of governing equations then is closed and determined. In practice, only the closure of the compressible model requires equations of state. For incompressible models, the microscopic and macroscopic level of interactions are decoupled due to the constant density assumption. Therefore, relations deduced from the microscopic level interactions, as specified by the equations of state, are irrelevant to the closure of the macroscopic system.
+
+\section{Conservation laws of fluid motion}
+
+\subsection{Vector conservation laws in conservative form}
+
+\begin{equation}\label{eq:NS}
+    \frac{\partial \Vector{U}}{\partial t}+\frac{\partial \Vector{F}_x(\Vector{U})}{\partial x}+\frac{\partial \Vector{F}_y(\Vector{U})}{\partial y}+\frac{\partial \Vector{F}_z(\Vector{U})}{\partial z} = \frac{\partial \Vector{F}^{\Des{v}}_x(\Vector{U})}{\partial x}+\frac{\partial \Vector{F}^{\Des{v}}_y(\Vector{U})}{\partial y}+\frac{\partial \Vector{F}^{\Des{v}}_z(\Vector{U})}{\partial z}+\Vector{\Phi}
+\end{equation}
+\[
+    \Vector{U} =
+    \begin{pmatrix}
+        \rho,
+        \rho u,
+        \rho v,
+        \rho w,
+        \rho e_{\Des{T}}
+    \end{pmatrix}^{\Des{T}}
+\]
+\[
+    \Vector{F}_x(\Vector{U}) =
+    \begin{pmatrix}
+        \rho u,
+        \rho uu+p,
+        \rho vu,
+        \rho wu,
+        (\rho e_{\Des{T}}+p)u
+    \end{pmatrix}^{\Des{T}}
+    = u\Vector{U} + p(0, 1, 0, 0, u)^{\Des{T}}
+\]
+\[
+    \Vector{F}_y(\Vector{U}) =
+    \begin{pmatrix}
+        \rho v,
+        \rho uv,
+        \rho vv+p,
+        \rho wv,
+        (\rho e_{\Des{T}}+p)v
+    \end{pmatrix}^{\Des{T}}
+    = v\Vector{U} + p(0, 0, 1, 0, v)^{\Des{T}}
+\]
+\[
+    \Vector{F}_z(\Vector{U}) =
+    \begin{pmatrix}
+        \rho w,
+        \rho uw,
+        \rho vw,
+        \rho ww+p,
+        (\rho e_{\Des{T}}+p)w
+    \end{pmatrix}^{\Des{T}}
+    = w\Vector{U} + p(0, 0, 0, 1, w)^{\Des{T}}
+\]
+\[
+    \Vector{F}^{\Des{v}}_x(\Vector{U}) =
+    \begin{pmatrix}
+        0,
+        \tau_{xx},
+        \tau_{xy},
+        \tau_{xz},
+        k \frac{\partial T}{\partial x}+\tau_{xx} u+\tau_{xy} v+\tau_{xz} w
+    \end{pmatrix}^{\Des{T}}
+\]
+\[
+    \Vector{F}^{\Des{v}}_y(\Vector{U}) =
+    \begin{pmatrix}
+        0,
+        \tau_{yx},
+        \tau_{yy},
+        \tau_{yz},
+        k \frac{\partial T}{\partial y}+\tau_{yx} u+\tau_{yy} v+\tau_{yz} w
+    \end{pmatrix}^{\Des{T}}
+\]
+\[
+    \Vector{F}^{\Des{v}}_z(\Vector{U}) =
+    \begin{pmatrix}
+        0,
+        \tau_{zx},
+        \tau_{zy},
+        \tau_{zz},
+        k \frac{\partial T}{\partial z}+\tau_{zx} u+\tau_{zy} v+\tau_{zz} w
+    \end{pmatrix}^{\Des{T}}
+\]
+\[
+    \Vector{\Phi} =
+    \begin{pmatrix}
+        0,
+        f^{\Des{b}}_x,
+        f^{\Des{b}}_y,
+        f^{\Des{b}}_z,
+        f^{\Des{b}}_x u + f^{\Des{b}}_y v + f^{\Des{b}}_z w
+    \end{pmatrix}^{\Des{T}}
+\]
+\[
+    \tau_{ij} = \mu\left(\frac{\partial V_i}{\partial x_j} + \frac{\partial V_j}{\partial x_i}-
+    \frac{2}{3}(\nabla\cdot\Vector{V}) \delta_{ij}\right)
+\]
+\[
+    e_{\Des{T}} = e+\frac{1}{2}(u^2+v^2+w^2)
+\]
+\[
+    e = C_v T = \frac{p}{(\gamma-1)\rho}
+\]
+\[
+    p = \rho RT
+\]
+\[
+    C_v = \frac{R}{\gamma-1}
+\]
+\[
+    C_p = \gamma C_v
+\]
+\[
+    k = \frac{C_p\mu}{Pr}
+\]
+\[
+    c = \sqrt{\gamma\frac{p}{\rho}}
+\]
+
+\subsubsection{Dimensional form}
+
+To use the equations (Eq.~\eqref{eq:NS}) in a dimensional form, the specific gas constant $R$ and the dynamical viscosity $\mu$ are dimensional parameters.
+
+\subsubsection{Dimensionless form}
+
+Dimensional variables
+\[
+    \tilde{x},\ \tilde{y},\ \tilde{z},\ \tilde{u},\ \tilde{v},\ \tilde{w},\ \tilde{t},\ \tilde{\rho},\ \tilde{T},\ \tilde{p},\ \tilde{e}_{\Des{T}},\ \tilde{e},\ \tilde{f}^{\Des{b}}_x,\ \tilde{f}^{\Des{b}}_y,\ \tilde{f}^{\Des{b}}_z
+\]
+Reference variables
+\[
+    L^*,\ U^*,\ \rho^*,\ T^*
+\]
+Nondimensionalized variables
+\[
+    \begin{gathered}
+        x = \frac{\tilde{x}}{L^*},\ y = \frac{\tilde{y}}{L^*},\ z = \frac{\tilde{z}}{L^*},\ u = \frac{\tilde{u}}{U^*},\ v = \frac{\tilde{v}}{U^*},\ w = \frac{\tilde{w}}{U^*}\\
+        t = \frac{\tilde{t}U^*}{L^*},\ \rho = \frac{\tilde{\rho}}{\rho^*},\ T = \frac{\tilde{T}}{T^*},\ p = \frac{\tilde{p}}{\rho^* {U^*}^2},\ e_{\Des{T}} = \frac{\tilde{e}_{\Des{T}}}{{U^*}^2},\ e = \frac{\tilde{e}}{{U^*}^2}\\
+        f^{\Des{b}}_x = \frac{\tilde{f}^{\Des{b}}_x}{\rho^* {U^*}^2 / L^*},\ f^{\Des{b}}_y = \frac{\tilde{f}^{\Des{b}}_y}{\rho^* {U^*}^2 / L^*},\ f^{\Des{b}}_z = \frac{\tilde{f}^{\Des{b}}_z}{\rho^* {U^*}^2 / L^*}
+    \end{gathered}
+\]
+Dimensional parameters
+\[
+    \tilde{\mu}, \ \tilde{R}
+\]
+Nondimensionalized parameters
+\[
+    \mu,\ R, \ C_v, \ C_p, \ c, \ k 
+\]
+Dimensionless parameters
+\[
+    Re, \ Pr, \ Ma
+\]
+Dimensionless parameters based on reference variables
+\[
+    Re_{\Des{ref}},\ Ma_{\Des{ref}}
+\]
+Constants
+\[
+    \gamma
+\]
+
+While preserving the original form of equations (Eq.~\eqref{eq:NS}) after normalization, the following parameters shall be adopted for the nondimensionalized governing equations.
+\[
+    R = \frac{1}{\gamma Ma_{\Des{ref}}^2}
+\]
+\[
+    Ma_{\Des{ref}} = \frac{U^*}{\sqrt{\gamma \tilde{R} T^*}}
+\]
+\[
+    \mu = \frac{1}{Re_{\Des{ref}}}
+\]
+\[
+    Re_{\Des{ref}} = \frac{\rho^*U^*L^*}{\tilde{\mu}}
+\]
+
+\subsection{Vector conservation laws in nonconservative form}
+
+\begin{equation}
+    \frac{\partial \Vector{U}}{\partial t} + \Matrix{A}_x\frac{\partial \Vector{U}}{\partial x} + \Matrix{A}_y\frac{\partial \Vector{U}}{\partial y} + \Matrix{A}_z\frac{\partial \Vector{U}}{\partial z} = \frac{\partial \Vector{F}^{\Des{v}}_x(\Vector{U})}{\partial x}+\frac{\partial \Vector{F}^{\Des{v}}_y(\Vector{U})}{\partial y}+\frac{\partial \Vector{F}^{\Des{v}}_z(\Vector{U})}{\partial z}+\Vector{\Phi}
+\end{equation}
+
+\subsubsection{Transformation}
+
+\[
+    \Vector{U} =
+    \begin{pmatrix}
+        u_1 \\
+        u_2 \\
+        u_3 \\
+        u_4 \\
+        u_5
+    \end{pmatrix}
+    =
+    \begin{pmatrix}
+        \rho\\
+        \rho u\\
+        \rho v\\
+        \rho w\\
+        \rho e_{\Des{T}}
+    \end{pmatrix}
+\]
+\[
+    \Vector{F}_x(\Vector{U}) =
+    \begin{pmatrix}
+        u_2 \\
+        \frac{u_2^2}{u_1}+(\gamma-1)[u_5-\frac{1}{2}\frac{u_2^2+u_3^2+u_4^2}{u_1}] \\
+        \frac{u_2u_3}{u_1} \\
+        \frac{u_2u_4}{u_1} \\
+        \frac{u_5u_2}{u_1}+(\gamma-1)[u_5-\frac{1}{2}\frac{u_2^2+u_3^2+u_4^2}{u_1}]\frac{u_2}{u_1}
+    \end{pmatrix}
+\]
+\[
+    \Vector{F}_y(\Vector{U}) =
+    \begin{pmatrix}
+        u_3 \\
+        \frac{u_3u_2}{u_1} \\
+        \frac{u_3^2}{u_1}+(\gamma-1)[u_5-\frac{1}{2}\frac{u_2^2+u_3^2+u_4^2}{u_1}] \\
+        \frac{u_3u_4}{u_1} \\
+        \frac{u_5u_3}{u_1}+(\gamma-1)[u_5-\frac{1}{2}\frac{u_2^2+u_3^2+u_4^2}{u_1}]\frac{u_3}{u_1}
+    \end{pmatrix}
+\]
+\[
+    \Vector{F}_z(\Vector{U}) =
+    \begin{pmatrix}
+        u_4 \\
+        \frac{u_4u_2}{u_1} \\
+        \frac{u_4u_3}{u_1} \\
+        \frac{u_4^2}{u_1}+(\gamma-1)[u_5-\frac{1}{2}\frac{u_2^2+u_3^2+u_4^2}{u_1}] \\
+        \frac{u_5u_4}{u_1}+(\gamma-1)[u_5-\frac{1}{2}\frac{u_2^2+u_3^2+u_4^2}{u_1}]\frac{u_4}{u_1}
+    \end{pmatrix}
+\]
+
+\subsubsection{Definition of parameter}
+\[
+    c = \sqrt{\gamma \frac{p}{\rho}}
+\]
+\[
+    q^2 = u^2 + v^2 + w^2
+\]
+\[
+    e = \frac{c^2}{\gamma(\gamma-1)}
+\]
+\[
+    e_{\Des{T}} = e+\frac{1}{2}q^2= \frac{c^2}{\gamma(\gamma-1)}+\frac{1}{2}q^2
+\]
+\[
+    h = e+\frac{p}{\rho} = \frac{c^2}{\gamma-1} = \gamma e
+\]
+\[
+    h_{\Des{T}} = e_{\Des{T}}+\frac{p}{\rho} = \gamma e + \frac{1}{2}q^2 = \gamma e_{\Des{T}} - \frac{1}{2}q^2(\gamma-1)
+\]
+\[
+    b= \frac{\gamma-1}{2c^2}
+\]
+
+\subsubsection{Jacobian matrix of convective flux}
+\[
+    \Matrix{A} = \frac{\mathrm{d} \Vector{F}(\Vector{U})} {\mathrm{d} \Vector{U}}, \ \ A_{ij} = \frac{\partial F_{i}}{\partial U_{j}}
+\]
+\[
+    \Matrix{A}_x =
+    \begin{bmatrix}
+        0 & 1 & 0 & 0 & 0 \\
+        -u^2+\frac{\gamma-1}{2}q^2 & 2u -(\gamma-1)u & -(\gamma-1)v & -(\gamma-1)w & \gamma-1 \\
+        -uv & v & u & 0 & 0 \\
+        -uw & w & 0 & u & 0 \\
+        -[\frac{c^2}{\gamma-1}+\frac{2-\gamma}{2}q^2]u & \frac{c^2}{\gamma-1}+\frac{1}{2}q^2-(\gamma-1)u^2 & -(\gamma-1)uv & -(\gamma-1)uw & \gamma u
+    \end{bmatrix}
+\]
+\[
+    \Matrix{A}_y =
+    \begin{bmatrix}
+        0 & 0 & 1 & 0 & 0 \\
+        -vu & v & u & 0 & 0 \\
+        -v^2+\frac{\gamma-1}{2}q^2 & -(\gamma-1)u & 2v-(\gamma-1)v & -(\gamma-1)w & \gamma-1 \\
+        -vw & 0 & w & v & 0 \\
+        -[\frac{c^2}{\gamma-1}+\frac{2-\gamma}{2}q^2]v & -(\gamma-1)vu & \frac{c^2}{\gamma-1}+\frac{1}{2}q^2-(\gamma-1)v^2 & -(\gamma-1)vw & \gamma v
+    \end{bmatrix}
+\]
+\[
+    \Matrix{A}_z =
+    \begin{bmatrix}
+        0 & 0 & 0 & 1 & 0 \\
+        -wu & w & 0 & u & 0 \\
+        -wv & 0 & w & v & 0 \\
+        -w^2+\frac{\gamma-1}{2}q^2 & -(\gamma-1)u & -(\gamma-1)v & 2w-(\gamma-1)w & \gamma-1 \\
+        -[\frac{c^2}{\gamma-1}+\frac{2-\gamma}{2}q^2]w & -(\gamma-1)wu & -(\gamma-1)wv & \frac{c^2}{\gamma-1}+\frac{1}{2}q^2-(\gamma-1)w^2 & \gamma w
+    \end{bmatrix}
+\]
+
+\subsubsection{Eigenvalue}
+\[
+    \Matrix{\Lambda}_x = {\Matrix{R}_x}^{-1}\Matrix{A}_x\Matrix{R}_x =
+    \begin{bmatrix}
+        u-c &  &  &  &  \\
+         & u &  &  &  \\
+         &  & u &  &  \\
+         &  &  & u &  \\
+         &  &  &  & u+c
+    \end{bmatrix}
+    \overset{\Def}{=}
+    \begin{bmatrix}
+        \lambda_x^1 &  &  &  &  \\
+         & \lambda_x^2 &  &  &  \\
+         &  & \lambda_x^3 &  &  \\
+         &  &  & \lambda_x^4 &  \\
+         &  &  &  & \lambda_x^5
+    \end{bmatrix}
+\]
+\[
+    \Matrix{\Lambda}_y = {\Matrix{R}_y}^{-1}\Matrix{A}_y\Matrix{R}_y =
+    \begin{bmatrix}
+        v-c &  &  &  &  \\
+         & v &  &  &  \\
+         &  & v &  &  \\
+         &  &  & v &  \\
+         &  &  &  & v+c
+    \end{bmatrix}
+    \overset{\Def}{=}
+    \begin{bmatrix}
+        \lambda_y^1 &  &  &  &  \\
+         & \lambda_y^2 &  &  &  \\
+         &  & \lambda_y^3 &  &  \\
+         &  &  & \lambda_y^4 &  \\
+         &  &  &  & \lambda_y^5
+    \end{bmatrix}
+\]
+\[
+    \Matrix{\Lambda}_z = {\Matrix{R}_z}^{-1}\Matrix{A}_z\Matrix{R}_z =
+    \begin{bmatrix}
+        w-c &  &  &  &  \\
+         & w &  &  &  \\
+         &  & w &  &  \\
+         &  &  & w &  \\
+         &  &  &  & w+c
+    \end{bmatrix}
+    \overset{\Def}{=}
+    \begin{bmatrix}
+        \lambda_z^1 &  &  &  &  \\
+         & \lambda_z^2 &  &  &  \\
+         &  & \lambda_z^3 &  &  \\
+         &  &  & \lambda_z^4 &  \\
+         &  &  &  & \lambda_z^5
+    \end{bmatrix}
+\]
+
+\subsubsection{Eigenvector}
+\[
+    \Matrix{R}_x = 
+    \begin{bmatrix}
+        1 & 1 & 0 & 0 & 1 \\
+        u-c & u & 0 & 0 & u+c \\
+        v & 0 & 1 & 0 & v \\
+        w & 0 & 0 & 1 & w \\
+        h_{\Des{T}}-uc & u^2-\frac{1}{2}q^2 & v & w & h_{\Des{T}}+uc
+    \end{bmatrix}
+\]
+\[
+    \Matrix{R}_y = 
+    \begin{bmatrix}
+        1 & 0 & 1 & 0 & 1 \\
+        u & 1 & 0 & 0 & u \\
+        v-c & 0 & v & 0 & v+c \\
+        w & 0 & 0 & 1 & w \\
+        h_{\Des{T}}-vc & u & v^2-\frac{1}{2}q^2 & w & h_{\Des{T}}+vc
+    \end{bmatrix}
+\]
+\[
+    \Matrix{R}_z = 
+    \begin{bmatrix}
+        1 & 0 & 0 & 1 & 1 \\
+        u & 1 & 0 & 0 & u \\
+        v & 0 & 1 & 0 & v \\
+        w-c & 0 & 0 & w & w+c \\
+        h_{\Des{T}}-wc & u & v & w^2-\frac{1}{2}q^2 & h_{\Des{T}}+wc
+    \end{bmatrix}
+\]
+
+\[
+    \Matrix{L}_x = {\Matrix{R}_x}^{-1} =
+    \begin{bmatrix}
+        \frac{1}{2}bq^2+\frac{1}{2c}u & -bu-\frac{1}{2c} & -bv & -bw & b \\
+        -bq^2+1 & 2bu & 2bv & 2bw & -2b \\
+        -bq^2v & 2bvu & 2bv^2+1 & 2bwv & -2bv \\
+        -bq^2w & 2bwu & 2bwv & 2bw^2+1 & -2bw \\
+        \frac{1}{2}bq^2 - \frac{1}{2c}u & -bu + \frac{1}{2c} & -bv & -bw & b
+    \end{bmatrix}
+\]
+\[
+    \Matrix{L}_y = {\Matrix{R}_y}^{-1} =
+    \begin{bmatrix}
+        \frac{1}{2}bq^2+\frac{1}{2c}v & -bu & -bv-\frac{1}{2c} & -bw & b \\
+        -bq^2u & 2bu^2+1 & 2bvu & 2bwu & -2bu \\
+        -bq^2+1 & 2bu & 2bv & 2bw & -2b \\
+        -bq^2w & 2bwu & 2bwv & 2bw^2+1 & -2bw \\
+        \frac{1}{2}bq^2 - \frac{1}{2c}v & -bu & -bv + \frac{1}{2c} & -bw & b
+    \end{bmatrix}
+\]
+\[
+    \Matrix{L}_z = {\Matrix{R}_z}^{-1} =
+    \begin{bmatrix}
+        \frac{1}{2}bq^2+\frac{1}{2c}w & -bu & -bv & -bw-\frac{1}{2c} & b \\
+        -bq^2u & 2bu^2+1 & 2bvu & 2bwu & -2bu \\
+        -bq^2v & 2bvu & 2bv^2+1 & 2bwv & -2bv \\
+        -bq^2+1 & 2bu & 2bv & 2bw & -2b \\
+        \frac{1}{2}bq^2 - \frac{1}{2c}w & -bu & -bv & -bw + \frac{1}{2c} & b
+    \end{bmatrix}
+\]
+
+Due to the important role of eigenvalues, it is useful to present the convective flux as a function of eigenvalues according to the relation:
+\[
+    \Vector{F} = \Matrix{A} \Vector{U} = \Matrix{R} \Matrix{\Lambda} \Matrix{R}^{-1} \Vector{U}
+\]
+which can be directly used for splitting the convective flux into subvectors associated with specified eigenvalue spectra \citep{steger1981flux}.
+
+When arranging the mathematical expressions of fluxes, there are two choices to present the fluxes considering the relative dominance of eigenvalues and physical quantities. Although these two forms are mathematically equivalent, the physical interpretations can be different: the eigenvalue dominance form is directly related to flux vector splitting since this form groups physical quantities of the same characteristics. However, the grouped physical quantities have no specific physical meanings when being considered as an entity. Therefore, the physical quantity dominance form is employed here.
+\[
+    \Vector{F}_x =
+    \frac{\rho}{2\gamma}
+    \begin{pmatrix}
+        \lambda_x^1 + 2(\gamma-1)\lambda_x^2 + \lambda_x^5 \\
+        [\lambda_x^1 + 2(\gamma-1)\lambda_x^2 + \lambda_x^5]u + (\lambda_x^5-\lambda_x^1)c \\
+        [\lambda_x^1 + 2(\gamma-1)\lambda_x^3 + \lambda_x^5]v \\
+        [\lambda_x^1 + 2(\gamma-1)\lambda_x^4 + \lambda_x^5]w \\
+        [\lambda_x^1 + 2(\gamma-1)\lambda_x^2 + \lambda_x^5](\frac{1}{2}q^2) + (\lambda_x^1 + \lambda_x^5)h + (\lambda_x^5-\lambda_x^1)cu \\
+    \end{pmatrix}
+\]
+\[
+    \Vector{F}_y =
+    \frac{\rho}{2\gamma}
+    \begin{pmatrix}
+        \lambda_y^1 + 2(\gamma-1)\lambda_y^3 + \lambda_y^5 \\
+        [\lambda_y^1 + 2(\gamma-1)\lambda_y^2 + \lambda_y^5]u \\
+        [\lambda_y^1 + 2(\gamma-1)\lambda_y^3 + \lambda_y^5]v + (\lambda_y^5-\lambda_y^1)c \\
+        [\lambda_y^1 + 2(\gamma-1)\lambda_y^4 + \lambda_y^5]w \\
+        [\lambda_y^1 + 2(\gamma-1)\lambda_y^3 + \lambda_y^5](\frac{1}{2}q^2) + (\lambda_y^1 + \lambda_y^5)h + (\lambda_y^5-\lambda_y^1)cv \\
+    \end{pmatrix}
+\]
+\[
+    \Vector{F}_z =
+    \frac{\rho}{2\gamma}
+    \begin{pmatrix}
+        \lambda_z^1 + 2(\gamma-1)\lambda_z^4 + \lambda_z^5 \\
+        [\lambda_z^1 + 2(\gamma-1)\lambda_z^2 + \lambda_z^5]u \\
+        [\lambda_z^1 + 2(\gamma-1)\lambda_z^3 + \lambda_z^5]v \\
+        [\lambda_z^1 + 2(\gamma-1)\lambda_z^4 + \lambda_z^5]w + (\lambda_z^5-\lambda_z^1)c \\
+        [\lambda_z^1 + 2(\gamma-1)\lambda_z^4 + \lambda_z^5](\frac{1}{2}q^2) + (\lambda_z^1 + \lambda_z^5)h + (\lambda_z^5-\lambda_z^1)cw \\
+    \end{pmatrix}
+\]
+Unified form via a direction vector $\Vector{e} = (e_1, e_2, e_3)$
+\[
+    \Vector{F} =
+    \frac{\rho}{2\gamma}
+    \begin{pmatrix}
+        \lambda^1 + 2(\gamma-1)\lambda^2 + \lambda^5 \\
+        [\lambda^1 + 2(\gamma-1)\lambda^2 + \lambda^5]u + (\lambda^5-\lambda^1)c * e_1 \\
+        [\lambda^1 + 2(\gamma-1)\lambda^3 + \lambda^5]v + (\lambda^5-\lambda^1)c * e_2 \\
+        [\lambda^1 + 2(\gamma-1)\lambda^4 + \lambda^5]w + (\lambda^5-\lambda^1)c * e_3 \\
+        [\lambda^1 + 2(\gamma-1)\lambda^2 + \lambda^5](\frac{1}{2}q^2) + (\lambda^1 + \lambda^5)h + (\lambda^5-\lambda^1)c(u * e_1 + v * e_2 + w * e_3)\\
+    \end{pmatrix}
+\]
+
+\subsubsection{Vector space}
+
+Eigenvector sets $\{\Vector{L}_m\}$ and $\{\Vector{R}^m\}$ of the Jacobian matrix $\Matrix{A}$ are two orthogonal vector spaces in Euclidean space $\Set{R}^M$ admitting the fact that
+\[
+    \Vector{L}_m \cdot \Vector{R}^n = \delta_m^n, \,\, m, n = 1, \dotsc, M
+\]
+
+The vector $\Delta \Vector{U} = \Vector{U}_{\Des{R}} - \Vector{U}_{\Des{L}}$, which measures the strength of a jump discontinuity comprising a right state $\Vector{U}_{\Des{R}}$ and a left state $\Vector{U}_{\Des{L}}$, belongs to $\Set{R}^M$, therefore, it can be decomposed in the vector space $\{\Vector{R}^m\}$:
+\[
+    \Vector{U}_{\Des{R}} - \Vector{U}_{\Des{L}} = \sum_{m=1}^{M} \alpha_m \Vector{R}^m
+\]
+where $\alpha_m$ are decomposition or projection coefficients, which can be determined by
+\[
+    \alpha_m = \Vector{L}_m \cdot (\Vector{U}_{\Des{R}} - \Vector{U}_{\Des{L}})
+\]
+Define vector $\Vector{\alpha}$ as $\Vector{\alpha} = (\alpha_1, \dotsc, \alpha_M)^{\Des{T}}$, then equivalently,
+\[
+    \Vector{U}_{\Des{R}} - \Vector{U}_{\Des{L}} = \Matrix{R}\Vector{\alpha}
+\]
+Therefore, the jump in flux values has
+\[
+    \begin{aligned}
+        \Vector{F}_{\Des{R}} - \Vector{F}_{\Des{L}} &= \Matrix{A} (\Vector{U}_{\Des{R}} - \Vector{U}_{\Des{L}})\\ 
+                                    &= \Matrix{A} \Matrix{R} \Vector{\alpha} \\
+                                    &= \Matrix{R} \Matrix{\Lambda} \Matrix{R}^{-1} \Matrix{R} \Vector{\alpha} \\
+                                    &= \Matrix{R} \Matrix{\Lambda} \Vector{\alpha}\\
+                                    &= \sum_{m=1}^{M}\lambda_m\alpha_m \Vector{R}^m
+    \end{aligned}
+\]
+
+\section{Conservation laws of solid motion}
+
+\subsection{Rigid body kinematics}
+
+The kinematics of a rigid body is governed by the equation system comprising the Newton's second law of translational motion and the Euler equations of rotational motion:
+\begin{equation}
+    \frac{\mathrm{d} \Vector{U}}{\mathrm{d} t} = \Vector{\Phi}
+    ,\,\,
+    \Vector{U} =
+    \begin{pmatrix}
+        \Vector{V}\\
+        \Vector{x}_{\Des{c}}\\
+        \Matrix{I}_{\Des{c}} \Vector{\omega}\\
+        \Vector{\theta}
+    \end{pmatrix}
+    ,\,\,
+    \Vector{\Phi} =
+    \begin{pmatrix}
+        \frac{1}{m}\int\limits_{\partial\Omega} \unitVector{n} \cdot (-p \unitTensor{I} + \Tensor{\tau}) \, \mathrm{d}S + \Vector{g} \\
+        \Vector{V}\\
+        \int\limits_{\partial\Omega} (\Vector{x} - \Vector{x}_{\Des{c}}) \times [\unitVector{n} \cdot (-p \unitTensor{I} + \Tensor{\tau})] \, \mathrm{d}S\\
+        \Vector{\omega}
+    \end{pmatrix}
+\end{equation}
+where $\Vector{x}$ is the position vector of spatial points, $\Omega$ is the spatial domain occupied by a solid, $\Vector{x}_{\Des{c}}$ is the position vector of the solid centroid, $\Vector{\theta}$ is the orientation (vector of Euler angles) of the solid, $\Vector{V}$ and $\Vector{\omega}$ are the translational and angular velocities of the solid, respectively, $m$ is the mass of the solid, $\Matrix{I}_{\Des{c}}$ is the moment of inertia matrix, $\unitVector{n}$ is the unit outward surface normal vector, $p$ and $\Tensor{\tau}$ are the pressure and viscous stress tensor field exerted on the solid surface via fluid, respectively, and $\Vector{g}$ is the body force per unit mass, such as gravitational acceleration, exerted by external fields.
+
+\subsection{Deformation}
+
+The governing equations for a compressible solid material experiencing high strain rate deformation are subject to the conservation laws of mass, momentum, energy with an additional evolution equation for deviatoric stresses \citep{tran2004particle, kapahi2013three}. 
+\begin{equation} \label{eq:governingssolid}
+    \begin{cases}
+        \frac{\partial \rho}{\partial t} + \nabla\cdot(\rho\Vector{V}) = 0 \\
+        \frac{\partial (\rho\Vector{V})}{\partial t} + \nabla\cdot(\rho\Vector{V}\Vector{V}) = \nabla\cdot\Tensor{\sigma} + \Vector{f}^{\Des{b}}\\
+        \frac{\partial (\rho e_{\Des{T}})}{\partial t} + \nabla\cdot(\rho e_{\Des{T}}\Vector{V}) = \nabla\cdot(k\nabla T) + \nabla\cdot(\Tensor{\sigma}\cdot\Vector{V}) + \Vector{f}^{\Des{b}}\cdot \Vector{V}\\
+        \frac{\partial (\rho \Tensor{S})}{\partial t} + \nabla\cdot(\rho\Vector{V}\Tensor{S}) + \frac{2}{3} \rho G \Trace(\Tensor{D})\unitTensor{I} - 2\rho G \Tensor{D} = 0 \\
+    \end{cases}
+\end{equation}
+where $\rho$ is the material density, $\Vector{V}$ is the velocity field, $e_{\Des{T}}$ is the specific total energy of the material, $\Tensor{D}$ is the strain rate tensor, $G$ is the shear modulus of the material. 
+
+The governing equations are solved via assuming a pure elastic deformation (i.e. freezing the plastic flow) as an elastic predictor step, then a radial return mapping to bring the predicted stress back to the yield surface is followed.
+
+\subsection{Collision}
+
+A collision is a short-duration interaction between two or more objects. The internal forces exerted among involved objects result in motion change and energy conversion simultaneously. Collisions are subject to universal conservation laws of mass, momentum, and energy. The conservation of kinetic energy distinguishes different collision patterns. An elastic collision occurs when the total kinetic energy is conserved and no kinetic energy is lost during the conversion between kinetic energy and repulsive force associated potential energy. In an inelastic collision, kinetic energy is not conserved due to internal friction. A partially inelastic collision, in which kinetic energy is partially dissipated and converted into other forms of energy such as sound, heat, and work deforming the objects, is the most common form of collisions in the real world. A perfectly inelastic collision occurs if the maximum amount of kinetic energy of the system is lost, which happens when the colliding particles coalesce into a single object.
+
+The degree of kinetic energy conservation of a collision between two objects is measured by the coefficient of restitution ($C_{\Des{R}}$), which is defined along the line of impact (common normal for surfaces are closest or in contact during impact) and as the ratio of relative speeds after and before a collision \citep{landau1987mech, louge2002anomalous}.
+\begin{equation} \label{eq:cor}
+    C_{\Des{R}} = \frac{\text{Relative speed after collision}}{\text{Relative speed before collision}}
+\end{equation}
+where $C_{\Des{R}} = 0$, $0 < C_{\Des{R}} < 1$, and $C_{\Des{R}} = 1$ are corresponding to perfectly inelastic collision, partially inelastic collision, and elastic collision, respectively. Thus, the coefficient of restitution quantifies the degree to which a collision is elastic or inelastic. The coefficient of restitution is considered as a property of a pair of colliding objects and is a function of collision speed \citep{louge2002anomalous}. However, it is commonly treated as an averaged constant \citep{walton1993numerical}.
+
+Consider two objects denoted as $\Omega_1$ and $\Omega_2$. Assume $m$, $v$, and $v'$ representing the mass, the velocity before collision, and the velocity after collision, respectively. Using the definition of the coefficient of restitution and the law of the conservation of momentum, the equations for a one-dimensional collision is:
+\begin{equation} \label{eq:onedimcol}
+    \begin{aligned}
+        C_{\Des{R}} &= \frac{v'_2 - v'_1}{v_1 - v_2} \\
+        m_1 v_1 + m_2 v_2 &= m_1 v'_1 + m_2 v'_2
+    \end{aligned}
+\end{equation}
+
+Solving the above system of equations, yields:
+\begin{equation} \label{eq:onedimcolspeed}
+    \begin{aligned}
+        v'_1 &= v_1 - \frac{m_2}{m_1 + m_2} (1 + C_{\Des{R}}) (v_1 - v_2) \\
+        v'_2 &= v_2 - \frac{m_1}{m_1 + m_2} (1 + C_{\Des{R}}) (v_2 - v_1)
+    \end{aligned}
+\end{equation}
+where the speeds after impact are subject to symmetry with respect to subscripts.
+
+For collisions in higher dimensions, the overall velocity of each object requires to be decomposed into components in the orthogonal coordinate system comprising the line of impact and tangents of the common normal surfaces at the contact point. The one-dimensional collision equations can then be applied on the line of impact. A common solution is to first change the frame of reference such that one object is stationary before collision. After determining the line of impact, the velocities after collision in the new frame of reference can then be solved. Finally, a conversion back to the original frame of reference is conducted to obtain the required solutions.
+
+Relatively few problems involving collisions, especially inelastic and frictional collisions, are able to be solved analytically. Therefore, numerical methods have a primary role in solving collision problems. In general, there are two integral parts in collision simulations. One is the collision detection to determine whether two objects have collided. The other is the collision response to determine the changes in the motion of colliding objects.
+
+Collision detection, which is frequently associated with applications in physical simulations, robotics, virtual reality, and computer-aided design, typically refers to the computational problem of detecting the intersection of two or more objects. Solving collision detection problems extensively involves concepts from computer graphics and computational geometry.
+
+Collision response is to apply models and algorithms for simulating the changes in the motion of colliding objects. When two objects collide in reality, objects undergo compression in the region of contact, followed by expansion and then separation. During the compression and expansion phases, reactive forces are generated at the points of contact. The compression phase converts kinetic energy into potential energy. Meanwhile, significant portion of kinetic energy will be converted into irreversible work deforming the objects when yield strengths are exceeded in the contact region. The potential energy are converted back to kinetic energy during the expansion phase \citep{walton1993numerical, gidaspow1994multiphase}.
+
+If rotation and tangential sliding happen at the contact surfaces during collision, frictional force combining with changing normal contact poses a serious challenge to modeling the contact phenomena. Generally, to specify an instantaneous collision operator rather than to evaluate a varying force-displacement relation during each collision is preferred due to computational efficiency. Various approximate models for frictional contacts have been proposed in the past. A realistic, frictional collision operator may employ three main parameters: the coefficient of restitution in the normal direction, a coefficient of rational restitution, and a coefficient of sliding friction \citep{walton1993numerical}. Another major challenge in collision response is to resolve multicontact multibody collision, for which no analytical solutions have been achieved so far.
+

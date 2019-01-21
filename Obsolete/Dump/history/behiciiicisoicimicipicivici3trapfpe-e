@@ -1,0 +1,41 @@
+/****************************************************************************
+ *                              ArtraCFD                                    *
+ *                          <By Huangrui Mo>                                *
+ * Copyright (C) Huangrui Mo <huangrui.mo@gmail.com>                        *
+ * This file is part of ArtraCFD.                                           *
+ * ArtraCFD is free software: you can redistribute it and/or modify it      *
+ * under the terms of the GNU General Public License as published by        *
+ * the Free Software Foundation, either version 3 of the License, or        *
+ * (at your option) any later version.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Header Files
+ ****************************************************************************/
+#define _GNU_SOURCE 1 /* GNU C library for floating-point control */
+#include <fenv.h> /* floating-point control environment */
+/****************************************************************************
+ * Function definitions
+ ****************************************************************************/
+/*
+ * GNU floating-point exception handling
+ *
+ * This is to use a C-callable mechanism to provide general control over
+ * whether or not floating-point exceptions are trapped or ignored, which
+ * can be invoked at startup using gcc's constructor attribute. Compiling
+ * and linking this C code with your program will turn on exception
+ * trapping for the "common" exceptions on a GNU system.
+ *
+ * When an floating-point exception occurs, your program will be sent the
+ * SIGFPE signal. By default, when SIGFPE is delivered the program will
+ * terminate, and a core will be dumped. This allows you to debug the
+ * program at the point where the problem first occurs.
+ */
+static void __attribute__ ((constructor)) trapfpe (void)
+{
+    /*
+     * Trap floating point exceptions
+     */
+    feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
+}
+/* a good practice: end file with a newline */
+

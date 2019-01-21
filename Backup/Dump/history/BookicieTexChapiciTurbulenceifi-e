@@ -1,0 +1,112 @@
+\chapter{Turbulence Modeling}
+
+Turbulence modeling is the construction and use of a mathematical model to predict the effects and evolution of turbulence. Turbulent flows are commonplace in most real life scenarios. No analytical theory is currently able to predict the evolution of turbulent flows. The equations governing turbulent flows can only be solved directly for simple cases of flow. For most real life turbulent flows, turbulent models are used as simplified constitutive equations to predict the statistical evolution of turbulence.
+
+\section{Closure problem}
+
+The Navier-Stokes equations govern the velocity and pressure of a fluid flow. In a turbulent flow, each of these quantities may be decomposed into a mean part and a fluctuating part. Averaging the equations gives the Reynolds-averaged Navier-Stokes (RANS) equations, which govern the mean flow. However, the nonlinearity of the Navier-Stokes equations means that the velocity fluctuations still appear in the RANS equations, in the nonlinear term, $-\rho \overline{\upsilon_{i}^{\prime} \upsilon_{j}^{\prime}}$ from the convective acceleration. This term is known as the Reynolds stress, $R_{ij}$. Its effect on the mean flow is like that of a stress term, such as from pressure or viscosity.
+
+To obtain equations containing only the mean velocity and pressure, the RANS equations need to be closed by modelling the Reynolds stress term $R_{ij}$ as a function of the mean flow, removing any reference to the fluctuating part of the velocity. This is the closure problem.
+
+\section{Classes of turbulence models}
+\begin{itemize}
+    \item RANS-based models
+        \begin{itemize}
+            \item Linear eddy-viscosity models
+                \begin{itemize}
+                    \item Algebraic models such as Cebeci-Smith model, Baldwin-Lomax model, and Johnson-King model.
+                    \item One equation models such as Prandtl's one-equation model, Baldwin-Barth model, Spalart-Allmaras model, and Rahman-Siikonen-Agarwal Model.
+                    \item Two equation models such as k-epsilon models and k-omega models.
+                \end{itemize}
+            \item Non-linear eddy viscosity models and algebraic stress models such as Cubic k-epsilon in Explicit nonlinear constitutive relation and v2-f models.
+            \item Reynolds stress model 
+        \end{itemize}
+    \item Large eddy simulations such as Smagorinsky-Lilly model and Dynamic subgrid-scale model.
+    \item Detached eddy simulations and other hybrid models 
+    \item Direct numerical simulations 
+\end{itemize}
+
+\section{Eddy viscosity}
+
+Joseph Valentin Boussinesq was the first to attack the closure problem, by introducing the concept of eddy viscosity. The Boussinesq hypothesis is applied to model the Reynolds stress term, in which a new proportionality constant $\nu_t > 0$, the turbulence eddy viscosity, is introduced to relate the turbulence stresses to the mean flow to close the system of equations. Models of this type are known as eddy viscosity models or EVM's.
+
+\[
+    - \overline{\upsilon_{i}^{\prime} \upsilon_{j}^{\prime}} = \nu _{t} \left({\frac{\partial {\bar{\upsilon}}_{i}}{\partial x_{j}}} + {\frac {\partial {\bar{\upsilon}}_{j}}{\partial x_{i}}} \right) - \frac{2}{3} k \delta_{ij}
+\]
+    Which can be written in shorthand as
+\[
+    - \overline{\upsilon_{i}^{\prime} \upsilon_{j}^{\prime}} = 2\nu_{t} S_{ij} - \frac{2}{3} k \delta_{ij}
+\]
+    where $S_{ij}$ is the mean rate of strain tensor. $\nu_t$ is the turbulence eddy viscosity. $k = \frac{1}{2} {\overline {\upsilon_{i}' \upsilon_{i}'}}$ is the turbulence kinetic energy, and $\delta_{ij}$ is the Kronecker delta.
+
+In this model, the additional turbulence stresses are given by augmenting the molecular viscosity with an eddy viscosity. This can be a simple constant eddy viscosity (which works well for some free shear flows such as axisymmetric jets, 2-D jets, and mixing layers).
+
+\section{Prandtl's mixing-length concept}
+
+Later, Ludwig Prandtl introduced the additional concept of the mixing length, along with the idea of a boundary layer. For wall-bounded turbulent flows, the eddy viscosity must vary with distance from the wall, hence the addition of the concept of a 'mixing length'. In the simplest wall-bounded flow model, the eddy viscosity is given by the equation:
+\[
+    \nu_t = \left|\frac{\partial u}{\partial y}\right|l_m^2
+\]
+where $\frac{\partial u}{\partial y}$ is the partial derivative of the streamwise velocity ($u$) with respect to the wall normal direction ($y$);  $l_m$ is the mixing length.
+
+This simple model is the basis for the "law of the wall", which is a surprisingly accurate model for wall-bounded, attached (not separated) flow fields with small pressure gradients.
+
+More general turbulence models have evolved over time, with most modern turbulence models given by field equations similar to the Navier-Stokes equations.
+
+\section{Smagorinsky model for the sub-grid scale eddy viscosity}
+
+Joseph Smagorinsky (1964) was the first who proposed a formula for the eddy viscosity in numerical models, based on the local derivatives of the velocity field and the local grid size:
+\[
+    \nu_t = \Delta x \Delta y \sqrt{\left(\frac{\partial u}{\partial x}\right)^2 + \left(\frac{\partial v}{\partial y}\right)^2 + \frac{1}{2}\left(\frac{\partial u}{\partial y} + \frac{\partial v}{\partial x}\right)^2}
+\]
+In the context of Large Eddy Simulation, turbulence modeling refers to the need to parameterize the subgrid scale stress in terms of features of the filtered velocity field. This field is called subgrid-scale modeling.
+
+\section{Common models}
+
+The following is a brief overview of commonly employed models in modern engineering applications.
+
+    Spalart-Allmaras (S-A)
+
+The Spalart-Allmaras model is a one-equation model that solves a modelled transport equation for the kinematic eddy turbulent viscosity. The Spalart-Allmaras model was designed specifically for aerospace applications involving wall-bounded flows and has been shown to give good results for boundary layers subjected to adverse pressure gradients. It is also gaining popularity in turbomachinery applications.
+
+    $k-\epsilon$
+
+$k-\epsilon$ turbulence model is the most common model used in computational fluid dynamics (CFD) to simulate mean flow characteristics for turbulent flow conditions. It is a two-equation model which gives a general description of turbulence by means of two transport equations (PDEs). The original impetus for the $k-\epsilon$ model was to improve the mixing-length model, as well as to find an alternative to algebraically prescribing turbulent length scales in moderate to high complexity flows.
+
+    $k-\omega$
+
+In computational fluid dynamics, the $k-\omega$ turbulence model is a common two-equation turbulence model that is used as a closure for the Reynolds-averaged Navier-Stokes equations (RANS equations). The model attempts to predict turbulence by two partial differential equations for two variables, $k$ and $\omega$, with the first variable being the turbulence kinetic energy ($k$) while the second ($\omega$) is the specific rate of dissipation (of the turbulence kinetic energy $k$ into internal thermal energy).
+
+    SST (Menter’s Shear Stress Transport)
+
+SST (Menter's shear stress transport) turbulence model is a widely used and robust two-equation eddy-viscosity turbulence model. The model combines the k-omega turbulence model and K-epsilon turbulence model such that the k-omega is used in the inner region of the boundary layer and switches to the k-epsilon in the free shear flow.
+
+The Boussinesq hypothesis is employed in the Spalart-Allmaras (S-A), $k-\epsilon$, and $k-\omega$ models and offers a relatively low cost computation for the turbulence viscosity $\nu_t$. The S-A model uses only one additional equation to model turbulence viscosity transport, while the $k-\epsilon$ and $k-\omega$ models use two.
+
+Eddy viscosity based closures cannot account for the return to isotropy of turbulence, observed in decaying turbulent flows. Eddy-viscosity based models cannot replicate the behaviour of turbulent flows in the Rapid Distortion limit, where the turbulent flow essentially behaves like an elastic medium.
+
+    Reynolds stress equation model
+
+The Reynolds stress equation model (RSM), also referred to as second moment closure model, is the most complete classical turbulence modelling approach. Popular eddy-viscosity based models like the $k-\epsilon$ model and the $k-\omega$ models have significant shortcomings in complex engineering flows. This arises due to the use of the eddy-viscosity hypothesis in their formulation. For instance, in flows with high degrees of anisotropy, significant streamline curvature, flow separation, zones of recirculating flow or flows influenced by rotational effects, the performance of such models is unsatisfactory. In such flows, Reynolds stress equation models offer much better accuracy.
+
+\section{Large eddy simulation}
+
+The simulation of turbulent flows by numerically solving the Navier-Stokes equations requires resolving a very wide range of time and length scales, all of which affect the flow field. Such a resolution can be achieved with direct numerical simulation (DNS), but DNS is computationally expensive, and its cost prohibits simulation of practical engineering systems with complex geometry or flow configurations, such as turbulent jets, pumps, vehicles, and landing gear.
+
+The principal idea behind LES is to reduce the computational cost by ignoring the smallest length scales, which are the most computationally expensive to resolve, via low-pass filtering of the Navier-Stokes equations. Such a low-pass filtering, which can be viewed as a time- and spatial-averaging, effectively removes small-scale information from the numerical solution. This information is not irrelevant, however, and its effect on the flow field must be modeled, a task which is an active area of research for problems in which small-scales can play an important role, such as near-wall flows, reacting flows, and multiphase flows.
+
+\subsection{Filter definition and properties}
+
+An LES filter can be applied to a spatial and temporal field $\phi(\Vector{x},t)$ and perform a spatial filtering operation, a temporal filtering operation, or both. The filtered field, denoted with a bar, is defined as
+\[
+    \overline{\phi(\boldsymbol{x},t)} = \int_{-\infty}^{\infty} \int_{-\infty}^{\infty} \phi(\boldsymbol{r},t^{\prime}) G(\boldsymbol{x}-\boldsymbol{r},t - t^{\prime}) dt^{\prime} d \boldsymbol{r}
+\]
+where $G$ is the filter convolution kernel. This can also be written as:
+\[
+    \overline{\phi} = G \star \phi
+\]
+The filter kernel $G$ has an associated cutoff length scale $\Delta$ and cutoff time scale $\tau_{c}$. Scales smaller than these are eliminated from $\overline{\phi}$. Using the above filter definition, any field $\phi$ may be split up into a filtered and sub-filtered (denoted with a prime) portion, as
+\[
+    \phi = \bar{\phi} + \phi^{\prime}
+\]
+It is important to note that the large eddy simulation filtering operation does not satisfy the properties of a Reynolds operator. 

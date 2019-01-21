@@ -1,0 +1,2174 @@
+\documentclass[12pt]{article}
+\usepackage{graphicx}
+\usepackage{microtype}
+\usepackage{amsmath}% math support
+\usepackage[square,comma,numbers,sort&compress]{natbib}% natbib support
+\usepackage[usenames,dvipsnames]{xcolor}% color support
+\usepackage{mathptmx}% times font
+\usepackage{enumitem}% customizing enumerated lists
+\usepackage{subcaption}% subfigures
+%\usepackage[section]{placeins}% to prevent floats from being moved over section
+\usepackage[left=25mm,right=25mm,top=25mm,bottom=25mm]{geometry}
+
+\graphicspath{{./}{./img/}}
+
+\bibliographystyle{elsarticle-num-names}
+%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\title{Differential Equation}
+
+\author{Huangrui Mo%
+\thanks{Email: \texttt{huangrui.mo@uwaterloo.ca}}}
+
+\maketitle
+
+%%\begin{abstract}
+%%    \normalsize
+%%\end{abstract}
+
+\section{Mathematical modeling}
+
+A model is a representation of a process. Usually, a mathematical model takes the form of a set of equations describing a number of variables, and we distinguish between continuous models, in which the variables vary continuously in space and time, and discrete models, whose variables vary discontinuously. Continuous models in practice means models formulated as differential equations, both ordinary and partial.
+
+Applied mathematicians have a procedure, almost a philosophy, that they apply when building models. First, there is a phenomenon of interest that one wants to describe or, more importantly, explain. Observations of the phenomenon lead to a hypothetical mechanism that can explain the phenomenon. The purpose of a model is then to formulate a description of the mechanism in quantitative terms, and the analysis of the resulting model leads to results that can be tested against the observations. Ideally, the model also leads to predictions which, if verified, lend authenticity to the model. It is important to realize that all models are idealizations and are limited in their applicability. In fact, one usually aims to over-simply; the idea is that if a model is basically right, then it can subsequently be made more complicated, but the analysis of it is facilitated by having treated a simpler version first.
+
+In formulating continuous models, there are three main ways of prescribing governing equations. The classical procedure is to formulate exact conservation laws. In certain situations, conservation laws involve empiricism. Lastly, there are what might be termed "hypothetical" laws, based on qualitative reasoning in the absence of precise rules.
+
+The procedure of modeling \citep{fowler1997mathematical}
+\begin{enumerate}
+    \item Problem identification. Mathematical modeling begins with the identification of a problem. There is something we don't understand, a phenomenon that requires explanation, and we begin by trying to identify a plausible mechanism. How do we model the problem? First, we need to define a model context, and we need to know what appropriate variables are. We idealize the real situation by supposing that the variables may be represented as continuous (indeed, differentiable) functions of space and time: this is essentially continuous approximation, familiar in the modeling of fluids and other continua. To formulate a model, we require laws (often of conservation type) and constitutive relations between variables, which may be based on experiment or empirical reasoning.
+    \item Model formulation. Once a problem is identified and a mechanism proposed, then one must formulate it mathematically. Often the difficulty lies in the choice of complexity: one wants the ease of a simpler model, but on the other hand one should include every relevant process. Formulation involves equations and boundary conditions, and if the problem is a sensible representation of the physics, it will usually be well-posed.
+    \item Reduction. Solution of the proposed model now proceeds differently according to the modeler's background. Often a model is a numerical model, and a solution means a numerical solution. There are two levels of difficulty with this. At the primitive level, direct numerical computations can founder because of ill-posedness or stiffness of the equations. More seriously, computation can limit insight, because of an inability to pose questions properly.
+
+        The first difficulty is aided by some pretreatment of the governing equations. It is, for example, often unhelpful to solve problems unless they have been nondimensionalized. When this is done properly (and this often forms the focal point of mathematical modeling) then the presence of small or large dimensionless parameters can be an indicator of singular perturbations, and thus stiffness. In many cases (most, in fact), this numerical inconvenience is an aid to analysis, facilitating the use of perturbation methods that can be used to gain insight into solutions.
+
+        The second difficulty resides in the ability to use big computers to solve problems directly. Successful mathematical modeling needs to combine different approaches, rather than elevate any one in a misplaced ascendancy.
+
+        The first thing we wish to do with a continuous model that consists of a set of differential equations and associated boundary conditions is to nondimensionalize the system. Practically useful models are very often far too complicated to analyze rigorously, and the only way forward is some kind of asymptotic reduction based on the idea that certain terms are small and can be neglected. But what do we mean by small? A little thought shows that the word must be used in a relative manner. In fact, we can only properly measure the size of a quantity by comparison with another of the same dimension. In this way, terms are evaluated in order of magnitude by means of dimensionless ratios, and the process hereby the terms in an equation are methodically evaluated in this way is called nondimensionalization. The art of nondimensionalization lies in the choice of scales. The basic principle is that the scales must ultimately be chosen self-consistently by balancing the terms in the equations. Because the purpose is to attain "properly scaled" equations in which the largest dimensionless parameters are numerically of order one, the simplest choice arise when the scales can be chosen so that all the dimensionless parameters are $O(1)$. In general, one cannot choose all the dimensionless parameters to be one, or $O(1)$. It is usually best then to try and choose the largest dimensionless parameters to be equal to one. Usually, this can only be done in one self-consistent manner, which has to be determined by trial and error, particularly concerning the use of parameters involved in the initial and boundary conditions as scales.
+        
+        After nondimensionalization, it is then possible to identify in a rational way whether different terms are large or small. If the later, they can in some (but not all) circumstances be ignored. One is thus led to a reduced model, which is a simplification of the original problem but not significantly less accurate. One must keep in mind what the question is. If one seeks not so much a quantitative simulation as a theoretical insight, then it may be judicious to simplify further. For example, detailed simulation of turbulence fluid flow requires use of turbulence models, but in some circumstances, Bernoulli's law may be sufficient and even Laplace's equation for the velocity potential.
+    \item Analysis. Reduction is the process whereby a model is simplified, most often by the neglect of various small terms. In some cases, their neglect leads to what are called singular perturbations, whose effect can be understood by using the method of matched asymptotic expansions. In particular, it is often possible to break down a complicated model into simpler constituent processes, which, for example, operate on different space and time scales. Analytic dissection in this way leads to an overall understanding that is not so simply available through straightforward numerical computations, and indeed it also provides a methodology for simplifying such computations.
+
+        In analyzing a model, one is often led through a sequence of similar types of calculation: the existence and nature of steady solutions; their stability and instability, and consequent bifurcations to oscillations and traveling waves; hysteresis and the associated phenomenon of blow-up; secondary instabilities, and the occurrence of chaotic behavior. By studying a variety of models, as we do here, one thus 'learns' modeling by seeing the same sequence of processes carried out on a wide variety of different systems.
+    \item Computation. At some judicious point, numerical results need to be obtained. The use of these may be complementary: to obtain quantitative results in parametric regions where analysis is impossible. Or they may be validatory: they provide an independent confirmation of analytic results. Sometimes, scientists think of analysis as confirming numerical results; in reality, one often needs to design numerical experiments to complement analytic results: straightforward but unthinking approaches often lead to apparent contradictions where a more carefully designed computation would remove these.
+    \item Model validation. Ideally, a mathematical model ends by returning to its origin. We look to see whether the model and its analysis explains the phenomenon we are interested in. Does the predicted curve fit the experimental data? Does the predicted stability curve agree with the experimentally determined values? The whole art of mathematical modeling lies in its self-consistency. It is an inexact science that derives its justification from the fact that apparently arbitrary assumptions are seen to work. And ultimately, this is the justification for a model: it helps us to understand an experimental observation. There is no unique or "correct" model; but there are good models and bad models. The skill of modeling lies in being able to judge which is which.
+\end{enumerate}
+
+A mathematical model is a description of a system using mathematical concepts and language. When solving an engineering problem of a physical nature, we first have to translate the physical situation into a mathematical model, that is, formulate the problem as a mathematical expression in terms of variables, functions, and equations using the law of physics and the language of math. The process of setting up a model, solving it mathematically, and interpreting the result in physical or other terms is called mathematical modeling or, briefly, modeling. The traditional mathematical model contains four major elements. These are governing equations, constitutive equations, constraints, and kinematic equations.
+\begin{equation*}
+    \small
+    \begin{split}
+        \text{Physical Problem} \xrightarrow[\text{Law of physics} + \text{Language of Math}]{\text{Modeling}} \text{Governing Equation} \xrightarrow[\text{Analytically/Numerically}]{\text{Solve}} \text{Solution}\\
+        \xrightarrow{\text{Analysis}} \text{Conclusion}
+        \begin{cases}
+            \text{Understanding}\\
+            \text{Prediction}\\
+            \text{Optimization}\\
+            \dotsc\\
+        \end{cases}
+    \end{split}
+\end{equation*}
+
+Mathematical models can take many forms, including dynamical systems, statistical models, differential equations, or game theoretic models. These and other types of models can overlap, with a given model involving a variety of abstract structures. In general, mathematical models may include logical models. In many cases, the quality of a scientific field depends on how well the mathematical models developed on the theoretical side agree with results of repeatable experiments. Lack of agreement between theoretical mathematical models and experimental measurements often leads to important advances as better theories are developed.
+
+Mathematical models are of great importance in the natural sciences, particularly in physics. Physical theories are almost invariably expressed using mathematical models. Throughout history, more and more accurate mathematical models have been developed. Newton's laws accurately describe many everyday phenomena, but at certain limits relativity theory and quantum mechanics must be used; even these do not apply to all situations and need further refinement. It is possible to obtain the less accurate models in appropriate limits, for example relativistic mechanics reduces to Newtonian mechanics at speeds much less than the speed of light. Quantum mechanics reduces to classical physics when the quantum numbers are high. For example, the de Broglie wavelength of a tennis ball is insignificantly small, so classical physics is a good approximation to use in this case.
+
+Mathematical models are usually composed of relationships and variables. Relationships can be described by operators, such as algebraic operators, functions, differential operators, etc. Variables are abstractions of system parameters of interest, that can be quantified. Several classification criteria can be used for mathematical models according to their structure:
+\begin{itemize}
+    \item Linear vs. Nonlinear: If all the operators in a mathematical model exhibit linearity, the resulting mathematical model is defined as linear. A model is considered to be nonlinear otherwise. The definition of linearity and nonlinearity is dependent on context, and linear models may have nonlinear expressions in them.
+    \item Static vs. Dynamic: A dynamic model accounts for time-dependent changes in the state of the system, while a static (or steady-state) model calculates the system in equilibrium, and thus is time-invariant. 
+    \item Explicit vs. Implicit: If all the input parameters of the overall model are known, and the output parameters can be calculated by a finite series of computations (known as linear programming, not to be confused with linearity as described above), the model is said to be explicit. But sometimes it is the output parameters which are known, and the corresponding inputs must be solved for by an iterative procedure, the model is then implicit.
+    \item Discrete vs. Continuous: A discrete model treats objects as discrete, such as the particles in a molecular model or the states in a statistical model; while a continuous model represents the objects in a continuous manner, such as the velocity field of fluid in pipe flows, temperatures and stresses in a solid.
+    \item Deterministic vs. Probabilistic (stochastic): A deterministic model is one in which every set of variable states is uniquely determined by parameters in the model and by sets of previous states of these variables; therefore, a deterministic model always performs the same way for a given set of initial conditions. Conversely, in a stochastic model-usually called a "statistical model" -randomness is present, and variable states are not described by unique values, but rather by probability distributions.
+    \item Deductive, inductive, or floating: A deductive model is a logical structure based on a theory. An inductive model arises from empirical findings and generalization from them. The floating model rests on neither theory nor observation, but is merely the invocation of expected structure. Application of mathematics in social sciences outside of economics has been criticized for unfounded models. Application of catastrophe theory in science has been characterized as a floating model.
+\end{itemize}
+
+\subsection{Modeling process}
+
+Approach towards mathematical modelling:
+\begin{enumerate}
+    \item Problem statement
+        \begin{itemize}
+            \item Picture representation of the system
+            \item Identify important physical parameters
+            \item Determine the variable you want to find
+        \end{itemize}
+    \item Formulate the mathematical model
+        \begin{itemize}
+            \item Find the physical laws such as the conservation of mass, momentum, and energy related to the variable of interest.
+            \item Use the physical laws to express the problem mathematically
+            \item Identify initial/boundary conditions
+        \end{itemize}
+    \item Solve the problem
+        \begin{itemize}
+            \item Identify and classify the types of differential equations
+            \item Select the correct solution strategy
+            \item Find the function form of the variable of interest
+            \item Solve for any particular cases using initial/boundary conditions
+            \item Check to see if the form of the solution makes sense
+        \end{itemize}
+    \item Analysis
+\end{enumerate}
+
+\subsection{Physical law}
+
+A physical law or scientific law is a theoretical statement "inferred from particular facts, applicable to a defined group or class of phenomena, and expressible by the statement that a particular phenomenon always occurs if certain conditions be present." Physical laws are typically conclusions based on repeated scientific experiments and observations over many years and which have become accepted universally within the scientific community. 
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.5\textwidth]{scientific_method}
+    \caption{Diagram illustrating steps in the scientific method.}
+    \label{fig:scientific_method}
+\end{figure}
+
+\subsubsection{Laws being consequences of mathematical symmetries}
+
+Many laws reflect mathematical symmetries found in Nature (say, Pauli exclusion principle reflects identity of electrons, conservation laws reflect homogeneity of space-time, Lorentz transformations reflect rotational symmetry of space-time). Laws are constantly being checked experimentally to higher and higher degrees of precision. This is one of the main goals of science. The fact that laws have never been seen to be violated does not preclude testing them at increased accuracy or new kinds of conditions to confirm whether they continue to hold, or whether they break, and what can be discovered in the process. It is always possible for laws to be invalidated or proven to have limitations, by repeatable experimental evidence. However, fundamental changes to the laws are extremely unlikely, since this would imply a change to experimental facts they were derived from in the first place.
+
+Well-established laws have indeed been invalidated in some special cases, but the new formulations created to explain the discrepancies can be said to generalize upon, rather than overthrow, the originals. That is, the invalidated laws have been found to be only close approximations (see below), to which other terms or factors must be added to cover previously unaccounted conditions, e.g., very large or very small scales of time or space, enormous speeds or masses, etc. Thus, rather than unchanging knowledge, physical laws are better viewed as a series of improving and more precise generalizations.
+
+\subsubsection{Laws as approximations}
+
+Some laws are only approximations of other more general laws, and are good approximations with a restricted domain of applicability. For example, Newtonian dynamics (which is based on Galilean transformations) is the low speed limit of special relativity (since the Galilean transformation is the low-speed approximation to the Lorentz transformation). Similarly, the Newtonian gravitation law is a low-mass approximation of general relativity, and Coulomb's law is an approximation to Quantum Electrodynamics at large distances (compared to the range of weak interactions). In such cases it is common to use the simpler, approximate versions of the laws, instead of the more accurate general laws.
+
+\subsubsection{Physical laws derived from symmetry principles}
+
+Many fundamental physical laws are mathematical consequences of various symmetries of space, time, or other aspects of nature. Specifically, Noether's theorem connects some conservation laws to certain symmetries. For example, conservation of energy is a consequence of the shift symmetry of time (no moment of time is different from any other), while conservation of momentum is a consequence of the symmetry (homogeneity) of space (no place in space is special, or different from any other). The indistinguishability of all particles of each fundamental type (say, electrons, or photons) results in the Dirac and Bose quantum statistics which in turn result in the Pauli exclusion principle for fermions and in Bose-Einstein condensation for bosons. The rotational symmetry between time and space coordinate axes (when one is taken as imaginary, another as real) results in Lorentz transformations which in turn result in special relativity theory. Symmetry between inertial and gravitational mass results in general relativity.
+
+The inverse square law of interactions, any physical law stating that a specified physical quantity or intensity is inversely proportional to the square of the distance from the source of that physical quantity, is the mathematical consequence of the 3-dimensionality of space. The fundamental cause for this can be understood as geometric dilution corresponding to point-source radiation into three-dimensional space. The inverse-square law generally applies when some force, energy, or other conserved quantity is evenly radiated outward from a point source in three-dimensional space. Since the surface area of a sphere is proportional to the square of the radius, as the emitted radiation gets farther from the source, it is spread out over an area that is increasing in proportion to the square of the distance from the source. Hence, the intensity of radiation passing through any unit area (directly facing the point source) is inversely proportional to the square of the distance from the point source. Gauss's law is similarly applicable, and can be used with any physical quantity that acts in accord to the inverse-square relationship.
+
+One strategy in the search for the most fundamental laws of nature is to search for the most general mathematical symmetry group that can be applied to the fundamental interactions.
+
+\section{Differential equation}
+
+In the language of mathematics, changing entities are called variables. The rate at which one variable changes with respect to the change of another variable is called a derivative, which measures the instantaneous rate of change of the dependent variable with respect to the independent variable. Now many physical concepts, such as velocity and acceleration, are derivatives. Hence, a model is very often an equation containing derivatives of an unknown function. Such a model is called a differential equation.
+
+A differential equation is a mathematical equation that relates some function with its derivatives. The functions usually represent physical quantities, the derivatives represent their rates of change, and the equation defines a relationship between the two. However, we generally are not interested in knowing how the variables and derivatives are related but only how the variables themselves are related. In other words, we need to solve the differential equations to obtain the function relations.
+
+\subsection{Geometric interpretation}
+
+The derivative of a function of a single variable at a chosen input value, when it exists, is the slope of the tangent line to the graph of the function at that point. The tangent line is the best linear approximation of the function near that input value. Derivatives may be generalized to functions of several real variables. In this generalization, the derivative is reinterpreted as a linear transformation whose graph is (after an appropriate translation) the best linear approximation to the graph of the original function. The Jacobian matrix is the matrix that represents this linear transformation with respect to the basis given by the choice of independent and dependent variables. It can be calculated in terms of the partial derivatives with respect to the independent variables. For a real-valued function of several variables, the Jacobian matrix reduces to the gradient vector.
+
+\subsection{Types and classification}
+
+Differential equations can be divided into several types. Apart from describing the properties of the equation itself, these classes of differential equations can help inform the choice of approach to a solution. Commonly used distinctions include whether the equation is: Ordinary/Partial, Linear/Non-linear, and Homogeneous/Inhomogeneous.
+
+In mathematics, a linear function or linear map is a map $f$ between two vector spaces that satisfies:
+\begin{itemize}
+    \item Additivity: $f(x + y) = f(x) + f(y)$. 
+    \item Homogeneity of degree $1$: $f(\alpha x) = \alpha f(x)$ for all $\alpha$.
+\end{itemize}
+The homogeneity and additivity properties together are called the superposition principle.
+
+A linear differential equation is a differential equation having solutions which can be added together in particular linear combinations to form further solutions. They can be ordinary (ODEs) or partial (PDEs). The solutions to (homogeneous) linear differential equations form a vector space (unlike non-linear differential equations), which results in much more developed theory of linear differential equations.
+
+Linear differential equations are of the form
+\[
+    Ly = f
+\]
+where the differential operator $L$ is a linear operator, $y$ is the unknown function (such as a function of time $y(t)$), and the right hand side $f$ is a given function of the same nature as $y$ (called the source term). For a function dependent on time we may write the equation more expressly as
+\[
+    L y(t) = f(t)
+\]
+and, even more precisely by bracketing
+\[
+    L [y(t)] = f(t)
+\]
+The linear operator $L$ may be considered to be of the form
+\[
+    L_n(y) \equiv \frac{d^n y}{dt^n} + a_{n-1}(t)\frac{d^{n-1}y}{dt^{n-1}} + \cdots + a_{1}(t)\frac{dy}{dt} + a_{0}(t)y 
+\]
+The linearity condition on $L$ rules out operations such as taking the square of the derivative of $y$; but permits, for example, taking the second derivative of $y$. It is convenient to rewrite this equation in an operator form
+\[
+    L_n(y) \equiv \left[\,D^n + a_{n-1}(t)D^{n-1} + \cdots + a_{1}(t) D + a_{0}(t)\right] y
+\]
+where $D$ is the differential operator $d/dt$ (i.e. $Dy = y'$ , $D^2y = y''$,... ), and the $a_n$ are given functions. Such an equation is said to have order $n$, the index of the highest derivative of $y$ that is involved.
+
+If $y$ is assumed to be a function of only one variable, one speaks about an ordinary differential equation, else the derivatives and their coefficients must be understood as (contracted) vectors, matrices or tensors of higher rank, and we have a (linear) partial differential equation.
+
+The case where $f = 0$ is called a homogeneous equation and its solutions are called complementary functions. It is particularly important to the solution of the general case, since any complementary function can be added to a solution of the inhomogeneous equation to give another solution (by a method traditionally called particular integral and complementary function). When the $a_n$ are numbers, the equation is said to have constant coefficients.
+
+Non-linear differential equations are formed by the products of the unknown function and its derivatives. There are very few methods of solving nonlinear differential equations exactly; those that are known typically depend on the equation having particular symmetries. Nonlinear differential equations can exhibit very complicated behavior over extended time intervals, characteristic of chaos. Even the fundamental questions of existence, uniqueness, and extendability of solutions for nonlinear differential equations, and well-posedness of initial and boundary value problems for nonlinear PDEs are hard problems and their resolution in special cases is considered to be a significant advance in the mathematical theory (cf. Navier-Stokes existence and smoothness). However, if the differential equation is a correctly formulated representation of a meaningful physical process, then one expects it to have a solution. A common approach to nonlinear problems is local linearization, in which linear differential equations frequently appear as approximations to nonlinear equations. These approximations are only valid under restricted conditions.
+
+\section{Ordinary differential equation}
+
+In mathematics, an ordinary differential equation (ODE) is a differential equation containing one or more functions of one independent variable and its derivatives. The term "ordinary" is used in contrast with the term partial differential equation which may be with respect to more than one independent variable.
+
+\paragraph{General definition}
+
+Given $F$, a function of $x, y$, and derivatives of $y$. Then an equation of the form
+\[
+    F\left (x,y,y',\cdots y^{(n-1)} \right )=y^{(n)}
+\]
+is called an explicit ordinary differential equation of order $n$. More generally, an implicit ordinary differential equation of order $n$ takes the form:
+\[
+    F\left(x, y, y', y'',\ \cdots,\ y^{(n)}\right) = 0
+\]
+
+A differential equation not depending on $x$ is called autonomous. A differential equation is said to be linear if $F$ can be written as a linear combination of the derivatives of $y$:
+\[
+    y^{(n)} = \sum_{i=0}^{n-1} a_i(x) y^{(i)} + r(x)
+\]
+where $a_i(x)$ and $r(x)$ are continuous functions in $x$. For non-linear equations, $a_i(x)$ and $r(x)$ are functions of $y$ and $x$.
+
+The function $r(x)$ is called the source term, leading to two further important classifications. Homogeneous: If $r(x) = 0$, and consequently one "automatic" solution is the trivial solution, $y = 0$. The solution of a linear homogeneous equation is a complementary function, denoted here by $y_c$. Non-homogeneous (or inhomogeneous): If $r(x) \neq 0$. The additional solution to the complementary function is the particular integral, denoted here by $y_p$. The general solution to a linear equation can be written as $y = y_c + y_p$.
+
+A general solution of an $n$th-order equation is a solution containing $n$ arbitrary independent constants of integration. Geometrically, the general solution of an ODE is a family of infinitely many solution curves, one for each value of the constant $c$. A particular solution is derived from the general solution by setting the constants to particular values, often chosen to fulfill set 'initial conditions or boundary conditions'. A singular solution is a solution that cannot be obtained by assigning definite values to the arbitrary constants in the general solution.
+
+\subsection{Homogeneous ODEs with constant coefficients -- Characteristic equation}
+
+The first method of solving linear homogeneous ordinary differential equations with constant coefficients is due to Euler, who realized that solutions have the form $e^{zx}$, for possibly-complex values of $z$. The exponential function is one of the few functions to keep its shape after differentiation, allowing the sum of its multiple derivatives to cancel out to zero, as required by the equation. Thus, for constant values $a_n$, to solve:
+\[
+    y^{(n)} + a_{n-1}y^{(n-1)} + \cdots + a_{0}y = 0\,,
+\]
+we set $y = e^{zx}$, leading to
+\[
+    z^n e^{zx} + a_{n-1} z^{n-1} e^{zx} + \cdots + a_0 e^{zx} = 0.
+\]
+Division by $e^{zx}$ gives the $n$th-order polynomial:
+\[
+    F(z) = z^{n} + a_{n-1}z^{n-1} + \cdots + a_0 = 0.
+\]
+This algebraic equation $F(z) = 0$ is the characteristic equation considered later by Gaspard Monge and Augustin-Louis Cauchy.
+
+Formally, the terms $y^{(k)}$ ($k = 1, 2, \dots, n$) of the original differential equation are replaced by $z^k$. Solving the polynomial gives $n$ values of $z$: $z_1, \dots, z_n$. Substitution of any of those values for $z$ into $e^{zx}$ gives a solution $e^{z_ix}$. Since homogeneous linear differential equations obey the superposition principle, any linear combination of these functions also satisfies the differential equation.
+
+When these roots are all distinct, we have $n$ distinct solutions to the differential equation. It can be shown that these are linearly independent, by applying the Vandermonde determinant, and together they form a basis of the space of all solutions of the differential equation.
+
+The preceding gave a solution for the case when all roots are distinct, that is, each has multiplicity $1$. For the general case, if $z$ is a (possibly complex) root of $F(z)$ having multiplicity $m$, then, for $k\in\{0,1,\dots,m-1\}$, $y=x^ke^{zx}$ is a solution of the ODE (can be derived by using the reduction of order technique). Applying this to all roots gives a collection of $n$ distinct and linearly independent functions, where $n$ is the degree of $F(z)$. As before, these functions make up a basis of the solution space.  If the coefficients $A_i$ of the differential equation are real, then real-valued solutions are generally preferable. Since non-real roots $z$ then come in conjugate pairs, so do their corresponding basis functions $x^ke^{zx}$, and the desired result is obtained by replacing each pair with their real-valued linear combinations $Re(y)$ and $Im(y)$, where $y$ is one of the pair.  Solving characteristic equation, in the $n=2$ case the characteristic equation is of the form \[ m^2 + (a-1)m + b = 0.  \] We then can solve for $m$. There are three particular cases of interest: Case 1: Two distinct roots, $m_1$ and $m_2$ Case 2: One real repeated root, $m$ Case 3: Complex roots, $\alpha \pm \beta i$ In case 1, the solution is given by \[ y = c_1 e^{m_{1}x} + c_2 e^{m_2x}.  \] 
+In case 2, the solution is given by
+\[
+    y = ( c_1 + c_2 x ) e^{mx}.
+\]
+
+In case 3, because the coefficients are real, we are likely not interested in the complex solutions. Since these solutions provide a basis for the two-dimensional solution space of the second order differential equation, linear combinations of these solutions will also be solutions. Noting basis elements are mutual conjugates, the following linear combinations can be constructed: 
+\[
+    u_1=\mbox{Re}(y_1)=\tfrac{1}{2} (y_1+y_2) = e^{\alpha x} \cos(\beta x)
+\]
+\[
+    u_2=\mbox{Im}(y_1)=\tfrac{1}{2i} (y_1-y_2) = e^{\alpha x} \sin(\beta x)
+\]
+which gives us a real basis in $\{u_1,u_2\}$ with
+\[
+    \alpha = \mathop{\rm Re}(m),
+\]
+\[
+    \beta = \mathop{\rm Im}(m).
+\]
+These two trigonometric solutions are linearly independent, so they can serve as another basis for the solution space, yielding the following general solution:
+\[
+    y = c_1 u_1 + c_2 u_2 = c_1 e^{\alpha x} \cos(\beta x) + c_2 e^{\alpha x} \sin(\beta x) 
+\]
+
+\subsection{2nd order linear ODEs with missing terms -- Reduction of order}
+
+General procedure: Let's use the standard form of a 2nd order linear ODE to see how the method works
+\begin{equation*}
+    \frac{\mathrm{d}^2 y}{\mathrm{d} x^2} + p(x) \frac{\mathrm{d} y}{\mathrm{d} x}+ q(x)y = f(x)
+\end{equation*}
+
+\textbf{Basic idea:} Reduce a 2nd order ODE to a 1st order ODE by introducing a new function $V(x)=\frac{dy}{dx}$.
+\begin{equation*}
+    \text{2nd order ODE} \xrightarrow[\text{reduction of order}]{V(x)=\frac{\mathrm{d} y}{\mathrm{d} x}} \text{1st order ODE}
+\end{equation*}
+
+\begin{enumerate}
+    \item Introduce $V(x) = \frac{\mathrm{d} y}{\mathrm{d} x}$ and sub into the ODE
+        \begin{equation*}
+            \frac{\mathrm{d} V}{\mathrm{d} x} + p(x) V + q(x)y = f(x)
+        \end{equation*}
+    \item Identify missing terms and select a solution strategy to solve $V(x)$
+
+        Although we have obtained a 1st order ODE for the function $V$, the current equation is still too complicated to solve as there are two dependent variables: $V$ and $y$, which are both a function of $x$. However, from this standard form, two cases with missing terms can be distinguished and solved using solution strategies for 1st order ODEs:
+        \begin{enumerate}
+            \item $q(x) = 0$ 
+                \begin{equation*}
+                    \frac{\mathrm{d} V}{\mathrm{d} x} + p(x) V = f(x) \ (\text{Integrating factor})
+                \end{equation*}
+            \item $p(x) = 0$
+                \begin{equation*}
+                    \frac{\mathrm{d} V}{\mathrm{d} x} + q(x)y = f(x)
+                \end{equation*}
+                As $\frac{\mathrm{d} V}{\mathrm{d} x} = \frac{\mathrm{d} V}{\mathrm{d} y} \frac{\mathrm{d} y}{\mathrm{d} x} = \frac{\mathrm{d} V}{\mathrm{d} y} V$, we have
+                \begin{equation*}
+                    V \frac{\mathrm{d} V}{\mathrm{d} y} + q(x) y = f(x) \ (\text{Direct integration})
+                \end{equation*}
+        \end{enumerate}
+    \item Solve for $y$ by integration $y(x) = \int V(x) \,\mathrm{d}x$
+    \item (if needed) Find the particular solution using the IC/BCs.
+\end{enumerate}
+
+Reduction of order can also be employed when one solution $y_1(x)$ is known and a second linearly independent solution $y_2(x)$ is desired. The method also applies to $n$-th order equations. In this case the method will yield a $(n-1)$-th order equation for $v$.
+
+Given the general non-homogeneous linear differential equation
+\[
+    y''+p(t)y'+q(t)y=r(t)\,
+\]
+and a single solution $y_1(t)$ of the homogeneous equation [$r(t)=0$], let us try a solution of the full non-homogeneous equation in the form:
+\[
+    y_2=v(t)y_1(t)\,
+\]
+where $v(t)$ is an arbitrary function. Thus
+\[
+    y_2'=v'(t)y_1(t)+v(t)y_1'(t)\,
+\]
+and
+\[
+    y_2''=v''(t)y_1(t)+2v'(t)y_1'(t)+v(t)y_1''(t).\,
+\]
+If these are substituted for $y$, $y'$, and $y''$ in the differential equation, then
+\[
+    y_1(t)\,v''+(2y_1'(t)+p(t)y_1(t))\,v'+(y_1''(t)+p(t)y_1'(t)+q(t)y_1(t))\,v=r(t).
+\]
+Since $y_1(t)$ is a solution of the original homogeneous differential equation, $y_1''(t)+p(t)y_1'(t)+q(t)y_1(t)=0$, so we can reduce to
+\[
+    y_1(t)\,v''+(2y_1'(t)+p(t)y_1(t))\,v'=r(t)
+\]
+which is a first-order differential equation for $v'(t)$ (reduction of order). Divide by $y_1(t)$, obtaining
+\[
+    v''+\left(\frac{2y_1'(t)}{y_1(t)}+p(t)\right)\,v'=\frac{r(t)}{y_1(t)}.
+\]
+Integrating factor: $\mu(t)=e^{\int(\frac{2y_1'(t)}{y_1(t)}+p(t))dt}=y_1^2(t)e^{\int p(t) dt}$.
+
+Multiplying the differential equation with the integrating factor $\mu(t)$, the equation for $v(t)$ can be reduced to
+\[
+    \frac{d}{dt}(v'(t) y_1^2(t) e^{\int p(t) dt})=y_1(t)r(t)e^{\int p(t) dt}.
+\]
+After integrating the last equation, $v'(t)$ is found, containing one constant of integration. Then, integrate $v'(t)$ to find the full solution of the original non-homogeneous second-order equation, exhibiting two constants of integration as it should:
+\[
+    y_2(t)=v(t)y_1(t)\, . 
+\]
+Finally, we can prove that the second solution $y_2(x)$ found via this method is linearly independent of the first solution by calculating the Wronskian.
+
+\subsection{Non-homogeneous equation with constant coefficients}
+
+To obtain the solution to the non-homogeneous equation (sometimes called inhomogeneous equation), find a particular integral $y_p(x)$ by the method of variation of parameters or undetermined coefficients; the general solution to the linear differential equation is the sum of the general solution of the related homogeneous equation and the particular integral. Or, when the initial conditions are set, use Laplace transform to obtain the particular solution directly.
+
+\subsubsection{Variation of parameters}
+
+Given an ordinary non-homogeneous linear differential equation of order $n$
+\[
+    y^{(n)}(x) + \sum_{i=0}^{n-1} a_i(x) y^{(i)}(x) = f(x).\quad\quad {(i)}
+\]
+let $y_1(x), \ldots, y_n(x)$ be a fundamental system of linearly independent solutions of the corresponding homogeneous equation
+\[
+    y^{(n)}(x) + \sum_{i=0}^{n-1} a_i(x) y^{(i)}(x) = 0.\quad\quad {(ii)}
+\]
+Then a particular solution to the non-homogeneous equation is given by
+\[
+    y_p(x) = \sum_{i=1}^{n} c_i(x) y_i(x)\quad\quad {(iii)}
+\]
+where the $c_i(x)$ are differentiable functions of $x$ which are assumed to satisfy the conditions (both to close the system and to avoid higher order derivatives of $c(x)$ to appear)
+\[
+    \sum_{i=1}^{n} c_i'(x) y_i^{(j)}(x) = 0 \, \mathrm{,} \quad j = 0,\ldots, n-2.\quad\quad {(iv)}
+\]
+Starting with (iii), repeated differentiation combined with repeated use of (iv) gives
+\[
+    y_p^{(j)}(x) = \sum_{i=1}^{n} c_i(x) y_i^{(j)}(x) \, \mathrm{,} \quad j=0,\ldots,n-1 \, \mathrm{.} \quad\quad {(v)}
+\]
+One last differentiation gives
+\[
+    y_p^{(n)}(x)=\sum_{i=1}^n c_i'(x)y_i^{(n-1)}(x)+\sum_{i=1}^n c_i(x) y_i^{(n)}(x)\, \mathrm{.} \quad\quad{\rm (vi)}
+\]
+By substituting (iii) into (i) and applying (v) and (vi) it follows that
+\[
+    \sum_{i=1}^n c_i'(x) y_i^{(n-1)}(x) = f(x).\quad\quad {(vii)}
+\]
+(iv and vii) of $n$ equations give a linear system of the $c'_i$  
+\[
+    \begin{pmatrix}
+        y_1 & y_2 & \cdots & y_n\\
+        y_1' & y_2' & \cdots & y_n'\\
+        \vdots  & \vdots  & \ddots & \vdots  \\
+        y^{(n-2)}_1 & y^{(n-2)}_2 & \cdots & y^{(n-2)}_n\\
+        y^{(n-1)}_1 & y^{(n-1)}_2 & \cdots & y^{(n-1)}_n\\
+    \end{pmatrix}
+    \begin{pmatrix}
+        c'_1\\
+        c'_2\\
+        \vdots\\
+        c'_{n-1}\\
+        c'_{n}
+    \end{pmatrix}
+    =
+    \begin{pmatrix}
+        0\\
+        0\\
+        \vdots\\
+        0\\
+        f
+    \end{pmatrix}
+\]
+Using Cramer's rule yielding
+\[
+    c_i'(x) = \frac{W_i(x)}{W(x)}, \, \quad i=1,\ldots,n
+\]
+where $W(x)$ is the Wronskian determinant of the fundamental system and $W_i(x)$ is the Wronskian determinant of the fundamental system with the $i$-th column replaced by $(0, 0, \ldots, f(x))$. The rest is a matter of integrating $c'_i$. The particular solution to the non-homogeneous equation can then be written as
+\[
+    y_p(x) = \sum_{i=1}^n y_i(x) \, \int \frac{W_i(x)}{W(x)}\ \mathrm dx. 
+\]
+
+\paragraph{Application procedure}
+
+For a linear 2nd-order non-homogeneous ODE in standard form
+\[
+    y'' + a_1(x) y' + a_0(x) y = f(x)
+\]
+\begin{enumerate}[nosep]
+    \item Find the complementary solution $y_c = c_1 y_1(x) + c_2 y_2(x)$ by solving the homogeneous equation
+        \[
+            y'' + a_1(x) y' + a_0(x) y = 0
+        \]
+    \item Check linear independence of $y_1(x)$ and $y_2(x)$ by Wronskian
+        \[
+            W[y_1, y_2] = \begin{vmatrix}
+                y_1 & y_2\\
+                y_1' & y_2'\\
+            \end{vmatrix}
+            \ne 0
+        \]
+    \item Assume the particular solution
+        \[
+            y_p = v_1(x) y_1(x) + v_2(x) y_2(x)
+        \]
+        and find $v_1(x)$, $v_2(x)$, $y_p$ by solving the "Variation of Parameter (VOP)" system
+        \[
+            \begin{pmatrix}
+                y_1 & y_2\\
+                y_1' & y_2'\\
+            \end{pmatrix}
+            \begin{pmatrix}
+                v_1'\\
+                v_2'\\
+            \end{pmatrix}
+            =
+            \begin{pmatrix}
+                0\\
+                f
+            \end{pmatrix}
+        \]
+        or equivalently,
+        \[
+            v_1 = \int_{}^{} \frac{-y_2 f}{W} \,\mathrm{d}x, \ \ v_2 = \int_{}^{} \frac{y_1 f}{W} \,\mathrm{d}x
+        \]
+    \item Express the general solution (superposition principle)
+        \[
+            y = y_c + y_p = c_1 y_1 + c_2 y_2 + v_1 y_1 + v_2 y_2
+        \] 
+\end{enumerate}
+
+Solve
+\[
+    y'' - y = e^x
+\]
+by method of undetermined coefficients (MUC) and by variation of parameters (VOP). Compare the solutions.
+
+\paragraph{Solution}
+
+\begin{enumerate}[nosep]
+    \item Find $y_c$
+
+        Complimentary equation:
+        \[
+            y'' - y = 0
+        \]
+        Characteristic equation (linear, const coe, homo):
+        \[
+            r^2 - 1 = 0
+        \]
+        \[
+            y_1 = e^{x}, \ y_2 = e^{-x}, \ y_c = c_1 e^{x} + c_2 e^{-x}
+        \]
+    \item Check Wronskian
+        \[
+            W[y_1, y_2] = 
+            \begin{vmatrix}
+                y_1 & y_2\\
+                y_1' & y_2'\\
+            \end{vmatrix}
+            = y_1y_2'-y_1'y_2 = -e^x e^{-x} - e^x e^{-x}= -2 \ne 0
+        \]
+    \item Assume $y_p$ and find $y_p$
+        \[
+            \begin{cases}
+                \text{MUC}: \text{guess via } f(x)
+                \begin{cases}
+                    \text{Polynomial: } f(x) = C x^m \to y_p = A_m x^m + \dotsc + A_1 x + A_0\\
+                    \text{Exponential: } f(x) = C e^{mx} \to y_p = A e^{mx}\\
+                    \text{Sinusoidal: } f(x) = C \sin(mx) \to y_p = A_1 \cos(mx) + A_2 \sin(mx)\\
+                    \text{Exp x Poly: } f(x) = C x ^m e^{rx} \to y_p = x^s (A_m x^m + \dotsc + A_0) e^{rx}\\
+                    \text{where } s = n, \text{ if } $r$ \text{ is a root of comp. equ. with multiplicity } n\\
+                \end{cases}\\
+                \text{VOP}: y_p = v_1(x) y_1(x) + v_2(x) y_2(x)\\
+            \end{cases}
+        \]
+    MUC:
+        \[
+            y_p = Axe^x, \ y_p' = Ae^x + Axe^x, \ y_p'' = 2Ae^x + Axe^x
+        \]
+        Substitute into ODE, gives
+        \[
+            2Ae^x + Axe^x - Axe^x = e^x
+        \]
+        Therefore,
+        \[
+            A = \frac{1}{2}, \ y_p = \frac{xe^x}{2}
+        \]
+    VOP:
+        \[
+            v_1 = \int_{}^{} \frac{-y_2 f}{W} \,\mathrm{d}x = \int_{}^{} \frac{-e^{-x}e^x}{-2} \,\mathrm{d}x = \frac{x}{2}
+        \]
+        \[
+            v_2 = \int_{}^{} \frac{y_1 f}{W} \,\mathrm{d}x = \int_{}^{} \frac{e^x e^x}{-2} \,\mathrm{d}x = \frac{-e^{2x}}{4}
+        \]
+        \[
+            y_p = v_1y_1 + v_2y_2 = \frac{xe^x}{2} - \frac{e^x}{4}
+        \]
+    \item Find $y$
+        \[
+            y = y_c + y_p = c_1 e^x + c_2 e^{-x} + \frac{xe^x}{2}
+        \]
+
+\end{enumerate}
+
+\subsubsection{Laplace transform}
+
+The Laplace transform is a frequency-domain approach for piecewise continuous time signals. The Laplace transform of a function $f(t)$, defined for all real numbers $t \ge 0$, is the function $F(s)$, which is a unilateral transform that transforms the function from a time-domain to an $s$-domain defined by
+\[
+    F(s) = L\{f(t)\} = \int_0^\infty e^{-st} f(t)\, dt
+\]
+where $F(s)$ is the transformed function in the $s$-domain, $L$ is the Laplace transform operator, $e^{-st}$ is the kernel of the operator, and $s$ is a complex number frequency parameter
+\[
+    s = \sigma + i \omega
+\]
+
+Existence of Laplace transform for a given function $f(t)$: 
+\begin{enumerate}
+    \item Piecewise continuous
+        \begin{itemize}
+            \item $f(t)$ is continuous on $[0, \infty]$ except at a finite number of jump discontinuities.
+            \item $f(t)$ approaches a finite limit at each discontinuity (all jump discontinuities are finite)
+        \end{itemize}
+    \item Exponential order: rate of growth is no faster than that of exponential functions.
+
+        $f(t)$ is said to be of exponential order $\alpha$ if there exist positive constants $T$ and $M$ such that
+        \[
+            |f(t)| \le M e^{\alpha t} \text{ for all } t \ge T
+        \]
+\end{enumerate}
+
+The Laplace transform has a number of properties that make it useful for analyzing linear dynamical systems. Merits of Laplace transforms:
+\begin{itemize}[nosep]
+    \item Transforms discontinuous functions into a single continuous function
+    \item Transforms differentiation and integration to multiplication and division, respectively, by $s$. Because of this property, the Laplace variable $s$ is also known as operator variable in the $L$ domain. Hence, transforms differential/integral equations into algebraic equations. Once solved, use of the inverse Laplace transform reverts to the time domain.
+    \item Incorporates the initial condition directly into the algebraic equations (no need to apply ICs)
+\end{itemize}
+LT
+\[
+    F(s) = L\{f(t)\} = \int_0^\infty e^{-st} f(t)\, dt
+\]
+Inverse LT
+\[
+    f(t) = L^{-1} \left\{ F(s) \right\}
+\]
+Useful properties:
+\begin{enumerate}
+    \item Linearity:
+        \[
+            L \left\{ c_1 f_1(t) \pm c_2 f_2(t) \right\} = c_1 L \left\{ f_1(t) \right\} \pm c_2 L \left\{ f_2(t) \right\} = c_1 F_1(s) \pm c_2 F_2(s)\\
+        \]
+        \[
+            L^{-1} \left\{ c_1 F_1(s) \pm c_2 F_2(s) \right\} = c_1 L^{-1} \left\{ F_1(s) \right\} \pm c_2 L^{-1} \left\{ F_2(s) \right\}\\
+        \]
+\item Frequency-domain derivative:
+    \[
+        L \left\{ t^n f(t) \right\} = (-1)^n F^{(n)}(s)
+    \]
+\item Time-domain derivative:
+    \[
+        L \left\{ f'(t) \right\} = s F(s) - f(0)
+    \]
+    \[
+        L \left\{ f''(t) \right\} = s^2 F(s) - sf(0) - f'(0)
+    \]
+    \[
+        L \left\{ f^{n}(t) \right\} = s^n F(s) - \sum_{k=1}^{n}s^{n-k}f^{(k-1)}(0)
+    \]
+\item Frequency shifting:
+    \[
+        L \left\{ e^{a t} f(t) \right\} = F(s - a)
+    \]
+\item Time shifting:
+    \[
+        L \left\{ f(t - a) u(t - a) \right\} = e^{-as}F(s)
+    \]
+    \[
+        L \left\{ g(t) u(t - a) \right\} = L \left\{ g(t + a - a) u(t - a) \right\} = e^{-as} L \left\{ g(t + a) \right\} 
+    \]
+    Proof
+     \[
+         \begin{split}
+             L \left\{ f(t - a) u(t - a) \right\} &= \int_{0}^{\infty} e^{-st} f(t - a) u(t - a)\,\mathrm{d}t = \int_{a}^{\infty} e^{-st} f(t - a) \,\mathrm{d}t \\
+                                                  &\overset{t-a=\tau}{=} \int_{0}^{\infty} e^{-as} e^{-s \tau} f(\tau) \,\mathrm{d}\tau = e^{-as} F(s)
+         \end{split}
+     \]
+\item Convolution:
+    \[
+        L \left\{ f(t) * g(t) \right\} = L \left\{ \int_{0}^{t} f(t - \tau) g(\tau) \,\mathrm{d}\tau \right\} = F(s) \cdot G(s)
+    \]
+    Proof
+    \[
+        \begin{split}
+            L \left\{ f(t) * g(t) \right\} &= \int_{0}^{\infty} e^{-st} \left[ \int_{0}^{t} f(t - \tau) g(\tau) \,\mathrm{d}\tau \right] \,\mathrm{d}t\\ 
+            &\overset{\text{ converting to infinity interval via } u(t)}{=} \int_{0}^{\infty} e^{-st} \left[ \int_{0}^{\infty} u(t - \tau) f(t - \tau) g(\tau) \,\mathrm{d}\tau \right] \,\mathrm{d}t\\
+                                           &\overset{\text{ change the order of integration }}{=} \int_{0}^{\infty} g(\tau) \left[ \int_{0}^{\infty} e^{-st} u(t - \tau) f(t - \tau) \,\mathrm{d}t \right] \,\mathrm{d}\tau\\ 
+                                           &= \int_{0}^{\infty} g(\tau) e^{-s\tau} F(s) \,\mathrm{d}\tau =  F(s)\int_{0}^{\infty} g(\tau) e^{-s\tau} \,\mathrm{d}\tau = F(s) G(s)
+        \end{split}
+    \]
+\end{enumerate}
+
+Quickly complete the Table of Laplace transforms using the properties of LT:
+\begin{center}
+    %\footnotesize% fontsize
+    %\setlength{\tabcolsep}{4pt}% column separation
+    \renewcommand{\arraystretch}{1.5}% row space 
+    \begin{tabular}{lc}
+        \hline\hline
+        %\multicolumn{num_of_cols_to_merge}{alignment}{contents} \\
+        %\cline{i-j}% partial hline from column i to column j
+        $f(t)$ & $F(s) = L \left\{ f(t) \right\}$\\
+        \hline
+        $1$ & $\frac{1}{s}, \text{  } s > 0$\\
+        $e^{at}$ & $\frac{1}{s - a}, \text{  } s > a$\\
+        $\sin(bt)$ & $\frac{b}{s^2 + b^2}, \text{  } s > 0$\\
+        $\cos(bt) = \frac{(\sin(bt))'}{b}$ & $\frac{s}{s^2 + b^2}, \text{  } s > 0$\\
+        $t^n = t^n \cdot 1$ & $(-1)^n \frac{\mathrm{d}^n}{\mathrm{d}s^n}(\frac{1}s{}) = \frac{n!}{s^{n+1}}, \text{  } s > 0$\\
+        $e^{at}t^n = e^{at} \cdot t^n$ & $\frac{n!}{(s - a)^{n+1}}, \text{  } s > a$\\
+        $e^{at} \sin(bt) = e^{at} \cdot \sin(bt)$ & $\frac{b}{(s - a)^{2} + b^2}, \text{  } s > a$\\
+        $e^{at} \cos(bt) = e^{at} \cdot \cos(bt)$ & $\frac{s - a}{(s - a)^{2} + b^2}, \text{  } s > a$\\
+        \hline\hline
+    \end{tabular}
+\end{center}
+
+Use the Heaviside function $u(t)$ to transform the following piecewise function into a single expression:
+\[
+    f(t) = 
+    \begin{cases}
+        2t + e^t, \text{ } & t < 1\\
+        0, \text{ } & 1 < t < 5\\
+        t^2, \text{ } & 5 < t < 10\\
+        t^2 / e^t, \text{ } & 10 < t\\
+    \end{cases}
+\]
+
+\paragraph{Solution}
+
+\begin{enumerate}
+    \item Find the slices in the definition domain of $f(t)$:
+        \[
+            t \in [0, 1] + [1, 5] + [5, 10] + [10, \infty]
+        \]
+\item Slice the function $y(t) = 1$ according to the above slices using the rectangular window function $\Pi_{a,b}(t)$ and the Heaviside function $u(t)$
+    \[
+        u(t) = 
+        \begin{cases}
+            0, &\text{ } t < 0\\
+            1, &\text{ } t > 0\\
+        \end{cases}
+    \]
+\[
+    \Pi_{a,b}(t) = u(t - a) - u(t - b) =
+        \begin{cases}
+            0, &\text{ } t < a\\
+            1, &\text{ } a < t < b\\
+            0, &\text{ } b < t\\
+        \end{cases}
+\]
+\[
+    1 =  (1) \Pi_{0,1}(t) + (1) \Pi_{1,5}(t) + (1) \Pi_{5,10}(t) + (1) u(t - 10)
+\]
+\item Scale $y(t) = 1$ to obtain $f(t)$ as a combination of the windowed slices
+\[
+    f(t) = (2t + e^t) \Pi_{0,1}(t) + (0) \Pi_{1,5}(t) + (t^2) \Pi_{5,10}(t) + (\frac{t^2}{e^t}) u(t - 10)
+\]
+\end{enumerate}
+
+Solve
+\[
+    y''(t) + 4 y(t) = f(t), \ \ y(0) = 0, \ y'(0) = 0
+\]
+where
+\[
+    f(t) =
+    \begin{cases}
+        1, &\text{ } 0 < t < 1\\
+        -1, &\text{ } 1 < t < 2\\
+        0, &\text{ } 2 < t\\
+    \end{cases}
+\]
+\paragraph{Solution}
+
+\[
+    f(t) = (1) \Pi_{0,1}(t) + (-1) \Pi_{1,2}(t) = u(t) - 2u(t-1) + u(t-2)
+\]
+
+\begin{enumerate}
+    \item $L \left\{ \text{ ODE } \right\}$
+        \[
+            s^2Y(s) - sy(0) - y'(0) + 4 Y(s) = L \left\{ f(t) \right\} = F(s)
+        \]
+
+    \item Find $Y(s)$
+        \[
+            Y(s) = \frac{F(s)}{s^2 + 4}
+        \]
+
+    \item $y(t) = L^{-1} \left\{ Y(s) \right\}$
+
+        Method of convolution:
+        \[
+            Y(s) = \frac{1}{s^2 + 4} F(s) = G(s) F(s), \ \ G(s) = \frac{1}{s^2 + 2^2}, \ \ g(t) = \frac{1}{2}\sin(2t)
+        \]
+        \[
+            \begin{split}
+                y(t) &= L^{-1}\left\{ Y(s) \right\} = g(t) * f(t) = \int_{0}^{t} g(t - \tau) f(\tau) \,\mathrm{d}\tau\\
+                     &= \int_{0}^{t} g(t - \tau) u(\tau) \,\mathrm{d}\tau -2 \int_{0}^{t} g(t - \tau) u(\tau-1) \,\mathrm{d}\tau + \int_{0}^{t} g(t - \tau) u(\tau-2) \,\mathrm{d}\tau\\
+                     &= \frac{1}{2} \int_{0}^{t}\sin(2t - 2\tau) \,\mathrm{d}\tau - u(t - 1) \int_{1}^{t} \sin(2t - 2\tau) \,\mathrm{d}\tau + \frac{1}{2} u(t - 2) \int_{0}^{t} \sin(2t - 2\tau) \,\mathrm{d}\tau\\
+                     &= \left. \frac{1}{4} \cos(2t - 2\tau)\right|_{0}^{t} - \left. \frac{1}{2} u(t - 1) \cos(2t - 2\tau)\right|_{1}^{t} \left. + \frac{1}{4} \cos(2t - 2\tau)\right|_{2}^{t}\\
+                     &= \frac{1}{4}[1 - \cos(2t)] - \frac{1}{2} u(t - 1) \left[ 1 - \cos(2t - 2)\right] + \frac{1}{4} u(t - 2) \left[ 1 - \cos(2t - 4) \right]
+            \end{split}
+        \]
+
+        Method of partial fractions $Y(s) = \frac{P(s)}{Q(s)}$
+        \begin{enumerate}
+            \item Nonrepeated linear factors:
+                \[
+                    Q(s) = (s - r_1)(s - r_2) \dotsm (s - r_n)
+                \]
+            where $r_i$ ($i = 1, \dotsc, n$) are all distinct roots.
+                \[
+                    \frac{P(s)}{Q(s)} = \frac{A_1}{s - r_1} + \frac{A_2}{s - r_2} + \dotsm + \frac{A_n}{s - r_n}
+                \]
+        \item   Repeated linear factors:
+            \[
+                Q(s) = (s - r)^m q(s)
+                \]
+            where $r$ is a root with multiplicity $m$, and $q(s)$ is a polynomial.
+                \[
+                    \frac{P(s)}{Q(s)} = \frac{A_1}{s - r} + \frac{A_2}{(s - r)^2} + \dotsm + \frac{A_m}{(s - r)^m} + \frac{C}{q(s)}
+                \]
+        \item Quadratic factors:
+            \[
+                Q(s) = [(s - \alpha)^2 + \beta^2]^mq(s)
+                \]
+            where$[(s - \alpha)^2 + \beta^2]$ is a quadratic factor with multiplicity $m$, and $q(s)$ is a polynomial.
+                \[
+                    \frac{P(s)}{Q(s)} = \frac{A_1(s - \alpha) + B_1 \beta}{[(s - \alpha)^2 + \beta^2]} + \frac{A_2(s - \alpha) + B_2 \beta}{[(s - \alpha)^2 + \beta^2]^2} + \dotsm + \frac{A_m(s - \alpha) + B_m \beta}{[(s - \alpha)^2 + \beta^2]^m} + \frac{C}{q(s)}
+                \]
+        \end{enumerate}
+        Through equating the numerators, all the constants $A_i$, $B_j$, $C_k$ can be determined by the method of undetermined coefficients.
+
+        \[
+            F(s) = L \left\{ f(t) \right\} = \frac{1}{s} - \frac{2e^{-s}}{s} + \frac{e^{-2s}}{s}
+        \]
+        \[
+            \begin{split}
+                Y(s) &= \frac{F(s)}{s^2 + 4} = \frac{1}{s(s^2+4)} - \frac{2e^{-s}}{s(s^2+4)} + \frac{e^{-2s}}{s(s^2+4)}\\
+                     &= G(s) - 2e^{-s} G(s) + e^{-2s} G(s)
+            \end{split}
+        \]
+        \[
+            G(s) = \frac{1}{s(s^2+4)} = \frac{1}{4} (\frac{1}{s}) - \frac{1}{4} (\frac{s}{s^2+4})
+        \]
+        \[
+            g(t) = \frac{1}{4} - \frac{1}{4} \cos(2t)
+        \]
+        Use the time shifting property, gives
+        \[
+            \begin{split}
+                y(t) &= L^{-1}\left\{ G(s) - 2e^{-s} G(s) + e^{-2s} G(s) \right\}\\
+                     &= g(t) - 2g(t-1)u(t-1) + g(t-2)u(t-2)\\
+                     &= \frac{1}{4}[1 - \cos(2t)] - \frac{1}{2} u(t - 1) \left[ 1 - \cos(2t - 2)\right] + \frac{1}{4} u(t - 2) \left[ 1 - \cos(2t - 4) \right]
+            \end{split}
+        \]
+\end{enumerate}
+
+\subsection{Nonlinear first order ODEs}
+
+\subsubsection{Separable first order ODEs -- Direct integration}
+
+A solution of a separable first order ODE can be found using direct integration
+\[
+    \frac{\mathrm{d} y}{\mathrm{d} x} = f(x,y) = p(x) q(y)
+\]
+Then,
+\[
+    \int_{}^{} \frac{1}{q(y)} \,\mathrm{d}y = \int_{}^{} p(x) \,\mathrm{d}x
+\]
+
+If the equation is not separable, we may still be able to solve it by applying substitutions or transformations to make the ODE separable. If we can write $f(x, y) = f(y/x)$, we can substitute a new variable $v = y/x$ such that the RHS is $f(v)$. We have:
+\[
+    \frac{\mathrm{d} y}{\mathrm{d} x} = f(v)
+\]
+Now we want to also transform the LHS, we see that $y = vx$. By deriving this equation with respect to $x$, we obtain:
+\[
+    \frac{\mathrm{d} y}{\mathrm{d} x} = x \frac{\mathrm{d} v}{\mathrm{d} x} + v
+\]
+Therefore, we obtain a separable equation for $v(x)$
+\[
+    \frac{\mathrm{d} v}{\mathrm{d} x} = \frac{f(v) - v}{x}
+\]
+
+\subsubsection{First order ODEs in exact equation form -- Total derivation}
+
+A differential equation
+\[
+    M(x,y) dx + N(x,y) dy = 0
+\]
+is called an exact equation if it is the total differential of a function $F(x,y)$, i.e.,
+\[
+    M(x,y) = \frac{\partial F(x,y)}{\partial x} \text{ and } N(x,y) = \frac{\partial F(x,y)}{\partial y}
+\]
+Then the ODE can be rewritten as
+\[
+    dF = \frac{\partial F}{\partial x}dx + \frac{\partial F}{\partial y}dy = M(x,y)dx + N(x,y)dy = 0
+\]
+The continuity property of continuous partial derivatives gives
+\[
+    \frac{\partial }{\partial y} \frac{\partial F}{\partial x} = \frac{\partial }{\partial x} \frac{\partial F}{\partial y}
+\]
+As a result, the compatibility condition requires that
+\[
+    \frac{\partial }{\partial y} M(x,y) = \frac{\partial }{\partial x} N(x,y)
+\]
+To solve an exact equation
+\begin{enumerate}[nosep]
+    \item Reformulate the first order ODE as $Mdx + Ndy = 0$
+    \item Check exactness of the equation (compatibility condition): $\frac{\partial }{\partial y}M = \frac{\partial }{\partial x}N$
+    \item Find $F(x,y)$ with the relation $F(x,y) = \int_{}^{} M \,\mathrm{d}x + c(y)$
+    \item Determine $c(y)$ by solving $\frac{\partial F(x,y)}{\partial y} = N$
+\end{enumerate}
+
+Sometimes a given ODE is not exact, but it can be transformed into an exact one by multiplying an integrating factor
+\[
+    P(x,y)dx + Q(x,y)dy = 0
+\]
+multiply by a function $U(x,y)$
+\[
+    U(x,y) P(x,y) dx + U(x,y) Q(x,y) dy = 0
+\]
+Assume the resulting equation is exact, by the compatibility condition,
+\[
+    \frac{\partial UP}{\partial y} = \frac{\partial UQ}{\partial x}
+\]
+apply the chain rule to obtain
+\[
+    P \frac{\partial U}{\partial y} + U \frac{\partial P}{\partial y} = Q \frac{\partial U}{\partial x} + U \frac{\partial Q}{\partial x}
+\]
+to simplify this complex equation, we assume that the integrating factor is only a function of ONE variable, either $U=U(x)$ or $U=U(y)$. If $U=U(x)$, then we obtain
+\[
+    \frac{1}{U}\frac{\mathrm{d} U}{\mathrm{d} x} = \frac{1}{Q}(\frac{\partial P}{\partial y} - \frac{\partial Q}{\partial x})
+\]
+Therefore,
+\[
+    U(x) = e^{\int_{}^{} \frac{1}{Q}(\frac{\partial P}{\partial y} - \frac{\partial Q}{\partial x}) \,\mathrm{d}x}
+\]
+How to select between $U(x)$ and $U(y)$?
+\begin{itemize}[nosep]
+    \item Select $U(x)$ if $R = \frac{1}{Q}(\frac{\partial P}{\partial y} - \frac{\partial Q}{\partial x})$ is continuous and depends only on $x$.
+    \item Select $U(y)$ if $R = \frac{1}{P}(\frac{\partial Q}{\partial x} - \frac{\partial P}{\partial y})$ is continuous and depends only on $y$.
+\end{itemize}
+
+\subsection{Linear ODEs with variable coefficients}
+
+A linear ODE of order $n$ with variable coefficients has the general form
+\[
+    p_{n}(x)y^{(n)}(x) + p_{n-1}(x) y^{(n-1)}(x) + \cdots + p_0(x) y(x) = r(x). 
+\]
+
+\subsubsection{Linear first-order equation -- Integration Factors}
+
+A linear first order ODE has the general form
+\[
+    \frac{\mathrm{d} y}{\mathrm{d} x} + p(x) y(x) = f(x).
+\]
+Equations of this form can be solved by multiplying an integrating factor $U(x)$ such that
+\[
+    \frac{\mathrm{d} (U(x)y)}{\mathrm{d} x} = U(x) \frac{\mathrm{d} y}{\mathrm{d} x} + U'(x) y = U(x) \frac{\mathrm{d} y}{\mathrm{d} x} + U(x) P(x) y = U(x) f(x)
+\]
+We need to find $U(x)$ such that
+\[
+    \frac{1}{U} \frac{\mathrm{d} U}{\mathrm{d} x} = P
+\]
+Therefore,
+\[
+    U(x) = e^{\int_{}^{} P(x) \,\mathrm{d}x}
+\]
+The solution is then
+\[
+    y(x) = \frac{1}{U(x)} [\int_{}^{} U(x)f(x) \,\mathrm{d}x]
+\]
+
+\subsubsection{Cauchy-Euler equation}
+\[
+    x^n y^{(n)}(x) + a_{n-1} x^{n-1} y^{(n-1)}(x) + \cdots + a_0 y(x) = 0. 
+\]
+
+The general practice for solving differential equations (or any kind of problems) is to try to transform/decompose the unknown problems into a set of problems that are known and well studied.  If the attempt succeeds, the unknown problems are then able to be solved by previous knowledge. If the attempt can not be done, then new approaches may need to be established.
+
+When solving an Euler-Cauchy equation
+\[
+    ax^2\frac{d^2y}{dx^2} + bx\frac{dy}{dx} +cy=0
+\]
+By introducing a change of independent variable $z=ln(x)$, the Euler-Cauchy equation (a type of ODE with non-constant coefficients) can be transformed into an ODE with constant coefficients
+\[
+    a\frac{d^2y}{dz^2} + (b-a)\frac{dy}{dz} +cy=0
+\]
+which is well-studied and we are familiar with, the general solution is
+\[
+    y=c_1e^{rz}+c_2e^{sz} \ (3)
+\]
+Now we successfully solved a less familiar problem via transforming the problem into a more familiar problem. However, please don't forget that to obtain the solution of the original problem, we need to invert the transformation process.
+
+To do the inversion, please try to replace $z$ with $z=ln(x)$ to see why the general solution adopts the form of
+\[
+    y=c_1x^{r}+c_2x^{s}
+\]
+Note that
+\[
+    e^{ab} = {(e^{a})}^b
+\]
+
+\subsubsection{Bessel's equation}
+\[
+    x^2 \frac{d^2y}{dx^2} + x \frac{dy}{dx} + (x^2-n^2)y = 0 
+\]
+here $P(x) = x^2$, $Q(x) = x$, $R(x) = (x^2-n^2)$, $n=constant$
+
+This is called Bessel's ODE of order $n$. For the zero order case ($n=0$), which, by dividing through by $x$, can be written as
+\[
+    x \frac{d^2y}{dx^2} + \frac{dy}{dx} +xy = 0
+\]
+
+Infinite series must be used to solve Bessel's ODE. Depending on the form of the $P(x)$, $Q(x)$, $R(x)$ polynomials, either a Taylor (Maclaurin) series (assume $y(x)=\sum a_kx^k$) or a Frobenius series (assume $y(x)=x^r\sum a_kx^k$) may be needed. Tedious algebra is required to substitute the series into the ODE, collect terms, and obtain the values of the $a_k$ coefficients and the constant $r$. For Bessel's equation of zero order, this series solution procedure employing Frobenius series leads to
+\[
+    y(x) = C_1 (1 - \frac{x^2}{2^2} + \frac{x^4}{2^24^2} - \frac{x^6}{2^24^26^2} + \dots) + C_2
+\]
+
+Because Bessel's ODE appears in many applications, these infinite series are given special names, and $y(x)$ is written as $y(x) = C_1 J_0(x) + C_2 Y_0(x)$, where $J_0(x)$ is called a Bessel function of the first kind of order $0$ and $Y_0(x)$ is called a Bessel function of the second kind of order $0$. There are corresponding Bessel functions of the first and second kind of order $n$ for the $n$th-order Bessel ODE given above.
+
+For clarification, it may be helpful to compare the Bessel function solution above with the more familiar trigonometric functions. Just like Bessel functions, the sine and cosine functions can be obtained as infinite series solutions of a differential equation:
+\[
+    \frac{d^2y}{dx^2} + xy = 0 
+\]
+Although of course we don't need infinite series to solve this simple ODE, Following the infinite series approach, the solution is:
+\[
+    y(x) = C_1(1 _ \frac{x^2}{2!} + \frac{x^4}{4!} - \dots) + C_2 (x - \frac{x^3}{3!} + \frac{x^5}{5!} - \dots)
+\]
+Because these infinite series appear in a wide variety of applications, they are given special names,
+namely, $\cos(x)$ and $\sin(x)$, respectively.
+
+\subsubsection{General form with variable coefficients}
+\[
+    P(x)\frac{d^2 y}{d x^2} + Q(x)\frac{dy}{dx} + R(x)y = 0
+\]
+In general, no closed form solutions exists. The only exact solution to this type of equation is an infinite series. Rewrite to
+\[
+    \frac{d^2 y}{d x^2} + \frac{Q(x)}{P(x)}\frac{dy}{dx} + \frac{R(x)}{P(x)}y = 0
+\]
+Identify the form of the solution: Taylor series $y = \sum^{\infty}_{n=0} a_nx^n$ if non-singular at $x=0$. Frobenius method $y = x^r\sum^{\infty}_{n=0}a_nx^n$ if singular at $x=0$. Substitute solution into the ODE. Apply ICs/BCs to find constants.
+
+\paragraph{Frobenius method}
+
+In mathematics, the Method of Frobenius, is a way to find an infinite series solution for an ordinary differential equation, especially for equations which will not be solvable with regular power series methods if the equation is not analytic at $0$. 
+
+The Method of Frobenius tells us that we can seek a power series solution of the form
+\[
+    u(z)=\sum_{k=0}^\infty A_kz^{k+r}, \qquad (A_0 \neq 0)
+\]
+Differentiating:
+\[
+    u'(z)=\sum_{k=0}^\infty (k+r)A_kz^{k+r-1}
+\]
+\[
+    u''(z)=\sum_{k=0}^\infty (k+r-1)(k+r)A_kz^{k+r-2}
+\]
+
+Substituting:
+\[
+    \begin{aligned}
+        &z^2\sum_{k=0}^\infty (k+r-1)(k+r)A_kz^{k+r-2} + zp(z) \sum_{k=0}^\infty (k+r)A_kz^{k+r-1} + q(z)\sum_{k=0}^\infty A_kz^{k+r}\\
+        &= \sum_{k=0}^\infty (k+r-1) (k+r)A_kz^{k+r} + p(z) \sum_{k=0}^\infty (k+r)A_kz^{k+r} + q(z) \sum_{k=0}^\infty A_kz^{k+r}\\
+        &= \sum_{k=0}^\infty [(k+r-1)(k+r) A_kz^{k+r} + p(z) (k+r) A_kz^{k+r} + q(z) A_kz^{k+r}]\\
+        &= \sum_{k=0}^\infty \left[(k+r-1)(k+r) + p(z)(k+r) + q(z)\right] A_kz^{k+r}\\
+        &= \left[ r(r-1)+p(z)r+q(z) \right] A_0z^r+\sum_{k=1}^\infty \left[ (k+r-1)(k+r)+p(z)(k+r)+q(z) \right] A_kz^{k+r} 
+    \end{aligned}
+\]
+The expression
+\[
+    r\left(r-1\right) + p\left(0\right)r + q\left(0\right) = I(r)
+\]
+is known as the indicial polynomial, which is quadratic in $r$. The general definition of the indicial polynomial is the coefficient of the lowest power of $z$ in the infinite series. In this case it happens to be that this is the $r$th coefficient but, it is possible for the lowest possible exponent to be $r - 2$, $r - 1$ or, something else depending on the given differential equation. This detail is important to keep in mind. In the process of synchronizing all the series of the differential equation to start at the same index value (which in the above expression is $k = 1$), one can end up with complicated expressions. However, in solving for the indicial roots attention is focused only on the coefficient of the lowest power of $z$.
+
+Using this, the general expression of the coefficient of $z^{k + r}$ is
+\[
+    I(k+r)A_k+\sum_{j=0}^{k-1}{(j+r)p^{(k-j)}(0)+q^{(k-j)}(0) \over (k-j)!}A_j,
+\]
+These coefficients must be zero, since they should be solutions of the differential equation, so
+\[
+    \begin{aligned}
+        I(k+r)A_k+\sum_{j=0}^{k-1} {(j+r)p^{(k-j)}(0)+q^{(k-j)}(0) \over (k-j)!} A_j=0\\
+        \sum_{j=0}^{k-1}{(j+r)p^{(k-j)}(0)+q^{(k-j)}(0) \over (k-j)!}A_j=-I(k+r)A_k\\
+        {1\over-I(k+r)}\sum_{j=0}^{k-1}{(j+r)p^{(k-j)}(0)+q^{(k-j)}(0) \over (k-j)!}A_j=A_k
+    \end{aligned}
+\]
+The series solution with $A^k$ above,
+\[
+    U_{r}(z)=\sum_{k=0}^{\infty}A_kz^{k+r}
+\]
+satisfies
+\[
+    z^2U_{r}(z)''+p(z)zU_{r}(z)'+q(z)U_{r}(z)=I(r)z^r
+\]
+If we choose one of the roots to the indicial polynomial for $r$ in $U_r(z)$, we gain a solution to the differential equation. If the difference between the roots is not an integer, we get another, linearly independent solution in the other root.
+
+\subsection{Systems of linear differential equations}
+
+An arbitrary linear ordinary differential equation or even a system of such equations can be converted into a first order system of linear differential equations by adding variables for all but the highest order derivatives. A linear system can be viewed as a single equation with a vector-valued variable. The general treatment is analogous to the treatment above of ordinary first order linear differential equations, but with complications stemming from noncommutativity of matrix multiplication.
+
+\paragraph{Gaussian elimination}
+
+For a system of linear ODEs
+\[
+    \begin{aligned}
+        a_n x_1^{(n)} + \dotsc + b_n x_2^{(n)} + \dotsc = f_1(t)\\
+        \dotsc\\
+        c_n x_1^{(n)} + \dotsc + d_n x_2^{(n)} + \dotsc = f_2(t)\\
+    \end{aligned}
+\]
+
+Solution idea: a system of equations involve multiple dependent variables. We can use Gaussian elimination to build a separate equation for each dependent variable.
+\begin{enumerate}
+    \item Rewrite the equations using differential operators
+        \[
+            \begin{aligned}
+                L_1[x_1] + L_2[x_2] + \dotsc = f_1(t)\\ 
+                \dotsc\\
+                L_3[x_1] + L_4[x_2] + \dotsc = f_1(t)\\ 
+            \end{aligned}
+        \]
+    where $L=a_nD^n + a_{n-1}D^{n-1} + \dotsc + a_0$, and $D=\frac{\mathrm{d} }{\mathrm{d} t}$
+\item Separate dependent variables by Gaussian elimination
+
+    (1) $\times$ $L_4$ - (2) $\times$ $L_2$
+        \[
+            L_4 \cdot L_1[x] - L_2 \cdot L3[x] = L_4(f_1(t)) - L_2(f_2(t))
+        \]
+\item Solve the ODE for one dependent variable
+
+\item Solve for the other dependent variables
+
+\end{enumerate}
+
+Example:
+\[
+    \begin{cases}
+        \frac{\mathrm{d} x}{\mathrm{d} t} - 3x - 6y = t^2\\
+        \frac{\mathrm{d} y}{\mathrm{d} t} + \frac{\mathrm{d} x}{\mathrm{d} t} - 3y = e^t
+    \end{cases}
+\]
+IC: $x(0)=0$, $y(0)=0$
+\begin{enumerate}
+    \item Rewrite the equations using the differential operator $D=\frac{\mathrm{d} }{\mathrm{d} t}$
+        \[
+            \begin{split}
+                D[x] - 3x - 6y = t^2\\
+                D[y] + D[x] - 3y = e^t
+            \end{split}
+        \]
+    \[
+            \begin{split}
+                (D - 3)[x] - 6y = t^2   \text{~~~~~~~~~~(1)}\\
+                D[x] + (D - 3)[y] = e^t \text{~~~~~~~~~~(2)}
+            \end{split}
+        \]
+\item Separate dependent variables by Gaussian elimination
+    
+    (D)(1) - (D-3)(2)  
+    \[
+        -6D[y] - (D-3)^2[y] = D[t^2] - (D-3)[e^t]
+    \]
+\[
+        -6D[y] - (D^2 - 6D + 9)[y] = D[t^2] - (D-3)[e^t]
+\]
+\[
+    \frac{\mathrm{d}^2 y}{\mathrm{d} t^2} + 9y = -2t -2e^t
+\]
+\item   Solve the ODE for one dependent variable 
+
+    2nd-order, linear, const. coe, non-homo:
+    \[
+        y_h = c_1 y_1 + c_2 y_2 = c_1 \cos(3t) + c_2 \sin(3t), \ y_1 = \cos(3t), \ y_2 = \sin(3t)
+    \]
+\[
+    W[y_1,y_2] = 
+        \begin{vmatrix}
+            y_1 & y_2\\
+            y_1' & y_2'
+    \end{vmatrix}
+        = 3\cos^2(3t) + 3\sin^2(3t) = 3 \ne 0
+\]
+ variation of parameters (VOP)
+\[
+    y_p = v_1 y_1 + v_2 y_2
+\]
+\[
+    \begin{split}
+        v_1 &= \int_{}^{} \frac{-f y_2}{W} \,\mathrm{d}t = \int_{}^{} \frac{(2t + 2e^t)\sin(3t)}{3} \,\mathrm{d}t\\
+        &= \frac{2}{3} \int_{}^{} t \cdot \sin(3t) \,\mathrm{d}t + \frac{2}{3} \int_{}^{} e^t \cdot \sin(3t) \,\mathrm{d}t\\
+        &\text{(integration by parts)}\\
+        &=-\frac{2}{9}(t \cos(3t) - \frac{\sin(3t)}{3}) + \frac{2}{3}(\frac{e^t \sin(3t)}{10} - \frac{3e^t \cos(3t)}{10})\\
+        &= (\frac{2}{27} + \frac{e^t}{15})\sin(3t) - (\frac{2}{9}t + \frac{e^t}{5}) \cos(3t)
+    \end{split}
+\]
+\[
+    \begin{split}
+        v_2 &= \int_{}^{} \frac{f y_1}{W} \,\mathrm{d}t = \int_{}^{} \frac{(2t + 2e^t)\cos(3t)}{3} \,\mathrm{d}t\\
+        &= \dotsc\\
+        &= -(\frac{2}{9}t + \frac{e^t}{5}) \sin(3t) - (\frac{2}{27} + \frac{e^t}{15})\cos(3t)
+    \end{split}
+\]
+\[
+    y_p = v_1 y_1 + v_2 y_2 = -(\frac{2t}{9} + \frac{e^t}{5}) (\cos^2(3t) + \sin^2(3t)) = -\frac{2t}{9} - \frac{e^t}{5}
+\]
+method of undetermined coe (MUC)
+\[
+    y_p = At + B + Ce^t, \ y_p' = A + Ce^t, \ y_p'' = Ce^t
+\]
+Sub into ODE
+\[
+    9B + 9At + (9C + C)e^t = -2t - 2e^t \ \to 9B = 0, \ 9A = -2, \ (9C + C) = -2
+\]
+\[
+    y_p = -\frac{2t}{9} - \frac{e^t}{5}
+\]
+\[
+    y = c_1 \cos(3t) + c_2 \sin(3t) - \frac{2}{9}t - \frac{1}{5}e^t
+\]
+\item Solve for the other dependent variable
+    \[
+        \text{To find } x(t):
+        \begin{cases}
+            \text{Repeat Gauss elimination to eliminate } y\\
+            \text{Sub the solved } y \text{ into eq(1)}\\
+            \text{Sub the solved } y \text{ into eq(2)}\\
+        \end{cases}
+    \]
+Observe: sub the solved $y$ into eq(2) obtains a simple equation for $x$:
+\[
+    \begin{split}
+        \frac{\mathrm{d}x }{\mathrm{d}t } &= 3y - \frac{\mathrm{d} y}{\mathrm{d} t} + e^t\\
+        &= 3(c_1 - c_2) \cos(3t) + 3(c_1 + c_2) \sin(3t) + \frac{2}{9} + \frac{3}{5}e^t - \frac{2}{3}t
+    \end{split}
+\]
+\[
+    x = (c_1 - c_2) \sin(3t) - (c_1 + c_2) \cos(3t) + \frac{2}{9}t + \frac{3}{5}e^t - \frac{t^2}{3} + c_3
+\]
+\item Apply ICs to determine integration constants
+    \[
+        y(0) = 0 \ \to c_1 = \frac{1}{5}
+    \]
+\[
+    x(0) = 0 \ \to -(c_1 + c_2) + \frac{3}{5} + c_3 = 0
+\]
+As the system was two 1st-order ODEs, we only need $2$ ICs. However, we now have $3$ constants. Therefore, we can sub the solved $x(t)$ and $y(t)$ into the unused eq(1) to develop a relation for the constants:
+\[
+    \frac{2}{9} - 3c_3 + t^2 = t^2 \ \to c_3 = \frac{2}{27}, \ c_2 = \frac{3}{5} - c_1 + c_3 = \frac{64}{135}
+\]
+\[
+    \begin{split}
+        x &= - \frac{37}{135} \sin(3t) - \frac{91}{135} \cos(3t) + \frac{2}{9}t + \frac{3}{5}e^t - \frac{t^2}{3} + \frac{2}{27}\\
+        y &= \frac{1}{5} \cos(3t) + \frac{64}{135} \sin(3t) - \frac{2}{9}t - \frac{1}{5}e^t
+    \end{split}
+\]
+
+\end{enumerate}
+
+\paragraph{Reduction to a first-order system} Differential equations can usually be solved more easily if the order of the equation can be reduced. Any differential equation of order $n$,
+\[
+    y^{(n)} = F\left(x, y, y', y'',\ \cdots,\ y^{(n-1)}\right) 
+\]
+can be written as a system of $n$ first-order differential equations by defining a new family of unknown functions
+\[
+    y_i = y^{(i-1)}
+\]
+for $i = 1, 2,... n$. The $n$-dimensional system of first-order coupled differential equations is then
+\[
+    \begin{aligned}
+        y_1 &= y \\ 
+        y_2 &= y_1' \\ 
+        y_3 &= y_2' \\
+            &\vdots \\
+        y_n &= y_{n-1}'\\ 
+        F(x,y_1,\cdots,y_n) &= y_n' 
+    \end{aligned}
+\]
+in matrix notation
+\[
+    \mathbf{y}'=A \mathbf{y} + b
+\]
+in vector notation:
+\[
+    \mathbf{y}'=\mathbf{F}(x,\mathbf{y})
+\]
+where
+\[
+    \mathbf{y}=(y_1,\cdots,y_n),\quad \mathbf{F}(x,y_1,\cdots,y_n)=(y_2,\cdots,y_n,F(x,y_1,\cdots,y_n)). 
+\]
+
+To solve
+\[
+\left\{\begin{array}{rl}\mathbf{y}'(x) &= A(x)\mathbf{y}(x)+\mathbf{b}(x)\\\mathbf y(x_0)&=\mathbf y_0\end{array}\right.
+\]
+(here $\mathbf{y} (x)$ is a vector or matrix, and $A(x)$ is a matrix), let $U( x )$ be the solution of $\mathbf y'(x) = A(x)\mathbf y(x)$ with $U(x_0) = I$ (the identity matrix). $U$ is a fundamental matrix for the equation - the columns of U form a complete linearly independent set of solutions for the homogeneous equation. After substituting $\mathbf y(x) = U(x)\mathbf z(x)$, the equation $\mathbf y'(x) = A(x)\mathbf y(x)+\mathbf b(x)$ simplifies to $U(x)\mathbf z'(x) = \mathbf b(x)$. Thus,
+\[
+    \mathbf{y}(x) = U(x)\mathbf{y_0} + U(x)\int_{x_0}^x U^{-1}(t)\mathbf{b}(t)\,dt
+\]
+If $A(x_1)$ commutes with $A(x_2)$ for all $x_1$ and $x_2$, then
+\[
+    U(x) = e^{\int_{x_0}^x A(x)\,dx}
+\]
+and thus
+\[
+    U^{-1}(x) = e^{-\int_{x_0}^x A(x)\,dx},
+\]
+but in the general case there is no closed form solution, and an approximation method such as Magnus expansion may have to be used. Note that the exponentials are matrix exponentials.
+
+\section{Partial differential equation}
+
+In mathematics, a partial differential equation (PDE) is a differential equation that contains unknown multivariable functions and their partial derivatives. Partial differential equations (PDEs) are equations that involve rates of change with respect to continuous variables. A partial differential equation (PDE) for the function $u(x_1, \cdots, x_n)$ is an equation of the form
+\[
+f \left (x_1, \ldots, x_n, u, \frac{\partial u}{\partial x_1}, \ldots, \frac{\partial u}{\partial x_n}, \frac{\partial^2 u}{\partial x_1 \partial x_1}, \ldots, \frac{\partial^2 u}{\partial x_1 \partial x_n}, \ldots \right) = 0.
+\]
+If $f$ is a linear function of $u$ and its derivatives, then the PDE is called linear. 
+
+Analytical methods to solve PDEs
+
+\paragraph{Separation of variables}
+
+Linear PDEs can be reduced to systems of ordinary differential equations by the important technique of separation of variables. A separable partial differential equation (PDE) is one that can be broken into a set of separate equations of lower dimensionality (fewer independent variables) by a method of separation of variables. This generally relies upon the problem having some special form or symmetry. In this way, the PDE can be solved by solving a set of simpler PDEs, or even ordinary differential equations (ODEs) if the problem can be broken down into one-dimensional equations. The most common form of separation of variables is simple separation of variables in which a solution is obtained by assuming a solution of the form given by a product of functions of each individual coordinate.
+
+\paragraph{Method of characteristics}
+
+In special cases, one can find characteristic curves on which a PDE reduces to an ODE - changing coordinates in the domain to straighten these curves allows separation of variables, and is called the method of characteristics. More generally, one may find characteristic surfaces. The method is to reduce a partial differential equation to a family of ordinary differential equations along which the solution can be integrated from some initial data given on a suitable hypersurface.
+
+Consider now a PDE of the form
+\[
+    \sum_{i=1}^n a_i(x_1,\dots,x_n,u) \frac{\partial u}{\partial x_i}=c(x_1,\dots,x_n,u).
+\]
+For this PDE to be linear, the coefficients $a_i$ may be functions of the spatial variables only, and independent of $u$. For it to be quasilinear, $a_i$ may also depend on the value of the function, but not on any derivatives. The distinction between these two cases is inessential for the discussion here.
+
+For a linear or quasilinear PDE, the characteristic curves are given parametrically by
+\[
+    (x_1,\dots,x_n,u) = (x_1(s),\dots,x_n(s),u(s))
+\]
+such that the following system of ODEs is satisfied
+\[
+    \frac{dx_i}{ds} = a_i(x_1,\dots,x_n,u)
+\]
+\[
+    \frac{du}{ds} = c(x_1,\dots,x_n,u).
+\]
+The two equations give the characteristics of the PDE.
+
+\paragraph{Change of variables}
+
+Often a PDE can be reduced to a simpler form with a known solution by a suitable change of variables. 
+Advice on the application of change of variable to PDEs is given by mathematician J. Michael Steele:
+
+"There is nothing particularly difficult about changing variables and transforming one equation to another, but there is an element of tedium and complexity that slows us down. There is no universal remedy for this molasses effect, but the calculations do seem to go more quickly if one follows a well-defined plan. If we know that $V(S,t)$ satisfies an equation (like the Black-Scholes equation) we are guaranteed that we can make good use of the equation in the derivation of the equation for a new function $v(x,\tau)$ defined in terms of the old if we write the old $V$ as a function of the new $v$ and write the new $\tau$ and $x$ as functions of the old $t$ and $S$. This order of things puts everything in the direct line of fire of the chain rule; the partial derivatives $\frac{\partial V}{\partial t}$, $\frac{\partial V}{\partial S}$ and $\frac{\partial^2 V}{\partial S^2}$ are easy to compute and at the end, the original equation stands ready for immediate use."
+
+Technique in general: Suppose that we have a function $u(x,t)$ and a change of variables $x_1,x_2$ such that there exist functions $a(x,t), b(x,t)$ such that
+\[
+    x_1=a(x,t)
+\]
+\[
+    x_2=b(x,t)
+\]
+and functions $e(x_1,x_2),f(x_1,x_2)$ such that
+\[
+    x=e(x_1,x_2)
+\]
+\[
+    t=f(x_1,x_2)
+\]
+and furthermore such that
+\[
+    x_1=a(e(x_1,x_2),f(x_1,x_2))
+\]
+\[
+    x_2=b(e(x_1,x_2),f(x_1,x_2))
+\]
+and
+\[
+    x=e(a(x,t),b(x,t))
+\]
+\[
+    t=f(a(x,t),b(x,t))
+\]
+In other words, it is helpful for there to be a bijection between the old set of variables and the new one, or else one has to restrict the domain of applicability of the correspondence to a subject of the real plane which is sufficient for a solution of the practical problem at hand (where again it needs to be a bijection). A PDE can be expressed as a differential operator applied to a function. Suppose $\mathcal{L}$ is a differential operator such that
+\[
+    \mathcal{L}u(x,t)=0
+\]
+Then it is also the case that
+\[
+    \mathcal{L}v(x_1,x_2)=0
+\]
+where
+\[
+    v(x_1,x_2)=u(e(x_1,x_2),f(x_1,x_2))
+\]
+and we operate as follows to go from $\mathcal{L}u(x,t)=0$ to $\mathcal{L}v(x_1,x_2)=0$: Apply the chain rule to $\mathcal{L} v(x_1(x,t),x_2(x,t))=0$ and expand out giving equation $e_1$. Substitute $a(x,t)$ for $x_1(x,t)$ and $b(x,t)$ for $x_2(x,t)$ in $e_1$ and expand out giving equation $e_2$. Replace occurrences of $x$ by $e(x_1,x_2)$ and $t$ by $f(x_1,x_2)$ to yield $\mathcal{L}v(x_1,x_2)=0$, which will be free of $x$ and $t$.
+
+\paragraph{Integral transform}
+
+An integral transform may transform the PDE to a simpler one, in particular, a separable PDE. This corresponds to diagonalizing an operator. An important example of this is Fourier analysis, which diagonalizes the heat equation using the eigenbasis of sinusoidal waves. If the domain is finite or periodic, an infinite sum of solutions such as a Fourier series is appropriate, but an integral of solutions such as a Fourier integral is generally required for infinite domains. 
+
+\paragraph{Superposition principle}
+
+Because any superposition of solutions of a linear, homogeneous PDE is again a solution, the particular solutions may then be combined to obtain more general solutions. If $u_1$ and $u_2$ are solutions of a homogeneous linear pde in same region $R$, then $u= c_1u_1+c_2u_2$ with any constants $c_1$ and $c_2$ are also a solution of that pde in that same region.
+
+\paragraph{Methods for non-linear equations}
+
+There are no generally applicable methods to solve nonlinear PDEs. Still, existence and uniqueness results are often possible, as are proofs of important qualitative and quantitative properties of solutions (getting these results is a major part of analysis).
+
+The method of characteristics (similarity transformation method) can be used in some very special cases to solve partial differential equations. In some cases, a PDE can be solved via perturbation analysis in which the solution is considered to be a correction to an equation with a known solution. Alternatives are numerical analysis techniques. The three most widely used numerical methods to solve PDEs are the finite element method (FEM), finite volume methods (FVM) and finite difference methods (FDM). Many interesting problems in science and engineering are solved in this way using computers, sometimes high performance supercomputers.
+
+\section{Boundary conditions}
+
+\subsection{Dirichlet boundary condition}
+
+In mathematics, the Dirichlet boundary condition is a type of boundary condition, named after Peter Gustav Lejeune Dirichlet, when imposed on an ordinary or a partial differential equation, it specifies the values that a solution needs to take on along the boundary of the domain.
+
+For an ordinary differential equation, for instance:
+\[
+    y'' + y = 0
+\]
+the Dirichlet boundary conditions on the interval $[a, \, b]$ take the form:
+\[
+    y(a)= \alpha \ \text{and} \ y(b) = \beta
+\]
+where $\alpha$ and $\beta$ are given numbers.
+
+For a partial differential equation, for instance:
+\[
+    \nabla^2 y + y = 0
+\]
+where $\nabla^2$ denotes the Laplacian, the Dirichlet boundary conditions on a domain $\Omega \subset {R}^n$ take the form:
+\[
+    y(x) = f(x) \quad \forall x \in \partial\Omega
+\]
+where $f$ is a known function defined on the boundary $\partial\Omega$.
+
+\subsection{Neumann boundary condition}
+
+In mathematics, the Neumann boundary condition is a type of boundary condition, named after Carl Neumann. When imposed on an ordinary or a partial differential equation, it specifies the values that the derivative of a solution is to take on the boundary of the domain. 
+
+For an ordinary differential equation, for instance:
+\[
+    y'' + y = 0
+\]
+the Neumann boundary conditions on the interval $[a, \, b]$ take the form:
+\[
+    y'(a)= \alpha \ \text{and} \ y'(b) = \beta
+\]
+where $\alpha$ and $\beta$ are given numbers.
+
+For a partial differential equation, for instance:
+\[
+    \nabla^2 y + y = 0
+\]
+where $\nabla^2$ denotes the Laplacian, the Neumann boundary conditions on a domain $\Omega \subset {R}^n$ take the form:
+\[
+    \frac{\partial y}{\partial \mathbf{n}}(\mathbf{x}) = f(\mathbf{x}) \quad \forall \mathbf{x} \in \partial \Omega.
+\]
+where $\mathbf{n}$ denotes the (typically exterior) normal to the boundary $\partial \Omega$ and $f$ is a given scalar function.
+
+The normal derivative which shows up on the left-hand side is defined as:
+\[
+    \frac{\partial y}{\partial \mathbf{n}}(\mathbf{x})=\nabla y(\mathbf{x})\cdot \mathbf{n}(\mathbf{x})
+\]
+where $\nabla$ is the gradient (vector) and the dot is the inner product.
+
+\subsection{Robin boundary condition}
+
+In mathematics, the Robin boundary condition is a type of boundary condition, named after Victor Gustave Robin. When imposed on an ordinary or a partial differential equation, it is a specification of a linear combination of the values of a function and the values of its derivative on the boundary of the domain.
+
+Robin boundary conditions are a weighted combination of Dirichlet boundary conditions and Neumann boundary conditions. This contrasts to mixed boundary conditions, which are boundary conditions of different types specified on different subsets of the boundary. 
+
+If $\Omega$ is the domain on which the given equation is to be solved and $\partial\Omega$ denotes its boundary, the Robin boundary condition is:
+\[
+    a u + b \frac{\partial u}{\partial n} =g \qquad \text{on} ~ \partial \Omega\,
+\]
+for some non-zero constants $a$ and $b$ and a given function $g$ defined on $\partial\Omega$. Here, $u$ is the unknown solution defined on $\Omega$ and ${\partial u}/{\partial n}$ denotes the normal derivative at the boundary. More generally, $a$ and $b$ are allowed to be (given) functions, rather than constants.
+
+\subsection{Mixed boundary condition}
+
+In mathematics, a mixed boundary condition for a partial differential equation defines a boundary value problem in which the solution of the given equation is required to satisfy different boundary conditions on disjoint parts of the boundary of the domain where the condition is stated. Precisely, in a mixed boundary value problem, the solution is required to satisfy a Dirichlet or a Neumann boundary condition in a mutually exclusive way on disjoint parts of the boundary.
+
+For example, given a solution $u$ to a partial differential equation on a domain $\Omega$ with boundary $\partial\Omega$, it is said to satisfy a mixed boundary condition if, consisting $\partial\Omega$ of two disjoint parts, $\Gamma_1$ and $\Gamma_2$, such that $\partial\Omega = \Gamma_1 \bigcup \Gamma_2$, $u$ verifies the following equations:
+\[
+    \left. u \right|_{\Gamma_1} = u_0          
+\]
+and
+\[
+    \left. \frac{\partial u}{\partial n}\right|_{\Gamma_2} = g,
+\]
+where $u_0$ and $g$ are given functions defined on those portions of the boundary.
+
+The mixed boundary condition differs from the Robin boundary condition in that the latter requires a linear combination, possibly with pointwise variable coefficients, of the Dirichlet and the Neumann boundary value conditions to be satisfied on the whole boundary of a given domain.
+
+\subsection{Cauchy boundary condition}
+
+In mathematics, a Cauchy boundary condition augments an ordinary differential equation or a partial differential equation with conditions that the solution must satisfy on the boundary; ideally so to ensure that a unique solution exists. A Cauchy boundary condition specifies both the function value and normal derivative on the boundary of the domain. This corresponds to imposing both a Dirichlet and a Neumann boundary condition. It is named after French mathematical analyst Augustin Louis Cauchy.
+
+Cauchy boundary conditions are simple and common in second order ordinary differential equations,
+\[
+    y''(s) = f(y(s),y'(s),s)
+\]
+where, in order to ensure that a unique solution $y(s)$ exists, one may specify the value of the function $y$ and the value of the derivative $y'$ at a given point $s=a$, i.e.,
+\[
+    y(a)=\alpha \ ,
+\]
+and
+\[
+    y'(a)=\beta \ . 
+\]
+where $a$ is a boundary or initial point.
+
+For partial differential equations, Cauchy boundary conditions specify both the function and the normal derivative on the boundary. To make things simple and concrete, consider a second-order differential equation in the plane
+\[
+    A(x,y) \psi_{xx} + B(x,y) \psi_{xy} + C(x,y) \psi_{yy}= F(x,y,\psi,\psi_x,\psi_y) \ 
+\]
+where $\psi(x,y)$ is the unknown solution, $\psi_{x}$ denotes derivative of $\psi$ with respect to $x$ etc. The functions $A,B,C,F$ specify the problem.
+
+We now seek a $\psi$ which satisfies the partial differential equation in a domain $\Omega$, which is a subset of the $x-y$ plane, and such that the Cauchy boundary conditions hold:
+\[
+    \psi(x,y) = \alpha(x,y), \mathbf{n}\cdot\nabla\psi = \beta(x,y) 
+\]
+for all boundary points $(x,y)\in\partial\Omega$. Here $\mathbf{n}\cdot\nabla\psi$ is the derivative in the direction of the normal to the boundary. The functions $\alpha$ and $\beta$ are the Cauchy data.
+
+Notice the difference between a Cauchy boundary condition and a Robin boundary condition. In the former, we specify both the function and the normal derivative. In the latter, we specify a weighted average of the two.
+
+\section{Mathematical concepts}
+
+\subsection{Wronskian}
+
+In mathematics, the Wronskian is a determinant used in the study of differential equations, where it can sometimes show linear independence in a set of solutions.
+
+The Wronskian for $n$ real- or complex-valued functions $f_1, \dotsc, f_n$, which are $n - 1$ times differentiable on an interval $I$, the Wronskian $W(f_1, \dotsc, f_n)$ as a function on $I$ is defined by
+\[
+    W(f_1, \ldots, f_n) (x)= 
+    \begin{vmatrix} 
+        f_1(x) & f_2(x) & \cdots & f_n(x) \\ 
+        f_1'(x) & f_2'(x) & \cdots & f_n' (x)\\ 
+        \vdots & \vdots & \ddots & \vdots \\ 
+        f_1^{(n-1)}(x)& f_2^{(n-1)}(x) & \cdots & f_n^{(n-1)}(x) 
+    \end{vmatrix},
+    \qquad x\in I. 
+\]
+That is, it is the determinant of the matrix constructed by placing the functions in the first row, the first derivative of each function in the second row, and so on through the $(n - 1)$th derivative, thus forming a square matrix sometimes called a fundamental matrix.
+
+If the functions $f_i$ are linearly dependent, then so are the columns of the Wronskian as differentiation is a linear operation, so the Wronskian vanishes. Thus, the Wronskian can be used to show that a set of differentiable functions is linearly independent on an interval by showing that it does not vanish identically. It may, however, vanish at isolated points.
+
+The linear independence property is related to the solution set of homogeneous system. Every homogeneous system has at least one solution, known as the zero solution (or trivial solution), which is obtained by assigning the value of zero to each of the variables. If the system has a non-singular matrix ($det(W) \neq 0$) then it is also the only solution. If the system has a singular matrix then there is a solution set with an infinite number of solutions.
+
+\subsection{Vector space}
+
+A vector space over a field $\mathbf{F}$ is a set $\mathbf{V}$ together with two operations that satisfy the eight axioms listed below. Elements of $\mathbf{V}$ are commonly called vectors. Elements of $\mathbf{F}$ are commonly called scalars. The first operation, called vector addition or simply addition, takes any two vectors $\mathbf{v}$ and $\mathbf{w}$ and assigns to them a third vector which is commonly written as $\mathbf{v} + \mathbf{w}$, and called the sum of these two vectors. The second operation, called scalar multiplication takes any scalar $a$ and any vector $\mathbf{v}$ and gives another vector $a \mathbf{v}$.
+
+To qualify as a vector space, the set $\mathbf{V}$ and the operations of addition and multiplication must adhere to a number of requirements called axioms. In the list below, let $\mathbf{u}$, $\mathbf{v}$ and $\mathbf{w}$ be arbitrary vectors in $\mathbf{V}$, and $a$ and $b$ scalars in $\mathbf{F}$.
+\begin{center}
+    \footnotesize
+    %\setlength{\tabcolsep}{4pt}
+    %\renewcommand{\arraystretch}{1.5}
+    \begin{tabular}{p{5cm}p{7.5cm}}
+        \hline\hline
+        Axiom  & Meaning\\
+        Associativity of addition &  $\mathbf{u} + (\mathbf{v} + \mathbf{w}) = (\mathbf{u} + \mathbf{v}) + \mathbf{w}$\\
+        Commutativity of addition &  $\mathbf{u} + \mathbf{v} = \mathbf{v} + \mathbf{u}$\\
+        Identity element of addition  &  There exists an element $0 \in \mathbf{V}$, called the zero vector, such that $\mathbf{v} + 0 = \mathbf{v}$ for all $\mathbf{v} \in \mathbf{V}$.\\
+        Inverse elements of addition  &  For every $\mathbf{v} \in \mathbf{V}$, there exists an element $-\mathbf{v} \in \mathbf{V}$, called the additive inverse of $\mathbf{v}$, such that $\mathbf{v} + (-\mathbf{v}) = 0$.\\
+        Compatibility of scalar multiplication with field multiplication  &  $a(b \mathbf{v}) = (ab)\mathbf{v}$\\
+        Identity element of scalar multiplication &  $1 \mathbf{v} = \mathbf{v}$, where $1$ denotes the multiplicative identity in $\mathbf{F}$.\\
+        Distributivity of scalar multiplication with respect to vector addition  &   $a(\mathbf{u} + \mathbf{v}) = a \mathbf{u} + a \mathbf{v}$\\
+        Distributivity of scalar multiplication with respect to field addition &  $(a + b)\mathbf{v} = a \mathbf{v} + b \mathbf{v}$\\
+        \hline\hline
+    \end{tabular}
+\end{center}
+
+When the scalar field $\mathbf{F}$ is the real numbers $R$, the vector space is called a real vector space. When the scalar field is the complex numbers, it is called a complex vector space. These two cases are the ones used most often in engineering. The general definition of a vector space allows scalars to be elements of any fixed field $\mathbf{F}$. The notion is then known as an $\mathbf{F}$-vector spaces or a vector space over $\mathbf{F}$. A field is, essentially, a set of numbers possessing addition, subtraction, multiplication and division operations.
+
+\paragraph{Coordinate spaces}
+
+The most simple example of a vector space over a field $\mathbf{F}$ is the field itself, equipped with its standard addition and multiplication. More generally, a vector space can be composed of $n$-tuples (sequences of length $n$) of elements of $\mathbf{F}$, such as $(a_1, a_2, ..., a_n)$, where each $a_i$ is an element of $\mathbf{F}$.
+
+A vector space composed of all the $n$-tuples of a field $\mathbf{F}$ is known as a coordinate space, usually denoted $F^n$. The case $n = 1$ is the above-mentioned simplest example, in which the field $\mathbf{F}$ is also regarded as a vector space over itself.
+
+\paragraph{Function space}
+
+Functions from any fixed set $\Omega$ to a field $\mathbf{F}$ also form vector spaces, by performing addition and scalar multiplication pointwise. That is, the sum of two functions $f$ and $g$ is the function $(f + g)$ given by
+\[
+    (f + g)(w) = f(w) + g(w),
+\]
+and similarly for multiplication. Such function spaces occur in many geometric situations, when $\Omega$ is the real line or an interval, or other subsets of $R$. Many notions in topology and analysis, such as continuity, integrability or differentiability are well-behaved with respect to linearity: sums and scalar multiples of functions possessing such a property still have that property. Therefore, the set of such functions are vector spaces. They are studied in greater detail using the methods of functional analysis. Algebraic constraints also yield vector spaces: the vector space $F[x]$ is given by polynomial functions:
+\[
+    f(x) = r_0 + r_1x + ... + r_{n−1}x^{n−1} + r_nx^n, 
+\]
+where the coefficients $r_0, \dotsc, r_n$ are in $F$.
+
+\paragraph{Systems of linear equations}
+
+Systems of homogeneous linear equations are closely tied to vector spaces. A general system of $m$ linear equations with $n$ unknowns can be written as
+\[
+    \begin{aligned}
+        a_{11} x_1 + a_{12} x_2 + \cdots + a_{1n} x_n  &= b_1 \\ 
+        a_{21} x_1 + a_{22} x_2 + \cdots + a_{2n} x_n  &= b_2 \\
+                                                       & \vdots \\
+        a_{m1} x_1  +  a_{m2} x_2  + \cdots +  a_{mn} x_n  &= b_m \\
+    \end{aligned}
+\]
+Here $x_1, x_2,\ldots,x_n$ are the unknowns, $a_{11},a_{12},\ldots,a_{mn}$ are the coefficients of the system, and $b_1,b_2,\ldots,b_m$ are the constant terms.
+
+One extremely helpful view is that each unknown is a weight for a column vector in a linear combination.
+\[
+    x_1 
+    \begin{bmatrix}
+        a_{11}\\
+        a_{21}\\
+        \vdots\\
+        a_{m1}
+    \end{bmatrix}
+    + x_2 
+    \begin{bmatrix}
+        a_{12}\\
+        a_{22}\\ 
+        \vdots\\
+        a_{m2}
+    \end{bmatrix}
+    + \cdots + x_n
+    \begin{bmatrix}
+        a_{1n}\\
+        a_{2n}\\ 
+        \vdots\\
+        a_{mn}
+    \end{bmatrix}
+    = 
+    \begin{bmatrix}
+        b_1\\
+        b_2\\
+        \vdots\\
+        b_m
+    \end{bmatrix} 
+\]
+This allows all the language and theory of vector spaces (or more generally, modules) to be brought to bear. For example, the collection of all possible linear combinations of the vectors on the left-hand side is called their span, and the equations have a solution just when the right-hand vector is within that span. If every vector within that span has exactly one expression as a linear combination of the given left-hand vectors, then any solution is unique. In any event, the span has a basis of linearly independent vectors that do guarantee exactly one expression; and the number of vectors in that basis (its dimension) cannot be larger than $m$ or $n$, but it can be smaller. This is important because if we have $m$ independent vectors a solution is guaranteed regardless of the right-hand side, and otherwise not guaranteed.
+
+The vector equation is equivalent to a matrix equation of the form
+\[
+    A\mathbf{x}=\mathbf{b}
+\]
+where $A$ is an $m×n$ matrix, $x$ is a column vector with $n$ entries, and $b$ is a column vector with $m$ entries.
+\[
+    A= 
+    \begin{bmatrix} 
+        a_{11} & a_{12} & \cdots & a_{1n} \\
+        a_{21} & a_{22} & \cdots & a_{2n} \\
+        \vdots & \vdots & \ddots & \vdots \\
+        a_{m1} & a_{m2} & \cdots & a_{mn} 
+    \end{bmatrix}
+    ,\quad \mathbf{x}=
+    \begin{bmatrix}
+        x_1 \\
+        x_2 \\
+        \vdots\\
+        x_n 
+    \end{bmatrix}
+    ,\quad \mathbf{b}= 
+    \begin{bmatrix} 
+        b_1 \\
+        b_2 \\
+        \vdots\\
+        b_m 
+    \end{bmatrix} 
+\]
+The number of vectors in a basis for the span is now expressed as the rank of the matrix. In a similar vein, the solutions of homogeneous linear differential equations form vector spaces.
+
+\paragraph{Normed vector spaces and inner product spaces}
+
+"Measuring" vectors is done by specifying a norm, a datum which measures lengths of vectors, or by an inner product, which measures angles between vectors. Norms and inner products are denoted $| \mathbf{v}|$ and $< \mathbf{v} , \mathbf{w}>$, respectively. The datum of an inner product entails that lengths of vectors can be defined too, by defining the associated norm $|\mathbf{v}| := \sqrt {< \mathbf{v}, \mathbf{v} >}$. Vector spaces endowed with such data are known as normed vector spaces and inner product spaces, respectively.
+
+\paragraph{Linear independence}
+
+In the theory of vector spaces the concept of linear dependence and linear independence of the vectors in a subset of the vector space is central to the definition of dimension. A set of vectors is said to be linearly dependent if one of the vectors in the set can be defined as a linear combination of the other vectors. If no vector in the set can be written in this way, then the vectors are said to be linearly independent.
+
+A vector space can be of finite dimension or infinite dimension depending on the number of linearly independent basis vectors. The definition of linear dependence and the ability to determine whether a subset of vectors in a vector space are linearly dependent are central to determining a set of basis vectors for a vector space.
+
+The vectors in a subset $S=\{\mathbf{v}_1,\mathbf{v}_2,\dots,\mathbf{v}_n\}$ of a vector space $\mathbf{V}$ are said to be linearly dependent, if there exist a finite number of distinct vectors $\mathbf{v}_1,\mathbf{v}_2,\dots,\mathbf{v}_k$ in $S$ and scalars $a_1,a_2,\dots,a_k$ , not all zero, such that
+\[
+    a_1\mathbf{v}_1+a_2\mathbf{v}_2+\cdots+a_k\mathbf{v}_k= 0,
+\]
+where zero denotes the zero vector.
+
+The vectors in a set $T=\{\mathbf{v}_1,\mathbf{v}_2,\dots,\mathbf{v}_n\}$ are said to be linearly independent if the equation
+\[
+    a_1\mathbf{v}_1+a_2\mathbf{v}_2+\cdots+a_n\mathbf{v}_n= 0,
+\]
+can only be satisfied by $a_i=0$ for $i=1,\dots,n$. This implies that no vector in the set can be represented as a linear combination of the remaining vectors in the set. In other words, a set of vectors is linearly independent if the only representations of $0$ as a linear combination of its vectors is the trivial representation in which all the scalars $a_i$ are zero.
+
+$n$ vectors in ${R}^n$ are linearly independent if and only if the determinant of the matrix formed by taking the vectors as its columns is non-zero.
+
+\subsection{Integral}
+
+Definite integral $\int_{a}^{b} f(x) \,\mathrm{d}x$ is a number and represents the area under the curve $f(x)$ from $x=a$ to $x=b$. Indefinite integral $\int f(x) \,\mathrm{d}x$ is a function and answers the question, "what function when differentiated gives $f(x)$". The fundamental theorem of Calculus relates these two integrals in the following manner: To compute a definite integral, find the antiderivative (indefinite integral) of the function and evaluate at the endpoints x=a and x=b.
+
+Prove:
+\[
+    F(x=b) - F(x=a) = \sum_{n=1}^{(b-a)/Delta x} \tan\theta_n  \mathrm{d}x = \int_{a}^{b} F'(x) \,\mathrm{d}x
+\]
+
+\section{Computer programming}
+
+Computer programming is a process that converts a solution methodology devised for a problem into source code understood by computer through using programming languages. The aim of computer programming is to solve problems via performing the solving processes by computer.
+
+Solving a problem frequently comprises a sequence of sections: problem definition, problem analysis, solution design, implementation, and validation. When involving computer programming, a useful strategy is to confine the programming activity into the implementation and validation sections, which avoids excessive interferences and simplifies the problem solving process. In other words, one first focuses on devising a clear solution methodology based on formal logic and knowledge, then tries to convert the solution methodology into source code.
+
+For instance, to solve a physical problem, the problem should be well defined and related physics should be analyzed at the first place. After gaining insights of the problem, mathematical modeling is employed to establish the governing equations for the physical problem. Depending on the complexity of the problem, the established governing equations may be too difficult to be solved analytically. Therefore, numerical discretization is applied to transform the differential or integral form of governing equations into algebraic equations.
+
+The algebraic equations resulting from numerical discretization usually form a large linear system, which is only able to be solved by computer. To implement the solving process, computer programming is utilized to convert the mathematical formulation into source code to be executed by computer, in which process the information flow and the structure of the code shall resemble those in the original mathematical formulation as closely as possible, in order to minimize programming mistakes and improve readability of the source code.
+
+The purpose of a programming language is to express the solution methodology in a way that can be understood by computer. Although different language patterns may yield different patterns of thought, choosing which programming language to use is not a critical issue. Since a solution methodology of a problem only involves data defining the problem and instructions describing the relationship and evolution of data, in computer programming with any languages, there are also only two elements of a program: data (variables) and instructions (code or functions). The process of programming is simply to express the data and instructions in the solution methodology by a language that is understandable and executable by computer.
+
+To learn how to program is to learn how to give a speech in a new language, for which practice is the only shortcut. One thing needs to keep in mind is that completing a successful speech requires not only knowing how to speak the language fluently but also polishing and organizing ideas and thoughts clearly. Similarly, coding a successful program is to give a successful speech to computer, mastering a programming language is basic and devising a clear solving process is crucial. When a program needs to be improved, it is usually the devised solving process rather than the usage of language that requires to be refined.
+
+\subsection{General concepts}
+
+Static languages require declaring the type of each variable, which information is used to compile the program into low-level machine language. Declaring variable types helps the computer to catch some mistakes and run faster, but it does require more up-front human thinking and typing. In contrast, dynamic languages (also called scripting languages) do not force you to declare variable types before using them. These languages let you accomplish more with fewer lines of code. Instead of being compiled, they are interpreted by a program called an interpreter. Dynamic languages are often slower than compiled static languages, but their speed is improving as their interpreters become more optimized.
+
+\subsubsection{Algorithm}
+
+In mathematics and computer science, an algorithm is a self-contained step-by-step set of operations to be performed. Algorithms perform calculation, data processing, and/or automated reasoning tasks.
+
+An algorithm is an effective method that can be expressed within a finite amount of space and time and in a well-defined formal language for calculating a function. Starting from an initial state and initial input (perhaps empty), the instructions describe a computation that, when executed, proceeds through a finite number of well-defined successive states, eventually producing "output" and terminating at a final ending state. The transition from one state to the next is not necessarily deterministic; some algorithms, known as randomized algorithms, incorporate random input.
+
+\subsubsection{Python}
+
+Python is a general-purpose, high-level, dynamic language. Its design makes it very readable, which is more important than it sounds. Every computer program is written only once, but read and revised many times, often by many people. Being readable also makes it easier to learn and remember, hence more writeable. Compared with other popular languages, Python has a gentle learning curve that makes you productive sooner, yet it has depths that you can explore as you gain expertise.
+
+A Python list is a sequence of values, accessed by their offset from the beginning of the list. The first value is at offset $0$. People count from $1$, so it might seem weird to count from $0$. It helps to think in terms of offsets instead of positions.
+
+\subsection{Solution of Equations by Iteration}
+
+A root-finding algorithm is a numerical method, or algorithm, for finding a value $x$ such that $f(x) = 0$, for a given function $f$. Such an $x$ is called a root of the function $f$
+
+Finding a root of $f(x) - g(x) = 0$ is the same as solving the equation $f(x) = g(x)$. Here, $x$ is called the unknown in the equation. Conversely, any equation can take the canonical form $f(x) = 0$, so equation solving is the same thing as computing (or finding) a root of a function.
+
+Numerical root-finding methods use iteration, producing a sequence of numbers that hopefully converge towards a limit, which is a root. The first values of this series are initial guesses. Many methods compute subsequent values by evaluating an auxiliary function on the preceding values. The limit is thus a fixed point of the auxiliary function, which is chosen for having the roots of the original equation as fixed points.
+
+To solve the equation when there is no formula for the exact solution available, we can use an approximation method, such as an iteration method. This is a method in which we start from an initial guess $x_0$ (which may be poor) and compute step by step (in general better and better) approximations $x_1$ , $x_2$ , $\dots$ of an unknown solution.
+
+In general, iteration methods are easy to program because the computational operations are the same in each step-just the data change from step to step, and, more importantly, if in a concrete case a method converges, it is stable in general.
+
+In computational mathematics, an iterative method is a mathematical procedure that generates a sequence of improving approximate solutions for a class of problems. A specific implementation of an iterative method, including the termination criteria, is an algorithm of the iterative method. An iterative method is called convergent if the corresponding sequence converges for given initial approximations. 
+
+In contrast, direct methods attempt to solve the problem by a finite sequence of operations. In the absence of rounding errors, direct methods would deliver an exact solution (like solving a linear system of equations $A\mathbf{x}=\mathbf{b}$ by Gaussian elimination). Iterative methods are often the only choice for nonlinear equations. However, iterative methods are often useful even for linear problems involving a large number of variables (sometimes of the order of millions), where direct methods would be prohibitively expensive (and in some cases impossible) even with the best available computing power
+
+\subsection{Fixed-Point Iteration for solving equation $f(x)=0$}
+
+In numerical analysis, fixed-point iteration is a method of computing fixed points of iterated functions.
+
+More specifically, given a function $f$ defined on the real numbers with real values and given a point $x_0$ in the domain of $f$, the fixed point iteration is
+\[
+    x_{n+1}=f(x_n), \, n=0, 1, 2, \dots
+\]
+which gives rise to the sequence $x_0, x_1, x_2, \dots$ which is hoped to converge to a point $x$. If $f$ is continuous, then one can prove that the obtained $x$ is a fixed point of $f$, i.e.,
+\[
+    f(x)=x. \, 
+\]
+More generally, the function $f$ can be defined on any metric space with values in that same space.
+
+Newton's method for finding roots of a given differentiable function $f(x)$ is
+\[
+    x_{n+1}=x_n-\frac{f(x_n)}{f'(x_n)}.
+\]
+If we write $g(x)=x-\frac{f(x)}{f'(x)}$, we may rewrite the Newton iteration as the fixed-point iteration
+\[
+    x_{n+1}=g(x_n).
+\]
+If this iteration converges to a fixed point $x$ of $g$, then
+\[
+    x=g(x)=x-\frac{f(x)}{f'(x)}, so f(x)/f'(x)=0.
+\]
+The inverse of anything is nonzero, therefore $f(x) = 0$: $x$ is a root of $f$. Under the assumptions of the Banach fixed point theorem, the Newton iteration, framed as the fixed point method, demonstrates linear convergence. However, a more detailed analysis shows quadratic convergence.
+
+By some algebraic steps we transform into the form
+\[
+    x = g(x)
+\]
+Then we choose an initial guess $x_0$ and compute $x_{n+1}=g(x_{n})$. A solution of the above equation is called a fixed point of $g$. We may get several different forms. The behavior of corresponding iterative sequences may differ, in particular, with respect to their speed of convergence. Indeed, some of them may not converge at all.
+
+An iteration process defined by $x_{n+1}=g(x_{n})$ is called convergent for an $x_0$ if the corresponding sequence $x_0, x_1, \dots$ is convergent. A sufficient condition for convergence is given in the following theorem:
+
+Let $x=s$ be a solution of $x =g(x)$ and suppose that $g$ has a continuous derivative in some interval $J$ containing $s$. Then, if $|g'(x)| \le L <1$ in $J$ , then this function has precisely one fixed point, and the fixed-point iteration converges towards that fixed point for any initial guess $x_0$ in $J$. The limit of the sequence $\{x_n\}$ is $s$.
+
+Proof of this theorem:
+
+Since $g$ is Lipschitz continuous with Lipschitz constant $L<1$, then for the sequence $\{x_n,n=0,1,2,\ldots\}$, we have:
+\[
+    |x_n-x_{n-1}|=|g(x_{n-1})-g(x_{n-2})|=\frac{|g(x_{n-1})-g(x_{n-2})|}{|x_{n-1}-x_{n-2}|} * |x_{n-1}-x_{n-2}|.
+\]
+By the mean value theorem of differential calculus, there is a $\bar{x}$ between $x_{n-1}$ and $x_{n-2}$ such that
+\[
+    \frac{|g(x_{n-1})-g(x_{n-2})|}{|x_{n-1}-x_{n-2}|} * |x_{n-1}-x_{n-2}|= |g'(\bar{x})| * |x_{n-1}-x_{n-2}| \leq  L |x_{n-1}-x_{n-2}|.
+\]
+Combining the above inequalities yields:
+\[
+    |x_n-x_{n-1}|\leq L^{n-1}|x_1-x_0|.
+\]
+Since $L<1$, $L^{n-1}\rightarrow 0$ as $n \rightarrow \infty$.
+
+Therefore, we can show $\{x_n\}$ is a Cauchy sequence and thus it converges to a point $x^*$.
+
+For the iteration $x_n=f(x_{n-1})$, let $n$ go to infinity on both sides of the equation, we obtain $x^*=f(x^*)$. This shows that $x^*$ is the fixed point for $f$. So we proved the iteration will eventually converge to a fixed-point.
+
+This property is very useful because not all iterations can arrive at a convergent fixed-point. When constructing a fixed-point iteration, it is very important to make sure it converges. 
+
+We mention that a function $g$ satisfying the condition in Theorem is called a contraction (Lipschitz continuous with Lipschitz constant $L<1$) because
+\[
+    |g(x_{n})-g(x_{n-1})| \leq L|x_{n}-x_{n-1}|
+\]
+Furthermore, $L$ gives information on the speed of convergence.
+
+\subsection{Newton's Method for Solving Equations $f (x) = 0$}
+
+In numerical analysis, Newton's method (also known as the Newton-Raphson method), named after Isaac Newton and Joseph Raphson, is a method for finding successively better approximations to the roots (or zeroes) of a real-valued function.
+\[
+    x : f(x) = 0 \,.
+\]
+
+The idea of the method is as follows: one starts with an initial guess which is reasonably close to the true root, then the function is approximated by its tangent line, and one computes the $x$-intercept of this tangent line. This $x$-intercept will typically be a better approximation to the function's root than the original guess, and the method can be iterated.
+
+Suppose $ƒ : [a, b] \to R$ is a differentiable function defined on the interval $[a, b]$ with values in the real numbers $R$. The formula for converging on the root can be easily derived. Suppose we have some current approximation $x_n$. Then we can derive the formula for a better approximation, $x_{n+1}$. The equation of the tangent line to the curve $y = ƒ(x)$ at the point $x=x_n$ is
+\[
+    y = f'(x_n) \, (x-x_n) + f(x_n),
+\]
+where $ƒ'$ denotes the derivative of the function $ƒ$.
+
+The $x$-intercept of this line (the value of $x$ such that $y=0$) is then used as the next approximation to the root, $x_{n+1}$. In other words, setting $y$ to zero and $x$ to $x_{n+1}$ gives
+\[
+    0 = f'(x_n) \, (x_{n+1}-x_n) + f(x_n).
+\]
+Solving for $x_{n+1}$ gives
+\[
+    x_{n+1} = x_n - \frac{f(x_n)}{f'(x_n)}. \,\!
+\]
+We start the process off with some arbitrary initial value $x_0$. (The closer to the zero, the better. But, in the absence of any intuition about where the zero might lie, a "guess and check" method might narrow the possibilities to a reasonably small interval by appealing to the intermediate value theorem.) The method will usually converge, provided this initial guess is close enough to the unknown zero, and that $ƒ'(x_0) \neq 0$.
+
+Proof of quadratic convergence for Newton's iterative method
+
+According to Taylor's theorem, any function $f(x)$ which has a continuous second derivative can be represented by an expansion about a point that is close to a root of $f(x)$. Suppose this root is $\alpha \,$. Then the expansion of $f(\alpha)$ about $x_n$ is:
+\[
+    f(\alpha) = f(x_n) + f^\prime(x_n)(\alpha - x_n) + R_1 \,
+\]
+where the Lagrange form of the Taylor series expansion remainder is
+\[
+    R_1 = \frac{1}{2!}f^{\prime\prime}(\xi_n)(\alpha - x_n)^{2} \,,
+\]
+where $\xi_n$ is in between $x_n$ and $\alpha \,$.
+
+Since $\alpha \,$ is the root, (1) becomes:
+\[
+    0 = f(\alpha) = f(x_n) + f^\prime(x_n)(\alpha - x_n) + \frac{1}{2}f^{\prime\prime}(\xi_n)(\alpha - x_n)^{2} \,
+\]
+Dividing equation (2) by $f^\prime(x_n)\,$ and rearranging gives
+\[
+    \frac {f(x_n)}{f^\prime(x_n)}+\left(\alpha-x_n\right) = \frac {- f^{\prime\prime} (\xi_n)}{2 f^\prime(x_n)}\left(\alpha-x_n\right)^2
+\]
+
+Remembering that $x_{n+1}$ is defined by
+\[
+    x_{n+1} = x_{n} - \frac {f(x_n)}{f^\prime(x_n)} \,,
+\]
+one finds that
+\[
+    \underbrace{\alpha - x_{n+1}}_{\epsilon_{n+1}} = \frac {- f^{\prime\prime} (\xi_n)}{2 f^\prime(x_n)} (\underbrace{\alpha - x_n}_{\epsilon_{n}})^2 \,.
+\]
+That is,
+\[
+    \epsilon_{n+1} = \frac {- f^{\prime\prime} (\xi_n)}{2 f^\prime(x_n)} \, {\epsilon_n}^2 \,.
+\]
+Taking absolute value of both sides gives
+\[
+    \left| {\epsilon_{n+1}}\right| = \frac {\left| f^{\prime\prime} (\xi_n) \right| }{2 \left| f^\prime(x_n) \right|} \, {\epsilon_n}^2 \,
+\]
+
+Equation (6) shows that the rate of convergence is quadratic if the following conditions are satisfied:
+\[
+    f'(x)\ne0; \forall x\in I \text{, where }I \text{ is the interval }[\alpha-r,\alpha+r] \text{ for some } r \ge \left\vert(\alpha-x_0)\right\vert;\,
+    f''(x) \text{ is continuous},\forall x\in I; \,
+    x_0 \, sufficiently close to the root \alpha \,
+\]
+The term sufficiently close in this context means the following:
+
+(a) Taylor approximation is accurate enough such that we can ignore higher order terms,
+\[
+    (b) \frac 1 {2}\left |{\frac {f^{\prime\prime} (x_n)}{f^\prime(x_n)}}\right |<C\left |{\frac {f^{\prime\prime} (\alpha)}{f^\prime(\alpha)}}\right |, \text{ for some } C<\infty,\,
+\]
+\[
+    (c) C \left |{\frac {f^{\prime\prime} (\alpha)}{f^\prime(\alpha)}}\right |\epsilon_n<1, \text{ for }n\in \zeta^+\cup\{0\} \text{ and }C \text{ satisfying condition (b) }.\,
+\]
+Finally, (6) can be expressed in the following way:
+\[
+    \left | {\epsilon_{n+1}}\right | \le M{{\epsilon}_n}^2 \, 
+\]
+where $M$ is the supremum of the variable coefficient of ${\epsilon_n}^2$ on the interval $I$ defined in the condition $1$, that is:
+\[
+    M = \sup_{x \in I} \frac 1 {2}\left |{\frac {f^{\prime\prime} (x)}{f^\prime(x)}}\right |. \,
+\]
+The initial point $x_0$ has to be chosen such that conditions $1$ through $3$ are satisfied, where the third condition requires that $M\left |\epsilon_0 \right |<1.$
+
+Minimization and maximization problems
+
+Newton's method can be used to find a minimum or maximum of a function. The derivative is zero at a minimum or maximum, so minima and maxima can be found by applying Newton's method to the derivative. The iteration becomes:
+\[
+    x_{n+1} = x_n - \frac{f'(x_n)}{f''(x_n)} 
+\]
+
+Pseudocode
+
+The following is an example of using the Newton's Method to help find a root of a function $f$ which has derivative fprime.
+
+maxIterations = 20          Don't allow the iterations to continue indefinitely
+haveWeFoundSolution = false Have not converged to a solution yet
+\begin{verbatim}
+    
+for i = 1 : maxIterations
+
+y = f(x0)
+yprime = fprime(x0)
+
+if(abs(yprime) < epsilon) Don't want to divide by too small of a number
+denominator is too small
+break;Leave the loop
+end
+
+x1 = x0 - y/yprime Do Newton's computation
+
+if(abs(x1 - x0) <=  tolerance * abs(x1))If the result is within the desired tolerance
+haveWeFoundSolution = true
+break; Done, so leave the loop
+end
+
+x0 = x1 Update x0 to start the process again
+
+end
+
+if (haveWeFoundSolution)
+...  x1 is a solution within tolerance and maximum number of iterations
+else
+...  did not converge
+end
+\end{verbatim}
+
+\subsection{Secant method}
+
+In numerical analysis, the secant method is a root-finding algorithm that uses a succession of roots of secant lines to better approximate a root of a function $f$. The secant method can be thought of as a finite difference approximation of Newton's method. 
+
+The secant method is defined by the recurrence relation
+\[
+    x_n =x_{n-1}-f(x_{n-1})\frac{x_{n-1}-x_{n-2}}{f(x_{n-1})-f(x_{n-2})}  
+\]
+As can be seen from the recurrence relation, the secant method requires two initial values, $x_0$ and $x_1$, which should ideally be chosen to lie close to the root.
+
+The secant method does not require that the root remain bracketed like the bisection method does, and hence it does not always converge. The secant method can be interpreted as a method in which the derivative is replaced by an approximation and is thus a Quasi-Newton method.
+
+\subsection{Bisection method}
+
+Bracketing methods track the end points of an interval containing a root. This allows them to provide absolute error bounds on a root's location when the function is known to be continuous. Bracketing methods require two initial conditions, one on either side of the root.
+
+The bisection method in mathematics is a root-finding method that repeatedly bisects an interval and then selects a subinterval in which a root must lie for further processing. It is a very simple and robust method, but it is also relatively slow. Because of this, it is often used to obtain a rough approximation to a solution which is then used as a starting point for more rapidly converging methods.
+
+The method is applicable for numerically solving the equation $f(x) = 0$ for the real variable $x$, where $f$ is a continuous function defined on an interval $[a, b]$ and where $f(a)$ and $f(b)$ have opposite signs. In this case $a$ and $b$ are said to bracket a root since, by the intermediate value theorem, the continuous function $f$ must have at least one root in the interval $(a, b)$.
+
+At each step the method divides the interval in two by computing the midpoint $c = (a+b) / 2$ of the interval and the value of the function $f(c)$ at that point. Unless $c$ is itself a root (which is very unlikely, but possible) there are now only two possibilities: either $f(a)$ and $f(c)$ have opposite signs and bracket a root, or $f(c)$ and $f(b)$ have opposite signs and bracket a root. The method selects the subinterval that is guaranteed to be a bracket as the new interval to be used in the next step. In this way an interval that contains a zero of $f$ is reduced in width by $50\%$ at each step. The process is continued until the interval is sufficiently small.
+
+Explicitly, if $f(a)$ and $f(c)$ have opposite signs, then the method sets $c$ as the new value for $b$, and if $f(b)$ and $f(c)$ have opposite signs then the method sets $c$ as the new $a$. (If $f(c)=0$ then $c$ may be taken as the solution and the process stops.) In both cases, the new $f(a)$ and $f(b)$ have opposite signs, so the method is applicable to this smaller interval.
+
+Algorithm
+
+The method may be written in pseudocode as follows:
+
+INPUT: Function $f$, endpoint values $a$, $b$, tolerance $TOL$, maximum iterations $NMAX$
+CONDITIONS: $a < b$, either $f(a) < 0$ and $f(b) > 0$ or $f(a) > 0$ and $f(b) < 0$
+OUTPUT: value which differs from a root of $f(x)=0$ by less than $TOL$
+
+$N \gets 1$
+
+While $N \leq NMAX$ limit iterations to prevent infinite loop
+
+$c \gets (a + b)/2$ new midpoint
+
+If $f(c) = 0$ or $(b - a)/2 < TOL$ then solution found
+
+Output($c$)
+
+Stop
+
+EndIf
+
+$N \gets N + 1$ increment step counter
+
+If $sign(f(c)) = sign(f(a))$ then $a \gets c$ else $b \gets c$ new interval
+
+EndWhile
+
+Output("Method failed.")  max number of steps exceeded
+
+The method is guaranteed to converge to a root of $f$ if $f$ is a continuous function on the interval $[a, b]$ and $f(a)$ and $f(b)$ have opposite signs. The absolute error is halved at each step so the method converges linearly, which is comparatively slow.
+
+Specifically, if $c_11 = (a+b)/2$ is the midpoint of the initial interval, and $c_n$ is the midpoint of the interval in the nth step, then the difference between $c_n$ and a solution $c$ is bounded by
+\[
+    |c_n-c|\le\frac{|b-a|}{2^n}.
+\]
+This formula can be used to determine in advance the number of iterations that the bisection method would need to converge to a root to within a certain tolerance. The number of iterations needed, $n$, to achieve a given error (or tolerance), $\epsilon$, is given by: $n = \log_2\left(\frac{\epsilon_0}{\epsilon}\right)=\frac{\log\epsilon_0-\log\epsilon}{\log2}$ ,
+
+where $\epsilon_0 = \text{initial bracket size} = b-a $.
+
+Therefore, the linear convergence is expressed by $\epsilon_{n+1} = \text{constant} \times \epsilon_n^m, \ m=1$ .
+
+\subsection{Linear Systems: Solution by Iteration}
+
+In numerical linear algebra, the method of successive over-relaxation (SOR) is a variant of the Gauss-Seidel method for solving a linear system of equations, resulting in faster convergence. A similar method can be used for any slowly converging iterative process.
+
+Formulation
+
+Given a square system of $n$ linear equations with unknown $x$:
+\[
+    A\mathbf x = \mathbf b
+\]
+where:
+\[
+    A=
+    \begin{bmatrix} 
+        a_{11} & a_{12} & \cdots & a_{1n} \\
+        a_{21} & a_{22} & \cdots & a_{2n} \\ 
+        \vdots & \vdots & \ddots & \vdots \\
+        a_{n1} & a_{n2} & \cdots & a_{nn} 
+    \end{bmatrix}
+    , \qquad \mathbf{x} = 
+    \begin{bmatrix} 
+        x_{1} \\ 
+        x_2 \\ 
+        \vdots \\
+        x_n 
+    \end{bmatrix} 
+    , \qquad \mathbf{b} = 
+    \begin{bmatrix} 
+        b_{1} \\ 
+        b_2 \\ 
+        \vdots \\ 
+        b_n 
+    \end{bmatrix}.
+\]
+Then $A$ can be decomposed into a diagonal component $D$, and strictly lower and upper triangular components $L$ and $U$:
+\[
+    A=D+L+U, 
+\]
+where
+\[
+    D = \begin{bmatrix} 
+        a_{11} & 0 & \cdots & 0 \\ 
+        0 & a_{22} & \cdots & 0 \\ 
+        \vdots & \vdots & \ddots & \vdots \\
+        0 & 0 & \cdots & a_{nn} 
+    \end{bmatrix}
+    , \quad L = 
+    \begin{bmatrix} 
+        0 & 0 & \cdots & 0 \\
+        a_{21} & 0 & \cdots & 0 \\ 
+        \vdots & \vdots & \ddots & \vdots \\
+        a_{n1} & a_{n2} & \cdots & 0 
+    \end{bmatrix}, 
+    \quad U = \begin{bmatrix}
+        0 & a_{12} & \cdots & a_{1n} \\ 
+        0 & 0 & \cdots & a_{2n} \\
+        \vdots & \vdots & \ddots & \vdots \\
+        0 & 0 & \cdots & 0 
+    \end{bmatrix}. 
+\]
+The system of linear equations may be rewritten as:
+\[
+    (D+\omega L) \mathbf{x} = \omega \mathbf{b} - [\omega U + (\omega-1) D ] \mathbf{x} 
+\]
+the constant $\omega$ called the relaxation factor.
+
+The method of successive over-relaxation is an iterative technique that solves the left hand side of this expression for $x$, using previous value for $x$ on the right hand side. Analytically, this may be written as:
+\[
+    \mathbf{x}^{(k+1)} = (D+\omega L)^{-1} \big(\omega \mathbf{b} - [\omega U + (\omega-1) D ] \mathbf{x}^{(k)}\big)=L_w \mathbf{x}^{(k)}+\mathbf{c}, 
+\]
+where $\mathbf{x}^{(k)}$ is the $k$th approximation or iteration of $\mathbf{x}$ and $\mathbf{x}^{(k+1)}$ is the next or $k + 1$ iteration of $\mathbf{x}$. However, by taking advantage of the triangular form of $(D+\omega L)$, the elements of $x^(k+1)$ can be computed sequentially using forward substitution:
+\[
+    x^{(k+1)}_i = (1-\omega)x^{(k)}_i + \frac{\omega}{a_{ii}} \left(b_i - \sum_{j<i} a_{ij}x^{(k+1)}_j - \sum_{j>i} a_{ij}x^{(k)}_j \right),\quad i=1,2,\ldots,n. 
+\]
+The choice of relaxation factor $\omega$ is not necessarily easy, and depends upon the properties of the coefficient matrix.
+
+A similar technique can be used for any iterative method. If the original iteration had the form
+\[
+    x_{n+1}=f(x_n)
+\]
+then the modified version would use
+\[
+    x^\mathrm{SOR}_{n+1}=(1-\omega)x^{\mathrm{SOR}}_n+\omega f(x^\mathrm{SOR}_n).
+\]
+Note however that the formulation presented above, used for solving systems of linear equations, is not a special case of this formulation if $x$ is considered to be the complete vector. If this formulation is used instead, the equation for calculating the next vector will look like
+\[
+    \mathbf{x}^{(k+1)} = (1-\omega)\mathbf{x}^{(k)} + \omega L_*^{-1} (\mathbf{b} - U\mathbf{x}^{(k)}),
+\]
+where $L_* = L + D$. Values of $\omega>1$ are used to speed up convergence of a slow-converging process, while values of $\omega<1$ are often used to help establish convergence of a diverging iterative process or speed up the convergence of an overshooting process.
+
+In numerical linear algebra, the Gauss-Seidel method, also known as the Liebmann method or the method of successive displacement, is an iterative method used to solve a linear system of equations and is similar to the Jacobi method. Though it can be applied to any matrix with non-zero elements on the diagonals, convergence is only guaranteed if the matrix is either diagonally dominant, or symmetric and positive definite.
+
+The Gauss-Seidel method is an iterative technique for solving a square system of $n$ linear equations with unknown $x$:
+\[
+A\mathbf x = \mathbf b.
+\]
+It is defined by the iteration
+\[
+L_* \mathbf{x}^{(k+1)} = \mathbf{b} - U \mathbf{x}^{(k)}, 
+\]
+where $\mathbf{x}^{(k)}$ is the $k$th approximation or iteration of $\mathbf{x},\,\mathbf{x}^{k+1}$ is the next or $k + 1$ iteration of $\mathbf{x}$, and the matrix $A$ is decomposed into a lower triangular component $L_*$, and a strictly upper triangular component $U: A = L_* + U$.
+
+In more detail, write out $A$, $x$ and $b$ in their components:
+\[
+    A=\begin{bmatrix} 
+        a_{11} & a_{12} & \cdots & a_{1n} \\
+        a_{21} & a_{22} & \cdots & a_{2n} \\ 
+        \vdots & \vdots & \ddots & \vdots \\
+        a_{n1} & a_{n2} & \cdots & a_{nn}
+    \end{bmatrix}
+    , \qquad \mathbf{x} = 
+    \begin{bmatrix} 
+        x_{1} \\
+        x_2 \\
+        \vdots \\
+        x_n 
+    \end{bmatrix} 
+    , \qquad \mathbf{b} =
+    \begin{bmatrix}
+        b_{1} \\
+        b_2 \\ 
+        \vdots \\ 
+        b_n
+    \end{bmatrix}.
+\]
+Then the decomposition of $A$ into its lower triangular component and its strictly upper triangular component is given by:
+\[
+    A=L_*+U \qquad \text{where} \qquad L_* = 
+    \begin{bmatrix} 
+        a_{11} & 0 & \cdots & 0 \\
+        a_{21} & a_{22} & \cdots & 0 \\
+        \vdots & \vdots & \ddots & \vdots \\
+        a_{n1} & a_{n2} & \cdots & a_{nn} 
+    \end{bmatrix}
+    , \quad U = 
+    \begin{bmatrix} 
+        0 & a_{12} & \cdots & a_{1n} \\ 
+        0 & 0 & \cdots & a_{2n} \\ 
+        \vdots & \vdots & \ddots & \vdots \\
+        0 & 0 & \cdots & 0 
+    \end{bmatrix}. 
+\]
+The system of linear equations may be rewritten as:
+\[
+L_* \mathbf{x} = \mathbf{b} - U \mathbf{x} 
+\]
+The Gauss-Seidel method now solves the left hand side of this expression for $x$, using previous value for $x$ on the right hand side. Analytically, this may be written as:
+\[
+\mathbf{x}^{(k+1)} = L_*^{-1} (\mathbf{b} - U \mathbf{x}^{(k)}). 
+\]
+However, by taking advantage of the triangular form of $L_*$, the elements of $x^(k+1)$ can be computed sequentially using forward substitution:
+\[
+x^{(k+1)}_i = \frac{1}{a_{ii}} \left(b_i - \sum_{j=1}^{i-1}a_{ij}x^{(k+1)}_j - \sum_{j=i+1}^{n}a_{ij}x^{(k)}_j \right),\quad i,j=1,2,\dots,n. [3]
+\]
+The procedure is generally continued until the changes made by an iteration are below some tolerance, such as a sufficiently small residual.
+
+Discussion
+
+The element-wise formula for the Gauss-Seidel method is extremely similar to that of the Jacobi method.
+
+The computation of $x_i^{(k+1)}$ uses only the elements of $x^{(k+1)}$ that have already been computed, and only the elements of $x^{(k)}$ that have not yet to be advanced to iteration $k+1$. This means that, unlike the Jacobi method, only one storage vector is required as elements can be overwritten as they are computed, which can be advantageous for very large problems.
+
+However, unlike the Jacobi method, the computations for each element cannot be done in parallel. Furthermore, the values at each iteration are dependent on the order of the original equations.
+
+Gauss-Seidel is the same as SOR (successive over-relaxation) with $\omega=1$.
+
+Jacobi method
+
+Let
+\[
+    A\mathbf x = \mathbf b
+\]
+be a square system of $n$ linear equations, where:
+\[
+    A=\begin{bmatrix} 
+        a_{11} & a_{12} & \cdots & a_{1n} \\ 
+        a_{21} & a_{22} & \cdots & a_{2n} \\ 
+        \vdots & \vdots & \ddots & \vdots \\
+        a_{n1} & a_{n2} & \cdots & a_{nn} 
+    \end{bmatrix}
+    , \qquad \mathbf{x} = 
+    \begin{bmatrix}
+        x_{1} \\ 
+        x_2 \\ 
+        \vdots \\
+        x_n 
+    \end{bmatrix}
+    , \qquad \mathbf{b} = 
+    \begin{bmatrix} 
+        b_{1} \\
+        b_2 \\
+        \vdots \\
+        b_n
+    \end{bmatrix}.
+\]
+Then $A$ can be decomposed into a diagonal component $D$, and the remainder $R$:
+\[
+    A=D+R \qquad \text{where} \qquad D = 
+    \begin{bmatrix} 
+        a_{11} & 0 & \cdots & 0 \\
+        0 & a_{22} & \cdots & 0 \\ 
+        \vdots & \vdots & \ddots & \vdots \\
+        0 & 0 & \cdots & a_{nn} 
+    \end{bmatrix} 
+    \text{ and } R = 
+    \begin{bmatrix} 
+        0 & a_{12} & \cdots & a_{1n} \\
+        a_{21} & 0 & \cdots & a_{2n} \\
+        \vdots & \vdots & \ddots & \vdots \\ 
+        a_{n1} & a_{n2} & \cdots & 0 
+    \end{bmatrix}. 
+\]
+The solution is then obtained iteratively via
+\[
+    \mathbf{x}^{(k+1)} = D^{-1} (\mathbf{b} - R \mathbf{x}^{(k)}), 
+\]
+where $\mathbf{x}^{(k)}$ is the $k$th approximation or iteration of $\mathbf{x}$ and $\mathbf{x}^{(k+1)}$ is the next or $k + 1$ iteration of $\mathbf{x}$. The element-based formula is thus:
+\[
+    x^{(k+1)}_i = \frac{1}{a_{ii}} \left(b_i -\sum_{j\ne i}a_{ij}x^{(k)}_j\right),\quad i=1,2,\ldots,n. 
+\]
+The computation of $x_i^{(k+1)}$ requires each element in $x^{(k)}$ except itself. Unlike the Gauss-Seidel method, we can't overwrite $x_i^{(k)}$ with $x_i^{(k+1)}$, as that value will be needed by the rest of the computation. The minimum amount of storage is two vectors of size $n$.
+
+In 2014, a refinement of the algorithm, called scheduled relaxation Jacobi (SRJ) method, was published ("Acceleration of the Jacobi iterative method by factors exceeding 100 using scheduled relaxation", "Scheduled Relaxation Jacobi method: improvements and applications"). The new method employs a schedule of over- and under-relaxations and provides performance improvements for solving elliptic equations discretized on large two- and three-dimensional Cartesian grids. 
+
+\bibliography{ref}
+\end{document}

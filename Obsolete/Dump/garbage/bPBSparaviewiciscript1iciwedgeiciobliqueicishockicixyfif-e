@@ -1,0 +1,270 @@
+#### import the simple module from the paraview
+from paraview.simple import *
+#### disable automatic camera reset on 'Show'
+paraview.simple._DisableFirstRenderCameraReset()
+
+# create a new 'EnSight Reader'
+fieldcase = EnSightReader(CaseFileName='/scratch/morui/graham/1_wedge_oblique_shock/xy_mv/field.case')
+fieldcase.PointArrays = ['rho', 'u', 'v', 'w', 'p', 'T', 'did', 'Vel']
+
+# get animation scene
+animationScene1 = GetAnimationScene()
+
+# update animation scene based on data timesteps
+animationScene1.UpdateAnimationUsingDataTimeSteps()
+
+# Properties modified on fieldcase
+fieldcase.PointArrays = ['rho']
+
+# get active view
+renderView1 = GetActiveViewOrCreate('RenderView')
+# uncomment following to set a specific view size
+# renderView1.ViewSize = [977, 638]
+
+# get color transfer function/color map for 'rho'
+rhoLUT = GetColorTransferFunction('rho')
+
+# show data in view
+fieldcaseDisplay = Show(fieldcase, renderView1)
+# trace defaults for the display properties.
+fieldcaseDisplay.AmbientColor = [0.0, 0.0, 0.0]
+fieldcaseDisplay.ColorArrayName = ['POINTS', 'rho']
+fieldcaseDisplay.DiffuseColor = [0.0, 0.0, 0.0]
+fieldcaseDisplay.LookupTable = rhoLUT
+fieldcaseDisplay.BackfaceDiffuseColor = [0.0, 0.0, 0.0]
+fieldcaseDisplay.OSPRayScaleArray = 'rho'
+fieldcaseDisplay.OSPRayScaleFunction = 'PiecewiseFunction'
+fieldcaseDisplay.GlyphType = 'Arrow'
+fieldcaseDisplay.ScalarOpacityUnitDistance = 0.12463066751843671
+
+# reset view to fit data
+renderView1.ResetCamera()
+
+#changing interaction mode based on data extents
+renderView1.InteractionMode = '2D'
+renderView1.CameraPosition = [4.500000059604645, 0.0, 10000.0]
+renderView1.CameraFocalPoint = [4.500000059604645, 0.0, 0.0]
+
+# show color bar/color legend
+fieldcaseDisplay.SetScalarBarVisibility(renderView1, True)
+
+# get opacity transfer function/opacity map for 'rho'
+rhoPWF = GetOpacityTransferFunction('rho')
+
+# create a new 'Compute Derivatives'
+computeDerivatives1 = ComputeDerivatives(Input=fieldcase)
+computeDerivatives1.Scalars = ['POINTS', 'rho']
+computeDerivatives1.Vectors = [None, '1']
+
+# Properties modified on computeDerivatives1
+computeDerivatives1.Vectors = [None, '']
+
+# show data in view
+computeDerivatives1Display = Show(computeDerivatives1, renderView1)
+# trace defaults for the display properties.
+computeDerivatives1Display.AmbientColor = [0.0, 0.0, 0.0]
+computeDerivatives1Display.ColorArrayName = ['POINTS', 'rho']
+computeDerivatives1Display.DiffuseColor = [0.0, 0.0, 0.0]
+computeDerivatives1Display.LookupTable = rhoLUT
+computeDerivatives1Display.BackfaceDiffuseColor = [0.0, 0.0, 0.0]
+computeDerivatives1Display.OSPRayScaleArray = 'rho'
+computeDerivatives1Display.OSPRayScaleFunction = 'PiecewiseFunction'
+computeDerivatives1Display.GlyphType = 'Arrow'
+computeDerivatives1Display.ScalarOpacityUnitDistance = 0.12463066751843671
+
+# hide data in view
+Hide(fieldcase, renderView1)
+
+# show color bar/color legend
+computeDerivatives1Display.SetScalarBarVisibility(renderView1, True)
+
+# set scalar coloring
+ColorBy(computeDerivatives1Display, ('CELLS', 'ScalarGradient'))
+
+# rescale color and/or opacity maps used to include current data range
+computeDerivatives1Display.RescaleTransferFunctionToDataRange(True)
+
+# show color bar/color legend
+computeDerivatives1Display.SetScalarBarVisibility(renderView1, True)
+
+# get color transfer function/color map for 'ScalarGradient'
+scalarGradientLUT = GetColorTransferFunction('ScalarGradient')
+
+# get opacity transfer function/opacity map for 'ScalarGradient'
+scalarGradientPWF = GetOpacityTransferFunction('ScalarGradient')
+
+# rescale color and/or opacity maps used to exactly fit the current data range
+computeDerivatives1Display.RescaleTransferFunctionToDataRange(False)
+
+# Rescale transfer function
+scalarGradientLUT.RescaleTransferFunction(1.0, 200.0)
+
+# Rescale transfer function
+scalarGradientPWF.RescaleTransferFunction(1.0, 200.0)
+
+# convert to log space
+scalarGradientLUT.MapControlPointsToLogSpace()
+
+# Properties modified on scalarGradientLUT
+scalarGradientLUT.UseLogScale = 1
+
+# Apply a preset using its name. Note this may not work as expected when presets have duplicate names.
+scalarGradientLUT.ApplyPreset('X Ray', True)
+
+# get color legend/bar for scalarGradientLUT in view renderView1
+scalarGradientLUTColorBar = GetScalarBar(scalarGradientLUT, renderView1)
+
+# Properties modified on scalarGradientLUTColorBar
+scalarGradientLUTColorBar.Title = 'Schlieren'
+scalarGradientLUTColorBar.ComponentTitle = ''
+
+# Properties modified on computeDerivatives1Display
+computeDerivatives1Display.Specular = 1.0
+
+# reset view to fit data
+renderView1.ResetCamera()
+
+# reset view to fit data
+renderView1.ResetCamera()
+
+# set active source
+SetActiveSource(fieldcase)
+
+# create a new 'EnSight Reader'
+geo_stlcase = EnSightReader(CaseFileName='/scratch/morui/graham/1_wedge_oblique_shock/xy_mv/geo_stl.case')
+
+# show data in view
+geo_stlcaseDisplay = Show(geo_stlcase, renderView1)
+# trace defaults for the display properties.
+geo_stlcaseDisplay.AmbientColor = [0.0, 0.0, 0.0]
+geo_stlcaseDisplay.ColorArrayName = [None, '']
+geo_stlcaseDisplay.DiffuseColor = [0.0, 0.0, 0.0]
+geo_stlcaseDisplay.BackfaceDiffuseColor = [0.0, 0.0, 0.0]
+geo_stlcaseDisplay.OSPRayScaleFunction = 'PiecewiseFunction'
+geo_stlcaseDisplay.GlyphType = 'Arrow'
+geo_stlcaseDisplay.ScalarOpacityUnitDistance = 0.7561723736133242
+geo_stlcaseDisplay.SetScaleArray = [None, '']
+geo_stlcaseDisplay.ScaleTransferFunction = 'PiecewiseFunction'
+geo_stlcaseDisplay.OpacityArray = [None, '']
+geo_stlcaseDisplay.OpacityTransferFunction = 'PiecewiseFunction'
+
+# set active source
+SetActiveSource(computeDerivatives1)
+
+# create a new 'Annotate Time Filter'
+annotateTimeFilter1 = AnnotateTimeFilter(Input=computeDerivatives1)
+
+# Properties modified on annotateTimeFilter1
+annotateTimeFilter1.Format = 'Time: %.2fs'
+
+# show data in view
+annotateTimeFilter1Display = Show(annotateTimeFilter1, renderView1)
+# trace defaults for the display properties.
+annotateTimeFilter1Display.Color = [0.0, 0.0, 0.0]
+
+# Properties modified on annotateTimeFilter1Display
+annotateTimeFilter1Display.FontSize = 8
+
+# set active source
+SetActiveSource(geo_stlcase)
+
+# create a new 'Line'
+line1 = Line()
+
+# Properties modified on line1
+line1.Point1 = [0.0, 0.0, 0.0]
+line1.Point2 = [1.0, 1.0120669989533015, 0.0]
+
+# show data in view
+line1Display = Show(line1, renderView1)
+# trace defaults for the display properties.
+line1Display.AmbientColor = [0.0, 0.0, 0.0]
+line1Display.ColorArrayName = [None, '']
+line1Display.DiffuseColor = [0.0, 0.0, 0.0]
+line1Display.BackfaceDiffuseColor = [0.0, 0.0, 0.0]
+line1Display.OSPRayScaleArray = 'Texture Coordinates'
+line1Display.OSPRayScaleFunction = 'PiecewiseFunction'
+line1Display.GlyphType = 'Arrow'
+line1Display.SetScaleArray = [None, '']
+line1Display.ScaleTransferFunction = 'PiecewiseFunction'
+line1Display.OpacityArray = [None, '']
+line1Display.OpacityTransferFunction = 'PiecewiseFunction'
+
+# toggle 3D widget visibility (only when running from the GUI)
+Hide3DWidgets(proxy=line1)
+
+# change representation type
+line1Display.SetRepresentationType('Points')
+
+# change solid color
+line1Display.AmbientColor = [1.0, 0.0, 0.0]
+
+# Properties modified on line1Display
+line1Display.LineWidth = 4.0
+
+# Properties modified on line1Display
+line1Display.PointSize = 12.0
+
+# Properties modified on line1
+line1.Resolution = 8
+
+# set active source
+SetActiveSource(annotateTimeFilter1)
+
+# Properties modified on annotateTimeFilter1
+annotateTimeFilter1.Format = 'Time: %.3fs'
+
+# set active source
+SetActiveSource(geo_stlcase)
+
+# create a new 'Line'
+line2 = Line()
+
+# Properties modified on line2
+line2.Point1 = [0.0, 0.0, 0.0]
+line2.Point2 = [1.0, -1.0120669989533015, 0.0]
+
+# show data in view
+line2Display = Show(line2, renderView1)
+# trace defaults for the display properties.
+line2Display.AmbientColor = [0.0, 0.0, 0.0]
+line2Display.ColorArrayName = [None, '']
+line2Display.DiffuseColor = [0.0, 0.0, 0.0]
+line2Display.BackfaceDiffuseColor = [0.0, 0.0, 0.0]
+line2Display.OSPRayScaleArray = 'Texture Coordinates'
+line2Display.OSPRayScaleFunction = 'PiecewiseFunction'
+line2Display.GlyphType = 'Arrow'
+line2Display.SetScaleArray = [None, '']
+line2Display.ScaleTransferFunction = 'PiecewiseFunction'
+line2Display.OpacityArray = [None, '']
+line2Display.OpacityTransferFunction = 'PiecewiseFunction'
+
+# toggle 3D widget visibility (only when running from the GUI)
+Hide3DWidgets(proxy=line2)
+
+# change representation type
+line2Display.SetRepresentationType('Points')
+
+# change solid color
+line2Display.AmbientColor = [1.0, 0.0, 0.0]
+
+# Properties modified on line2Display
+line2Display.LineWidth = 4.0
+
+# Properties modified on line2Display
+line2Display.PointSize = 12.0
+
+# Properties modified on line2
+line2.Resolution = 8
+
+#### saving camera placements for all active views
+
+# current camera placement for renderView1
+renderView1.InteractionMode = '2D'
+renderView1.CameraPosition = [4.500000059604645, 0.0, 21.641984612263986]
+renderView1.CameraFocalPoint = [4.500000059604645, 0.0, 0.0]
+renderView1.CameraParallelScale = 3.8258027398877203
+
+#### uncomment the following to render all views
+# RenderAllViews()
+# alternatively, if you want to write images, you can use SaveScreenshot(...).

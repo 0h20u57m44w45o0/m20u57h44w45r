@@ -1,0 +1,225 @@
+#!/bin/bash
+set -e
+
+#---------------------------------------------------------------------------#
+#-                   Data Operation and Manipulation                       -#
+#-                          <By Huangrui Mo>                               -#
+#- Copyright (C) Huangrui Mo <huangrui.mo@gmail.com>                       -#
+#- This file is part of ArtraDOAM.                                         -#
+#- ArtraDOAM is free software: you can redistribute it and/or modify it    -#
+#- under the terms of the GNU General Public License as published by       -#
+#- the Free Software Foundation, either version 3 of the License, or       -#
+#- (at your option) any later version.                                     -#
+#---------------------------------------------------------------------------#
+
+#---------------------------------------------------------------------------#
+#-                            Methodology
+#- Stream data --> Process data --> Export result
+#---------------------------------------------------------------------------#
+
+#---------------------------------------------------------------------------#
+#->> Data processor
+#---------------------------------------------------------------------------#
+
+data_processor="python3"
+main_script="artradoam.py"
+plot_script="artraplot.py"
+
+#---------------------------------------------------------------------------#
+#->> Configuration
+#---------------------------------------------------------------------------#
+
+#- number of provided data operators
+num_optr=8
+#- data operator names
+operator_name[0]="plot"
+operator_name[1]="stream"
+operator_name[2]="diff"
+operator_name[3]="transform"
+operator_name[4]="statistic"
+operator_name[5]="fft"
+operator_name[6]="polyfit"
+operator_name[7]="convrate"
+operator_name[8]="compute"
+#- set default operator
+pid="${operator_name[1]}"
+
+echo "#---------------------------------------------------------------------------#"
+#- get running mode and data operator
+if [[ "$#" == "2" && "$1" == "-cmd" && -n "$(echo "$2" | grep "^[0-9]*$")" && "$2" -le "$num_optr" && "$2" -ge 0 ]]; then
+    #- set data operator via command line
+    order_num="$2"
+    pid="${operator_name[$order_num]}"
+    echo "mode: "$0"  "$1"  "$pid""
+else
+    #- set data operator interactively
+    for n in $(seq 0 $num_optr)
+    do
+        echo "$n ${operator_name[$n]}"
+    done
+    flag=""
+    while [[ -z "$flag" ]]
+    do
+        order_num=""
+        while [[ -z "$order_num" ]]
+        do
+            read -p "operator:" order_num
+        done
+        if [[ -n "$(echo "$order_num" | grep "^[0-9]*$")" && "$order_num" -le "$num_optr" && "$order_num" -ge 0 ]]; then
+            pid="${operator_name[$order_num]}"
+            echo "apply: $pid"
+            read_key=""
+            while [[ -z "$read_key" ]]
+            do
+                read -p "conform (y or n):" read_key
+            done
+            if [[ "$read_key" == [y] ]]; then
+                flag="end"
+            fi
+        else
+            echo "invalid option..."
+        fi
+    done
+fi
+
+#---------------------------------------------------------------------------#
+#->> Stream parameter
+#---------------------------------------------------------------------------#
+
+#- set directories
+importer="importer"
+processor="processor"
+exporter="exporter"
+operator="operator"
+plotter="plotter"
+recorder="recorder"
+#- save current bash script Dir 
+ArtraDir="$(pwd)"
+#- configure system
+if [[ ! -d "$importer" ]]; then
+    mkdir -p "$importer"
+    mkdir -p "$processor"
+    mkdir -p "$exporter"
+    mkdir -p "$operator"
+    mkdir -p "$plotter"
+    mkdir -p "$recorder"
+    mkdir -p "$recorder"/"$importer"
+    mkdir -p "$recorder"/"$exporter"
+    if [[ -n "$(ls *.py)" ]]; then
+        mv *.py "$operator"/
+    fi
+    echo "environment initialized..."
+    exit
+fi
+#- file names
+case_list="case.list"
+case_info="case.info"
+run_log="run.log"
+#- appendix name for recorder backup
+suffix="$(date +'%Y_%m_%d_%H_%M_%S')"
+
+#---------------------------------------------------------------------------#
+#->> Plot operator
+#---------------------------------------------------------------------------#
+
+if [[ "$order_num" -eq 0 ]]; then
+    if [[ -z "$(ls "$exporter")" ]]; then
+        echo "error: no data files in $exporter for plotting..."
+        exit
+    fi
+    #- change to plotter dir and plot
+    cd "$ArtraDir"/"$plotter"
+    "$data_processor" "$ArtraDir"/"$operator"/"$plot_script"
+    #- automatically open file
+    #sys_name="$(uname)"
+    #if [[ "$sys_name" == "Linux" ]]; then
+    #    PDFviewer="xdg-open"
+    #elif [[ "$sys_name" == "Darwin" ]]; then
+    #    PDFviewer="open"
+    #else
+    #    PDFviewer="open"
+    #fi
+    #"$PDFviewer" "${plot_script/.py/.pdf}" || exit
+    echo "#---------------------------------------------------------------------------#"
+    exit
+fi
+
+#---------------------------------------------------------------------------#
+#->> Stream data
+#---------------------------------------------------------------------------#
+
+echo "preprocessing..."
+#- before processing, backup the results of last time to recorder
+if [[ -n "$(ls "$exporter")" ]]; then
+    :> "$recorder"/"$exporter"/"initial"
+    rm "$recorder"/"$exporter"/*
+    mv "$exporter"/* "$recorder"/"$exporter"/
+    cp -r "$recorder"/"$exporter" "$recorder"/"$exporter"_"$suffix"
+fi
+#- change to importer dir
+cd "$ArtraDir"/"$importer"
+#- find the file list in data importer
+file_list="$(ls)"
+if [[ -z "$file_list" ]]; then
+    echo "error: no files in $importer..."
+    exit
+fi
+#- change to processor dir
+cd "$ArtraDir"/"$processor"
+#- configure processor center
+:> "$case_list"
+:> "$case_info"
+:> "$run_log"
+#- count the amount of regular cases and record their names
+for file in $file_list
+do
+    if [[ -f "$ArtraDir"/"$importer"/"$file" && -s "$ArtraDir"/"$importer"/"$file" ]]; then
+        echo "$file" >> "$case_list"
+    else
+        echo "warning: \"$file\" aborted, not a regular file..." >> "$run_log"
+    fi
+done
+#- get the total amount of cases
+num_case=$(wc -l "$case_list" | awk '{print $1}')
+if [[ $num_case -eq 0 ]]; then
+    echo "error: empty case list, no valid data file in \"$importer\"..."
+    exit
+fi
+#- configure the head info of data import file
+echo "#---------------------------------------------------------------------------#" >> "$case_info"
+echo "#                             case data stream                              #" >> "$case_info"
+echo "#---------------------------------------------------------------------------#" >> "$case_info"
+echo "# number of cases" >> "$case_info"
+echo "$num_case" >> "$case_info"
+echo "# operator" >> "$case_info"
+echo "$pid" >> "$case_info"
+echo "# case list" >> "$case_info"
+cat "$case_list" >> "$case_info"
+echo "#---------------------------------------------------------------------------#" >> $case_info
+#- now run the processor to process data
+echo "processing..."
+echo "start at $(date +'%F %k:%M:%S')" >> "$run_log"
+"$data_processor" "$ArtraDir"/"$operator"/"$main_script" |& tee -a "$run_log"
+echo "end at $(date +'%F %k:%M:%S')" >> "$run_log"
+#- error detect and control
+error=$(grep 'error' "$run_log" | wc -l)
+if [[ $error -eq 0 ]]; then
+    warning=$(grep 'warn' "$run_log" | wc -l)
+    if [[ $warning -gt 0 ]]; then
+        cat "$run_log"
+    fi
+else
+    cat "$run_log"
+    exit
+fi
+echo "postprocessing..."
+#- backup the input data of this time to recorder
+cd "$ArtraDir"
+:> "$recorder"/"$importer"/"initial"
+rm "$recorder"/"$importer"/*
+mv "$importer"/* "$recorder"/"$importer"/
+cp -r "$recorder"/"$importer" "$recorder"/"$importer"_"$suffix"
+#- summary info
+echo "\"$num_case\" files processed, results exported into \"$exporter\"..."
+echo "#---------------------------------------------------------------------------#"
+

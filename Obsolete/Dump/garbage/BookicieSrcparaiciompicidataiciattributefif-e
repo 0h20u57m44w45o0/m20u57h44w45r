@@ -1,0 +1,26 @@
+#include <omp.h> /* parallel header file */
+#include <stdio.h>
+
+/*
+ * Private clause
+ */
+void wrong() {
+    int tmp = 0;
+    #pragma omp for private(tmp)
+    for (int j = 0; j < 1000; ++j) {
+        tmp += j; /* tmp was not initialized */
+    }
+    printf("%d\n", tmp); /* value is undefined after the region */
+}
+/*
+ * Firstprivate clause
+ */
+void useless() {
+    int tmp = 0;
+    #pragma omp for firstprivate(tmp)
+    for (int j = 0; j < 1000; ++j) {
+        tmp += j; /* tmp at each thread initialized to 0 */
+    }
+    printf("%d\n", tmp); /* value is undefined after the region */
+}
+

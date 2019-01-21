@@ -1,0 +1,1477 @@
+%%%%% --------------------------------------------------------------------------------
+%%
+%%                             LaTeX Lecture Notes
+%%
+%%%%% --------------------------------------------------------------------------------
+%% Copyright (C) Huangrui Mo <huangrui.mo@gmail.com> 
+%% This is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% (at your option) any later version.
+%%%%% --------------------------------------------------------------------------------
+%%
+%%%%************************ Document Class Declaration ******************************
+%%
+\documentclass{ctexarticle}% thesis template of UCAS
+%% Multiple optional arguments:
+%% [scheme = plain] % for thesis writing of international students
+%% [<singlesided|doublesided|printcopy>] % single-sided, double-sided, or print layout
+%% [draftversion] % show draft version information, default is no show
+%% [fontset = <adobe|...>] % specify font set, default is automatic detection
+%% [standard options for ctex class]
+%%%%% --------------------------------------------------------------------------------
+%%
+%%%%************************* Command Define and Settings ****************************
+%%
+\usepackage{Style/custom}% user defined commands
+%%%%% --------------------------------------------------------------------------------
+%%
+%%%%******************************** Content *****************************************
+%%
+\begin{document}
+%%
+%%%%% --------------------------------------------------------------------------------
+%%
+%%%%******************************** Frontmatter *************************************
+%%
+%% Frontmatter of Title page, Table of contents, Preface chapter.
+\frontmatter
+%%
+%% >>> Frontpages
+%%
+\title{\LaTeX学术写作轻松入门}
+\input{Tex/Frontpages}
+%%
+%%% >>> List of Content
+%%
+\intotoc{\contentsname}% add a corresponding item to the contents table and bookmark
+\tableofcontents% contents catalog
+%%
+%% >>> prematter
+%%
+\input{Tex/Prematter}% list of symbols, preface of books
+%%
+%%%%% --------------------------------------------------------------------------------
+%%
+%%%%******************************** Mainmatter **************************************
+%%
+\section{什么是\LaTeX{}？}
+
+使用\url{http://latex-cookbook.net/articles/smart-diagrams/}进行图示介绍。
+
+TeX is a low-level markup and programming language created by Donald Knuth to typeset documents attractively and consistently. English speakers often pronounce it /'tɛk/, like the first syllable of technical. Programming in TeX generally progresses along a very gradual learning curve, requiring a significant investment of time to build custom macros for text formatting.
+
+LaTeX (pronounced either "Lah-tech" or "Lay-tech") is a macro package based on TeX created by Leslie Lamport. Its purpose is to simplify TeX typesetting, especially for documents containing mathematical formulae. Many later authors have contributed extensions, called packages or styles, to LaTeX. Some of these are bundled with most TeX/LaTeX software distributions; more can be found in the Comprehensive TeX Archive Network (CTAN \url{https://ctan.org/}).
+
+Since LaTeX comprises a group of TeX commands, LaTeX document processing is essentially programming. You create a text file in LaTeX markup, which LaTeX reads to produce the final document.
+
+\section{为什么用\LaTeX{}？} 
+
+L A TEX is a document preparation system that enables the document writer to
+concentrate on the contents of their text, without bothering too much about
+the formatting of it. For example, chapters are indicated by \chapter{htitlei}
+rather than by selecting 18pt bold.
+
+This approach has some disadvantages in comparison with a WYSIWYG (What You See Is What You Get) program such as LibreOffice Writer or Microsoft Word.
+
+In LaTeX:
+
+    You don't (usually) see the final version of the document when editing it.
+    You generally need to know the necessary commands for LaTeX markup.
+    It can sometimes be difficult to obtain a certain look for the document.
+
+On the other hand, there are certain advantages to the LaTeX approach:
+
+    Document sources can be read with any text editor and understood, unlike the complex binary and XML formats used with WYSIWYG programs.
+    You can concentrate purely on the structure and contents of the document, not get caught up with superficial layout issues.
+You don't need to manually adjust fonts, text sizes, line heights, or text flow for readability, as LaTeX takes care of them automatically.
+Mathematical formulae can be easily typeset.
+Indexes, footnotes, citations and references are generated easily.
+
+ We are separating our text from the structural code
+
+Philosophy of use
+
+Flexibility and modularity
+One of the most frustrating things beginners and even advanced users might encounter using LaTeX is the lack of flexibility regarding the document design and layout. If you want to design your document in a very specific way, you may have trouble accomplishing this. Keep in mind that LaTeX does the formatting for you, and mostly the right way. If it is not exactly what you desired, then the LaTeX way is at least not worse, if not better. One way to look at it is that LaTeX is a bundle of macros for TeX that aims to carry out everything regarding document formatting, so that the writer only needs to care about content. If you really want flexibility, use plain TeX instead. One solution to this dilemma is to make use of the modular possibilities of LaTeX. You can build your own macros, or use macros developed by others. You are likely not the first person to face some particular formatting problem, and someone who encountered a similar problem before may have published their solution as a package.
+
+文章=格式+内容
+
+格式与内容分离
+
+自动排版、随意切换格式（参考文献）
+
+\section{怎么装\LaTeX{}？}
+
+LaTeX is not a program by itself; it is a language. Using LaTeX requires a bunch of tools. Acquiring them manually would result in downloading and installing multiple programs in order to have a suitable computer system that can be used to create LaTeX output, such as PDFs. TeX Distributions help the user in this way, in that it is a single step installation process that provides (almost) everything.
+
+At a minimum, you'll need a TeX distribution, a good text editor and a DVI or PDF viewer. 
+
+\subsection{安装\LaTeX{}编译环境}
+
+TeX distributions are collections of packages and programs (compilers, fonts, and macro packages) that enable you to typeset without having to manually fetch files and configure things. it includes a TeX compiler (which is used to generate output files from source), fonts, and the LaTeX macro set.
+
+TeX Live    A cross-platform TeX distribution.GNU/Linux, Mac OS X and Windows.
+MacTeX 	 is a Mac OS-specific distribution based on TeX Live.
+MiKTeX 	A TeX distribution for Windows.
+
+\subsection{安装\LaTeX{}文本编辑器}
+
+an attractive editor to write LaTeX source documents (this is probably where you will spend most of your time)
+
+LaTeX source documents (as well as related files) are all text files, and can be opened and modified in almost any text editor. Dedicated LaTeX editors are more useful than generic plain text editors, because they usually have autocompletion of commands, spell and error checking and handy macros.
+
+
+texmaker (\url{http://www.xm1math.net/texmaker/})TeXmaker is a cross-platform editor very similar to Kile in features and user interface. In addition it has its own PDF viewer.
+
+\subsection{安装PDF阅读器}
+
+\section{如何用\LaTeX{}写文章？}
+
+LaTeX uses a markup language in order to describe document structure and presentation. LaTeX converts your source text, combined with the markup, into a high quality document. 
+
+\subsection{预备工作}
+
+Never, ever use directories (folders) or file names that contain spaces. Although your operating system probably supports them, some don't, and they will only cause grief and tears with TeX. Make filenames as short or as long as you wish, but strictly avoid spaces.
+
+We really urge you to use UTF-8 encoding. It is technically superior to most (all?) encodings, it supports the full Unicode specification (all symbols that ever existed), and is backward compatible with ASCII.
+
+There are some important steps to specify encoding.
+
+    Make sure your text editor decodes the file in UTF-8.
+    Make sure it saves your file in UTF-8. Most text editors do not make the distinction, but some do, such as Notepad++.
+    If you are working in a terminal, make sure it is set to support UTF-8 input and output. Some old Unix terminals may not support UTF-8. PuTTY is not set to use UTF-8 by default, you have to configure it.
+    Tell LaTeX that the source file is UTF-8 encoded.
+
+One word of warning: do not leave empty spaces in the filenames, they can cause ambiguous behaviour. Either leave no spaces or use underscores _ instead.
+
+\subsection{微型实例}
+
+\begin{verbatim}
+\documentclass{article}
+
+\begin{document}
+你好，\LaTeX{}!
+\end{document}
+\end{verbatim}
+
+\documentclass{article} 	This line is a command and tells LaTeX to use the article document class. A document class file defines the formatting, which in this case is a generic article format. The handy thing is that if you want to change the appearance of your document, substitute article for another class file that exists.
+\begin{document} 	This line is the beginning of the environment called document; it alerts LaTeX that content of the document is about to commence. Anything above this command is known generally to belong in the preamble.
+Hello World! 	This was the only actual line containing real content - the text that we wanted displayed on the page.
+\end{document} 	The document environment ends here. It tells LaTeX that the document source is complete, anything after this line will be ignored.
+
+\subsection{基础编译方法}
+
+.tex $\overset{xelatex}{\to}$ .pdf
+
+The general concept is to transform a plain text document into a publishable format, mostly a DVI, PS or PDF file. This process is called compilation, which is done by an executable file called a compiler.
+
+xelatex
+
+\subsection{结构化文档}
+
+The sectioning commands use 'mark' commands to pass information to the page headers. For example, \verb|\chapter| uses \verb|\chaptermark|, \verb|\section| uses \verb|\sectionmark|, and so on. With this knowledge, one can achieve a three-layer structure for chapters: 
+
+\verb|\chapter[toc version]{doc version}|
+
+\verb|\chaptermark{version for header}|
+
+In the case of sections, one has typically to take account of the nature of the \verb|\*mark| commands: the thing that goes in the heading is the first mark on the page (or, failing any mark, the last mark on any previous page). As a result the recipe for sections is more tiresome:
+
+\verb|\section[toc version]{doc version%\sectionmark{header version}}|
+
+\verb|\sectionmark{header version}|
+
+(the first \verb|\sectionmark| deals with the header of the page the \verb|\section| command falls on, and the second deal with subsequent pages; note that here, you need the optional argument to \verb|\section|, even if "middling version" is in fact the same text as "long version".)
+
+A similar arrangement is necessary even for chapters if the class you're using is odd enough that it puts a page header on a chapter's opening page. 
+
+The main point of writing a text is to convey ideas, information, or knowledge to the reader. The reader will understand the text better if these ideas are well-structured, and will see and feel this structure much better if the typographical form reflects the logical and semantic structure of the content.
+
+LaTeX is different from other typesetting systems in that you just have to tell it the logical and semantical structure of a text. It then derives the typographical form of the text according to the “rules” given in the document class file and in various style files. LaTeX allows users to structure their documents with a variety of hierarchical constructs, including chapters, sections, subsections and paragraphs.
+
+\subsubsection{Global structure}
+
+When LaTeX processes an input file, it expects it to follow a certain structure. Thus every input file must contain the commands
+
+\documentclass{...}
+
+\begin{document}
+...
+\end{document}
+
+The area between \documentclass{...} and \begin{document} is called the preamble. It normally contains commands that affect the entire document.
+
+After the preamble, the text of your document is enclosed between two commands which identify the beginning and end of the actual document:
+
+\begin{document}
+...
+\end{document}
+
+You would put your text where the dots are. The reason for marking off the beginning of your text is that LaTeX allows you to insert extra setup specifications before it (where the blank line is in the example above: we'll be using this soon). The reason for marking off the end of your text is to provide a place for LaTeX to be programmed to do extra stuff automatically at the end of the document, like making an index.
+
+\subsubsection{选择文档类型}
+
+A package is a file or collection of files containing extra LaTeX commands and programming which add new styling features or modify those already existing. There are two main file types: class files with .cls extension, and style files with .sty extension. There may be ancillary files as well. When you try to typeset a document which requires a package which is not installed on your system, LaTeX will warn you with an error message that it is missing. 
+
+When processing an input file, LaTeX needs to know the type of document the author wants to create. 
+
+\documentclass[options]{class}
+
+Here, class specifies the type of document to be created. The LaTeX distribution provides additional classes for other documents, including letters and slides. It is also possible to create your own, as is often done by journal publishers, who simply provide you with their own class file, which tells LaTeX how to format your content. 
+
+Example: an input file for a LaTeX document could start with the line
+
+\documentclass[11pt,twoside,a4paper]{article}
+
+which instructs LaTeX to typeset the document as an article with a base font size of 11 points, and to produce a layout suitable for double sided printing on A4 paper.
+
+Here are some document classes that can be used with LaTeX:
+article 	For articles in scientific journals, presentations, short reports, program documentation, invitations, ...
+IEEEtran 	For articles with the IEEE Transactions format.
+report 	For longer reports containing several chapters, small books, thesis, ...
+book 	For real books.
+beamer 	For writing presentations (see LaTeX/Presentations).
+
+\subsubsection{加载包裹}
+
+While writing your document, you will probably find that there are some areas where basic LaTeX cannot solve your problem. If you want to include graphics, colored text or source code from a file into your document, you need to enhance the capabilities of LaTeX. Such enhancements are called packages.
+The command to use a package is pretty simple: 
+
+\usepackage[options]{package}
+command, where package is the name of the package and options is a list of keywords that trigger special features in the package.
+
+ou can pass several options to a package, each separated by a comma.
+
+\usepackage[option1,option2,option3]{''package_name''}
+
+\subsection{添加文档信息}
+
+At the beginning of most documents there will be information about the document itself, such as the title and date, and also information about the authors, such as name, address, email etc. 
+
+标题，作者，时间，职位
+
+\title, \author \thanks and \date
+
+The command \thanks will store content, which will produce a footnote along with the title. As the name suggests, it can be used to thanks someone. Or just to print an email address or similar in a footnote.
+
+The authors are separated by the command \and, allowing author blocks to be output next to each other. 
+
+Journals follow a specific layout. To ensure this they often provide a template which defines the layout. What is available for the title (for example emails, affiliation names, keywords) heavily depends on the template and highly differs between different journals. Follow the template if the journal provides one. 
+
+\documentclass[11pt,a4paper]{report}
+
+\begin{document}
+\title{How to Structure a LaTeX Document}
+\author{Andrew Roberts}
+\date{December 2004}
+\maketitle
+\end{document}
+The \title, \author, and \date commands are self-explanatory. You put the title, author name, and date in curly braces after the relevant command. The title and author are usually compulsory (at least if you want LaTeX to write the title automatically); if you omit the \date command, LaTeX uses today's date by default. You always finish the top matter with the \maketitle command, which tells LaTeX that it's complete and it can typeset the title according to the information you have provided and the class (style) you are using. If you omit \maketitle, the title will never be typeset.
+
+\subsubsection{摘要}
+
+Abstract
+
+As most research papers have an abstract, there are predefined commands for telling LaTeX which part of the content makes up the abstract. This should appear in its logical order, therefore, after the top matter, but before the main sections of the body. This command is available for the document classes article and report, but not book.
+
+\documentclass{article}
+
+\begin{document}
+
+\begin{abstract}
+Your abstract goes here...
+...
+\end{abstract}
+...
+\end{document}
+
+\subsubsection{}
+Sectioning commands
+
+The commands for inserting sections are fairly intuitive. Of course, certain commands are appropriate to different document classes. For example, a book has chapters but an article doesn't. Here are some of the structure commands found in simple.tex.
+
+\chapter{Introduction}
+This chapter's content...
+
+\section{Structure}
+This section's content...
+
+\subsection{Top Matter}
+This subsection's content...
+
+\subsubsection{Article Information}
+This subsubsection's content...
+
+Notice that you do not need to specify section numbers; LaTeX will sort that out for you. Also, for sections, you do not need to use \begin and \end commands to indicate which content belongs to a given block.
+
+LaTeX provides 7 levels of depth for defining sections (see table below). Each section in this table is a subsection of the one above it.
+Command 	Level 	Comment
+\part{''part''} 	-1 	not in letters
+\chapter{''chapter''} 	0 	only books and reports
+\section{''section''} 	1 	not in letters
+\subsection{''subsection''} 	2 	not in letters
+\subsubsection{''subsubsection''} 	3 	not in letters
+\paragraph{''paragraph''} 	4 	not in letters
+\subparagraph{''subparagraph''} 	5 	not in letters
+
+All the titles of the sections are added automatically to the table of contents (if you decide to insert one).
+
+To get an unnumbered section heading which does not go into the Table of Contents, follow the command name with an asterisk before the opening curly brace:
+
+\subsection*{Introduction}
+
+\subsubsection{目录}
+
+All auto-numbered headings get entered in the Table of Contents (ToC) automatically. You don't have to print a ToC, but if you want to, just add the command \tableofcontents at the point where you want it printed (usually after the Abstract or Summary).
+The commands \listoffigures and \listoftables work in exactly the same way as \tableofcontents to automatically list all your tables and figures. 
+
+\subsubsection{List Structures}
+
+Lists often appear in documents, especially academic, as their purpose is often to present information in a clear and concise fashion. List structures in LaTeX are simply environments which essentially come in three types:
+
+    itemize for a bullet list
+    enumerate for an enumerated list and
+    description for a descriptive list.
+
+\begin{list_type}  
+\item The first item 
+\item The second item 
+\item The third etc \ldots 
+\end{list_type}
+
+LaTeX will happily allow you to insert a list environment into an existing one (up to a depth of four, more levels are available using packages). Simply begin the appropriate environment at the desired point within the current list. Latex will sort out the layout and any numbering for you.
+
+\subsubsection{Text Formatting}
+
+text-formatting techniques. Formatting refers to most things to do with appearance including text style and spacing. 
+
+\paragraph{空格与换行}
+
+The LaTeX compiler normalises whitespace so that whitespace characters, such as [space] or [tab], are treated uniformly as "space": several consecutive "spaces" are treated as one, "space" opening a line is generally ignored, and a single line break also yields “space”. A double line break (an empty line), however, defines the end of a paragraph; multiple empty lines are also treated as the end of a paragraph. An example of applying these rules is presented below: the left-hand side shows the user's input (.tex), while the right-hand side depicts the rendered output (.dvi/.pdf/.ps).
+
+\begin{verbatim}
+    
+It does not matter whether you
+enter one or several             spaces
+after a word.
+
+An empty line starts a new
+paragraph.
+\end{verbatim}
+
+\paragraph{保留字符}
+
+The following symbols are reserved characters that either have a special meaning under LaTeX or are unavailable in all the fonts. If you enter them directly in your text, they will normally not print but rather make LaTeX do things you did not intend.
+
+\# \$ \% \^ \& \_ \{ \} \~ \textbackslash{}
+
+As you will see, these characters can be used in your documents all the same by adding a prefix backslash:
+
+\# \$ \% \^{} \& \_ \{ \} \~{} \textbackslash{}
+
+\paragraph{LaTeX groups}
+
+Sometimes a certain state should be kept local, i.e. limiting its scope. This can be done by enclosing the part to be changed locally in curly braces. 
+\documentclass{article}
+\begin{document}
+normal text {\itshape walzing \bfseries Wombat} more normal text
+\end{document}
+Environments form an implicit group.
+
+\paragraph{LaTeX environments}
+
+Environments in LaTeX have a role that is quite similar to commands, but they usually have effect on a wider part of the document. Their syntax is:
+
+\begin{environmentname}
+text to be influenced
+\end{environmentname}
+
+Between the \begin and the \end you can put other commands and nested environments. The internal mechanism of environments defines a group, which makes its usage safe (no influence on the other parts of the document). 
+
+\paragraph{Sizing text}
+
+To apply different font sizes, simply follow the commands on this table:
+Command 	Output
+\tiny 	sample text
+\scriptsize 	sample text
+\footnotesize 	sample text
+\small 	sample text
+\normalsize 	sample text
+\large 	sample text
+\Large 	sample text
+\LARGE 	sample text
+\huge 	sample text
+\Huge 	sample text
+
+These commands change the size within a given scope, so for instance {\Large some words} will change the size of only some words, and does not affect the font in the rest of the document. It will work for most parts of the text.
+
+\paragraph{注释}
+
+Comments
+
+When LaTeX encounters a % character while processing an input file, it ignores the rest of the current line, the line break, and all whitespace at the beginning of the next line.
+
+This can be used to write notes into the input file, which will not show up in the printed version.
+
+\paragraph{footnotes}
+
+Footnotes are a very useful way of providing extra information to the reader. Usually, it is non-essential information which can be placed at the bottom of the page. This keeps the main body of text concise.
+
+The footnote facility is easy to use. The command you need is: \footnote{text}. Do not leave a space between the command and the word where you wish the footnote marker to appear, otherwise LaTeX will process that space and will leave the output not looking as intended.
+
+\paragraph{Hyperlinks}
+
+he basic usage with the standard settings is straightforward. Just load the package in the preamble:
+
+\usepackage{hyperref}
+
+This will automatically turn all your internal references into hyperlinks. If you load it, you will have the possibility to include interactive external links and all your internal references will be turned to hyperlinks. 
+
+\url
+
+Usage:
+
+\url{<my_url>}
+
+It will show the URL using a mono-spaced font and, if you click on it, your browser will be opened pointing at it.
+\href
+
+Usage:
+
+\href{<my_url>}{<description>}
+
+It will show the string description using standard document font but, if you click on it, your browser will be opened pointing at my_url. Here is an example:
+
+\url{https://www.wikibooks.org}
+\href{https://www.wikibooks.org}{Wikibooks home}
+
+Both point at the same page, but in the first case the URL will be shown, while in the second case the URL will be hidden. Note that, if you print your document, the link stored using \href will not be shown anywhere in the document.
+
+\subsection{插入图片}
+单图、多图
+
+Floats are containers for things in a document that cannot be broken over a page. Floats are not part of the normal stream of text, but separate entities, positioned in a part of the page to themselves (top, middle, bottom, left, right, or wherever the designer specifies). They always have a caption describing them and they are always numbered so they can be referred to from elsewhere in the text. LaTeX automatically floats Tables and Figures, depending on how much space is left on the page at the point that they are processed. If there is not enough room on the current page, the float is moved to the top of the next page. This can be changed by moving the Table or Figure definition to an earlier or later point in the text, or by adjusting some of the parameters which control automatic floating.
+
+If you are writing a document using two columns (i.e. you started your document with something like \documentclass[twocolumn]{article}), you might have noticed that you can't use floating elements that are wider than the width of a column (using a LaTeX notation, wider than 0.5\textwidth), otherwise you will see the image overlapping with text. If you really have to use such wide elements, the only solution is to use the "starred" variants of the floating environments, that are {figure*} and {table*}. Those "starred" versions work like the standard ones, but they will be as wide as the page, so you will get no overlapping.
+
+A bad point of those environments is that they can be placed only at the top of the page or on their own page. If you try to specify their position using modifiers like b or h, they will be ignored. 
+
+A suggestion: do not give your files names like "chapter_01.tex" or "figure_03.png", i. e. try to avoid using numbers in file-names: if the numbering LaTeX gives them automatically, is different from the one you gave (and this will likely happen) you will get really confused. When naming a file, stop for a second, think about a short name that can fully explain what is inside the file without being ambiguous, it will let you save a lot of time as soon as the document gets larger.
+
+Use vector graphics rather than raster images
+
+Raster (bitmap) graphics scale poorly and often create jagged or low-quality results which clash with the document quality, particularly when printed.
+
+Using vector (line-oriented) graphics instead, either through LaTeX's native diagramming tools or by exporting vector formats from your drawing or diagramming tools, will produce much higher quality results. When possible, you should prefer PDF, EPS, or SVG graphics over PNG or JPG.
+
+\subsection{绘制表格}
+
+l 	left-justified column
+c 	centered column
+r 	right-justified column
+p{'width'} 	paragraph column with text vertically aligned at the top
+m{'width'} 	paragraph column with text vertically aligned in the middle (requires array package)
+b{'width'} 	paragraph column with text vertically aligned at the bottom (requires array package)
+| 	vertical line
+|| 	double vertical line
+
+& 	column separator
+\\ 	start new row (additional space may be specified after \\ using square brackets, such as \\[6pt])
+\hline 	horizontal line
+\newline 	start a new line within a cell (in a paragraph column)
+\cline{i-j} 	partial horizontal line beginning in column i and ending in column j
+
+By default, if the text in a column is too wide for the page, LaTeX won't automatically wrap it. Using p{'width'} you can define a special type of column which will wrap-around the text as in a normal paragraph. You can pass the width using any unit supported by LaTeX, such as 'pt' and 'cm', or command lengths, such as \textwidth.
+
+论文中应尽量避免过长或是横排的表格。在此提供横排图表的两种实现方式：使用 landscape 环境放置图table 或 放置表figure。此方式通过横置页面实现横排，从而不妨碍阅读，对于图也是只需用 landscape 环境放置即可。使用 sidewaystable 替换图table 和使用 sidewaysfigure 替换表figure 。此方案只横排图表不横排页，从而需扭头观看
+
+\begin{landscape}% 横排页环境
+\begin{table}%
+    \bicaption{这是一个横排样表。}{This is a rotated sample table.}
+    \label{tab:rotatedsamplelscape}
+    \centering
+    \begin{tabular}{lcccccccc}
+        \hline
+        \textbf{Type} & Avg1 & Avg2 & Avg3 & Avg4 & Avg5 & Avg6 & Avg7 & Avg8 \\
+        \hline
+        BS & 79.24 & 84.33 & 77.75 & 80.50 & 51.90 & 49.20 & 9.10 & 100.00 \\
+        BC & 77.83 & 77.30 & 75.81 & 77.92 & 55.80 & 46.30 & 12.30 & 100.00 \\
+        CE & 90.96 & 83.29 & 87.44 & 91.19 & 84.90 & 29.70 & 14.70 & 100.00 \\
+        CHES & 94.84 & 83.97 & 82.16 & 95.22 & 72.40 & 42.90 & 15.30 & 100.00 \\
+        CA & 86.68 & 81.16 & 83.76 & 86.07 & 76.80 & 40.90 & 18.50 & 100.00 \\
+        DER & 87.82 & 62.03 & 73.37 & 86.96 & 64.40 & 37.20 & 4.50 & 100.00 \\
+        EC & 84.62 & 85.43 & 85.43 & 84.97 & 60.00 & 38.20 & 13.60 & 100.00 \\
+        GI & 74.12 & 69.83 & 68.95 & 74.12 & 59.90 & 40.80 & 15.10 & 100.00 \\
+        HR & 72.62 & 73.39 & 63.39 & 69.54 & 49.30 & 49.30 & 13.10 & 100.00 \\
+        HEP & 86.25 & 85.00 & 81.25 & 86.25 & 71.70 & 43.40 & 17.80 & 100.00 \\
+        IS & 97.19 & 97.23 & 95.80 & 97.14 & 70.60 & 27.60 & 15.90 & 100.00 \\
+        ION & 94.02 & 93.45 & 93.17 & 93.73 & 52.50 & 47.50 & 12.90 & 100.00 \\
+        IRS & 95.33 & 93.33 & 84.00 & 96.00 & 54.20 & 26.90 & 9.50 & 100.00 \\
+        \hline
+    \end{tabular}
+\end{table}
+\end{landscape}
+
+\setupctable{captionsleft}% 标题朝向
+\begin{sidewaystable}% 横排表环境
+    \bicaption{这是一个横排样表。}{This is a rotated sample table.}
+    \label{tab:rotatedsamplesideway}
+    \centering
+    \begin{tabular}{lcccccccc}
+        \hline
+        \textbf{Type} & Avg1 & Avg2 & Avg3 & Avg4 & Avg5 & Avg6 & Avg7 & Avg8 \\
+        \hline
+        BS & 79.24 & 84.33 & 77.75 & 80.50 & 51.90 & 49.20 & 9.10 & 100.00 \\
+        BC & 77.83 & 77.30 & 75.81 & 77.92 & 55.80 & 46.30 & 12.30 & 100.00 \\
+        CE & 90.96 & 83.29 & 87.44 & 91.19 & 84.90 & 29.70 & 14.70 & 100.00 \\
+        CHES & 94.84 & 83.97 & 82.16 & 95.22 & 72.40 & 42.90 & 15.30 & 100.00 \\
+        CA & 86.68 & 81.16 & 83.76 & 86.07 & 76.80 & 40.90 & 18.50 & 100.00 \\
+        DER & 87.82 & 62.03 & 73.37 & 86.96 & 64.40 & 37.20 & 4.50 & 100.00 \\
+        EC & 84.62 & 85.43 & 85.43 & 84.97 & 60.00 & 38.20 & 13.60 & 100.00 \\
+        GI & 74.12 & 69.83 & 68.95 & 74.12 & 59.90 & 40.80 & 15.10 & 100.00 \\
+        HR & 72.62 & 73.39 & 63.39 & 69.54 & 49.30 & 49.30 & 13.10 & 100.00 \\
+        HEP & 86.25 & 85.00 & 81.25 & 86.25 & 71.70 & 43.40 & 17.80 & 100.00 \\
+        IS & 97.19 & 97.23 & 95.80 & 97.14 & 70.60 & 27.60 & 15.90 & 100.00 \\
+        ION & 94.02 & 93.45 & 93.17 & 93.73 & 52.50 & 47.50 & 12.90 & 100.00 \\
+        IRS & 95.33 & 93.33 & 84.00 & 96.00 & 54.20 & 26.90 & 9.50 & 100.00 \\
+        \hline
+    \end{tabular}
+\end{sidewaystable}
+
+
+\subsection{输入公式}
+
+\subsection{引用文献}
+
+you can store them in an external BibTeX file and then link them via a command to your current document and use a Bibtex style to define how they appear. This way you can create a small database of the references you might use and simply link them, letting LaTeX work for you.
+
+BibTeX provides for the storage of all references in an external, flat-file database. (BibLaTeX uses this same syntax.) This database can be referenced in any LaTeX document, and citations made to any record that is contained within the file. This is often more convenient than embedding them at the end of every document written; a centralized bibliography source can be linked to as many documents as desired (write once, read many!). 
+
+A BibTeX database is stored as a .bib file. It is a plain text file, and so can be viewed and edited easily. The structure of the file is also quite simple. An example of a BibTeX entry:
+After the type, you must have a left curly brace '{' to signify the beginning of the reference attributes. The first one follows immediately after the brace, which is the citation key, or the BibTeX key. This key must be unique for all entries in your bibliography. It is this identifier that you will use within your document to cross-reference it to this entry. It is up to you as to how you wish to label each reference, but there is a loose standard in which you use the author's surname, followed by the year of publication. This is the scheme that I use in this tutorial.
+
+At the end of your LaTeX file (that is, after the content, but before \end{document}), you need to place the following commands:
+
+\bibliographystyle{plain}
+\bibliography{sample1,sample2,...,samplen} 
+% Note the lack of whitespace between the commas and the next bib file.
+
+Bibliography styles are files recognized by BibTeX that tell it how to format the information stored in the .bib file when processed for output. And so the first command listed above is declaring which style file to use. The style file in this instance is plain.bst (which comes as standard with BibTeX). You do not need to add the .bst extension when using this command, as it is assumed. Despite its name, the plain style does a pretty good job (look at the output of this tutorial to see what I mean).
+
+The second command is the one that actually specifies the .bib file you wish to use. 
+
+Now that LaTeX and BibTeX know where to look for the appropriate files, actually citing the references is fairly trivial. The \cite{ref_key} is the command you need, making sure that the ref_key corresponds exactly to one of the entries in the .bib file. If you wish to cite more than one reference at the same time, do the following: \cite{ref_key1, ref_key2, ..., ref_keyN}.
+
+
+
+\subsection{完整编译方法}
+
+The TeX compilers are single-pass processes. It means that there is no way for a compiler to jump around the document, which would be useful for the table of contents and references. Indeed the compiler cannot guess at which page a specific section is going to be printed, so when the table of contents is printed before the upcoming sections, it cannot set the page numbers.
+
+Ancillary files
+To circumvent this issue, many LaTeX commands which need to jump use ancillary files which usually have the same file name as the current document but a different extension. It stores temporary data into these files and use them for the next compilation. So to have an up-to-date table of contents, you need to compile the document twice. There is no need to re-compile if no section moved.
+None of these files contains unrecoverable information. It means you can delete them safely, compiling will regenerate them automatically.
+
+The only important file types are .tex, .cls and .sty, .bib and .bst for BibTeX, these are not temporary and should not be deleted.
+
+.aux 	A file that transports information from one compiler run to the next. Among other things, the .aux file is used to store information associated with cross-references.
+.bbl 	Bibliography file output by BiBTeX and used by LaTeX
+.bib 	Bibliography database file. containing the reference database. (where you can store a list of full bibliographic citations)
+.blg 	BiBTeX log file. (errors are logged here)
+.bst 	BiBTeX style file. a style file for reference format, used by \bibliographystyle{xxx} command
+.cls 	Class files define what your document looks like. They are selected with the \documentclass command.
+.sty 	LaTeX Macro package. This is a file you can load into your LaTeX document using the \usepackage command.
+.tex Latex input file, one of them is the main tex file and be complied with latex.
+.out 	hyperref package file, just one for the master file.
+.log 	Gives a detailed account of what happened during the last compiler run.
+.toc 	Stores all your section headers. It gets read in for the next compiler run and is used to produce the table of contents.
+.lof 	This is like .toc but for the list of figures.
+.lot 	And again the same for the list of tables.
+.pdf 	Portable Document Format. This is the main result of a LaTeX compile run with pdflatex. You can look at its content or print it with any PDF viewer.
+
+To summarise, .cls and .sty files are loaded by LATEX
+to provide and improve methods that are used to create documents. Generally speaking,
+class files implement the specific structure of the document, whereas packages are used
+to provide either generic functionality to any document, or to 'style' the methods
+provided by a specific class.
+
+References and citations are best handled in a consistent way by using BibTeX. In this
+method, you supply all the relevant information about references in a .bib file without
+regard to ordering or style. (See the sample file myrefs.bib, below.) Then you let BibTeX
+format all citations and reference entries according to the chosen bibliographic style, and
+you don't have to sweat all the font and punctuation and ordering details yourself.
+
+To fully compile and cross-link references on must repeat some commands:
+
+The addition of BibTeX adds extra complexity for the processing of the source to the desired output. This is largely hidden from the user, but because of all the complexity of the referencing of citations from your source LaTeX file to the database entries in another file, you actually need multiple passes to accomplish the task. This means you have to run LaTeX a number of times. Each pass will perform a particular task until it has managed to resolve all the citation references. Here's what you need to type (into command line):
+
+    latex latex_source_code.tex : creates .aux file which includes keywords of  any citations
+
+    bibtex latex_source_code.aux : uses the .aux file to extract cited publications from the database in the .bib file, formats them according to the indicated style, and puts the results into in a .bbl file
+
+    latex latex_source_code.tex: inserts appropriate reference indicators at each point of citation, according to the indicated bibliography style
+
+    latex latex_source_code.tex: refines citation references and other cross- references, page formatting and page numbers
+
+(Extensions are optional, if you put them note that the bibtex command takes the AUX file as input.)
+
+After the first LaTeX run, you will see errors such as:
+
+LaTeX Warning: Citation `lamport94' on page 1 undefined on input line 21.
+...
+LaTeX Warning: There were undefined references.
+
+The next step is to run bibtex on that same LaTeX source (or more precisely the corresponding AUX file, however not on the actual .bib file) to then define all the references within that document. You should see output like the following:
+
+This is BibTeX, Version 0.99c (Web2C 7.3.1)
+The top-level auxiliary file: latex_source_code.aux
+The style file: plain.bst
+Database file #1: sample.bib
+
+The third step, which is invoking LaTeX for the second time will see more errors like "LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.". Don't be alarmed, it's almost complete. As you can guess, all you have to do is follow its instructions, and run LaTeX for the third time, and the document will be output as expected, without further problems.
+
+If you want a pdf output instead of a dvi output you can use pdflatex instead of latex as follows:
+
+    pdflatex latex_source_code.tex
+    bibtex latex_source_code.aux
+    pdflatex latex_source_code.tex
+    pdflatex latex_source_code.tex
+\section{如何用\LaTeX{}做PPT？}
+
+\section{如何用\LaTeX{}排简历？}
+
+\section{如何进阶？}
+
+Removing the spaces between words: Is there any way to remove spaces from in between the words in a text? Something like
+
+\RemoveSpaces{This is   my    sentence.}
+
+which will be converted to
+
+Thisismysentence.
+
+Answer:
+
+\makeatletter
+\def\RemoveSpaces#1{\zap@space#1 \@empty}
+\makeatother
+
+xeCJK 风格的字体选择
+
+1. 首先是针对 TeX 中三个主要的字族（family）设置。这三个字族分别是 \rmfamily、\sffamily、\ttfamily。对应的文档字体设置命令分别是 \setCJKmainfont、\setCJKsansfont、\setCJKmonofont。
+
+对于每一条 \setCJKxxxfont 命令，又分别有 \mdseries\upshape 和 \bfseries\upshape 以及 \mdseries\itshape 的分别。具体来说
+
+\setCJKmainfont[BoldFont = B, ItalicFont = C]{A}
+
+将文档中 \rmfamily 的 CJK 部分的 \mdseries\upshape 字体设置为 A，将其 \bfseries\upshape 以及 \mdseries\itshape 字体分别设置为 B 和 C。
+
+当不提供 BoldFont 或 ItalicFont 时，若 XeTeX 能找到 A 字体的高字重及/或意大利体字形，则系统会直接调用它们。而若它们不存在时，若 xeCJK 的伪粗体伪斜体打开，则会使用伪粗伪斜代替；若没打开，则只能回退到 A 本身。
+
+在设计字体配置（fontset）时，我们的考量主要有以下几个。
+
+    中文 \rmfamily 以宋体为代表，\sffamily 以黑体为代表，而 \ttfamily 则交给仿宋体。
+    由于中文不存在 \itshape 的说法，所以 \itshape 以楷书代替。
+    对于 \bfseries，若有高质量的粗体，则明确配置（或者由 XeTeX 自己确定）；但若没有高质量的粗体，则对 \rmfamily 以黑体替代，其他字族则视情况而定（可以考虑伪粗体）。
+
+2. 然后定义一些新的字族和字体切换命令：
+
+\setCJKfamilyfont{zhsong}{Adobe Song Std}
+\setCJKfamilyfont{zhhei}{Adobe Heiti Std}
+\setCJKfamilyfont{zhfs}{Adobe Fangsong Std}
+\setCJKfamilyfont{zhkai}{Adobe Kaiti Std}
+
+\newcommand*{\songti}{\CJKfamily{zhsong}} % 宋体
+\newcommand*{\heiti}{\CJKfamily{zhhei}}   % 黑体
+\newcommand*{\kaishu}{\CJKfamily{zhkai}}  % 楷书
+\newcommand*{\fangsong}{\CJKfamily{zhfs}} % 仿宋
+\newcommand*{\lishu}{\CJKfamily{zhli}}    % 隶书
+\newcommand*{\youyuan}{\CJKfamily{zhyou}} % 幼圆
+
+请注意区分 \rmfamily 和 \songti，前者会设置粗体（BoldFont）为黑体或者粗宋体，而后者只在有粗宋体时，才将其设置为粗体。
+
+fontspec 包的策略是，如果两个字体完全相同，就不定义新字体。这里，mainfont 和 sansfont 的定义完全相同，都是 Times New Roman，他们就共用了一个族名 TimesNewRoman(0)，我们对 \fontfamily 的补丁就无法区分用户使用的是 \rmfamily 还是 \sffamily，导致中文字体族匹配失误。
+
+如果字体的定义完全相同，可以指定 NFSSFamily 选项，让 fontspec 总是定义新字体，避免族名复用：
+
+\setsansfont[NFSSFamily=sf]{Times New Roman}
+
+考虑设置数学字体，使得全文风格统一，看到的相关内容有：
+1. newtx 可以将数学字体换为 times 风格的，但是似乎跟其他宏包有冲突
+2. TeX Gyre Termes 字体（似乎这个就是 newtx 的默认数学字体吧？）
+3. 似乎还有 STIX 和 XITS 字体
+4. unicode-math 不知道这个宏包是做什么用的
+5. times, txfont, mathptmx 都已经过时了
+
+不要用 mathspec。
+
+如果用 unicode-math，数字字体可以选：
+TeX Gyre Termes Math
+XITS Math
+二者之一。正文不建议用 Times New Roman，而是用 \setmainfont 设置 TeX Gyre Termes 或 XITS 对前面对应。
+
+如果不用 unicode-math，可以选：
+newtxtext + newtxmath
+stix
+二者之一。此时不必使用 fontspec 来设置正文字体。
+
+上面的原则主要是使用相对成套的字体。其中 stix 包使用的字体与 XITS + XITS Math 效果基本一样。另外两种在数学符号上有差异，自己可以都试一试，根据需要选。我个人的感觉 STIX 字体的积分求和号的风格大概更常见一些（与 CM 接近）。
+
+模板开发者自己应该有解决简单的宏包冲突的能力，字体包冲突一般是符号重定义了，往往是用了多余的字体包或者顺序需要调整，解决都很简单。比如你得明白 amssymb 在上述几种字体选择方案中都是不能使用的。
+至于 unicode-math 就更容易了。知道 \setmathfont 一条命令就够了。
+
+如果你的模板限定用 XeLaTeX 或 LuaLaTeX 编译，上述方案都可以。如果还希望支持 pdfLaTeX 下的编译，那么应该使用 newtx 或 stix 包。
+
+另外注意，newtx 会同时定义正文的 \sffamily 与 \ttfamily。
+\sffamily 是 Helvetica 的样子，中规中矩。
+\ttfamily 是他们自己的字体。
+
+其他字体包只改 \rmfamily 与数学字体。你需要自己配对应的 \sffamily 和 \ttfamily。一般学校如果规定正文用 Times，那么往往会同时规定无衬线用 Arial 或 Helvetica。
+
+Functional difference between newtx, Times, Termes, STIX, XITS; text and math
+
+Suppose that I want to write a document with Times font and mathematics. I know that packages times, txfonts, mathptm and mathptmx have been essentially superseded by the newtx package which offers more features and better quality (spacing etc.). But there is a relatively new package called tgtermes, so should I
+
+\usepackage{newtxtext, newtxmath} 
+
+or
+
+\usepackage{tgtermes, newtxmath}
+
+I also know that when compiling with XeLaTeX, I can do this:
+
+\usepackage{unicode-math}
+\setmainfont{XITS}
+\setmathfont{XITS Math}
+
+Or:
+
+\setmainfont{TeX Gyre Termes}
+\setmathfont{TeX Gyre Termes Math}
+
+Or:
+
+\setmainfont{STIX}
+\setmathfont{STIX Math}
+
+But I can just as well \setmainfont{Times New Roman} on Windows.
+
+So I would like to know:
+
+    What is the difference between newtxtext and tgtermes? (Equivalently newpxtext and tgpagella.) What features are there that are unique to one or the other?
+    What is the difference between Times New Roman, STIX, XITS and TeX Gyre Termes? What features are unique to one or the other? What difference will this choice make in my document?
+    What is the difference between STIX Math, XITS Math and TeX Gyre Termes Math? (Apart from differently designed symbols.) What features are unique to one or the other?
+
+Here is one reason one (at least I) would try to avoid TeX Gyre Termes Math and the OpenType version of STIX for now:
+
+\documentclass{scrartcl}
+\usepackage{unicode-math}
+\setmathfont{TeX Gyre Termes Math}
+%\setmathfont{XITS Math}
+
+\begin{document}
+\[ x(t)=\int_{-B}^B X(f)e^{j2\pi ft} df \] 
+\end{document}
+
+XITS fonts are a fork of the original STIX fonts, and they had full OpenType math way before STIX was completed. So either newtxmath or XITS is good!
+
+%-
+%-> Platform fontset <windows>, <mac>, <adobe>, <times>, <others>
+%-
+\RequirePackage{expl3}% LaTeX3 programming environment
+\ExplSyntaxOn%
+\providecommand{\g__ctex_fontset_tl}{}% platform fontset state variable
+\edef\artxfontset{\g__ctex_fontset_tl}% expanded platform fontset state variable
+\ExplSyntaxOff%
+\newif\ifartx@windows \artx@windowsfalse
+\newif\ifartx@mac \artx@macfalse
+\newif\ifartx@adobe \artx@adobefalse
+\newif\ifartx@times \artx@timesfalse
+\newif\ifartx@others \artx@othersfalse
+\RequirePackage{etoolbox}% a toolbox of programming facilities
+\newcommand{\artxifstreq}{\expandafter\ifstrequal\expandafter}% expansion control
+\artxifstreq{\artxfontset}{windows}{\artx@windowstrue\artx@timestrue}{%
+\artxifstreq{\artxfontset}{mac}{\artx@mactrue\artx@timestrue}{%
+\artxifstreq{\artxfontset}{adobe}{\artx@adobetrue\artx@timestrue}{%
+\artx@otherstrue\artx@timesfalse}}}
+or
+\ExplSyntaxOn
+\newcommand\artxfontset{\g__ctex_fontset_tl}
+\ExplSyntaxOff
+\RequirePackage{xstring}
+\IfStrEq{\artxfontset}{mac}{
+  \setCJKmainfont[
+    UprightFont    = * Light,
+    BoldFont       = * Bold,
+    ItalicFont     = Kaiti SC,
+    BoldItalicFont = Kaiti SC Bold,
+  ]{Songti SC}
+  \setCJKsansfont{Heiti SC}
+}{\IfStrEq{\artxfontset}{windows}{
+  \setCJKmainfont[AutoFakeBold, ItalicFont=KaiTi]{SimSun}
+  \setCJKsansfont[AutoFakeBold]{SimHei}
+  \setCJKmonofont{FangSong}
+}{\IfStrEq{\artxfontset}{adobe}{
+  \setCJKmainfont[
+    AutoFakeBold,
+    ItalicFont=AdobeKaitiStd-Regular,
+  ]{AdobeSongStd-Light}
+  \setCJKsansfont[AutoFakeBold]{AdobeHeitiStd-Regular}
+}}}
+
+\subsection{模块化文档写作}
+
+Project structure
+
+Create a clear structure of the whole project this way:
+
+    create a directory only for the project. We'll refer to that in the following parts as the root directory
+    create two other directories inside the root, one for LaTeX documents, the other one for images. Since you'll have to write their name quite often, choose short names. A suggestion would be simply tex and img.
+    create your document (we'll call it document.tex, but you can use the name you prefer) and your own package (for example mystyle.sty); this second file will help you keep the code cleaner.
+
+If you followed all those steps, these files should be in your root directory, using "/" for each directory:
+
+./document.tex
+./mystyle.sty
+./tex/
+./img/
+
+nothing else.
+
+
+Getting LaTeX to process multiple files
+
+As your work grows, your LaTeX file can become unwieldy and confusing, especially if you are writing a long article with substantial, discrete sections, or a full-length book. In such cases it is good practice to split your work into several files. For example, if you are writing a book, it makes a lot of sense to write each chapter in a separate .tex file. LaTeX makes this very easy thanks to two commands:
+
+The \input{<filename>} macro makes LaTeX to process the content of
+the given file basically the same way as if it would be written at the same
+place as \input.You can use \input basically everywhere with any content .
+It is usable in the preamble, inside packages and in the document. You can nest \input macros.
+You can use \input inside a file which is read using \input. the only thing \input does is to input the file.
+You don't have to worry about any side effects, but don't get any
+extra features. 
+
+The \include{<filename>} macro is bigger and is supposed to be used
+with bigger amounts of content, like chapters, which people might like to
+compile on their own during the editing process.
+\include does basically the following thing:
+It uses \clearpage before and after the content of the file. This
+ensure that its content starts on a new page of its own and is not
+placed together with earlier or later text.
+It opens a new .aux file for the given file.
+There will be a filename.aux file which contains all counter values,
+like page and chapter numbers etc., at the begin of the filename. This
+way the file can be compiled alone but still has the correct page and
+chapter etc. numbers. Such part aux files are read by the main aux
+file.
+It then uses \input internally to read the file's content.
+
+Mentionable properties of \include are:
+
+It can't be used anywhere except in the document and only where a
+page break is allowed.
+Because of the \clearpage and the own .aux file \include doesn't
+work in the preamble, inside packages. Using it in restricted modes or
+math mode won't work properly, while \input is fine there.
+
+
+You can't nest \include files.
+You can't use \include inside a file which is read by \include. This is
+by intention and is because to avoid issues with the .aux files.
+Otherwise three .aux files (main, parent \include, child \include)
+would be open at the same time which was deemed to complicated I
+guess.
+You can use \input inside an \include file and also \input an
+\include file.
+
+
+Biggest benefit: You can use \includeonly{filename1,filename2,...}
+in the preamble to only include specific \include files.
+Because the state of the document (i.e. above mentioned counter
+values) was stored in an own .aux file all page and sectioning
+numbers will still be correct. This is very useful in the writing process
+of a large document because it allows you to only compile the chapter
+you currently write on while skipping the others. Also, if used
+persistently it can be used to create PDFs of sub-parts of your document, like only the front matter or everything but/only the
+appendix, etc.
+
+The differences between these two ways to include files is explained below. What they have in common is that they process the contents of filename.tex before continuing with the rest of the base file (the file that contains these statements). When the compiler processes your base file and reaches one of the commands \input or \include, it reads filename.tex and processes its content in accordance with the formatting commands specified in the base file. This way you can put all the formatting options in your base file and write the contents using \input or \include in the files which contain the actual content of your work. This means that the important part of your working process, i.e. writing, is kept largely separate from formatting choices. This is one of the main reasons why LaTeX is so good for serious writing! You will thus be dealing solely with text and very basic commands such as \section, \emph etc. Your document will be uncluttered and much easier to work with.
+
+Another important difference is that using \include will force a page break (which makes it ideal for a book's chapters), whereas the \input command does not (which in turn makes it ideal for use within, say, a long article with discrete sections, which of course are not normally set on a new page).
+
+\input{filename}
+
+and
+
+\include{filename}
+
+
+\subsection{解决问题的技巧}
+
+Besides internet resources being plentiful, the best documentation source remains
+
+1. the official manual for every specific package
+
+2. the reference documentation, i.e., Wikibook, and the TeXbook by D. Knuth and LaTeX: A document preparation system by L. Lamport.
+
+If you are getting frustrated with a specific package, make sure you read its official documentation, which is usually the best source of information.
+
+Error messages
+The format of an error message is always the same. Error messages begin with an exclamation mark at the start of the line, and give a description of the error, followed by another line starting with the number, which refers to the line-number in your document file which LaTeX was processing when the error was spotted.
+
+Too many }'s
+
+   
+! Too many }'s.
+l.6 \date December 2004}
+
+The reason LaTeX thinks there are too many }'s here is that the opening curly brace is missing after the \date control sequence and before the word December, so the closing curly brace is seen as one too many (which it is!). In fact, there are other things which can follow the \date command apart from a date in curly braces, so LaTeX cannot possibly guess that you've missed out the opening curly brace until it finds a closing one!
+Undefined control sequence
+
+! Undefined control sequence.
+l.6 \dtae
+{December 2004}
+
+In this example, LaTeX is complaining that it has no such command ("control sequence") as \dtae. Obviously it's been mistyped, but only a human can detect that fact: all LaTeX knows is that \dtae is not a command it knows about: it's undefined. Mistypings are the most common source of errors. Some editors allow common commands and environments to be inserted using drop-down menus or icons, which may be used to avoid these errors.
+Not in Mathematics Mode
+
+! Missing $ inserted
+
+A character that can only be used in the mathematics was inserted in normal text. If you intended to use mathematics mode, then use $...$ or \begin{math}...\end{math} or use the 'quick math mode': \ensuremath{...}. If you did not intend to use mathematics mode, then perhaps you are trying to use a special character that needs to be entered in a different way; for example _ will be interpreted as a subscript operator in mathematics mode, and you need \_ to get an underscore character.
+
+This can also happen if you use the wrong character encoding, for example using utf8 without "\usepackage[utf8]{inputenc}" or using iso8859-1 without "\usepackage[latin1]{inputenc}", there are several character encoding formats, make sure to pick the right one.
+
+Missing package
+
+! LaTeX Error: File `paralisy.sty' not found.
+Type X to quit or <RETURN> to proceed,
+or enter new name. (Default extension: sty)
+Enter file name:
+
+When you use the \usepackage command to request LaTeX to use a certain package, it will look for a file with the specified name and the filetype .sty. In this case the user has mistyped the name of the paralist package, so it's easy to fix. However, if you get the name right, but the package is not installed on your machine, you will need to download and install it before continuing. If you don't want to affect the global installation of the machine, you can simply download from Internet the necessary .sty file and put it in the same folder of the document you are compiling.
+
+\subsection{\LaTeX{}er的自我修养}
+
+Linux 操作系统 + \LaTeX{} 编译环境 + Vim 文本编辑器 + Github 文本自动补齐增强组件和版本控制 + Python 数据处理和可视化 + Dropbox 数据同步和备份
+
+\subsection{Write class and package}
+
+The first thing to do when you want to put some new L A TEX commands in a file
+is to decide whether it should be a document class or a package. The rule of
+thumb is:
+
+If the commands could be used with any document class, then make
+them a package; and if not, then make them a class.
+
+当开发一个文档类或包裹库时，应保证每一个开发的文档可以独立编译通过，不存在交叉依赖错误。
+
+\section{Macros}
+
+First, bear in mind that TeX is a macro expansion language, not a functional language. Secondly, note that TeX has very few built-in variable types. A lot of 'variables' are therefore macros with appropriate structure.
+
+The \newif macro creates three new macros from the argument \if<name>:
+
+    \if<name>, a switch to be used in tests;
+    \<name>true, which sets the switch logically true;
+    \<name>false, which sets the switch logically false;
+
+Typically, the \if<name> here is something like \if@myswitch or \ifmy@switch. Other answers have mentioned that @ here is a 'letter', which is used to namespace TeX macros. Thus the @ has no special meaning to TeX: it's there for the programmer. (The usual pattern is to use @ to make the names easier to read, so \if@<package>@<meaning> or \if<package>@<meaning> are common.)
+
+So analysising the question, the two lines \newif\ifcancelspace and \newif\if@addpoints create the macros
+
+    \ifcancelspace
+    \cancelspacetrue
+    \cancelspacefalse
+    \if@addpoints
+    \@addpointstrue
+    \@addpointsfalse
+
+The two switches can now be used in a constructions
+
+\if@addpoints % or \ifcancelspace
+  % Do stuff
+\else
+  % Do other stuff
+\fi
+
+Taking point [4] next, the macro \@addpointsfalse sets the \if@addpoints switch to logically false. So it means my test above would 'do other stuff'. Setting \@addpointstrue would mean that the test would 'do stuff'.
+
+The last point to deal with is [3], for which you need to understand grouping in TeX, macro expansion and how the switches actually work. As TeX is a macro language, it does not have a concept of a variable being used 'within' a function. Thus groups are created by the constructs
+
+{ ... }
+
+or
+
+\begingroup ... \endgroup
+
+(A brace group is also used in places where TeX 'expects' grouping, and so it effectively disappears. That is the case, for example, with the group needed to use \def.)
+
+An assignment will be trapped within such as group unless it made globally. Now, the definition \def\addpoints{\global\@addpointstrue} means that where we use \addpoints, TeX will replace it with \global\@addpointstrue (macro expansion). We'll come back to \global in a bit, but first note that \@addpointsture is a macro which expands to
+
+\let\if@addpoints\iftrue
+
+This is an assignment, and normally applies only within the current TeX group level. However, the \global prefix means that the assignment ignores grouping. So the result is that \addpoints will globally set the switch \if@addpoints to logically true.
+
+The \global is not used to escape from the group created by \def (this is not a group in that sense, but a definition extent), but to escape from groups at point-of-use. 
+
+There's only one subject area with a hard-and-fast rule: front-/main-/backmatter and appendix. To recap the behaviour of the standard book class:
+
+    \frontmatter turns off chapter numbering and uses roman numerals for page numbers;
+
+    \mainmatter turns on chapter numbering, resets page numbering and uses arabic numerals for page numbers;
+
+    \appendix resets chapter numbering, uses letters for chapter numbers and doesn't fiddle with page numbering;
+
+    \backmatter turns off chapter numbering and doesn't fiddle with page numbering.
+
+In the book document class, the macros \frontmatter, \mainmatter, and \backmatter are defined as follows (cf the file book.cls):
+
+\newcommand\frontmatter{%
+    \cleardoublepage
+    \@mainmatterfalse
+    \pagenumbering{roman}}
+\newcommand\mainmatter{%
+    \cleardoublepage
+    \@mainmattertrue
+    \pagenumbering{arabic}}
+\newcommand\backmatter{%
+    \if@openright
+      \cleardoublepage
+    \else
+      \clearpage
+    \fi
+    \@mainmatterfalse}
+
+The hard-and-fast rule: Don't use \appendix after \backmatter, because chapter numbering has already been turned off by \backmatter. However, a trick can be applied to do that:
+%---------------------------------------------------------------------------%
+%-                                                                         -%
+%-                           LaTeX Template                                -%
+%-                                                                         -%
+%---------------------------------------------------------------------------%
+%- Copyright (C) Huangrui Mo <huangrui.mo@gmail.com> 
+%- This is free software: you can redistribute it and/or modify it
+%- under the terms of the GNU General Public License as published by
+%- the Free Software Foundation, either version 3 of the License, or
+%- (at your option) any later version.
+%---------------------------------------------------------------------------%
+%->> Document class declaration
+%---------------------------------------------------------------------------%
+\documentclass[doublesided]{Style/ucasthesis}%
+%- Multiple optional arguments:
+%- [<singlesided|doublesided|printcopy>]% set one or two sided eprint or print
+%- [draftversion]% show draft version information
+%- [fontset=<fandol|...>]% specify font set to replace automatic detection
+%- [scheme=plain]% thesis writing of international students
+%- [standard options for ctex book class: draft|paper size|font size|...]%
+%---------------------------------------------------------------------------%
+%->> Document settings
+%---------------------------------------------------------------------------%
+\usepackage[super,myhdr]{Style/artratex}% document settings
+%- usage: \usepackage[option1,option2,...,optionN]{artratex}
+%- Multiple optional arguments:
+%- [bibtex|biber]% set bibliography processor and package
+%- [<numbers|super|authoryear|alpha>]% set citation and reference style
+%- <numbers>: textual: Jones [1]; parenthetical: [1]
+%- <super>: textual: Jones superscript [1]; parenthetical: superscript [1]
+%- <authoryear>: textual: Jones (1995); parenthetical: (Jones, 1995)
+%- <alpha>: textual: not available; parenthetical: [Jon95]
+%- [geometry]% reconfigure page layout via geometry package
+%- [lscape]% provide landscape layout environment
+%- [myhdr]% enable header and footer via fancyhdr package
+%- [color]% provide color support via xcolor package
+%- [background]% enable page background
+%- [tikz]% provide complex diagrams via tikz package
+%- [table]% provide complex tables via ctable package
+%- [list]% provide enhanced list environments for algorithm and coding
+%- [math]% enable some extra math packages
+\usepackage{Style/artracom}% user defined commands
+%---------------------------------------------------------------------------%
+%->> Document inclusion
+%---------------------------------------------------------------------------%
+%\includeonly{Tex/Chap_1,...,Tex/Chap_N}% selected files compilation
+%---------------------------------------------------------------------------%
+%->> Document content
+%---------------------------------------------------------------------------%
+\begin{document}
+%-
+%-> Frontmatter: title page, abstract, content list, symbol list, preface
+%-
+\frontmatter% initialize the environment
+\input{Tex/Frontpages}% title page, abstract, dedication
+{% content list region
+\linespread{1.2}% local line space
+%\intotoc{\contentsname}% add link to contents table and bookmark
+\tableofcontents% contents catalog
+%\intotoc{\listfigurename}% add link to contents table and bookmark
+\listoffigures% figures catalog
+%\intotoc{\listtablename}% add link to contents table and bookmark
+\listoftables% tables catalog
+}
+\input{Tex/Prematter}% list of symbols, preface content
+%-
+%-> Mainmatter
+%-
+\mainmatter% initialize the environment
+\input{Tex/Mainmatter}% main content
+%-
+%-> Bibliography
+%-
+\backmatter% initialize the environment
+\intotoc{\bibname}% add link to contents table and bookmark
+\bibliography{Biblio/ref}% bibliography
+\mainmatter% initialize the environment
+\setcounter{page}{23}% reset pagenumber
+%-
+%-> Bibliography
+%-
+\cleardoublepage%
+\pagestyle{backmatterstyle}%
+\intotoc{\bibname}% add link to contents table and bookmark
+\bibliography{Biblio/ref}% bibliography
+\cleardoublepage%
+\pagestyle{mainmatterstyle}%
+%-
+%-> Appendix
+%-
+\cleardoublepage%
+\appendix% initialize the environment
+\input{Tex/Appendix}% appendix content
+%-
+%-> Backmatter: bibliography, glossary, index
+%-
+\backmatter% initialize the environment
+\input{Tex/Backmatter}% other information
+\end{document}
+%---------------------------------------------------------------------------%
+
+Note: Probably because Leslie Lamport didn't anticipate sections in \frontmatter and \backmatter, the standard book class doesn't turn off section numbering there.
+
+In the following MWE I've created two different page styles: frontmatter and mainmatter. Your typical document structure will most likely include resetting the page style between these document components, including a call to \frontmatter/mainmatter to reset the page number and presentation (\roman and \arabic) as well as other ToC-related stuff:
+
+\documentclass[leqno,12pt,a4paper,oneside]{book}
+\usepackage{lipsum}% http://ctan.org/pkg/lipsum
+\usepackage{fancyhdr}% http://ctan.org/pkg/fancyhdr
+\fancypagestyle{frontmatter}{%
+  \renewcommand{\headrulewidth}{0pt}% No header rule
+  \renewcommand{\footrulewidth}{0pt}% No footer rule
+  \fancyhf{}% Clear header/footer
+  \fancyfoot[C]{\thepage}%
+}
+\fancypagestyle{mainmatter}{%
+  \renewcommand{\headrulewidth}{.4pt}% Header rule
+  \renewcommand{\footrulewidth}{.4pt}% Footer rule
+  \fancyhf{}% Clear header/footer
+  \fancyhead[L]{\leftmark}% Chapter in header Left
+  \fancyhead[R]{\thepage}% Page number in header Right
+}
+\begin{document}
+\frontmatter%
+\pagestyle{frontmatter}% frontmatter page style
+\tableofcontents
+\chapter{Preface}
+\lipsum[1-20]% Some dummy text
+
+\mainmatter
+\pagestyle{mainmatter}% mainmatter page style
+\chapter{Introduction}%
+\lipsum[1-20]% Some dummy text
+\end{document}
+
+Only author's initials in BibTeX natbib using named style
+
+I have a BibTeX file with a mix of entries, some with full author's names and some with just initials. I would like my typeset bibliography to only use initials. Is there a way to do this?
+
+    Copy the file named.bst (in TeXLive it is in texmf-dist/bibtex/bst/beebe/named.bst) to the file abbrvnamed.bst in your working directory.
+
+    Find in this file the line
+
+    FUNCTION {format.names}
+
+    and inside the function the line
+
+      { s nameptr "{ff~}{vv~}{ll}{, jj}" format.name$ 't :=
+
+    Change this line to
+
+      { s nameptr "{f.~}{vv~}{ll}{, jj}" format.name$ 't :=
+
+Now you can put in your document \bibliographystyle{abbrvnamed}, and get the result you want.
+
+For the curious: in this magic line ff means Full First names, f. means abbreviated First names, vv is "Von part", ll is for Last names, jj is for Junior suffix. Yes, BibTeX language is evil.
+
+The first thing is to know that there are spacing parameters and spacing commands; \parskip and \parindent belong to the former category, \enskip, \quad and \smallskip to the latter.
+
+A complete list of the spacing parameters would be quite long, so let's concentrate on spacing commands.
+
+Vertical spacing commands
+
+    \smallskip, \medskip and \bigskip leave a vertical space of some amount predefined by the class; they are particular cases of \vspace{<skip>}; if given in mid paragraph they produce a vertical space between the line where they happen to be set and the following, so they are best used between paragraphs.
+
+    \smallbreak, \medbreak and \bigbreak do almost the same, but they remove a preceding vertical space if less than what they would insert; they also terminate a paragraph and tell TeX that they mark a good point where a page break may happen.
+
+    \addvspace{<skip>} tries merging with possible other spacing of the same kind, in order to space by the maximum amount of the two (in some occasions this might not happen, the problem is quite subtle).
+
+    \vfill is equivalent to \vspace{\fill} and tells TeX to fill with white space.
+
+    The variant \vspace*{<skip>} tells TeX not to ignore the vertical spacing also if it happens to fall just after a page break; all the previous vertical spacings will in fact disappear at page breaks.
+
+Horizontal spacing commands
+
+    \enskip, \quad, \qquad leave a horizontal space of respectively half an em, one em and two ems. The "em" is a font depending length, frequently as wide as a capital M in the current font.
+
+    \hspace{<skip>} is a general horizontal spacing command, that tells TeX to leave that amount of horizontal space.
+
+    \hspace*{<skip>} is analogous, but won't disappear at a line break.
+
+    \hfill is equivalent to \hspace{\fill}.
+
+    \, and \! leave respectively a thin space and its negative; \, can be used to fix some bad spacings caused by visually incompatible pairs of characters (an uppercase letter attached immediately after a lowercase one might be an occasion) or in cases such as D.\,E.~Knuth (that somebody prefers to D.~E.~Knuth; note that D.E.~Knuth is wrong).
+
+What horizontal commands to use? In general it's best to rely on \quad and friends, that come from centuries of typography. When a particular application demands a different approach, the \hspace command serves the purpose.
+
+What's a <skip>?
+
+A <skip> is a three pronged length specification:
+
+<natural width> plus <stretching> minus <shrinking>
+
+For example, \smallskip is equivalent to \vspace{3pt plus 1pt minus 1pt} (in the standard classes) that tells TeX to leave a vertical space of 3pt, but shrinkable up to 2pt or stretchable (optimally) up to 4pt. However, when a stretch component is present, TeX is allowed to stretch that space also beyond the stated specification, in an emergency; this happens frequently when a \pagebreak command is found when TeX has not enough material to fill correctly the current page.
+
+The lengths can be specified in any of the legal TeX units of measure, but the stretch and shrink components can be expressed also in terms of infinite units fil, fill and filll (to be used with care). For example, if in a page TeX finds \vfill, which is the same as \vspace{0pt plus 1fill}, all the \smallskips found in the page will be 3pt wide, as the infinite component of \vfill wins.
+
+The command \stretch can be used in this context: \stretch{<decimal number>} is equivalent to the skip specification 0pt plus <decimal number>fill, so \vspace{\stretch{2}} is equivalent to say \vfill\vfill. TeX will fill with white space proportionally to the fill components. So
+
+\clearpage
+\thispagestyle{empty}
+\vspace*{\stretch{1}} % the same as `\vspace*{\fill}`
+\begin{flushright}
+\itshape
+To my dog\\
+and my cat
+\end{flushright}
+\vspace{\stretch{2}}
+\clearpage
+
+can be used to have a dedication placed in the page with twice as much white space below than above. Note that above one has to use \vspace* in order to avoid the spacing disappearing at the page break.
+
+What does \z@ do?
+
+latex.ltx says
+
+\newdimen\z@ \z@=0pt % can be used both for 0pt and 0
+
+so as it says it is short (and efficient) way of getting 0.
+
+You should always have a copy of the latex source file latex.ltx in a text editor window while reading package code:-), or perhaps, if you prefer, the typeset version of that, without the comments being removed, source2e.pdf, this is available in most distributions, or may be typeset from the sources.
+
+Note that \count@=\z@ is more efficient than \count@=0 as \z@ is a register so terminates the scan for a number. But 0 might be the first token in 0123 so TeX has to read ahead to find the next token, if it is a space, discard it, if it is anything else it needs to put the token back into its input stream to be read after the assignment.
+
+\z@ is a LaTeX “constant” that's defined to be zero. Package developers can use it to assign or test against the value 0 and it can also replace a length of 0pt. Similar constants are \@ne (one) \tw@ (two) and so on. Due to the @ they can only be used in packages or between \makeatletter and \makeatother.
+
+The difference between center and \centering is that the latter just sets the paragraph parameters but the former is a list (actually implemented via \trivlist) as such, it gets the standard vertical spacing used by all LaTeX display environments such as verbatim or verse or quote, as well as theorems.
+
+So if you just want to center something that is already vertically positioned (as is often the case inside a figure environment) then \centering is what you need, but if you want to implement a displayed construct that happens to need centred content, then center is what you should use.
+
+How to add a forced line break inside a table cell
+
+It's a quite old question, but I'll add my answer anyway, as the method I suggest didn't appear in the others
+
+\begin{tabular}{|c|c|c|}
+\hline
+Foo bar & \begin{tabular}[x]{@{}c@{}}Foo\\bar\end{tabular} & Foo bar \\
+\hline
+\end{tabular}
+
+where x is either t, c, or b to force the desired vertical alignment.
+
+In case this is needed in more than a couple of places, it's better to define a command
+
+\newcommand{\specialcell}[2][c]{%
+  \begin{tabular}[#1]{@{}c@{}}#2\end{tabular}}
+
+so the table line before can be one of
+
+Foo bar & \specialcell{Foo\\bar} & Foo bar \\    % vertically centered
+Foo bar & \specialcell[t]{Foo\\bar} & Foo bar \\ % aligned with top rule
+Foo bar & \specialcell[b]{Foo\\bar} & Foo bar \\ % aligned with bottom rule
+
+More variations are possible, for instance specifying also the horizontal alignment in the special cell.
+
+Notice the @{} to suppress added space before and after the cell text.
+
+For those wanting to control the horizontal alignment, change c@ to l@ or r@ (or make it another parameter like the vertical alignment?)
+
+Egreg's solution is one of the most interesting and efficient I ever seen for line breaking at tables! Thanks. However, I made a slight change to specify the alignment directly from the command \specialcell: \newcommand{\specialcell}[3][c]{% \begin{tabular}[#1]{@{}#2@{}}#3\end{tabular}}% which should be called by \specialcell{<align>}{text1\\text2} where <align> must be replaced by the desired position: l (left), c (center), r (right).
+
+What are the different kinds of boxes in (La)TeX?
+
+The primitive TeX commands for building boxes are
+
+    \hbox, horizontal box
+    \vbox, vertical box with reference point at the last line inside it
+    \vtop, vertical box with reference point at the first line inside it
+    \vcenter, vertical box with reference point in the middle (almost)
+
+Their usage in LaTeX documents is not encouraged, but when programming some macro they can be handier than the LaTeX substitutes. Of course one should know that some risks are next door, when using low level commands.
+
+The LaTeX commands for horizontal boxes are
+
+    \mbox{<text>} (analogous to \hbox), horizontal box with natural size of <text>
+
+    \makebox[<width>][<alignment>]{<text>}, horizontal box where the first optional argument sets the final width, independently of the natural width of <text> (which is nonetheless available as \width); the second optional argument is a character l c r or s that specifies the alignment of <text> with respect to the stated width
+
+    \sbox{<bin>}{<text>} and \savebox{<bin>}[<width>][<alignment>]{<text>} are analogous to \mbox and \makebox respectively, but store the box in the <bin> declared in advance with \newsavebox
+
+    \fbox{<text>} and \framebox[<width>][<alignment>]{<text>} are analogous to \mbox and \makebox respectively, but also draw a frame around the built box
+
+The LaTeX commands for vertical boxes are
+
+    \parbox[<alignment>]{<width>}{<text>}, vertical box
+    \begin{minipage}[<alignment>]{<width>}, vertical box
+
+The optional <alignment> is c (default), t or b, that states the alignment of the box with respect to the context. They are implemented with \vcenter, \vtop and \vbox respectively.
+
+There are other optional arguments, however:
+
+\parbox[<alignment>][<height>][<inner arrangement>]{<width>}{<text>}
+
+The <height> must be a length which tells LaTeX to build the box as if its vertical dimension were the stated length. The <inner arrangement> must be c, t, b or s (by default the stated or implicit <alignment> is used), that tells how to vertically arrange the text in the available space; s means "spread": all flexible glue available will be used for getting the first line at the top and the last line at the bottom of the available space.
+
+The same optional arguments are available for minipage, with the same meaning. The differences of boxes built with \parbox and minipage are quite subtle and not very relevant for a general discussion:
+
+\begin{minipage}[<alignment>][<height>][<inner arrangement>]{<width>}
+<text>
+\end{minipage}
+
+I used the following in a recent answer
+
+\parbox[t]{0pt}{...}
+
+so that the box is aligned with respect to its top line, but its vertical size is computed as zero; it was to be used inside a tabular environment, where other cells provide a vertical size. This of course can be accomplished with \vtop, but remembering the details and the correct placement of \vss is always a pain: using \parbox is much handier.
+
+What's the difference between \newcommand and \newcommand*?
+
+A bit of background first. When Knuth wrote TeX, he realised that most macros would not need to absorb more than one paragraph as an argument. As a result, a good way to test for errors such as a missing } is to forbid macros to accept paragraph tokens (either those generated by blank lines or explicit \par tokens). So he created \def for definitions which cannot take a paragraph token, and the \long prefix to allow them to:
+
+\def\examplea#1{% #1 cannot contain \par
+}
+\long\def\exampleb#1{% #1 can contain \par
+}
+
+When LaTeX was written, Lamport created \newcommand as a wrapper around \def with various bits of error checking. He found that paragraph tokens can pop up in odd places. So he decided that \newcommand would be 'long'. When the LaTeX team took over for LaTeX2e, they decided that you would need to add the modifier * to prevent this:
+
+\newcommand{\examplea}[1]{% #1 can contain \par
+}
+\newcommand*{\exampleb}[1]{% #1 cannot contain \par
+}
+
+Most of the time, \newcommand* is the best choice as you want the error-checking that it provides. That is why examples given by experienced LaTeX users normally use this form, rather than just \newcommand.
+
+The same behaviour is seen with \newenvironment:
+
+\newenvironment{examplea}[1]{% #1 can contain \par
+}{}
+\newenvironment*{exampleb}[1]{% #1 cannot contain \par
+}{}
+
+This works by defining \examplea and \endexamplea more-or-less using \newcommand, and \exampleb and \endexampleb more-or-less using \newcommand*. As a result, the 'end' macros have the same 'long' status as the 'begin' ones, even though they never take arguments. (Note that this does not affect what can go into the body of the environment, only the arguments at the start.) Environments are covered in more detail in What is the difference between \newenvironment and \newenvironment*?.
+
+For LaTeX3, we've decided to take a somewhat hybrid approach. If you use xparse for defining document commands, they are only 'long' if you ask for it:
+
+\NewDocumentCommand\examplea{m}{% #1 cannot contain \par
+}
+\NewDocumentCommand\examplab{+m}{% #1 can contain \par
+}
+
+(We've decided on + to represent a long argument). On the other hand, for internal use it is normally best to accept paragraph tokens, and to leave the filtering to the user interface level.
+
+When to use \edef, \noexpand, and \expandafter?
+
+Expansion is a complicated area of TeX programming. I'll try to explain the key primitives involved first, then try to come up with some examples.
+
+The \expandafter primitive expands the token after the next one. So
+
+\expandafter\def\csname an-awkward-name\endcsname
+
+will expand \csname before \def. So after one expansion the above turns into
+
+\def\an-awkward-name
+
+which will then do its thing. Life becomes more complex when you want to step further ahead, and it soon becomes very hard to track what is going on.
+
+The \edef> primitive does a full expansion of what is given as its argument (in contrast to \def, which simply stores the input). So
+
+\def\examplea{more stuff}
+\edef\exampleb{Some stuff \csname examplea\endcsname}
+
+will expand the \csname name\endcsname to \examplea, then expand that to leave a final definition of \exampleb as 'Some stuff more stuff'.
+
+Now, \noexpand comes in by preventing \edef from doing an expansion of the next token. So if I modify my above example to read
+
+\def\examplea{more stuff}
+\edef\exampleb{Some stuff \expandafter\noexpand\csname examplea\endcsname}
+
+then what will happen is that the \edef will execute the \expandafter, which will turn the above effectively into
+
+\def\examplea{more stuff}
+\edef\exampleb{Some stuff \noexpand\examplea}
+
+Now the \noexpand will operate (disappearing in the process), leaving the definition of \exampleb as 'Some stuff \examplea'.
+
+We can use this ability to cut down on \expandafter use, but there are a couple of other things to know. First, e-TeX includes an additional primitive \unexpanded, which will prevent expansion of multiple tokens. Secondly, there are various special cases where you don't need quite so many \expandafter statements. A classic example is from within \csname, as this will do expansion anyway. So you'll see things like
+
+\csname name\expandafter\endcsname\token
+
+which will expand \token before \name.
+
+Back to your example. In the first one, there isn't much to do: as the entire point is to have a dynamic name (#1), doing an \edef at point-of-definition doesn't really make sense. The closest one can get is something like
+
+\edef\cohtheory{%
+  \noexpand\newcommand\expandafter\noexpand\csname foofunc\endcsname[1][*]{%
+  \noexpand\MakeUppercase{foo}^{##1}}%
+}
+
+What will happen here is that \newcommand and \MakeUppercase will be protected from expansion, and the \csname will only expand once. (Tokens which don't have an expansion don't need protection, which is why things like '[1]' are simply included as is.) Of course, this is something of a 'toy' as all it does is create a fixed \foofunc.
+
+For your second example, you could instead to
+
+\begingroup
+  \edef\temp{%
+    \endgroup
+    \noexpand\command
+    {\unexpanded\expandafter{\argone}}%
+    {\unexpanded\expandafter{\argtwo}}%
+  }
+\temp
+
+I'm using a couple of extra ideas here. First, the group is used so that \temp is not altered anywhere other than where I'm using it. The \endgroup primitive will do nothing inside the \edef, and so will still be there to close the group when \temp is used. Secondly, \unexpanded works like a toks, and so will respect the \expandafter after it but before the {. This cuts down on an unnecessary \expandafter.
+
+There are more wrinkles to this, and often there are several equally-efficient and clear methods. You are best off posting specific examples, and seeking advice on how they might be achieved.
+
+%%%%% --------------------------------------------------------------------------------
+%%
+%%%%******************************** Appendix ****************************************
+%%
+%% Some subordinate chapters.
+\cleardoublepage
+\appendix%
+\input{Tex/Appendix}%
+%%%%% --------------------------------------------------------------------------------
+%%
+%%%%******************************* Backmatter ***************************************
+%%
+%% Matters of Bibliography, Glossary, Index.
+\backmatter
+%%
+%%% >>> Bibliography
+%%
+\intotoc{\bibname}% add a corresponding item to the contents table and bookmark
+\bibliography{Biblio/ref}%
+%%
+%%% >>> Other contents
+%%
+\input{Tex/Backmatter}
+%%
+\end{document}
+%%%%% --------------------------------------------------------------------------------

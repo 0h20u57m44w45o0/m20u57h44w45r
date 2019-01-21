@@ -1,0 +1,488 @@
+\chapter{Additional Code Verification and Validation}
+\label{cha:code}
+
+In numerical solutions, errors are introduced in a variety of phases such as physical modeling, geometric representation, computer floating point arithmetic, iteration, and numerical discretization. This chapter presents some additional verification and validation of the developed computational fluid dynamics code, particularly concerning stardard shock tube problems. The objective is to further demonstrate the validity and accuracy of the numerical solver and its implementation.
+
+In the following discussions, for the purpose of clarity, the notation "RKn-WENOm-XX" is used to represent a solution solved by the n-th order Runge--Kutta scheme for time integration, m-th order WENO scheme for spatial discretization, and "XX" for flux splitting with "XX=LF" and "XX=SW" representing the Lax--Friedrichs \citep{lax1957hyperbolic} and Steger--Warming \citep{steger1981flux} splitting, respectively.
+
+\section{Convergence test on smooth flow}
+
+\subsection{Vortex preservation problem}
+
+The vortex preservation test case \citep{balsara2000monotonicity}, which evolves an isentropic vortex in an inviscid uniform two-dimensional flow, is utilized to test the convergence behavior of the code for solving system of conservation laws in multidimensional space.
+
+The problem is built on a computational domain given by $[-5R,5R]\times[-5R,5R]$ and is governed by the Euler equations. On a uniform background flow $(\rho_{\infty}, u_{\infty}, v_{\infty}, p_{\infty})$, an isentropic vortex initially centered at $(x,y)=(0,0)$ with radius $R=5$ is created by adding the following perturbation to the mean flow
+\begin{equation}
+    \begin{aligned}
+        (\delta u, \delta v) &= \frac{\Gamma}{2\pi}e^{0.5(1-r^2)}(-y,x)\\
+        \delta T &= - \frac{(\gamma - 1)\Gamma^2}{8\gamma \pi^2}e^{(1-r^2)}
+    \end{aligned}
+\end{equation}
+where the vortex strength $\Gamma = 5$, the ratio of specific heat $\gamma = 1.4$, $r^2=x^2 + y^2 \le R^2$.
+
+Under isentropic flow condition, the temperature and entropy are defined as $T=p/\rho$ and $s=p/\rho^\gamma$, respectively. When $s=1$ and $\delta s=0$ are assumed for the flow, the initial conditions are taken as follows
+\begin{equation}
+    u = u_{\infty} + \delta u, \ v = v_{\infty} + \delta v, \ T = p_{\infty} / \rho_{\infty} + \delta T, \ \rho = T^{\frac{1}{\gamma - 1}}, p = T^{\frac{\gamma}{\gamma - 1}} 
+\end{equation}
+
+The background flow is chosen as $(\rho_{\infty}, u_{\infty}, v_{\infty}, p_{\infty}) = (1,1,1,1)$ such that the vortex propagates at $45^{\circ}$ to the grid line, which amplifies the opportunity for manifesting the effects of multidimensional propagation. The solution is solved to $t=10$, and the CFL coefficient is set to $C_{\Des{CFL}}=0.2$. Periodic boundary conditions are used for boundary treatment of both directions. Since the perturbation induced by the vortex is weak enough to avoid producing a strongly nonlinear effect, the exact solution of the problem with a specific initial state is the passive convection of the vortex with the mean velocity. Therefore, the solution should remain unchanged when time evolves to complete periods of vortex convection, as demonstrated by the computed results shown in Fig.~\ref{fig:vortex_preserve}.
+\begin{figure}[!htbp]
+    \centering
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 60mm 0mm 60mm 0mm, clip, width=\textwidth]{vortex_preserve_t00}
+        \caption{$t=0$}
+        \label{fig:vortex_preserve_t00}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 60mm 0mm 60mm 0mm, clip, width=\textwidth]{vortex_preserve_t05}
+        \caption{$t=5$}
+        \label{fig:vortex_preserve_t05}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.30\textwidth}
+        \includegraphics[trim = 60mm 0mm 60mm 0mm, clip, width=\textwidth]{vortex_preserve_t10}
+        \caption{$t=10$}
+        \label{fig:vortex_preserve_t10}
+    \end{subfigure}%
+    \caption{Density contour of the propagating isentropic vortex solved by RK3-WENO5-LF on a $100\times100$ grid at different time instants.}
+    \label{fig:vortex_preserve}
+\end{figure}
+
+RK3-WENO3-LF and RK3-WENO5-LF with dimension-by-dimension or dimensional-splitting approximation are tested and are shown in Table~\ref{tab:converge_dimbydim_prev_weno3}, Table~\ref{tab:converge_dimsplit_prev_weno3}, Table~\ref{tab:converge_dimbydim_prev_weno5}, and Table~\ref{tab:converge_dimsplit_prev_weno5}, respectively. For the successively refined grids used herein, the chosen CFL number is small enough to produce a temporal step size that holds down the errors from temporal discretization and avoids affecting the spatial accuracy. As captured by the results, the code is operating closely to its designed accuracy. In addition, the observed global convergence rates of RK3-WENO5-LF agrees with the results in \citep{balsara2000monotonicity}. The current results present very similar accuracy for the dimension-by-dimension and dimensional-splitting approaches for solving multidimensional problems.
+\begin{table}[!htbp]
+    \centering
+    \footnotesize
+    %\setlength{\tabcolsep}{4pt}
+    %\renewcommand{\arraystretch}{1.5}
+    \begin{tabular}{lcccccc}
+        \hline\hline
+        %\multicolumn{2}{c}{Item} \\
+        %\cline{1-2}
+        $N \times N$ & $L_1$ error & $L_1$ order & $L_{2}$ error & $L_{2}$ order & $L_{\infty}$ error & $L_{\infty}$ order\\
+        \hline
+        $25\times25$ & $2.164\mathrm{e}{-2}$ & $-$ & $5.048\mathrm{e}{-2}$ & $-$ & $3.855\mathrm{e}{-1}$ & $-$\\
+        $50\times50$ & $1.149\mathrm{e}{-2}$ & $0.9$ & $2.819\mathrm{e}{-2}$ & $0.8$ & $2.015\mathrm{e}{-1}$ & $0.9$\\
+        $75\times75$ & $5.281\mathrm{e}{-3}$ & $1.9$ & $1.315\mathrm{e}{-2}$ & $1.9$ & $8.889\mathrm{e}{-2}$ & $2.0$\\
+        $100\times100$ & $2.651\mathrm{e}{-3}$ & $2.4$ & $6.814\mathrm{e}{-3}$ & $2.3$ & $4.793\mathrm{e}{-2}$ & $2.1$\\
+        $150\times150$ & $9.221\mathrm{e}{-4}$ & $2.6$ & $2.519\mathrm{e}{-3}$ & $2.5$ & $2.031\mathrm{e}{-2}$ & $2.1$\\
+        \hline\hline
+    \end{tabular}
+    \caption{Global convergence rate for RK3-WENO3-LF with dimension-by-dimension approximation.}
+    \label{tab:converge_dimbydim_prev_weno3}
+\end{table}
+\begin{table}[!htbp]
+    \centering
+    \footnotesize
+    %\setlength{\tabcolsep}{4pt}
+    %\renewcommand{\arraystretch}{1.5}
+    \begin{tabular}{lcccccc}
+        \hline\hline
+        %\multicolumn{2}{c}{Item} \\
+        %\cline{1-2}
+        $N \times N$ & $L_1$ error & $L_1$ order & $L_{2}$ error & $L_{2}$ order & $L_{\infty}$ error & $L_{\infty}$ order\\
+        \hline
+        $25\times25$ & $2.164\mathrm{e}{-2}$ & $-$ & $5.048\mathrm{e}{-2}$ & $-$ & $3.855\mathrm{e}{-1}$ & $-$\\
+        $50\times50$ & $1.149\mathrm{e}{-2}$ & $0.9$ & $2.819\mathrm{e}{-2}$ & $0.8$ & $2.014\mathrm{e}{-1}$ & $0.9$\\
+        $75\times75$ & $5.281\mathrm{e}{-3}$ & $1.9$ & $1.315\mathrm{e}{-2}$ & $1.9$ & $8.889\mathrm{e}{-2}$ & $2.0$\\
+        $100\times100$ & $2.651\mathrm{e}{-3}$ & $2.4$ & $6.813\mathrm{e}{-3}$ & $2.3$ & $4.792\mathrm{e}{-2}$ & $2.1$\\
+        $150\times150$ & $9.220\mathrm{e}{-4}$ & $2.6$ & $2.519\mathrm{e}{-3}$ & $2.5$ & $2.031\mathrm{e}{-2}$ & $2.1$\\
+        \hline\hline
+    \end{tabular}
+    \caption{Global convergence rate for RK3-WENO3-LF with dimensional-splitting approximation.}
+    \label{tab:converge_dimsplit_prev_weno3}
+\end{table}
+\begin{table}[!htbp]
+    \centering
+    \footnotesize
+    %\setlength{\tabcolsep}{4pt}
+    %\renewcommand{\arraystretch}{1.5}
+    \begin{tabular}{lcccccc}
+        \hline\hline
+        %\multicolumn{2}{c}{Item} \\
+        %\cline{1-2}
+        $N \times N$ & $L_1$ error & $L_1$ order & $L_{2}$ error & $L_{2}$ order & $L_{\infty}$ error & $L_{\infty}$ order\\
+        \hline
+        $25\times25$ & $6.609\mathrm{e}{-3}$ & $-$ & $1.521\mathrm{e}{-2}$ & $-$ & $1.091\mathrm{e}{-1}$ & $-$\\
+        $50\times50$ & $4.677\mathrm{e}{-4}$ & $3.8$ & $1.195\mathrm{e}{-3}$ & $3.7$ & $1.680\mathrm{e}{-2}$ & $2.7$\\
+        $75\times75$ & $9.536\mathrm{e}{-5}$ & $3.9$ & $2.281\mathrm{e}{-4}$ & $4.1$ & $2.577\mathrm{e}{-3}$ & $4.6$\\
+        $100\times100$ & $3.349\mathrm{e}{-5}$ & $3.6$ & $6.909\mathrm{e}{-5}$ & $4.2$ & $7.150\mathrm{e}{-4}$ & $4.5$\\
+        $150\times150$ & $1.088\mathrm{e}{-5}$ & $2.8$ & $1.659\mathrm{e}{-5}$ & $3.5$ & $9.985\mathrm{e}{-5}$ & $4.9$\\
+        \hline\hline
+    \end{tabular}
+    \caption{Global convergence rate for RK3-WENO5-LF with dimension-by-dimension approximation.}
+    \label{tab:converge_dimbydim_prev_weno5}
+\end{table}
+\begin{table}[!htbp]
+    \centering
+    \footnotesize
+    %\setlength{\tabcolsep}{4pt}
+    %\renewcommand{\arraystretch}{1.5}
+    \begin{tabular}{lcccccc}
+        \hline\hline
+        %\multicolumn{2}{c}{Item} \\
+        %\cline{1-2}
+        $N \times N$ & $L_1$ error & $L_1$ order & $L_{2}$ error & $L_{2}$ order & $L_{\infty}$ error & $L_{\infty}$ order\\
+        \hline
+        $25\times25$ & $6.614\mathrm{e}{-3}$ & $-$ & $1.522\mathrm{e}{-2}$ & $-$ & $1.092\mathrm{e}{-1}$ & $-$\\
+        $50\times50$ & $4.682\mathrm{e}{-4}$ & $3.8$ & $1.195\mathrm{e}{-3}$ & $3.7$ & $1.677\mathrm{e}{-2}$ & $2.7$\\
+        $75\times75$ & $9.520\mathrm{e}{-5}$ & $3.9$ & $2.278\mathrm{e}{-4}$ & $4.1$ & $2.571\mathrm{e}{-3}$ & $4.6$\\
+        $100\times100$ & $3.337\mathrm{e}{-5}$ & $3.6$ & $6.891\mathrm{e}{-5}$ & $4.2$ & $7.109\mathrm{e}{-4}$ & $4.5$\\
+        $150\times150$ & $1.084\mathrm{e}{-5}$ & $2.8$ & $1.652\mathrm{e}{-5}$ & $3.5$ & $9.757\mathrm{e}{-5}$ & $4.9$\\
+        \hline\hline
+    \end{tabular}
+    \caption{Global convergence rate for RK3-WENO5-LF with dimensional-splitting approximation.}
+    \label{tab:converge_dimsplit_prev_weno5}
+\end{table}
+
+%\subsection{2D Taylor--Green vortex}
+%
+%The 2D Taylor--Green vortex problem is utilized to test the convergence behavior of the code for solving the Navier--Stokes equations with constant physical properties. The flow is initialized on a periodic rectangular domain with sides of length $2\pi L$, and the initial conditions are
+%\begin{equation}
+%    \begin{aligned}
+%        \rho(\Vector{x},0) &= \rho_0\\
+%        u(\Vector{x},0) &= V_0 \sin({x}/{L})\cos({y}/{L})\\
+%        v(\Vector{x},0) &= -V_0 \cos({x}/{L})\sin({y}/{L})\\
+%        p(\Vector{x},0) &= p_0 + (\rho_0V_0^2/4)\left[\cos({2x}/{L}) + \cos({2y}/{L})\right]
+%    \end{aligned}
+%\end{equation}
+%
+%The stream function of the Taylor--Green vortex is proportional to the vorticity. As a result, the time solution of the problem is invariant against convection and thus is the viscous decay of the initial condition given by
+%\begin{equation}
+%    \begin{aligned}
+%        u(\Vector{x},t) &= u(\Vector{x},0) \mathrm{e}^{-2 \nu t / L^2}\\
+%        v(\Vector{x},t) &= v(\Vector{x},0) \mathrm{e}^{-2 \nu t / L^2}\\
+%    \end{aligned}
+%\end{equation}
+%
+%The pressure field is obtained by substituting the velocity solution into the momentum equation and is given by
+%\begin{equation}
+%    p(\Vector{x},t) = p_0 + (\rho_0V_0^2/4)\left[\cos({2x}/{L}) + \cos({2y}/{L})\right] \mathrm{e}^{-4 \nu t / L^2}
+%\end{equation}
+%
+%The solution is solved to $3 L / V_0$ with $C_{\Des{CFL}}=0.2$, and the flow condition is listed in Table~\ref{tab:taylor_green_2d} with the fluid assumed to be the perfect gas.
+%\begin{table}[!htbp]
+%    \centering
+%    \footnotesize
+%    %\setlength{\tabcolsep}{4pt}
+%    %\renewcommand{\arraystretch}{1.5}
+%    \begin{tabular}{lcc}
+%        \hline\hline
+%        %\multicolumn{2}{c}{Item} \\
+%        %\cline{1-2}
+%        Quantity & Symbol & Value\\
+%        \hline
+%        Reference Length & $L$ & $1$\\
+%        Reference Density & $\rho_0$ & $1$\\
+%        Reference Pressure & $p_0$ & $100$\\
+%        Reference Velocity & $V_0$ & $1$\\
+%        Mach Number & $Ma$ & $\approx0.08$\\
+%        Reynolds Number & $Re$ & $100$\\
+%        Dynamic Viscosity & $\mu$ & $\frac{\rho_0 V_0 L}{Re}$\\
+%        \hline\hline
+%    \end{tabular}
+%    \caption{Flow conditions for the 2D Taylor--Green vortex problem.}
+%    \label{tab:taylor_green_2d}
+%\end{table}
+
+\section{Test cases with shocked flow}
+
+\subsection{One-dimensional Riemann problems}
+
+\paragraph{Sod's problem \citep{sod1978survey}}
+\begin{equation} \label{eq:sodproblem}
+    \begin{gathered}
+        \begin{aligned}
+            \rho &= 1; & u &= 0; & p &= 1 & \ \text{if}\ & 0 \le x < 1 \\
+            \rho &= 0.125; & u &= 0; & p &= 0.1 & \ \text{if}\ & 1 < x \le 2
+        \end{aligned}\\
+        t \in [0,0.14],\ \ C_{\Des{CFL}} = 0.6
+    \end{gathered}
+\end{equation}
+\begin{figure}[!htbp]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{sod_rho_x_n100}
+        \caption{}
+        \label{fig:sod_rho_x_n100}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{sod_rho_x_n500}
+        \caption{}
+        \label{fig:sod_rho_x_n500}
+    \end{subfigure}%
+    \caption{Numerical solutions of Sod's problem. (a) Grid $n=100$. (b) Grid $n=500$.}
+    \label{fig:sod_x}
+\end{figure}
+
+\paragraph{Lax's problem \citep{jiang1996efficient}}
+\begin{equation} \label{eq:laxproblem}
+    \begin{gathered}
+        \begin{aligned}
+            \rho &= 0.445; & u &= 0.698; & p &= 3.528 & \ \text{if}\ & 0 \le x < 1 \\
+            \rho &= 0.5; & u &= 0; & p &= 0.571 & \ \text{if}\ & 1 < x \le 2
+        \end{aligned}\\
+        t \in [0,0.13],\ \ C_{\Des{CFL}} = 0.6
+    \end{gathered}
+\end{equation}
+\begin{figure}[!htbp]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{lax_rho_y_n100}
+        \caption{}
+        \label{fig:lax_rho_y_n100}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{lax_rho_y_n500}
+        \caption{}
+        \label{fig:lax_rho_y_n500}
+    \end{subfigure}%
+    \caption{Numerical solutions of Lax's problem. (a) Grid $n=100$. (b) Grid $n=500$.}
+    \label{fig:lax_y}
+\end{figure}
+
+\paragraph{Woodward and Colella problem \citep{toro1999riemann}}
+\begin{equation} \label{eq:woodwardproblem}
+    \begin{gathered}
+        \begin{aligned}
+            \rho &= 1; & u &= 0; & p &= 1000 & \ \text{if}\ & 0 \le x < 0.5 \\
+            \rho &= 1; & u &= 0; & p &= 0.01 & \ \text{if}\ & 0.5 < x \le 1
+        \end{aligned}\\
+        t \in [0,0.012],\ \ C_{\Des{CFL}} = 0.6
+    \end{gathered}
+\end{equation}
+\begin{figure}[!htbp]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{woodward_rho_z_n100}
+        \caption{}
+        \label{fig:woodward_rho_z_n100}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{woodward_rho_z_n500}
+        \caption{}
+        \label{fig:woodward_rho_z_n500}
+    \end{subfigure}%
+    \caption{Numerical solutions of Woodward and Colella problem. (a) Grid $n=100$. (b) Grid $n=500$.}
+    \label{fig:woodward_z}
+\end{figure}
+
+\paragraph{Stationary contact \citep{toro1999riemann}}
+\begin{equation} \label{eq:contactproblem}
+    \begin{gathered}
+        \begin{aligned}
+            \rho &= 1; & u &= -19.59745; & p &= 1000 & \ \text{if}\ & 0 \le x < 0.8 \\
+            \rho &= 1; & u &= -19.59745; & p &= 0.01 & \ \text{if}\ & 0.8 < x \le 1
+        \end{aligned}\\
+        t \in [0,0.012],\ \ C_{\Des{CFL}} = 0.6
+    \end{gathered}
+\end{equation}
+\begin{figure}[!htbp]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{contact_rho_x_n100}
+        \caption{}
+        \label{fig:contact_rho_z_n100}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{contact_rho_x_n500}
+        \caption{}
+        \label{fig:contact_rho_z_n500}
+    \end{subfigure}%
+    \caption{Numerical solutions of stationary contact problem. (a) Grid $n=100$. (b) Grid $n=500$.}
+    \label{fig:contact_z}
+\end{figure}
+
+\paragraph{Remarks} Exact solutions are computed by the exact Riemann solver provided in \citet{toro1999riemann}.
+
+\paragraph{Two interacting blast waves \citep{woodward1984numerical, jiang1996efficient}}
+\begin{equation} \label{eq:blastproblem}
+    \begin{gathered}
+        \Vector{U}(x,0) = 
+        \begin{cases}
+            \Vector{U}_{\Des{L}}, & \ \text{if}\ 0 < x < 0.1\\
+            \Vector{U}_{\Des{M}}, & \ \text{if}\ 0.1 < x < 0.9\\
+            \Vector{U}_{\Des{R}}, & \ \text{if}\ 0.9 < x < 1
+        \end{cases}, \ \ 
+        \begin{cases}
+            (\rho_{\Des{L}}, u_{\Des{L}}, p_{\Des{L}}) = (1, 0, 1000)\\
+            (\rho_{\Des{M}}, u_{\Des{M}}, p_{\Des{M}}) = (1, 0, 0.01)\\
+            (\rho_{\Des{R}}, u_{\Des{R}}, p_{\Des{R}}) = (1, 0, 100)
+        \end{cases}\\ 
+        t \in [0,0.038],\ \ C_{\Des{CFL}} = 0.6
+    \end{gathered}
+\end{equation}
+\begin{figure}[!htbp]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{blast_rho_x_n100}
+        \caption{}
+        \label{fig:blast_rho_y_n100}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{blast_rho_x_n500}
+        \caption{}
+        \label{fig:blast_rho_y_n500}
+    \end{subfigure}%
+    \caption{Numerical solutions of two interacting blast waves. (a) Grid $n=100$. (b) Grid $n=500$. [The "exact" solution is computed by RK3-WENO5-LF with $4096$ nodes.}
+    \label{fig:blast}
+\end{figure}
+
+\paragraph{Shu and Osher problem \citep{shu1989efficient}}
+\begin{equation} \label{eq:shuproblem}
+    \begin{gathered}
+        \begin{aligned}
+            \rho &= 3.857143; & u &= 2.629369; & p &= 10.333333 & \ \text{if}\ & 0 \le x < 1 \\
+            \rho &= 1 + 0.2 \sin(5 x); & u &= 0; & p &= 1 & \ \text{if}\ & 1 < x \le 10
+        \end{aligned}\\
+        t \in [0,1.8],\ \ C_{\Des{CFL}} = 0.6
+    \end{gathered}
+\end{equation}
+\begin{figure}[!htbp]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{shu_rho_x_n100}
+        \caption{}
+        \label{fig:shu_rho_x_n100}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{shu_rho_x_n500}
+        \caption{}
+        \label{fig:shu_rho_x_n500}
+    \end{subfigure}%
+    \caption{Numerical solutions of Shu and Osher problem. (a) Grid $n=100$. (b) Grid $n=500$. [The "exact" solution is computed by RK3-WENO5-LF with $4096$ nodes.]}
+    \label{fig:shu}
+\end{figure}
+
+\subsection{Two-dimensional Riemann problems}
+
+\paragraph{2D Riemann problem -- configuration 1 \citep{lax1998solution}}
+\begin{equation} \label{eq:2driemannproblema}
+    \begin{gathered}
+        \begin{aligned}
+            \rho &= 1; & u &= -0.75; & v &= -0.5; & p &= 1 & \ \text{if}\ & 0.5 < x < 1, \ 0.5 < y < 1 \\
+            \rho &= 2; & u &= -0.75; & v &= 0.5; & p &= 1 & \ \text{if}\ & 0 < x < 0.5, \ 0.5 < y < 1 \\
+            \rho &= 1; & u &= 0.75; & v &= 0.5; & p &= 1 & \ \text{if}\ & 0 < x < 0.5, \ 0 < y < 0.5 \\
+            \rho &= 3; & u &= 0.75; & v &= -0.5; & p &= 1 & \ \text{if}\ & 0.5 < x < 1, \ 0 < y < 0.5
+        \end{aligned}\\
+        t \in [0, 0.23],\ \ C_{\Des{CFL}} = 0.6
+    \end{gathered}
+\end{equation}
+\begin{figure}[!htbp]
+    \centering
+    \begin{subfigure}[b]{0.35\textwidth}
+        \includegraphics[trim = 60mm 0mm 60mm 0mm, clip, width=\textwidth]{2d_riemann_config1_weno_lf}
+        \caption{}
+        \label{fig:2d_riemann_config1_weno_lf}
+    \end{subfigure}%
+    ~~~
+    \begin{subfigure}[b]{0.35\textwidth}
+        \includegraphics[trim = 60mm 0mm 60mm 0mm, clip, width=\textwidth]{2d_riemann_config1_weno_sw}
+        \caption{}
+        \label{fig:2d_riemann_config1_weno_sw}
+    \end{subfigure}%
+    \caption{Density contour of 2D Riemann problem with configuration 1. (a) RK3-WENO5-LF. (b) RK3-WENO5-SW.}
+    \label{fig:2d_riemann_config_1}
+\end{figure}
+
+\paragraph{2D Riemann problem -- configuration 2 \citep{lax1998solution}}
+\begin{equation} \label{eq:2driemannproblemb}
+    \begin{gathered}
+        \begin{aligned}
+            \rho &= 1; & u &= 0.75; & v &= -0.5; & p &= 1 & \ \text{if}\ & 0.5 < x < 1, \ 0.5 < y < 1 \\
+            \rho &= 2; & u &= 0.75; & v &= 0.5; & p &= 1 & \ \text{if}\ & 0 < x < 0.5, \ 0.5 < y < 1 \\
+            \rho &= 1; & u &= -0.75; & v &= 0.5; & p &= 1 & \ \text{if}\ & 0 < x < 0.5, \ 0 < y < 0.5 \\
+            \rho &= 3; & u &= -0.75; & v &= -0.5; & p &= 1 & \ \text{if}\ & 0.5 < x < 1, \ 0 < y < 0.5
+        \end{aligned}\\
+        t \in [0, 0.25],\ \ C_{\Des{CFL}} = 0.6
+    \end{gathered}
+\end{equation}
+\begin{figure}[!htbp]
+    \centering
+    \begin{subfigure}[b]{0.35\textwidth}
+        \includegraphics[trim = 60mm 0mm 60mm 0mm, clip, width=\textwidth]{2d_riemann_config2_weno_lf}
+        \caption{}
+        \label{fig:2d_riemann_config2_weno_lf}
+    \end{subfigure}%
+    ~~~
+    \begin{subfigure}[b]{0.35\textwidth}
+        \includegraphics[trim = 60mm 0mm 60mm 0mm, clip, width=\textwidth]{2d_riemann_config2_weno_sw}
+        \caption{}
+        \label{fig:2d_riemann_config2_weno_sw}
+    \end{subfigure}%
+    \caption{Density contour of 2D Riemann problem with configuration 2. (a) RK3-WENO5-LF. (b) RK3-WENO5-SW.}
+    \label{fig:2d_riemann_config_2}
+\end{figure}
+
+%\section{3D Taylor--Green vortex}
+%
+%The 3D Taylor--Green vortex is an unsteady flow of a decaying vortex governed by the Navier--Stokes equations with constant physical properties. The time evolution of Taylor--Green vortex entails a kinetic energy cascade, which is able to provide quantitative diagnostic of the intrinsic numerical dissipation and flow symmetry preservation in a discretization scheme \citep{shu2005numerical, debonis2013solutions}. 
+%
+%The problem is initialized on a periodic domain consisting of a cube with sides of length $2\pi L$. A variety of initial conditions have been developed in the past. The initial conditions specified by the AIAA workshop on High-Order Methods in Computational Fluid Dynamics are in the form
+%\begin{equation}
+%    \begin{aligned}
+%        \rho(\Vector{x},0) &= \rho_0\\
+%        u(\Vector{x},0) &= V_0 \sin({x}/{L})\cos({y}/{L})\cos({z}/{L})\\
+%        v(\Vector{x},0) &= -V_0 \cos({x}/{L})\sin({y}/{L})\cos({z}/{L})\\
+%        w(\Vector{x},0) &= 0\\
+%        p(\Vector{x},0) &= p_0 + (\rho_0V_0^2/16)\left[\cos({2x}/{L}) + \cos({2y}/{L})\right]\left[\cos({2z}/{L}) + 2\right]
+%    \end{aligned}
+%\end{equation}
+%
+%As the time evolves, the initial flow transitions to turbulence with the creation of small scales, followed by a decay phase. When the compressible Navier--Stokes equations are used with the fluid assumed to be a perfect gas, the Mach number should be small enough to approximate the incompressible state, for instance, $Ma \le 0.1$.
+%
+%The kinetic energy of the flow is the volume integral
+%\begin{equation}
+%    E_k = \frac{1}{\rho_0\Omega}\int_{\Omega} \frac{1}{2}\rho \Vector{V} \cdot \Vector{V} \,\mathrm{d}\Omega
+%\end{equation}
+%
+%The primary method for evaluating the Taylor--Green vortex solutions is to examine the kinetic energy dissipation rate, which is computed by differencing $E_k$ in time
+%\begin{equation}
+%    \varepsilon(E_k) = - \frac{\mathrm{d} E_k}{\mathrm{d} t}
+%\end{equation}
+%
+%The enstrophy of the flow is the volume integral
+%\begin{equation}
+%    E_e = \frac{1}{\rho_0\Omega}\int_{\Omega} \frac{1}{2}\rho \Vector{\omega} \cdot \Vector{\omega} \,\mathrm{d}\Omega
+%\end{equation}
+%
+%For incompressible flow, the enstrophy is directly related to the kinetic energy dissipation rate through a constant
+%\begin{equation}
+%    \varepsilon(E_k) = 2 \frac{\mu}{\rho_0} E_e
+%\end{equation}
+%
+%When the Euler equations are employed for evolving the Taylor--Green vortex, the kinetic energy is conserved during the time evolution of the inviscid flow, and the normalized kinetic energy $E_k(t)/E_k(0)$ should preserve a constant value of nearly unity. Hence, the rate of kinetic energy dissipation can be used for quantitatively measuring the numerical dissipation in a numerical scheme.
+%
+%The enstrophy measures the growth of vorticity in time and predicts the appearance of finite-time singularities in the flow. The computation of enstrophy involves derivatives of the velocity field and is sensitive to the accuracy with which the small scales are represented. In addition, the singularity of the vortex core cannot be resolved on a finite grid. Therefore, the enstrophy can be employed to quantify the resolving ability of a scheme. For the Taylor--Green vortex flow, it is conjectured that the normalized enstrophy $E_e(t)/E_e(0)$ increases from unity to infinity by a finite time $t \approx 5 t_c$ \citep{shu2005numerical}, where the characteristic convective time $t_c = L / V_0$.
+%
+%The solution is solved to $20t_c$ with $C_{\Des{CFL}}=0.2$, and the flow condition is listed in Table~\ref{tab:taylor_green}. All the presented values in the results, $t$, $E_k$, $\varepsilon(E_k)$, $E_e$, are correspondingly non-dimensionalized by $t_c$, $V_0^2$, $V_0^2/t_c$, $1/t_c^2$, respectively.
+%\begin{table}[!htbp]
+%    \centering
+%    \footnotesize
+%    %\setlength{\tabcolsep}{4pt}
+%    %\renewcommand{\arraystretch}{1.5}
+%    \begin{tabular}{lcc}
+%        \hline\hline
+%        %\multicolumn{2}{c}{Item} \\
+%        %\cline{1-2}
+%        Quantity & Symbol & Value\\
+%        \hline
+%        Reference Length & $L$ & $1$\\
+%        Reference Density & $\rho_0$ & $1$\\
+%        Reference Pressure & $p_0$ & $100$\\
+%        Reference Velocity & $V_0$ & $1$\\
+%        Mach Number & $Ma$ & $\approx0.08$\\
+%        Reynolds Number & $Re$ & $1600$\\
+%        Dynamic Viscosity & $\mu$ & $\frac{\rho_0 V_0 L}{Re}$\\
+%        \hline\hline
+%    \end{tabular}
+%    \caption{Flow conditions for the 3D Taylor--Green vortex problem.}
+%    \label{tab:taylor_green}
+%\end{table}
+

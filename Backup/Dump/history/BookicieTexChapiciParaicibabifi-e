@@ -1,0 +1,479 @@
+\chapter{OpenMP}
+
+OpenMP (Open Multi-Processing) is an application programming interface (API) that supports multi-platform shared memory multiprocessing programming in C/C++. It consists of a set of compiler directives, library routines, and environment variables that influence run-time behavior.
+
+OpenMP is a multi-threading, shared address model. Threads communicate by sharing variables. However, cache memory is not shared due to the growing discrepancy in processor and memory speed. Processors have been consistently getting faster, while the speed with which data can be read from and written to memory has not increased at the same rate. In response, computers are built with hierarchical memory systems, in which a small, expensive, and very fast memory called cache memory, or "cache" for short, supplies the processor with data and instructions at high rates. Each processor needs its own private cache if it is to be fed quickly; hence, not all memory is shared.
+
+Data is copied into cache from main memory: blocks of consecutive memory locations are transferred at a time. Since the cache is very small in comparison to main memory, a new block may displace data that was previously copied in. Hence, it is useful to learn how to structure program code to make sure that cache is utilized well. When a processor of an SMP stores results of local computations in its private cache, the new values are accessible only to code executing on that processor. If no extra precautions are taken, they will not be available to instructions executing elsewhere on an SMP machine until after the corresponding block of data is displaced from cache. But it may not be clear when this will happen. In fact, since the old values might still be in other private caches, code executing on other processors might continue to use them even then. This is known as the memory consistency problem. Therefore, the programmer must be aware of the OpenMP memory model, which provides for shared and private data and specifies when updated shared values are guaranteed to be available to all of the code in an OpenMP program.
+
+Unintended sharing of data causes race conditions: A data race condition exists when two threads may concurrently access the same shared variable between synchronization points, without holding any common locks and with at least one thread modifying the variable. A bug caused by a data race condition leads to nondeterministic behavior. A data race also implies that false sharing occurs, possibly degrading performance. Depending on the data type and hardware details, the write operation to memory might be broken into several smaller stores. Data racing will then corrupt the result. The program's outcome changes as the threads are scheduled differently. A parallel program should avoid race conditions to be thread safe: the program should get the same answer each time you run the program. The terminology thread-safe refers to the situation that, in a multithreaded program, the same functions and the same resources may be accessed concurrently by multiple flows of control.
+
+To control race conditions: Use synchronization to protect data conflicts.
+
+Synchronization is used to impose order constraints and to protect access to shared data
+
+Synchronization is expensive so: Change how data is accessed to minimize the need for synchronization.
+
+OpenMP adds support for parallel programming to C in a very clean way. Unlike thread libraries, little change is needed to existing programs to have them run on multiple processors in parallel. In fact, the basic constructs of OpenMP are so non-intrusive that programs using them but compiled by a compiler that doesn't support OpenMP will still work (although sequentially, of course).
+
+OpenMP provides means for the user to
+\begin{itemize}
+    \item create teams of threads for parallel execution,
+    \item specify how to share work among the members of a team,
+    \item declare both shared and private variables, and
+    \item synchronize threads and enable them to perform certain operations exclusively (i.e., without interference by other threads).
+\end{itemize}
+
+One of the powerful features of OpenMP is that one can write a parallel program, while preserving the (original) sequential source. In a way, the sequential version is "built-in." If one does not compile using the OpenMP option (flag), or uses a compiler that does not support OpenMP, the directives are simply ignored, and a sequential executable is generated. However, OpenMP also provides runtime functions that return information from the execution environment. In order to ensure that the program will still compile and execute correctly in sequential mode in their presence, special care needs to be taken when using them. For example, let’s say one wishes to use the \verb|omp_get_thread_num()| function that returns the thread number. If the application is compiled without OpenMP translation, the result will be an unresolved reference at link time.
+
+As a workaround, one can use conditional compilation: the OpenMP runtime functions can be placed under control of an \verb|#ifdef| \verb|_OPENMP|, so that they will be translated only if OpenMP compilation has been invoked. Here, the file \verb|omp.h| will be included only if \verb|_OPENMP| is defined. This header file is guaranteed to be available if an OpenMP-compliant compiler is used. It includes the interfaces of the OpenMP runtime functions. To be able to use function \verb|omp_get_thread_num()|, we set its value to zero in sequential mode. This is also the thread number of the initial thread in an OpenMP code. The combination of directive-based syntax and conditional compilation enables one to write an OpenMP program that preserves the sequential version of the application and that can be translated into either sequential or parallel code. A sequential compiler simply ignores the \verb|_OpenMP| directives, because it does not recognize them. By checking whether the \verb|_OPENMP| symbol has been defined as a conditional compilation, one can make a compile-time substitution for the runtime functions to avoid unresolved references at link time. This feature can also be useful in case of a regression. If the numerical results are incorrect, for example, one can simply not compile the suspect source parts under OpenMP. The sequential versions of these sources will then be used as a (temporary) workaround.
+\lstinputlisting[language=C]{para_omp_inc.c}
+
+Pros:
+\begin{itemize}
+    \item Portable multithreading code (in C/C++ and other languages, one typically has to call platform-specific primitives in order to get multithreading).
+    \item Simple: need not deal with message passing as MPI does.
+    \item Data layout and decomposition is handled automatically by directives.
+    \item Scalability comparable to MPI on shared-memory systems.
+    \item Incremental parallelism: can work on one part of the program at one time, no dramatic change to code is needed.
+    \item Unified code for both serial and parallel applications: OpenMP constructs are treated as comments when sequential compilers are used.
+    \item Original (serial) code statements need not, in general, be modified when parallelized with OpenMP. This reduces the chance of inadvertently introducing bugs.
+    \item Both coarse-grained and fine-grained parallelism are possible.
+    \item In irregular multiphysics applications which do not adhere solely to the SPMD mode of computation, as encountered in tightly coupled fluid-particulate systems, the flexibility of OpenMP can have a big performance advantage over MPI.
+    \item Can be used on various accelerators such as GPGPU.
+\end{itemize}
+
+Cons:
+\begin{itemize}
+    \item Risk of introducing difficulty to debug synchronization bugs and race conditions.
+    \item Only runs efficiently in shared-memory multiprocessor platforms (see however Intel's Cluster OpenMP and other distributed shared memory platforms).
+    \item Requires a compiler that supports OpenMP.
+    \item Scalability is limited by memory architecture.
+    \item No support for compare-and-swap.
+    \item Reliable error handling is missing.
+    \item Lacks fine-grained mechanisms to control thread-processor mapping.
+    \item High chance of accidentally writing false sharing code.
+\end{itemize}
+
+OpenMP programs work according to a fork-join parallelism, illustrated in Fig.~\ref{fig:para_omp_fork_joint}. Parallelism added incrementally until performance goals are met, that is, the sequential program evolves into a parallel program. The OpenMP runtime maintains a thread pool, and every time a parallel section is encountered, it distributes work over the threads in the pool. When all threads are done, sequential execution is resumed. The thread that encounters the parallel construct becomes the master of the new team. Each thread in the team is assigned a unique thread number (also referred to as the "thread id") to identify it. They range from zero (for the master thread) up to one less than the number of threads within the team, and they can be accessed by the programmer.
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{para_omp_fork_joint}
+    \caption{Illustration of the fork-join parallelism model: the program splits ('forks') into sections that are executed in parallel and join into a sequential section when done. This occurs multiple times over the lifetime of the program.}
+    \label{fig:para_omp_fork_joint}
+\end{figure}
+
+The section of code that is meant to run in parallel is marked accordingly, with a compiler directive that will cause the threads to form before the section is executed. Each thread has an id attached to it which can be obtained using a function (called \verb|omp_get_thread_num()|). The thread id is an integer, and the master thread has an id of $0$. After the execution of the parallelized code, the threads join back into the master thread, which continues onward to the end of the program.
+
+By default, each thread executes the parallelized section of code independently. Worksharing constructs can be used to divide a task among the threads so that each thread executes its allocated part of the code. Both task parallelism and data parallelism can be achieved using OpenMP in this way.
+
+The runtime environment allocates threads to processors depending on usage, machine load and other factors. The runtime environment can assign the number of threads based on environment variables, or the code can do so using functions. The OpenMP functions are included in a header file labelled \verb|omp.h| in C/C++. In C/C++, OpenMP uses \verb|#pragma|. To activate the OpenMP extensions for C/C++, the compile-time flag \verb|-fopenmp| must be specified. This enables the OpenMP directive \verb|#pragma| omp in C/C++.
+
+\begin{enumerate}
+    \item The first step in creating an OpenMP program from a sequential one is to identify the parallelism it contains.
+    \item The second step in creating an OpenMP program is to express, using OpenMP, the parallelism that has been identified. A huge practical benefit of OpenMP is that it can be applied to incrementally create a parallel program from an existing sequential code. The developer can insert directives into a portion of the program and leave the rest in its sequential form. Once the resulting program version has been successfully compiled and tested, another portion of the code can be parallelized. The programmer can terminate this process once the desired speedup has been obtained.
+\end{enumerate}
+
+\section{Setting up}
+\begin{itemize}
+    \item Compiler: GNU C Compiler or Intel C Compiler.
+    \item Build system: Make.
+    \item Thread checker: Intel Thread Checker (diagnose data races, deadlocks, stalled threads, abandoned locks etc.), Sun Studio Thread Analyzer.
+\end{itemize}
+
+\section{Core elements}
+
+As illustrated in Fig.~\ref{fig:para_omp_extension}, the core elements of OpenMP are the constructs for thread creation, workload distribution (work sharing), data-environment management, thread synchronization, user-level runtime routines and environment variables.
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.6\textwidth]{para_omp_extension}
+    \caption{Chart of OpenMP constructs.}
+    \label{fig:para_omp_extension}
+\end{figure}
+
+Most of the constructs in OpenMP are compiler directives.
+
+\verb|#pragma omp construct [clause [clause]...]|
+
+Most OpenMP constructs apply to a "structured block": a block of one or more statements with one point of entry at the top and one point of exit at the bottom. It's OK to have an \verb|exit()| within the structured block.
+
+Each thread executes a copy of the code within the structured block.
+
+The OpenMP specific pragmas are listed below.
+
+\paragraph{Thread creation}
+
+The pragma \verb|omp parallel| is used to fork additional threads to carry out the work enclosed in the construct in parallel. The original thread will be denoted as master thread with thread ID $0$.
+
+Example (C program): Display "Hello, world." using multiple threads.
+\lstinputlisting[language=C]{para_omp_thread.c}
+
+\paragraph{Working-sharing constructs}
+
+Used to specify how to assign independent work to one or all of the threads.
+\begin{itemize}
+    \item \verb|omp for| or \verb|omp do|: used to split up loop iterations among the threads, also called loop constructs.
+    \item \verb|sections|: assigning consecutive but independent code blocks to different threads. By default, there is a barrier at the end of the "omp sections". Use the "nowait" clause to turn off the barrier.
+        \lstinputlisting[language=C]{para_omp_section_exp.c}
+    \item \verb|master|: denotes a structured block that is executed only by the \verb|master| thread (the thread which forked off all the others during the execution of the OpenMP directive). No implicit barrier; The other threads just skip it (no synchronization is implied). For correct results, a barrier must be inserted before any accesses to the variables modified in the master construct.
+        \lstinputlisting[language=C]{para_omp_master_exp.c}
+    \item \verb|single|: denotes a code block that is executed by only one thread (not necessarily the \verb|master| thread), a barrier is implied at the end of the \verb|single| block (can remove the barrier with a \verb|nowait| clause)
+        \lstinputlisting[language=C]{para_omp_single_exp.c}
+\end{itemize}
+
+Example: initialize the value of a large array in parallel, using each thread to do part of the work
+\lstinputlisting[language=C]{para_omp_construct.c}
+The loop counter i is declared inside the parallel for loop in C99 style, which gives each thread a unique and private version of the variable.
+
+A parallel region is a block of code that will be executed by multiple threads. It is invoked by the 'Parallel' directive. When a thread reaches a PARALLEL directive, it creates a team of threads and becomes the master of the team. The master is a member of that team and has thread number 0 within that team. Starting from the beginning of this parallel region, the code is duplicated and all threads will execute that code.
+
+There is an implied barrier at the end of a parallel section. Only the master thread continues execution past this point. If any thread terminates within a parallel region, all threads in the team will terminate, and the work done up until that point is undefined.
+
+\paragraph{Clauses}
+
+Since OpenMP is a shared memory programming model, most variables in OpenMP code are visible to all threads by default. But sometimes private variables are necessary to avoid race conditions and there is a need to pass values between the sequential part and the parallel region (the code block executed in parallel), so data environment management is introduced as data sharing attribute clauses by appending them to the OpenMP directive. The different types of clauses are:
+
+Data sharing attribute clauses
+\begin{itemize}
+    \item \verb|shared|: the data within a parallel region is shared, which means visible and accessible by all threads simultaneously. By default, all variables in the work sharing region are shared except the loop iteration counter. In C, the index variables of the parallel for-loop are private by default, but this does not extend to the index variables of loops at a deeper nesting level.
+        \lstinputlisting[language=C]{para_omp_loop_counter.c}
+    \item \verb|private|: the data within a parallel region is private to each thread, which means each thread will have a local copy and use it as a temporary variable. A private variable is not initialized and the value is not maintained for use outside the parallel region. By default, the loop iteration counters in the OpenMP loop constructs are private. Sometimes programmers forget to mark private variables as such. Our first advice to C and C++ programmers is to use the scoping rules of the language itself. C and C++ both allow variables to be declared inside a parallel region. These variables will be private (except in rare edge cases described in the specification, e.g. static variables), and it is therefore not necessary to explicitly mark them as such, avoiding the mistake altogether.
+    \item \verb|default|: allows the programmer to state that the default data scoping within a parallel region will be either shared, or none for C/C++. The none option forces the programmer to declare each variable in the parallel region using the data sharing attribute clauses.
+    \item \verb|firstprivate|: like private except initialized to original value. Initializes each private copy with the corresponding value from the master thread.
+        \lstinputlisting[language=C]{para_omp_data_attribute.c}
+    \item \verb|lastprivate|: like private except original value is updated after construct. The final value of a private inside a parallel loop can be transmitted to the shared variable outside the loop.
+    \item \verb|reduction|: a safe way of joining work from all threads after construct.
+\end{itemize}
+
+Default storage attributes
+\begin{itemize}
+    \item Shared Memory programming model: Most variables are \verb|shared| by default.
+    \item Global variables are \verb|shared| among threads (C: File scope variables, static, and dynamically allocated memory (allocate, malloc, new))
+    \item But not everything is shared. Stack variables in functions called from parallel regions are \verb|private|; Automatic variables within a statement block are \verb|private|.
+    \item One can selectively change storage attributes for constructs using the data sharing attribute clauses.
+\end{itemize}
+
+Synchronization clauses
+\begin{itemize}
+    \item \verb|critical|: assigns a unique global name to the critical region and provides mutual exclusion. The enclosed code block will be executed by only one thread at a time, and the other threads wait their turn. It is often used to protect shared data from race conditions. When a thread encounters a critical construct, it waits until no other thread is executing a critical region with the same name. In other words, there is never a risk that multiple threads will execute the code contained in the same critical region at the same time.
+
+        An optional name can be given to a critical construct. In contrast to the rules governing other language features, this name is global and therefore should be unique. Otherwise the behavior of the application is undefined.
+
+        Critical regions in OpenMP have global binding and their scope extends to all occurrences of the critical construct that have the same name (in that respect all unnamed constructs share the same special internal name), no matter where they occur in the code. 
+
+        The binding thread set for a critical region is all threads. Region execution is restricted to a single thread at a time among all the threads in the program, without regard to the team(s) to which the threads belong. That's why it is strongly recommended that named critical regions should be used, especially if the sets of protected resources are disjoint. Naming the regions eliminates the chance that two unrelated critical construct could block each other.
+        \lstinputlisting[language=C]{para_omp_critical_exp.c}
+        We do not need to enforce a certain ordering of accesses here, but we must ensure that only one update may take place at a time. This is precisely what the critical construct guarantees.
+
+        One needs to avoid putting more code inside a critical region than necessary or going through the critical region more often than necessary, thereby potentially blocking other threads longer than needed. The programmer needs to check if each and every line of code that is inside a critical region really needs to be there. Computations that cannot lead to data races do not need to be protected and should be separated. Complicated function calls, for example, have no business being in there most of the time, and should be calculated beforehand if possible. As an example, consider the following piece of code:
+        \lstinputlisting[language=C]{para_omp_critical_demo.c}
+    \item \verb|atomic|: provides mutual exclusion only for memory update. The memory update (write, or read-modify-write) in the next instruction will be performed atomically. It does not make the entire statement atomic; only the memory update is atomic. A compiler might use special hardware instructions for better performance than when using critical.
+        \lstinputlisting[language=C]{para_omp_atomic_exp.c}
+    \item \verb|ordered|: denotes the structured block executed in the sequential order, in which iterations would be executed in a sequential loop
+        \lstinputlisting[language=C]{para_omp_ordered_exp.c}
+    \item \verb|barrier|: each thread waits until all of the other threads of a team have reached this point. An implicit barrier synchronization is imposed at the end of a worksharing construct and at the end of a parallel region.
+    \item \verb|nowait|: specifies that threads completing assigned work can proceed without waiting for all threads in the team to finish. In the absence of this clause, threads encounter a barrier synchronization at the end of the work sharing construct.
+\end{itemize}
+
+Scheduling clauses
+\begin{itemize}
+    \item \verb|schedule|(type, chunk): This is useful if the work sharing construct is a do-loop or for-loop. The iteration(s) in the work sharing construct are assigned to threads according to the scheduling method defined by this clause. The three types of scheduling are:
+        \begin{enumerate}
+            \item \verb|static|: Here, all the threads are allocated iterations before they execute the loop iterations. The iterations are divided among threads equally by default. However, specifying an integer for the parameter chunk will allocate chunk number of contiguous iterations to a particular thread.
+            \item \verb|dynamic|: Here, some of the iterations are allocated to a smaller number of threads. Once a particular thread finishes its allocated iteration, it returns to get another one from the iterations that are left. The parameter chunk defines the number of contiguous iterations that are allocated to a thread at a time.
+            \item \verb|guided|: A large chunk of contiguous iterations are allocated to each thread dynamically (as above). The chunk size decreases exponentially with each successive allocation to a minimum size specified in the parameter chunk
+        \end{enumerate}
+\end{itemize}
+
+IF control
+\begin{itemize}
+    \item \verb|if|: This will cause the threads to parallelize the task only if a condition is met. Otherwise the code block executes serially.
+\end{itemize}
+
+The if clause is supported on the parallel construct only, where it is used to specify conditional execution. Since some overheads are inevitably incurred with the creation and termination of a parallel region, it is sometimes necessary to test whether there is enough work in the region to warrant its parallelization. The main purpose of this clause is to enable such a test to be specified. The syntax of the clause is if(scalar-logical-expression ). If the logical expression evaluates to true, which means it is of type integer and has a non-zero value in C/C++, the parallel region will be executed by a team of threads. If it evaluates to false, the region is executed by a single thread only.
+\lstinputlisting[language=C]{para_omp_if_exp.c}
+It uses the if clause to check whetherthe value of variable n exceeds 5. If so, the parallel region is executed by the number of threads specified. Otherwise, one thread executes the region: in other words, it is then an inactive parallel region. Num threads Clause: The num threads clause is supported on the parallel construct only and can be used to specify how many threads should be in the team executing the parallel region. The syntax is \verb|num_threads|(scalar-integer-expression ). Any expression that evaluates to an integer value can be used. The code shows a simple example demonstrating the use of the \verb|num_threads| and \verb|if| clauses. To demonstrate the priority rules, we insert a call to the OpenMP runtime function omp \verb|set_num_threads|, setting the number of threads to four. We will override it via the clauses.
+
+Initialization
+\begin{itemize}
+    \item \verb|firstprivate|: the data is private to each thread, but initialized using the value of the variable using the same name from the master thread.
+    \item \verb|lastprivate|: the data is private to each thread. The value of this private data will be copied to a global variable using the same name outside the parallel region if current iteration is the last iteration in the parallelized loop. A variable can be both firstprivate and lastprivate.
+    \item \verb|threadprivate|: The data is a global data, but it is private in each parallel region during the runtime. The difference between threadprivate and private is the global scope associated with threadprivate and the preserved value across parallel regions.
+\end{itemize}
+
+Data copying
+\begin{itemize}
+    \item \verb|copyin|: similar to firstprivate for private variables, threadprivate variables are not initialized, unless using copyin to pass the value from the corresponding global variables. No copyout is needed because the value of a threadprivate variable is maintained throughout the execution of the whole program.
+    \item \verb|copyprivate|: used with single to support the copying of data values from private objects on one thread (the single thread) to the corresponding objects on other threads in the team.
+\end{itemize}
+
+Others
+\begin{itemize}
+    \item \verb|flush|: forces data to be updated in memory so other threads see the most recent value. If a thread updates shared data, the new values will first be saved in a register and then stored back to the local cache. The updates are thus not necessarily immediately visible to other threads, since threads executing on other processors do not have access to either of these memories. This is known as the data consistency problem. At synchronization points in the program, the OpenMP standard specifies that all modifications are written back to main memory and are thus available to all threads. Between these synchronization points, threads are permitted to have new values for shared variables stored in their local memory rather than in the global shared memory. As a result, each thread executing an OpenMP code potentially has its own temporary view of the values of shared data. This approach, called a relaxed consistency model, makes it easier for the system to offer good program performance. But sometimes this is not enough. Sometimes updated values of shared values must become visible to other threads in-between synchronization points. The OpenMP API provides the flush directive to make this possible. The purpose of the flush directive is to make a thread's temporary view of shared data consistent with the values in memory. 
+
+        The flush operation applies to all variables specified in the list. If no list is provided, it applies to all thread-visible shared data. If the flush operation is invoked by a thread that has updated the variables, their new values will be flushed to memory and therefore be accessible to all other threads. If the construct is invoked by a thread that has not updated a value, it will ensure that any local copies of the data are replaced by the latest value from main memory. Some care is required with its use. First, this does not synchronize the actions of different threads: rather, it forces the executing thread to make its shared data values consistent with shared memory. Second, since the compiler reorders operations to enhance program performance, one cannot assume that the flush operation will remain exactly in the position, relative to other operations, in which it was placed by the programmer.  What can be guaranteed is that it will not change its position relative to any operations involving the flushed variables. Implicit flush operations with no list occur at the following locations: All explicit and implicit barriers (e.g., at the end of a parallel region or worksharing construct), Entry to and exit from critical regions, Entry to and exit from lock routines.
+
+        The OpenMP memory model is a complicated beast. One of its complications is when reading a shared variable without flushing it first, it is not guaranteed to be up to date. Actually, the problem is even more complicated, as not only the reading thread has to flush the variable, but also any thread writing to it beforehand. Before a synchronization happens, every write to a shared variable must be followed by a flush, and every read to a modified shared variable must be preceded by a flush. The first flush ensures that the updated values are made visible to the successor thread before the synchronization takes place. The second flush ensures that the successor thread are reading the updated values.
+
+        For instance, there is a well known pattern called the producer-consumer pattern:
+        \begin{enumerate}
+            \item One thread produces values that another thread consumes.
+            \item Often used with a stream of produced values to implement "pipeline parallelism".
+            \item The key is to implement pairwise synchronization between threads.
+        \end{enumerate}
+        Serial
+        \lstinputlisting[language=C]{para_omp_pro_con_a.c}
+        Parallel
+        \lstinputlisting[language=C]{para_omp_pro_con_b.c}
+\end{itemize}
+
+Thread affinity
+
+Some vendors recommend setting the processor affinity on OpenMP threads to associate them with particular processor cores. This minimizes thread migration and context-switching cost among cores. It also improves the data locality and reduces the cache-coherency traffic among the cores (or processors).
+
+The SPMD pattern
+
+The most common approach for parallel algorithms is the SPMD or Single Program Multiple Data pattern. Each thread runs the same program (Single Program), but using the thread ID, they operate on different data (Multiple Data) or take slightly different paths through the code.
+
+In OpenMP this means:
+\begin{enumerate}
+    \item A parallel region "near the top of the code".
+    \item Pick up thread ID and number of threads.
+    \item Use them to split up loops and select different blocks of data to work on.
+\end{enumerate}
+
+A parallel construct by itself creates an SPMD or "Single Program Multiple Data" program, i.e., each thread redundantly executes the same code. How do you split up pathways through the code between threads within a team? This is called worksharing.
+
+The loop worksharing construct \verb|#pragma omp for| splits up loop iterations among the threads in a team. The loop count variable "i" is made "private" to each thread by default. You could do this explicitly with a \verb|private(i)| clause.
+
+A motivating example for loop worksharing constructs
+\lstinputlisting[language=C]{para_omp_loop_exp.c}
+
+Working with loops:
+\begin{enumerate}
+    \item Find compute intensive loops
+    \item Make the loop iterations independent. So they can safely execute in any order without loop-carried dependencies (a loop-carried dependence: the loop iterations are dependent on each other, which destroys the parallelism.)
+    \item Place the appropriate OpenMP directive and test
+\end{enumerate}
+
+Reduction:
+
+How do we handle this case?
+\lstinputlisting[language=C]{para_omp_reduction_exp.c}
+We are combining values into a single accumulation variable (ave). There is a true dependence between loop iterations that can't be trivially removed This is a very common situation ... it is called a "reduction". Support for reduction operations is included in most parallel programming environments.
+
+\verb|reduction(operator : list)|: the variable has a local copy in each thread, but the values of the local copies will be summarized (reduced) into a global shared variable. This is very useful if a particular operation (specified in operator for this particular clause) on a variable runs iteratively, so that its value at a particular iteration depends on its value at a prior iteration. The steps that lead up to the operational increment are parallelized, but the threads updates the global variable in a thread safe manner. This would be required in parallelizing numerical integration of functions and differential equations, as a common example. The programmer must identify the operations and the variables that will hold the result values: the rest of the work can then be left to the compiler.
+\begin{enumerate}
+    \item OpenMP reduction clause: \verb|reduction (op : list)|
+    \item Inside a parallel or a worksharing construct:
+        \begin{enumerate}
+            \item  A local copy of each list variable is made and initialized depending on the "op"
+                \begin{table}[!htbp]
+                    \centering
+                    %\footnotesize% fontsize
+                    %\setlength{\tabcolsep}{4pt}% column separation
+                    %\renewcommand{\arraystretch}{1.5}% row space 
+                    \begin{tabular}{lc}
+                        \hline\hline
+                        %\multicolumn{num_of_cols_to_merge}{alignment}{contents} \\
+                        %\cline{i-j}% partial hline from column i to column j
+                         Operator & Initialization value\\
+                        \hline
+                         $+$ & $0$\\
+                         $*$ & $1$\\
+                         $-$ & $0$\\
+                         $\&$ & $\sim0$\\
+                         $|$ & $0$\\
+                         $\hat{}$ & $0$\\
+                         $\&\&$ & $1$\\
+                         $||$ & $0$\\
+                        \hline\hline
+                    \end{tabular}
+                    \caption{Operators and inital values supported on the reduction clause in C/C++. The initialization value is the value of the local copy of the reduction variable. This value is operator, data type, and language dependent.}
+                    \label{tab:para_omp_reduction}
+                \end{table}
+            \item Compiler finds standard reduction expressions containing "op" and uses them to update the local copy.
+                \lstinputlisting[language=C]{para_omp_reduction_op.c}
+            \item Local copies are reduced into a single value and combined with the original global value. That is, depending on the operator used, the initial value of the shared reduction variable may be updated, not overwritten.
+                
+                The order in which thread-specific values are combined is unspecified. Therefore, where floating-point data are concerned, there may be numerical differences between the results of a sequential and parallel run, or even of two parallel runs using the same number of threads. This is a result of the limitation in precision with which computers represent floating-point numbers: results may vary slightly, depending on the order in which operations are performed. It is not a cause for concern if the values are all of roughly the same magnitude. It is good to keep this in mind when using the reduction clause.
+        \end{enumerate}
+    \item The variables in "list" must be shared in the enclosing parallel region, though it is not necessary to specify the corresponding variables explicitly in a "shared" clause.
+    \item Aggregate types (including arrays), pointer types, and reference types are not supported. A reduction variable must not be const-qualified. The operator specified on the clause can not be overloaded with respect to the variables that appear in the clause.
+\end{enumerate}
+
+Runtime environment routines:
+\begin{itemize}
+    \item Modify/Check the number of threads: \verb|omp_set_num_threads()|, \verb|omp_get_num_threads()|, \verb|omp_get_thread_num()|, \verb|omp_get_max_threads()|
+    \item Are we in an active parallel region?: \verb|omp_in_parallel()|
+    \item Do you want the system to dynamically vary the number of threads from one parallel construct to another?  \verb|omp_set_dynamic()|, \verb|omp_get_dynamic()|;
+    \item How many processors in the system? \verb|omp_num_procs()|
+\end{itemize}
+To use a known, fixed number of threads in a program:
+\begin{enumerate}
+    \item tell the system that you don't want dynamic adjustment of the number of threads, 
+    \item set the number of threads
+    \item then save the number you got.
+    \item even in this case, the system may give you fewer threads than requested. If the precise number of threads matters, test for it and respond accordingly.
+\end{enumerate}
+\lstinputlisting[language=C]{para_omp_fixed_threads.c}
+
+Lock routines: A lock implies a memory fence (a "flush") of all thread visible variables. Note: a thread always accesses the most recent copy of the lock, so you don't need to use a flush on the lock variable.
+
+A simple lock is available if it is unset. \verb|omp_init_lock()|, \verb|omp_set_lock()|, \verb|omp_unset_lock()|, \verb|omp_test_lock()|, \verb|omp_destroy_lock()|
+\lstinputlisting[language=C]{para_omp_lock_exp.c}
+
+A nested lock is available if it is unset or if it is set but owned by the thread executing the nested lock function \verb|omp_init_nest_lock()|, \verb|omp_set_nest_lock()|, \verb|omp_unset_nest_lock()|, \verb|omp_test_nest_lock()|, \verb|omp_destroy_nest_lock()|
+
+\section{Examples} \label{subsec:Examples}
+
+\subsubsection{Numerical integration}
+
+Calculate $\pi$ using numerical integration
+\begin{equation}
+    \pi = \int_{0}^{1} \frac{4.0}{1 + x^2} \,\mathrm{d}x
+\end{equation}
+
+Serial $\pi$ program
+\lstinputlisting[language=C]{para_omp_pi_a.c}
+Parallel $\pi$ program using a parallel construct
+\lstinputlisting[language=C]{para_omp_pi_b.c}
+Parallel $\pi$ program without false sharing
+\lstinputlisting[language=C]{para_omp_pi_c.c}
+\begin{enumerate}
+    \item False sharing: non-shared independent data elements such as array elements happen to share the same cache line so each update invalidates the cache line, causing the cache lines to "slosh independent data back and forth" between threads. There is no false sharing with read-only data, because the cache lines are not invalidated.
+
+        One of the factors limiting scalable performance is false sharing. It is a side effect of the cache-line granularity of cache coherence implemented in shared-memory systems. Any time a cache line is modified, cache coherence starts to do its work. It notifies other caches holding a copy of the same line that the line has been modified elsewhere. At such a point, the copy of the line on other processors is invalidated. If the data in the line is still needed, a new, up-to-date copy of it must be fetched. Consequently, when two threads update different data elements in the same cache line, they interfere with each other. This effect is known as false sharing. We note that a modest amount of false sharing does not have a significant impact on performance. If, however, some or all of the threads update the same cache line frequently, performance degrades.
+
+    \item Poor scalability: if you promote scalars to an array to support the creation of an SPMD program, the array elements are contiguous in memory and hence share cache lines.
+    \item Solution:
+        \begin{itemize}
+            \item When updates to an item are frequent, work with local copies of data instead of an array indexed by the thread ID.
+            \item Pad arrays so elements you use are on distinct cache lines.
+            \item In general, using private data instead of shared data significantly reduces the risk of false sharing. In contrast with padding, this is also a portable optimization.
+            \item Parallel the outermost loop. Parallelization of the i-loop would result in unfavorable memory access, giving rise to false sharing of data.
+        \end{itemize}
+\end{enumerate}
+Parallel $\pi$ program with reduction
+\lstinputlisting[language=C]{para_omp_pi_d.c}
+Parallel $\pi$ program using Monte Carlo calculations: using Random numbers to solve tough problems. Sample a problem domain to estimate areas, compute probabilities, find optimal values, etc. For example, computing $\pi$ with a digital dart board.
+\begin{enumerate}
+    \item Throw darts at the circle/square.
+    \item Probability of falling in circle is proportional to ratio of areas: $P = A_c / A_s = \pi / 4$.
+    \item Compute $\pi$ by randomly choosing points, count the fraction that falls in the circle, compute $\pi$.
+\end{enumerate}
+\lstinputlisting[language=C]{para_omp_pi_e.c}
+
+Matrix multiplication
+\lstinputlisting[language=C]{para_omp_matrix.c}
+
+\section{Performance expectations}
+
+One might expect to get an $N$ times speedup when running a program parallelized using OpenMP on a $N$ processor platform. However, this seldom occurs for these reasons:
+\begin{itemize}
+    \item When a dependency exists, a process must wait until the data it depends on is computed.
+    \item When multiple processes share a non-parallel proof resource (like a file to write in), their requests are executed sequentially. Therefore, each thread must wait until the other thread releases the resource.
+    \item A large part of the program may not be parallelized by OpenMP, which means that the theoretical upper limit of speedup is limited according to Amdahl's law.
+    \item N processors in a symmetric multiprocessing (SMP) may have N times the computation power, but the memory bandwidth usually does not scale up N times. Quite often, the original memory path is shared by multiple processors and performance degradation may be observed when they compete for the shared memory bandwidth.
+    \item Many other common problems affecting the final speedup in parallel computing also apply to OpenMP, like load balancing and synchronization overhead.
+\end{itemize}
+
+\section{Best practice} \label{sec:tips}
+
+Finding certain kinds of bugs in parallel programs can be difficult, so an application developer should endeavor to prevent them by adopting best practices from the start.
+
+\section{General}
+
+\begin{enumerate}
+    \item What helps when parallelizing an application is to have a clean sequential version to start with. In particular, the control and data flow through the program should be straightforward.
+    \item Use of global data that is modified should be minimized to reduce the chance of introducing a data race condition. Something else that helps when parallelizing loops is to avoid a bulky loop body, which makes the specification of data-sharing attributes tedious and error prone. If the loop body performs a substantial amount of work, one should push it into a function. All variables local to the function are private by default, often dramatically reducing the data-sharing list. This is not only more pleasing to the eye but also easier to maintain.
+    \item Use reduction where applicable. If the operation you need is not predefined, implement it yourself.
+    \item When doing I/O (either to the screen or to a file), large time savings are possible by writing the information to a buffer first (this can sometimes even be done in parallel) and then pushing it to the device in one run.
+    \item Test your programs with multiple compilers and all warnings turned on, because different compilers will find different mistakes.
+    \item Use tools such as the Intel Thread Checker, which help you to detect programming errors and write better performing programs.
+\end{enumerate}
+
+\section{Parallel region}
+
+\begin{enumerate}
+    \item Interaction with the Execution Environment. The OpenMP standard provides several means with which the programmer can interact with the execution environment, either to obtain information from it or to influence the execution of a program. If a program relies on some property of the environment, for example, expects that a certain minimum number of threads will execute a parallel region, then the programmer must test for its satisfaction explicitly. Once a team of threads is formed to execute a parallel region, the number of threads in it will not be changed. However, the number of threads to be used to execute future parallel regions can be specified in several ways:
+        \begin{itemize}
+            \item At the command line, the \verb|OMP_NUM_THREADS| environment variable may be set by \verb|export OMP_NUM_THREADS=integer| prior to program execution. The value specified will be used to initialize the \verb|nthreads-var| control variable.
+            \item During program execution, the number of threads to be used to execute a parallel region may be set or modified via the \verb|omp_set_num_threads| library routine. Its syntax is \verb|omp_set_num_threads|(scalar-integer-expression), where the evaluation of the expression must result in a positive integer. You must invoke \verb|omp_set_num_threads()| before the start of that parallel region.
+            \item Finally, it is possible to use the \verb|num_threads| clause together with a parallel construct to specify how many threads should be in the team executing that specific parallel region. If this is given, it temporarily overrides both of the previous constructs.
+        \end{itemize}
+        The environment variables defined by the standard can be set prior to program execution. The library routines can also be used to give values to control variables and override values set via environment variables. Both the environment variables and the library routines control the upper limit of the size of the thread team that OpenMP would spawn for all parallel regions (in the case of \verb|OMP_NUM_THREADS|) or for any consequent parallel region (after a call to \verb|omp_set_num_threads()|).The \verb|num_threads| clause only temporarily overrides both of the previous constructs.
+    \item If you rely on the number of threads in a parallel region (e.g. for manual work distribution), make sure you actually get this number (by checking \verb|omp_get_num_threads()| after entering the region). Sometimes, the runtime system will give you less threads, even when the dynamic adjustment of threads is off!
+    \item Simply throwing \verb|#pragma omp parallel for| before loops rarely leads to big performance gains, because of overhead such as thread creation and scheduling. You therefore have to search for potential for finer-grained parallelism.
+    \item If having multiple parallel loops near each other, try to create a single parallel region encompassing all worksharing for loops rather than to encapsulate each loop in an individual parallel region. Maximizing parallel regions can reduce overhead from the parallel construct and offer more opportunities for using data in cache and provide a bigger context for other compiler optimizations.
+        \lstinputlisting[language=C]{para_omp_multi_loop.c}
+    \item When you have nested loops, try to parallelize only the outer loop. Loop reordering techniques can sometimes help here. Beware of nested parallelism, as many compilers still do not support it, and even if it is supported, nested parallelism may not give you any speed increases.
+    \item When parallelizing inner loops, always avoid parallel construct in inner loops. Otherwise, we repeatedly experience the overheads of the parallel construct. A more efficient solution is to split the \verb|#pragma omp parallel for| construct into its constituent directives. Move the \verb|#pragma omp parallel| to enclose the entire loop nest, and the \verb|#pragma omp for| remains at the inner loop level.
+    \item Try to get rid of the private clause, and declare private variables at the beginning of the parallel region using the scoping rule instead. Among other reasons, this makes your data-sharing attribute clauses more manageable.
+    \item Use \verb|default(none)|, it will force each variable to be explicitly declared in a data-sharing attribute clause, or else the compiler will complain. It makes you think about your data-sharing attribute clauses for all variables and avoids some errors. Moreover, for good performance, it is often best to minimize sharing of variables.
+\end{enumerate}
+
+\section{Worksharing constructs}
+
+\begin{enumerate}
+    \item Address Poor Load Balance. For each loop you parallelize, check whether or not every iteration of the loop has to do the same amount of work. If this is not the case, the static work schedule (which is often the default in compilers) might hurt your performance and you should consider dynamic or guided scheduling.
+        \lstinputlisting[language=C]{para_omp_dynamic_load.c}
+    \item Whatever kind of schedule you choose, explicitly specify it in the worksharing construct, as the default is implementation-defined!
+    \item If you use ordered, remember that you always have to use both the ordered clause and the ordered construct.
+\end{enumerate}
+
+\section{Synchronization}
+
+\begin{enumerate}
+    \item If more than one thread accesses a variable and one of the accesses is a write, you must use synchronization, even if it is just a simple operation like $i = 1$.  There are no guarantees by OpenMP on the results otherwise!
+    \item Use atomic instead of critical if possible, because the compiler might be able to optimize out the atomic, while it can rarely do that for critical.
+    \item Try to put as little code inside critical regions as possible. Complicated function calls, for example, can often be carried out beforehand.
+    \item Try to avoid the costs associated with repeatedly calling critical regions, for instance by checking for a condition before entering the critical region.
+    \item Only use locks when necessary and resort to the critical clause in all other cases. If you have to use locks, make sure to invoke \verb|omp_set_lock()| and \verb|omp_unset_lock()| from the same thread.
+    \item Avoid nesting of critical regions, and if needed, beware of deadlocks.
+    \item Beware of the OpenMP memory model. Even if you only read a shared variable, you have to flush it beforehand.
+\end{enumerate}
+
+\section{SPMD using OpenMP}
+
+While OpenMP is well suited for realizing fine-grained parallelization, one also can use it to accomplish very coarse-grained parallelism. To do so, one creates code that encloses a program’s entire computation in one large parallel region. This approach typically involves a higher programming effort but can provide high levels of scalability. It requires the programmer to assign data and work explicitly to threads. The most typical usage is to employ data parallelism, where some or all of the data is partitioned so that each thread receives its own portion. The threads will work on their part of the data. Shared data structures are created to hold those values that are shared in the resulting program; in many cases, this is just a small fraction of the total amount of program data. This is the SPMD (single program multiple data) programming style. Note that the availability of shared memory permits variants of this idea to be used. For example, it is possible that a major part of the program is an SPMD code while other parts are not. Likewise, some of the data structures might be distributed among the threads while others remain shared. In reality, SPMD style programs are examples of a low-level thread-specific programming style that has the following characteristics:
+\begin{enumerate}
+    \item The code contains a small number of large parallel regions.
+    \item Work sharing is controlled by the user, based on the thread identifier (ID).
+    \item For true SPMD codes, work sharing is based on distributing major data structures among threads. Usually, most of the data is private.
+\end{enumerate}
+Demonstrate a directive-based code fragment and an equivalent SPMD style code. The simple example shows that the SPMD programming style requires more user effort than simply inserting directives into the code. So, what is the advantage? It is because the directive-based is 1D parallelism and the SPMD style is 3D type parallelism. The true strength of the SPMD style becomes apparent when it is applied to large applications. When using with data parallelism together, it permits threads consistently update specific subparts of the data, which may substantially reduce the cost of memory accesses, and has the potential for scalability as the extreme number of threads for 1D type decomposition is restricted by the number of nodes on the parallelized dimension.
+\lstinputlisting[language=C]{para_omp_fine_coarse.c}
+
+\section{Debug}
+\begin{enumerate}
+    \item Parallel execution of the code may expose problems in the sequential code that have not manifested themselves earlier. Therefore, the first step when debugging a parallel application should always be the verification of the sequential version. To this end, the programmer should disable the OpenMP directives.
+        \begin{enumerate}
+            \item Enable as many compiler diagnostic options as possible.
+            \item Try different compiler optimizations. The bug might already show up for a specific set of options applied to the sequential version.
+            \item Run the loops parallelized with OpenMP backwards. If the result is wrong, the loop(s) cannot be executed in parallel. The reverse is not true. If the result is okay, it does not automatically mean the loop can be parallelized.
+        \end{enumerate}
+
+    \item Verification of the Parallel Code.
+        \begin{enumerate}
+            \item At this point it can be helpful to consider the nature of the runtime behavior. For example, if the bug is predictable and does not seem to depend on the number of threads used, a data race is less likely.
+            \item It is also good practice to find the lowest compiler optimization level for which the bug occurs. A bug in the use of the flush directive may show up only if the compiler reorders the statements.
+            \item Run the OpenMP version of the program on one thread. If the error shows up then, there is most likely a basic error in the code.
+            \item Selectively enable/disable OpenMP directives to zoom in on the part of the program where the error originates.
+            \item If a data race is suspected: 1) Use as many threads as possible. The higher the number of threads, the more likely the data race is to show up. 2) The use of static and external variables in C/C++ might cause data to be shared unintentionally
+            \item Check that the libraries used are thread-safe in case one or more of their functions are called within a parallel region.
+        \end{enumerate}
+\end{enumerate}
+
+One of the biggest drawbacks of shared-memory parallel programming is that it might lead to the introduction of a certain type of bug that manifests itself through silent data corruption. To make matters worse, the runtime behavior of code with this kind of error is also not reproducible: if one executes the same erroneous program a second time, the problem might not show up. commonly known as a data race condition. This is sometimes also referred to simply as a data race or race condition.
+\lstinputlisting[language=C]{para_omp_pitfalls.c}
+
+When debugging an OMP program, it is good to use the entire number of processes of a desktop computer so that the load is significantly imbalanced due to at least one process is occupied severely by the system to reveal synchronization problems.
+
+\section{Orphan directives}
+
+Procedures Subroutines and functions can complicate the use of parallel programming APIs. In order to accommodate them, major changes to a program may sometimes be needed. One of the innovative features of OpenMP is the fact that directives may be inserted into the procedures that are invoked from within a parallel region. These have come to be known as orphan directives, a term that indicates that they are not in the routine in which the parallel region is specified.  (For compiler buffs, this means that they are not within the lexical extent of the parallel construct.)
+
+OpenMP permits the use of work-sharing constructs and synchronization operations in a different procedure from the one in which the corresponding parallel region was created. This makes it easier for the application developer to create large parallel regions without unnecessary program modification. However, a procedure containing orphan directives may potentially be invoked from within multiple different parallel regions, as well as in a sequential part of the code, at run time. Consequently, the constructs may be active in some execution instances and ignored in others. The implementation must ensure that these cases are distinguished and dealt with appropriately.
+\lstinputlisting[language=C]{para_omp_orphan_directive.c}
+Orphan directives – Here, the omp for directive in function \verb|update_a| is an orphan directive. If this function is invoked from outside a parallel region, the omp for directive is ignored. Note that the use of orphan directives can help maximize the size of the parallel region. The code below shows how this can be achieved. The compiler has inserted an instruction that tests whether or not it is being executed in parallel. If so, the code to implement the for directive is performed: each thread obtains its set of iterations and carries out its share of the work. If, however, the test shows that the instruction is in a sequential part of the code, the original loop is executed in full by the thread that encounters it.

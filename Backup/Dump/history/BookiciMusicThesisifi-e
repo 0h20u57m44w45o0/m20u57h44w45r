@@ -1,0 +1,97 @@
+%%%%% --------------------------------------------------------------------------------
+%%
+%%                               Document Template
+%%
+%%%%% --------------------------------------------------------------------------------
+%% Copyright (C) 2014-2018 Huangrui Mo <huangrui.mo@gmail.com> 
+%% This is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% (at your option) any later version.
+%%%%% --------------------------------------------------------------------------------
+%%
+%%%%*************************Document Class Declaration*******************************
+%%
+\documentclass[doublesided]{uwaterloothesis}% thesis template of University of Waterloo
+%% Multiple Options:
+%% [doublesided] % change to double-sided style, default is single-sided
+%% [printcopy] % doublesided is for EThesis. if printed, need this for a uniform binding width
+%% [draftversion] % show draft version information, default is no show
+%% [standard options for book class]
+%%%%% --------------------------------------------------------------------------------
+%%
+%%%%**************************Command Define and Settings*****************************
+%%
+\usepackage{commons}% common settings
+%% usage: \usepackage[option1,option2,...,optionN]{commons}
+%% Multiple Options:
+%% [myhdr] % one available header and footer style, will enable fancyhdr
+%% [lscape] % provide landscape layout environment
+%% [geometry] % configure page layout by geometry package
+%% [numeric] % enable numeric citation mode replace the default "APA" style
+%% [list] % enable enhanced list environments, useful for Algorithm and Coding
+%% [color] % enable color package to use color, current package is xcolor
+%% [background] % enable page background, will auto enable color package
+%% [tikz] % enable tikz for complex diagrams, will auto enbale color package
+%% [table] % enable a table package for complex tables, current is ctable
+\usepackage{custom}% user defined commands
+%%%%% --------------------------------------------------------------------------------
+%%
+%%%%*********************************Content******************************************
+%%
+\begin{document}
+%%
+%%%%% --------------------------------------------------------------------------------
+%%
+%%%%*********************************Frontmatter**************************************
+%%
+%% Frontmatter of Title page, Table of contents, Preface chapter.
+\frontmatter
+%%
+%% >>> Frontpages
+%%
+\input{Frontpages}
+%%
+%%% >>> List of Content
+%%
+\tableofcontents% contents catalog
+\listoftables% tables catalog
+\intotoc{List of Tables}% add a corresponding item to the contents table and bookmark
+\listoffigures% figures catalog
+\intotoc{List of Figures}% add a corresponding item to the contents table and bookmark
+%%
+%% >>> prematter
+%%
+\input{Prematter}% list of symbols, preface of books
+%%
+%%%%% --------------------------------------------------------------------------------
+%%
+%%%%*********************************Mainmatter***************************************
+%%
+%% Main topics.
+\mainmatter
+%%
+%%% >>> Main Contents
+%%
+\input{Main_Content}%
+%%%%% --------------------------------------------------------------------------------
+%%
+%%%%*********************************Appendix*****************************************
+%%
+%% Some subordinate chapters.
+\appendix%
+\input{Appendix}%
+%%%%% --------------------------------------------------------------------------------
+%%
+%%%%********************************Backmatter****************************************
+%%
+%% Matters of Bibliography, Glossary, Index.
+\backmatter
+%%
+%%% >>> Bibliography
+%%
+\bibliography{Myrefs}%
+\intotoc{References}% add a corresponding item to the contents table and bookmark
+%%
+\end{document}
+%%%%% --------------------------------------------------------------------------------

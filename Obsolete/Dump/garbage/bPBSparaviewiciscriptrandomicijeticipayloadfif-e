@@ -1,0 +1,355 @@
+#### import the simple module from the paraview
+from paraview.simple import *
+#### disable automatic camera reset on 'Show'
+paraview.simple._DisableFirstRenderCameraReset()
+
+# create a new 'EnSight Reader'
+geo_sphcase = EnSightReader(CaseFileName='/scratch/morui/graham/visualize/omega-l1/geo_sph.case')
+geo_sphcase.PointArrays = ['r', 'did', 'Vel']
+
+# get animation scene
+animationScene1 = GetAnimationScene()
+
+# update animation scene based on data timesteps
+animationScene1.UpdateAnimationUsingDataTimeSteps()
+
+# get active view
+renderView1 = GetActiveViewOrCreate('RenderView')
+# uncomment following to set a specific view size
+# renderView1.ViewSize = [977, 638]
+
+# get color transfer function/color map for 'r'
+rLUT = GetColorTransferFunction('r')
+
+# show data in view
+geo_sphcaseDisplay = Show(geo_sphcase, renderView1)
+# trace defaults for the display properties.
+geo_sphcaseDisplay.AmbientColor = [0.0, 0.0, 0.0]
+geo_sphcaseDisplay.ColorArrayName = ['POINTS', 'r']
+geo_sphcaseDisplay.DiffuseColor = [0.0, 0.0, 0.0]
+geo_sphcaseDisplay.LookupTable = rLUT
+geo_sphcaseDisplay.BackfaceDiffuseColor = [0.0, 0.0, 0.0]
+geo_sphcaseDisplay.OSPRayScaleArray = 'r'
+geo_sphcaseDisplay.OSPRayScaleFunction = 'PiecewiseFunction'
+geo_sphcaseDisplay.GlyphType = 'Arrow'
+geo_sphcaseDisplay.ScalarOpacityUnitDistance = 0.007272971250322052
+geo_sphcaseDisplay.SetScaleArray = ['POINTS', 'r']
+geo_sphcaseDisplay.ScaleTransferFunction = 'PiecewiseFunction'
+geo_sphcaseDisplay.OpacityArray = ['POINTS', 'r']
+geo_sphcaseDisplay.OpacityTransferFunction = 'PiecewiseFunction'
+
+# reset view to fit data
+renderView1.ResetCamera()
+
+#changing interaction mode based on data extents
+renderView1.InteractionMode = '2D'
+renderView1.CameraPosition = [10000.0, 1.3859011232852936e-05, -0.00011677853763103485]
+renderView1.CameraFocalPoint = [0.0, 1.3859011232852936e-05, -0.00011677853763103485]
+renderView1.CameraViewUp = [0.0, 0.0, 1.0]
+
+# show color bar/color legend
+geo_sphcaseDisplay.SetScalarBarVisibility(renderView1, True)
+
+# get opacity transfer function/opacity map for 'r'
+rPWF = GetOpacityTransferFunction('r')
+
+# create a new 'Glyph'
+#---------------------------------------------------
+glyph1 = Glyph(Input=geo_sphcase,
+    GlyphType='Cylinder')
+glyph1.Scalars = ['POINTS', 'r']
+glyph1.Vectors = ['POINTS', 'None']
+glyph1.ScaleMode = 'scalar'
+glyph1.ScaleFactor = 1.0
+glyph1.GlyphTransform = 'Transform2'
+glyph1.GlyphMode = 'All Points'
+
+# Properties modified on glyph1.GlyphType
+glyph1.GlyphType.Resolution = 144
+glyph1.GlyphType.Height = 0.0
+glyph1.GlyphType.Radius = 1.0
+
+# Properties modified on glyph1.GlyphTransform
+#glyph1.GlyphTransform.Rotate = [90.0, 0.0, 0.0] # xy
+glyph1.GlyphTransform.Rotate = [0.0, 0.0, 90.0] # yz
+#---------------------------------------------------
+
+# show data in view
+glyph1Display = Show(glyph1, renderView1)
+# trace defaults for the display properties.
+glyph1Display.AmbientColor = [0.0, 0.0, 0.0]
+glyph1Display.ColorArrayName = ['POINTS', 'r']
+glyph1Display.DiffuseColor = [0.0, 0.0, 0.0]
+glyph1Display.LookupTable = rLUT
+glyph1Display.BackfaceDiffuseColor = [0.0, 0.0, 0.0]
+glyph1Display.OSPRayScaleArray = 'r'
+glyph1Display.OSPRayScaleFunction = 'PiecewiseFunction'
+glyph1Display.GlyphType = 'Arrow'
+glyph1Display.SetScaleArray = ['POINTS', 'r']
+glyph1Display.ScaleTransferFunction = 'PiecewiseFunction'
+glyph1Display.OpacityArray = ['POINTS', 'r']
+glyph1Display.OpacityTransferFunction = 'PiecewiseFunction'
+
+# show color bar/color legend
+glyph1Display.SetScalarBarVisibility(renderView1, True)
+
+# create a new 'EnSight Reader'
+geo_sphcase_1 = EnSightReader(CaseFileName='/scratch/morui/graham/visualize/omega-l2/geo_sph.case')
+geo_sphcase_1.PointArrays = ['r', 'did', 'Vel']
+
+# show data in view
+geo_sphcase_1Display = Show(geo_sphcase_1, renderView1)
+# trace defaults for the display properties.
+geo_sphcase_1Display.AmbientColor = [0.0, 0.0, 0.0]
+geo_sphcase_1Display.ColorArrayName = ['POINTS', 'r']
+geo_sphcase_1Display.DiffuseColor = [0.0, 0.0, 0.0]
+geo_sphcase_1Display.LookupTable = rLUT
+geo_sphcase_1Display.BackfaceDiffuseColor = [0.0, 0.0, 0.0]
+geo_sphcase_1Display.OSPRayScaleArray = 'r'
+geo_sphcase_1Display.OSPRayScaleFunction = 'PiecewiseFunction'
+geo_sphcase_1Display.GlyphType = 'Arrow'
+geo_sphcase_1Display.ScalarOpacityUnitDistance = 0.007604874818373719
+geo_sphcase_1Display.SetScaleArray = ['POINTS', 'r']
+geo_sphcase_1Display.ScaleTransferFunction = 'PiecewiseFunction'
+geo_sphcase_1Display.OpacityArray = ['POINTS', 'r']
+geo_sphcase_1Display.OpacityTransferFunction = 'PiecewiseFunction'
+
+# show color bar/color legend
+geo_sphcase_1Display.SetScalarBarVisibility(renderView1, True)
+
+# create a new 'Glyph'
+glyph2 = Glyph(Input=geo_sphcase_1,
+    GlyphType='Cylinder')
+glyph2.Scalars = ['POINTS', 'r']
+glyph2.Vectors = ['POINTS', 'None']
+glyph2.ScaleMode = 'scalar'
+glyph2.ScaleFactor = 1.0
+glyph2.GlyphTransform = 'Transform2'
+glyph2.GlyphMode = 'All Points'
+
+# Properties modified on glyph1.GlyphType
+glyph2.GlyphType.Resolution = 144
+glyph2.GlyphType.Height = 0.0
+glyph2.GlyphType.Radius = 1.0
+
+# Properties modified on glyph1.GlyphTransform
+#glyph2.GlyphTransform.Rotate = [90.0, 0.0, 0.0] # xy
+glyph2.GlyphTransform.Rotate = [0.0, 0.0, 90.0] # yz
+
+# show data in view
+glyph2Display = Show(glyph2, renderView1)
+# trace defaults for the display properties.
+glyph2Display.AmbientColor = [0.0, 0.0, 0.0]
+glyph2Display.ColorArrayName = ['POINTS', 'r']
+glyph2Display.DiffuseColor = [0.0, 0.0, 0.0]
+glyph2Display.LookupTable = rLUT
+glyph2Display.BackfaceDiffuseColor = [0.0, 0.0, 0.0]
+glyph2Display.OSPRayScaleArray = 'r'
+glyph2Display.OSPRayScaleFunction = 'PiecewiseFunction'
+glyph2Display.GlyphType = 'Arrow'
+glyph2Display.SetScaleArray = ['POINTS', 'r']
+glyph2Display.ScaleTransferFunction = 'PiecewiseFunction'
+glyph2Display.OpacityArray = ['POINTS', 'r']
+glyph2Display.OpacityTransferFunction = 'PiecewiseFunction'
+
+# show color bar/color legend
+glyph2Display.SetScalarBarVisibility(renderView1, True)
+
+# hide data in view
+Hide(geo_sphcase_1, renderView1)
+
+# hide data in view
+Hide(geo_sphcase, renderView1)
+
+# hide data in view
+Hide(glyph1, renderView1)
+
+# create a new 'EnSight Reader'
+geo_sphcase_2 = EnSightReader(CaseFileName='/scratch/morui/graham/visualize/omega-l3/geo_sph.case')
+geo_sphcase_2.PointArrays = ['r', 'did', 'Vel']
+
+# show data in view
+geo_sphcase_2Display = Show(geo_sphcase_2, renderView1)
+# trace defaults for the display properties.
+geo_sphcase_2Display.AmbientColor = [0.0, 0.0, 0.0]
+geo_sphcase_2Display.ColorArrayName = ['POINTS', 'r']
+geo_sphcase_2Display.DiffuseColor = [0.0, 0.0, 0.0]
+geo_sphcase_2Display.LookupTable = rLUT
+geo_sphcase_2Display.BackfaceDiffuseColor = [0.0, 0.0, 0.0]
+geo_sphcase_2Display.OSPRayScaleArray = 'r'
+geo_sphcase_2Display.OSPRayScaleFunction = 'PiecewiseFunction'
+geo_sphcase_2Display.GlyphType = 'Arrow'
+geo_sphcase_2Display.ScalarOpacityUnitDistance = 0.007604874818373719
+geo_sphcase_2Display.SetScaleArray = ['POINTS', 'r']
+geo_sphcase_2Display.ScaleTransferFunction = 'PiecewiseFunction'
+geo_sphcase_2Display.OpacityArray = ['POINTS', 'r']
+geo_sphcase_2Display.OpacityTransferFunction = 'PiecewiseFunction'
+
+# show color bar/color legend
+geo_sphcase_2Display.SetScalarBarVisibility(renderView1, True)
+
+# create a new 'Glyph'
+glyph3 = Glyph(Input=geo_sphcase_2,
+    GlyphType='Cylinder')
+glyph3.Scalars = ['POINTS', 'r']
+glyph3.Vectors = ['POINTS', 'None']
+glyph3.ScaleMode = 'scalar'
+glyph3.ScaleFactor = 1.0
+glyph3.GlyphTransform = 'Transform2'
+glyph3.GlyphMode = 'All Points'
+
+# Properties modified on glyph1.GlyphType
+glyph3.GlyphType.Resolution = 144
+glyph3.GlyphType.Height = 0.0
+glyph3.GlyphType.Radius = 1.0
+
+# Properties modified on glyph1.GlyphTransform
+#glyph3.GlyphTransform.Rotate = [90.0, 0.0, 0.0] # xy
+glyph3.GlyphTransform.Rotate = [0.0, 0.0, 90.0] # yz
+
+# show data in view
+glyph3Display = Show(glyph3, renderView1)
+# trace defaults for the display properties.
+glyph3Display.AmbientColor = [0.0, 0.0, 0.0]
+glyph3Display.ColorArrayName = ['POINTS', 'r']
+glyph3Display.DiffuseColor = [0.0, 0.0, 0.0]
+glyph3Display.LookupTable = rLUT
+glyph3Display.BackfaceDiffuseColor = [0.0, 0.0, 0.0]
+glyph3Display.OSPRayScaleArray = 'r'
+glyph3Display.OSPRayScaleFunction = 'PiecewiseFunction'
+glyph3Display.GlyphType = 'Arrow'
+glyph3Display.SetScaleArray = ['POINTS', 'r']
+glyph3Display.ScaleTransferFunction = 'PiecewiseFunction'
+glyph3Display.OpacityArray = ['POINTS', 'r']
+glyph3Display.OpacityTransferFunction = 'PiecewiseFunction'
+
+# show color bar/color legend
+glyph3Display.SetScalarBarVisibility(renderView1, True)
+
+# hide data in view
+Hide(geo_sphcase_2, renderView1)
+
+# hide data in view
+Hide(glyph2, renderView1)
+
+# create a new 'EnSight Reader'
+geo_sphcase_3 = EnSightReader(CaseFileName='/scratch/morui/graham/visualize/omega-l4/geo_sph.case')
+geo_sphcase_3.PointArrays = ['r', 'did', 'Vel']
+
+# show data in view
+geo_sphcase_3Display = Show(geo_sphcase_3, renderView1)
+# trace defaults for the display properties.
+geo_sphcase_3Display.AmbientColor = [0.0, 0.0, 0.0]
+geo_sphcase_3Display.ColorArrayName = ['POINTS', 'r']
+geo_sphcase_3Display.DiffuseColor = [0.0, 0.0, 0.0]
+geo_sphcase_3Display.LookupTable = rLUT
+geo_sphcase_3Display.BackfaceDiffuseColor = [0.0, 0.0, 0.0]
+geo_sphcase_3Display.OSPRayScaleArray = 'r'
+geo_sphcase_3Display.OSPRayScaleFunction = 'PiecewiseFunction'
+geo_sphcase_3Display.GlyphType = 'Arrow'
+geo_sphcase_3Display.ScalarOpacityUnitDistance = 0.007604874818373719
+geo_sphcase_3Display.SetScaleArray = ['POINTS', 'r']
+geo_sphcase_3Display.ScaleTransferFunction = 'PiecewiseFunction'
+geo_sphcase_3Display.OpacityArray = ['POINTS', 'r']
+geo_sphcase_3Display.OpacityTransferFunction = 'PiecewiseFunction'
+
+# show color bar/color legend
+geo_sphcase_3Display.SetScalarBarVisibility(renderView1, True)
+
+# create a new 'Glyph'
+glyph4 = Glyph(Input=geo_sphcase_3,
+    GlyphType='Cylinder')
+glyph4.Scalars = ['POINTS', 'r']
+glyph4.Vectors = ['POINTS', 'None']
+glyph4.ScaleMode = 'scalar'
+glyph4.ScaleFactor = 1.0
+glyph4.GlyphTransform = 'Transform2'
+glyph4.GlyphMode = 'All Points'
+
+# Properties modified on glyph1.GlyphType
+glyph4.GlyphType.Resolution = 144
+glyph4.GlyphType.Height = 0.0
+glyph4.GlyphType.Radius = 1.0
+
+# Properties modified on glyph1.GlyphTransform
+#glyph4.GlyphTransform.Rotate = [90.0, 0.0, 0.0] # xy
+glyph4.GlyphTransform.Rotate = [0.0, 0.0, 90.0] # yz
+
+# show data in view
+glyph4Display = Show(glyph4, renderView1)
+# trace defaults for the display properties.
+glyph4Display.AmbientColor = [0.0, 0.0, 0.0]
+glyph4Display.ColorArrayName = ['POINTS', 'r']
+glyph4Display.DiffuseColor = [0.0, 0.0, 0.0]
+glyph4Display.LookupTable = rLUT
+glyph4Display.BackfaceDiffuseColor = [0.0, 0.0, 0.0]
+glyph4Display.OSPRayScaleArray = 'r'
+glyph4Display.OSPRayScaleFunction = 'PiecewiseFunction'
+glyph4Display.GlyphType = 'Arrow'
+glyph4Display.SetScaleArray = ['POINTS', 'r']
+glyph4Display.ScaleTransferFunction = 'PiecewiseFunction'
+glyph4Display.OpacityArray = ['POINTS', 'r']
+glyph4Display.OpacityTransferFunction = 'PiecewiseFunction'
+
+# show color bar/color legend
+glyph4Display.SetScalarBarVisibility(renderView1, True)
+
+# hide data in view
+Hide(geo_sphcase_3, renderView1)
+
+# hide data in view
+Hide(glyph2, renderView1)
+
+# create a new 'Cylinder'
+cylinder1 = Cylinder()
+
+# Properties modified on cylinder1
+cylinder1.Resolution = 144
+cylinder1.Height = 0.0
+cylinder1.Radius = 1.0
+
+# show data in view
+cylinder1Display = Show(cylinder1, renderView1)
+# trace defaults for the display properties.
+cylinder1Display.AmbientColor = [0.0, 0.0, 0.0]
+cylinder1Display.ColorArrayName = [None, '']
+cylinder1Display.DiffuseColor = [0.0, 0.0, 0.0]
+cylinder1Display.BackfaceDiffuseColor = [0.0, 0.0, 0.0]
+cylinder1Display.OSPRayScaleArray = 'Normals'
+cylinder1Display.OSPRayScaleFunction = 'PiecewiseFunction'
+cylinder1Display.GlyphType = 'Arrow'
+cylinder1Display.SetScaleArray = [None, '']
+cylinder1Display.ScaleTransferFunction = 'PiecewiseFunction'
+cylinder1Display.OpacityArray = [None, '']
+cylinder1Display.OpacityTransferFunction = 'PiecewiseFunction'
+
+# Properties modified on cylinder1Display
+cylinder1Display.Orientation = [0.0, 0.0, 90.0]
+
+# change solid color
+cylinder1Display.DiffuseColor = [1.0, 0.0, 0.0]
+
+# Properties modified on cylinder1
+cylinder1.Radius = 0.01
+
+# set active source
+SetActiveSource(glyph3)
+
+# hide color bar/color legend
+glyph3Display.SetScalarBarVisibility(renderView1, False)
+
+# reset view to fit data
+renderView1.ResetCamera()
+
+#### saving camera placements for all active views
+
+# current camera placement for renderView1
+renderView1.InteractionMode = '2D'
+renderView1.CameraPosition = [0.13619349149721277, -5.2084214985370636e-05, -4.5746564865112305e-06]
+renderView1.CameraFocalPoint = [0.0, -5.2084214985370636e-05, -4.5746564865112305e-06]
+renderView1.CameraViewUp = [0.0, 0.0, 1.0]
+renderView1.CameraParallelScale = 0.03524946941848689
+
+#### uncomment the following to render all views
+# RenderAllViews()
+# alternatively, if you want to write images, you can use SaveScreenshot(...).

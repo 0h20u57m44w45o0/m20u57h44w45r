@@ -1,0 +1,1280 @@
+\chapter{Numerical Discretization}
+\label{cha:numeric}
+
+As mathematical statements of physical conservation laws, the governing equations of material motion are the cornerstone for describing and quantifying the transportation of mass, momentum, and energy. Due to properties such as nonlinearity, multidimensions, time-space coupling, and complex boundary conditions, to solve the equation system analytically is extremely difficult. Therefore, numerical solution is currently the most promising approach, although the reliability of numerical results is limited by the precision of input data, the adequacy of mathematical models, and the availability of computing resources. 
+
+In discussing numerical solutions, it is convenient to represent a system of partial differential equations by an abstract vector form
+\begin{equation}\label{eq:governeq}
+    \frac{\partial \Vector{U}}{\partial t} = \Loptr\Vector{U}
+\end{equation}
+where $\Vector{U}$ is the solution vector, $\Loptr$ is the spatial operator. For the system of conservation laws of material motions,
+\begin{equation} \label{eq:conserlaw}
+    \begin{gathered}
+        \Loptr = \Loptr_x + \Loptr_y + \Loptr_z + \Vector{\Phi}\\
+        \Loptr_s\Vector{U} = - \frac{\partial \Vector{F}_s(\Vector{U})}{\partial x_s} + \frac{\partial \Vector{F}^{\Des{v}}_s(\Vector{U})}{\partial x_s}, \,\, s = x, y, z 
+    \end{gathered}
+\end{equation}
+
+\section{Concepts and fundamentals}
+
+A concept map of numerical solutions is shown in Fig.~\ref{fig:cfd_concept_map}. The utilization of numerical methods employs discretization that replaces the continuous problem represented by integral or differential equations to a discrete problem represented by algebraic equations. By first discretizing the continuous physical domains into discrete computational domains in both time and space, the corresponding discretization of governing equations results in a system of algebraic equations with a finite set of discrete values. As a result, the infinite degrees of freedom in the integral or differential equations are reduced to finite degrees of freedom in the algebraic equations, which are able to be solved on computers.
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[trim = 00mm 15mm 0mm 15mm, clip, width=0.9\textwidth]{cfd_concept_map}
+    \caption{A concept map of numerical solutions.}
+    \label{fig:cfd_concept_map}
+\end{figure}
+
+\subsection{An illustrative example}
+
+To illustrate the concept of discretization, consider a partial differential equation defined on the space-time domain represented by the $x-t$ plane
+\begin{equation}
+    \frac{\partial u}{\partial t} + \frac{\partial f(u)}{\partial x} = 0, \ \text{on}\ \Omega \times T
+\end{equation}
+
+\paragraph{Discretization of problem domain}
+
+As illustrated in Fig.~\ref{fig:discretize_domain}, to map the continuous physical domain $\Omega \times T$ to a discrete computational domain $\bigcup \Omega_i \times \bigcup T_n$, a mesh with spatial width $\Delta x$ and time step $\Delta t$ can be used, and each mesh cell center represented by a discrete grid point $(x_i,t_n)$ is defined by
+\begin{equation}
+    \begin{aligned}
+        x_i &= i \Delta x, \,\, i = 0, \dotsc, I-1\\
+        t_n &= n \Delta t, \,\, n = 0, \dotsc, N-1
+    \end{aligned}
+\end{equation}
+and the mesh cell $\Omega_i \times T_n$ is created by
+\begin{equation}
+    \begin{aligned}
+        \Omega_i &= [x_{i-\frac{1}{2}}, x_{i+\frac{1}{2}}]\\
+        T_n &= [t_n, t_{n+1}]
+    \end{aligned}
+\end{equation}
+where
+\begin{equation}
+    x_{i+\frac{1}{2}} = x_i + \frac{\Delta x}{2} = (i + \frac{1}{2}) \Delta x
+\end{equation}
+are spatial cell interfaces.
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{discretize_domain}
+    \caption{A schematic diagram of domain discretization.}
+    \label{fig:discretize_domain}
+\end{figure}
+
+\paragraph{Discretization of governing equation}
+
+The application of numerical methods is to produce approximations to the solution at the discrete grid points. Therefore, it is convenient to introduce a notation for the point-wise approximation value to the true solution $u(x,t)$ at the discrete grid point $(x_i,t_n)$ as
+\begin{equation}
+    u_i^n \approx u(x_i, t_n) \equiv u(i \Delta x, n \Delta t)
+\end{equation}
+
+After domain discretization, different numerical methods adopt designated approaches to transform the integral or differential operators into algebraic expressions, which can then be solved to find the approximate solution $u_i^n$. According to the time level on which the spatial operators are discretized, spatial discretization schemes are broadly categorized into two groups: explicit schemes and implicit schemes. The optimal choice of the scheme type depends on the purpose of the solution.
+
+Explicit schemes apply spatial discretization on the time level with known solution values, which enables a time-marching solving process and is frequently considered for obtaining time-accurate solutions of transient problems due to its low cost per time step. Moreover, these schemes are easy to implement and parallelize. The main drawback of explicit schemes is that the time step size is tightly restricted by stability conditions.
+
+In contrast, implicit schemes apply spatial discretization on the time level with unknown solution values. In general, implicit schemes are unconditionally stable since their domain of dependence contains the entire computational domain. Therefore, they allow arbitrarily large time steps, bounded only by the desired time accuracy. However, an implicit discretization produces a coupled system of equations over the entire computational domain, thus large sparse matrices are involved in the solution system, which is generally required to be solved by high-cost iterative solvers such as Jacobian iteration or Gauss-Seidel iteration methods.
+
+Finite difference approximations of $u_i^n$ are obtained by replacing derivatives of $u$ at $(x_i,t_n)$ with algebraic expressions involving $u$ at points neighboring $(x_i,t_n)$. For instance, using forward discretization in time and explicit central difference discretization in space gives
+\begin{equation}
+    \frac{u_i^{n+1} - u_i^n}{\Delta t} + \frac{f(u_{i+1}^n) - f(u_{i-1}^n)}{2 \Delta x} = 0, \,\, 1 \le i \le I-2, \ n \ge 0
+\end{equation}
+Using forward discretization in time and implicit central difference discretization in space gives
+\begin{equation}
+    \frac{u_i^{n+1} - u_i^n}{\Delta t} + \frac{f(u_{i+1}^{n+1}) - f(u_{i-1}^{n+1})}{2 \Delta x} = 0, \,\, 1 \le i \le I-2, \ n \ge 0
+\end{equation}
+
+In general, the set of grid points involved in the computation of $u_i^{n+1}$ under a given method is called the stencil or the direct numerical domain of dependence of the method. The discretization of the governing equation is applied for all nodes, except for those at the temporal and spatial boundaries.
+
+To construct a well-defined problem and completely define the solution, initial conditions and boundary conditions are required to be provided as a supplement to the governing equation, which leads the corresponding enforcement of initial and boundary conditions on the discrete solution.
+
+\paragraph{Initial condition}
+
+To start the evolution of the solution, an initial condition that completely defines the solution at $t=0$ is needed.
+
+\paragraph{Boundary condition and treatment}
+
+In addition to the enforcement of practical conditions at the physical boundaries, the discretization of governing equations leads to extra issues related to numerical boundary treatment, which is due to that numerical methods usually require stencils from outside the computational domain.
+
+The numerical boundary issue can be addressed by two ways: either change the method or change the computational domain. In the former approach, near domain boundaries, the interior method may be switched to a direction biased method for avoiding stencils from outside the computational domain. In the latter approach, the computational domain may be extended by introducing imaginary cells called "ghost cells" outside of the computational domain \citep{laney1998computational}. When physical properties at the ghost cells are properly reconstructed from physical boundary conditions and values at interior computational domain, the interior method can be consistently implemented without involving adaption near boundaries.
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[trim = 00mm 40mm 0mm 40mm, clip, width=0.8\textwidth]{domain_index}
+    \caption{A schematic diagram illustrating domain partition and index range in a ghost-cell approach. [Nomenclature: $I=m+1+2I_g$, total number of nodes; $m$, number of normal cells; $I_g$, number of ghost node layers.]}
+    \label{fig:domain_index}
+\end{figure}
+
+To illustrate the ghost-cell approach, consider a one-dimensional domain discretized by $m$ cells as shown in Fig.~\ref{fig:domain_index}. To provide numerical boundaries for facilitating numerical discretization, $I_g$ ghost node layers are introduced at each side of the computational domain. As a result, the role of each computational region and its index range are subject to the relation
+\begin{equation}
+    [0, I)
+    \begin{cases}
+        [0, I_g), \ \text{lower ghost}\\
+        [I_g, I-I_g), \ \text{normal node}
+        \begin{cases}
+            [I_g, I_g+1), \ \text{lower boundary}\\
+            [I_g+1, I-I_g-1), \ \text{interior node}\\
+            [I-I_g-1, I-I_g), \ \text{upper boundary}\\
+        \end{cases}\\
+        [I-I_g, I), \ \text{upper ghost}\\
+    \end{cases}
+\end{equation}
+
+Assume the solution satisfies the periodic boundary condition
+\begin{equation}
+    u(x,t) = u(x-l \unitVector{n},t)
+\end{equation}
+where $l = m \Delta x$ is the domain length, and $\unitVector{n} = \pm 1$ is the unit outward normal of the boundaries at each direction.
+
+By translating the computational domain between the node $i=I_g$ and the node $i=I-I_g-1$, the discrete version for enforcing periodic boundary condition has
+\begin{equation}
+    u_{i}^n = u_{i-m \unitVector{n}}^n
+\end{equation}
+
+\paragraph{A complete algebraic system}
+
+Therefore, the complete algebraic system for solving the discrete solution under periodic boundary condition is obtained as
+\begin{equation}
+    \begin{aligned}
+        u_i^{n+1} = \Loptr_{\Delta} u^{n}, \,\,& i \in [I_g, I-I_g), \ n \ge 0\\
+        \ \text{I.C.}\ u_i^0 = u(x_i, 0), \,\, i \in [I_g, I-I_g); \,\,&
+        \ \text{B.C.}\
+        \begin{cases}
+            u_i^{n} = u_{i+m}^{n}, \,\, i \in [0, I_g), \ n \ge 0\\
+            u_i^{n} = u_{i-m}^{n}, \,\, i \in [I-I_g, I), \ n \ge 0\\
+        \end{cases}
+    \end{aligned}
+\end{equation}
+where $u_i^{n+1} = \Loptr_{\Delta} u^{n}$ represents the discretized governing equation.
+
+\subsection{Cell average interpretation}
+
+In addition to the standard interpretation of the approximate solution $u_i^n$ as point-wise values defined at grid points $(x_i, t_n)$, in developing numerical methods for conservation laws it is generally preferable to view $u_i^n$ as an approximation to a cell average of $u(x,t_n)$ on $\Omega_i$, defined by
+\begin{equation}
+    u_i^n \approx \bar{u}_i^n \equiv \frac{1}{\Delta x} \int_{x_{i - \frac{1}{2}}}^{x_{i + \frac{1}{2}}} u(x,t_n) \,\mathrm{d}x \equiv u(\bar{x}_i,t_n)
+\end{equation}
+where $\bar{x}_i$ is the midpoint of integration on $\Omega_i$.
+
+This cell average interpretation is natural since the integral form of the conservation law describes precisely the time evolution of the cell averaged integral, as shown by the integration of the differential equation over $\Omega_i \times T_n$
+\begin{equation}
+    \begin{aligned}
+        \int_{t_n}^{t_{n+1}} \int_{x_{i - \frac{1}{2}}}^{x_{i + \frac{1}{2}}} \frac{\partial u}{\partial t} \,\mathrm{d}x \,\mathrm{d}t 
+        &= \int_{x_{i - \frac{1}{2}}}^{x_{i + \frac{1}{2}}} u(x,t_{n+1}) - u(x,t_n) \,\mathrm{d}x \\
+        &= (\bar{u}_i^{n+1} - \bar{u}_i^n) \Delta x\\
+        \int_{t_n}^{t_{n+1}} \int_{x_{i - \frac{1}{2}}}^{x_{i + \frac{1}{2}}} \frac{\partial f}{\partial x} \,\mathrm{d}x \,\mathrm{d}t
+        &= \int_{t_n}^{t_{n+1}} f(u(x_{i+\frac{1}{2}},t)) - f(u(x_{i-\frac{1}{2}},t)) \,\mathrm{d}t\\ 
+        &= (\hat{f}_{i+\frac{1}{2}}^{n+\frac{1}{2}} - \hat{f}_{i-\frac{1}{2}}^{n+\frac{1}{2}}) \Delta t \\
+    \end{aligned}
+\end{equation}
+where
+\begin{equation}
+    \hat{f}_{i+\frac{1}{2}}^{n+\frac{1}{2}} = \frac{1}{\Delta t} \int_{t_n}^{t_{n+1}} f(u(x_{i+\frac{1}{2}},t)) \,\mathrm{d}t
+\end{equation}
+is the time average of the interfacial flux $f(u(x_{i+1/2},t))$ over $T_n$ at the interface between the cell $\Omega_i$ and $\Omega_{i+1}$ and is commonly referred to as numerical flux.
+
+\subsection{Fully-discrete form}
+
+After introducing the cell average interpretation of the solution and the numerical flux, a fully-discrete equation in both time and space is obtained and describes the relation among the averaged values precisely
+\begin{equation} \label{eq:standard_form}
+    u_i^{n+1} = u_i^n - \frac{\Delta t}{\Delta x} (\hat{f}_{i+\frac{1}{2}}^{n+\frac{1}{2}} - \hat{f}_{i-\frac{1}{2}}^{n+\frac{1}{2}})
+\end{equation}
+
+As the discrete equation only propagates the solution average $u_i^n$ in time, to solve this equation, a specific spatial distribution of the solution, $\hat{u}_i^n(x)$, requires to be assumed for reconstructing the solution $u(x,t^n)$ from the solution average $u_i^n$ as well as for finding the unknown interfacial fluxes $f(u(x_{i+1/2},t^{n+1/2}))$. Assuming a single polynomial of arbitrary degree through all the cells for solution reconstruction is impractical and also imposes unnecessary smoothness on the solution, since discontinuities should be allowed for an integral form of conservation law. Therefore, a more reasonable way is to use a piecewise polynomial to reconstruct the solution on each cell separately. As each reconstruction polynomial is restricted within each cell, and no smoothness condition is imposed on solution across neighboring cells, discontinuities can be naturally admitted into the solution.
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[trim = 0mm 5mm 0mm 20mm, clip, width=0.48\textwidth]{godunov_method}
+    \caption{Godunov's method for solving hyperbolic system.}
+    \label{fig:godunov_method}
+\end{figure}
+
+For instance, as illustrated in Fig.~\ref{fig:godunov_method}, if assuming a piecewise constant polynomial such that $u(x,t_n)$ has a constant distribution over each cell $\Omega_i$
+\begin{equation}
+    \hat{u}_i^n(x) = u_i^n, \,\, x \in \Omega_i
+\end{equation}
+then a jump discontinuity exists at the interface of neighboring cells, which has to be resolved in order to determine the interfacial state and the numerical flux. Godunov's idea is to construct a Riemann problem over each interface $x_{i+1/2}$ with the initial condition
+\begin{equation}
+    \hat{u}(x,t^n) =
+    \begin{cases}
+        \hat{u}_i^n(x), &\ \text{if}\ x < x_{i+\frac{1}{2}}\\
+        \hat{u}_{i+1}^n(x), &\ \text{if}\ x > x_{i+\frac{1}{2}}\\
+    \end{cases}
+\end{equation}
+which can be solved for $t \in [t^n, t^{n+1}]$ to find the interfacial state by using the method of characteristics. When the characteristic speed $a(u) = {\mathrm{d} f} / {\mathrm{d} u}$ does not dependent explicitly on $x$ and $t$, then the characteristics are straight lines
+\begin{equation}
+    \frac{\mathrm{d} x}{\mathrm{d} t} = a(u)
+\end{equation}
+Under the piecewise constant distribution assumption, if the time interval is sufficiently small, the characteristic line across the interface at every time instant is always originated from a constant upwind state. Then, the interfacial state is also constant through the time interval and is equal to the upwind state. 
+\begin{itemize}
+    \item If $a(u_i^n) > a(u_{i+1}^n)$, a shock wave, shock speed $s = (f(u_{i+1}^n) - f(u_i^n)) / (u_{i+1}^n - u_i^n)$.
+        \begin{equation}
+            \hat{f}_{i+1/2}^{n+\frac{1}{2}} = 
+            \begin{cases}
+                f(u_i^n), &\ \text{if}\ s > 0, \ \text{right propagating shock} \\
+                f(u_{i+1}^n), &\ \text{if}\ s < 0, \ \text{left propagating shock} \\
+            \end{cases}
+        \end{equation}
+    \item If $a(u_i^n) \le a(u_{i+1}^n)$, a rarefaction wave.
+        \begin{equation}
+            \hat{f}_{i+1/2}^{n+\frac{1}{2}} = 
+            \begin{cases}
+                f(u_i^n), &\ \text{if}\ a(u_i^n) \ge 0, \ \text{right propagating rarefaction} \\
+                0, &\ \text{if}\ a(u_i^n) < 0 < a(u_{i+1}^n), \ \text{sonic point} \\
+                f(u_{i+1}^n), &\ \text{if}\ a(u_{i+1}^n) \le 0, \ \text{left propagating rarefaction} \\
+            \end{cases}
+        \end{equation}
+\end{itemize}
+
+A symmetric stencil is referred to as central difference discretization, while an upwind-biassed stencil is called upwind discretization. The accuracy that is normally associated with symmetry would suggest taking a symmetric stencil. However, wave propagation is inherently an asymmetric process. Choosing the stencil to reflect the direction of wave propagation is called upwinding.
+
+In the fully-discrete equation, once admitting $u_i^n$ as the cell average of the solution, then the accuracy of $\hat{f}_{i+1/2}^{n+1/2}$ to approximate the temporal average of the interfacial flux over $T_n$ determines the spatial and temporal accuracy of the numerical approximation. Hence, the realization of $\hat{f}_{i+1/2}^{n+1/2}$ completely determines the underlying numerical scheme both in time and space.
+
+\subsection{Semi-discrete form}
+
+In general, for enhancing the flexibility in developing as well as implementing numerical schemes, it is preferable to treat time and space discretization separately rather than simultaneously as in the fully-discrete equation. In fact, the independent treatment of time and space discretization can be achieved in a semi-discrete equation, which is obtained by the integration of the differential equation over $\Omega_i$
+\begin{equation}
+    \begin{aligned}
+        \int_{x_{i - \frac{1}{2}}}^{x_{i + \frac{1}{2}}} \frac{\partial u}{\partial t} \,\mathrm{d}x 
+        &= \frac{\mathrm{d} \bar{u}_i}{\mathrm{d} t} \Delta x\\
+        \int_{x_{i - \frac{1}{2}}}^{x_{i + \frac{1}{2}}} \frac{\partial f}{\partial x} \,\mathrm{d}x
+        &= f(u(x_{i+\frac{1}{2}},t)) - f(u(x_{i-\frac{1}{2}},t))\\ 
+    \end{aligned}
+\end{equation}
+After introducing the cell average interpretation of the solution, a semi-discrete equation that is continuous in time and discrete in space is obtained as
+\begin{equation}
+    \frac{\mathrm{d} u_i}{\mathrm{d} t} = - \frac{1}{\Delta x} (\hat{f}_{i+\frac{1}{2}} - \hat{f}_{i-\frac{1}{2}})
+\end{equation}
+where the numerical flux $\hat{f}_{i+1/2}$ is the interfacial flux $f(u(x_{i+1/2},t))$ at the interface between the cell $\Omega_i$ and $\Omega_{i+1}$ at one instant in time.
+
+In the semi-discrete equation, the accuracy of $\hat{f}_{i+1/2}$ to approximate the interfacial flux determines the spatial accuracy of the numerical approximation, and the accuracy of integrating the ordinary differential equations in time determines the temporal accuracy. This approach of reducing a partial differential equation to a system of ordinary differential equations by decoupling the spatial and temporal discretization processes is called the method of lines \citep{schiesser1991numerical}. Since discretizing in space is conducted independently before discretizing in time, the temporal discretization of the partial differential equation is then equivalent to solving ordinary differential equations in the time domain. 
+
+\subsection{Conservative discretization}
+
+The spatial discretization in both the fully-discrete equation and the semi-discrete equation has the form
+\begin{equation}
+    \left. \frac{\partial f}{\partial x} \right|_i = \frac{1}{\Delta x}(\hat{f}_{i+\frac{1}{2}}-\hat{f}_{i-\frac{1}{2}})
+\end{equation}
+In general, the reconstruction of the numerical flux can be expressed via an interpolation function
+\begin{equation}
+    \hat{f}_{i+{1}/{2}}=\hat{f}(u_{i-j},\dotsc,u_{i+k})  
+\end{equation}
+where the interpolation function should satisfy the consistency condition
+\begin{equation}
+    \hat{f}(u,\dotsc,u) = f(u)
+\end{equation}
+
+The above form of spatial discretization is commonly referred to as a conservative discretization, as the developed numerical schemes guarantee discrete conservation via telescoping property
+\begin{equation}
+    \Delta x \sum_{i=p}^{q} u_i^{n+1} - \Delta x \sum_{i=p}^{q} u_i^n = \Delta t\hat{f}_{p-\frac{1}{2}}^{n} - \Delta t\hat{f}_{q+\frac{1}{2}}^{n}
+\end{equation}
+which states the conservation principle that the change of the total quantity of a conserved variable in a region is equal to the flux through the boundaries. Therefore, the numerical solution obeys the same conservation principle as the exact solution does.
+
+In numerical approximations, ensuring the conservation principle is helpful in obtaining physically correct solutions, particularly for nonlinear systems with discontinuous solutions. To show this, assume the solution $u(x,t)$ is constant outside some finite spatial interval $[x_{p-1/2}, x_{q+1/2}]$ for the time interval $[t^a, t^b]$
+\begin{equation}
+    \begin{cases}
+        u(x,t) \equiv u_{-\infty}, & x \le x_{p-\frac{1}{2}}\\
+        u(x,t) \equiv u_{+\infty}, & x \ge x_{q+\frac{1}{2}}\\
+    \end{cases},
+    \,\, t \in [t^a, t^b]
+\end{equation}
+By the finite propagation speed in a hyperbolic system, this assumption is generally true if the initial data is constant outside some finite interval. Then, by the integral form of the conservation law, it gives
+\begin{equation}
+    \int_{x_{p-\frac{1}{2}}}^{x_{q+\frac{1}{2}}} u(x,t^b) \,\mathrm{d}x - \int_{x_{p-\frac{1}{2}}}^{x_{q+\frac{1}{2}}} u(x,t^a) \,\mathrm{d}x = (t^b - t^a) (f(u_{-\infty}) - f(u_{+\infty}))
+\end{equation}
+Equivalently, the numerical solution should also be constant outside the finite interval $[x_{p-1/2}, x_{q+1/2}]$. Since the numerical flux generally has a finite domain of dependence, so for $p$ and $q$ sufficiently far away, the consistency of the numerical flux can be used to obtain 
+\begin{equation}
+    \Delta x \sum_{i=p}^{q} u_i^{n+1} - \Delta x \sum_{i=p}^{q} u_i^n = \Delta t (f(u_{-\infty}) - f(u_{+\infty}))
+\end{equation}
+Sum over the time interval $[t^a, t^b]$, gives
+\begin{equation}
+    \Delta x \sum_{i=p}^{q} u_i^b - \Delta x \sum_{i=p}^{q} u_i^{a} = (t^b - t^a) (f(u_{-\infty}) - f(u_{+\infty}))
+\end{equation}
+As both the continuous and the discrete conservation relation continuously hold over the time interval $[t^a, t^b]$, the equation
+\begin{equation}
+    \Delta x \sum_{i=p}^{q} u_i^{n} = \int_{x_{p-\frac{1}{2}}}^{x_{q+\frac{1}{2}}} u(x,t^n) \,\mathrm{d}x
+\end{equation}
+should be true for any $t^n \in [t^a, t^b]$. Hence, the numerical discretization is conservative.
+
+The discrete conservation implies that, when a discontinuity is presented in the solution, the solution computed with a conservative method might have the discontinuity smeared out, but it must at least be smeared about the correct location. Otherwise, the integral cannot be true for any interval $[x_{p-1/2}, x_{q+1/2}]$ containing the discontinuity, as illustrated in Fig.~\ref{fig:conservation_principle}.
+\begin{figure}[!htbp]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{conservation_principle_a}
+        \caption{}
+        \label{fig:conservation_principle_a}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{conservation_principle_b}
+        \caption{}
+        \label{fig:conservation_principle_b}
+    \end{subfigure}%
+    \caption{True and computed solutions. (a) A smeared discontinuity with the correct location. (b) A sharp discontinuity with an incorrect location.}
+    \label{fig:conservation_principle}
+\end{figure}
+
+In addition to the discrete conservation property, the conservative discretization also provides high level of abstraction: different numerical schemes mainly lead to different realizations of the numerical flux. As a result, the conservative discretization form is commonly adopted as the standard form for developing as well as implementing numerical schemes. 
+
+A conservative scheme predicts total energy directly and computes the kinetic energy indirectly from the mass and momentum. For extremely high-speed flows, the internal energy is then the small difference of two large numbers, and may not even be positive. When this happens the code will crash. A scheme is defined to be positively conservative if it could be guaranteed to predict only positive densities and internal energies. The original Godunov scheme is positively conservative, and many popular schemes are not \citep{harten1987uniformly}.
+
+\subsection{Numerical analysis}
+
+Under the conservative discretization, the explicit central difference discretization has the numerical flux
+\begin{equation}
+    \hat{f}_{i+\frac{1}{2}}^{n} = \frac{1}{2}(f(u_i^n) + f(u_{i+1}^n))
+\end{equation}
+
+Now assume a linear flux function $f(u)=au$, where $a$ is a constant. The governing equation changes to the linear advection equation
+\begin{equation}
+    \frac{\partial u}{\partial t} + a \frac{\partial u}{\partial x} = 0
+\end{equation}
+
+Using forward discretization in time and explicit central difference discretization in space gives a discrete equation as
+\begin{equation}
+    \frac{u_i^{n+1} - u_i^n}{\Delta t} + a \frac{u_{i+1}^n - u_{i-1}^n}{2 \Delta x} = 0
+\end{equation}
+Apply the Taylor series expansions
+\begin{equation}
+    \begin{aligned}
+        u_i^{n+1} &= u_i^n + (\frac{\partial u}{\partial t})_i^n \frac{\Delta t}{1!} + (\frac{\partial^2 u}{\partial t^2})_i^n \frac{\Delta t^2}{2!} + \dotsb\\
+        u_{i+1}^n &= u_i^n + (\frac{\partial u}{\partial x})_i^n \frac{\Delta x}{1!} + (\frac{\partial^2 u}{\partial x^2})_i^n \frac{\Delta x^2}{2!} + (\frac{\partial^3 u}{\partial x^3})_i^n \frac{\Delta x^3}{3!} + \dotsb\\
+        u_{i-1}^n &= u_i^n - (\frac{\partial u}{\partial x})_i^n \frac{\Delta x}{1!} + (\frac{\partial^2 u}{\partial x^2})_i^n \frac{\Delta x^2}{2!} - (\frac{\partial^3 u}{\partial x^3})_i^n \frac{\Delta x^3}{3!} + \dotsb\\
+    \end{aligned}
+\end{equation}
+the discrete equation and the differential equation have the relation
+\begin{equation}
+    \frac{u_i^{n+1} - u_i^n}{\Delta t} + a \frac{u_{i+1}^n - u_{i-1}^n}{2 \Delta x} = (\frac{\partial u}{\partial t} + a \frac{\partial u}{\partial x})_i^n +  \frac{\Delta t}{2} (\frac{\partial^2 u}{\partial t^2})_i^n + \frac{\Delta x^2}{6} (\frac{\partial^3 u}{\partial x^3})_i^n + \dotsb 
+\end{equation}
+If we denote the remainder between the discrete equation and the differential equation as
+\begin{equation}
+    \tau_i^n = \frac{\Delta t}{2} (\frac{\partial^2 u}{\partial t^2})_i^n + \frac{\Delta x^2}{6} (\frac{\partial^3 u}{\partial x^3})_i^n + \dotsb = \Order(\Delta t, \Delta x^2) 
+\end{equation}
+Then $\tau_i^n$ measures the local order of accuracy of the discrete equation for approximating the differential equation and is referred to as the local truncation error. When discussing local truncation errors, we always assume that solutions are sufficiently smooth. Therefore, the derivatives are all assumed to exist and be bounded.
+
+Before solving the discrete equation, it is of interest to know how the solution of the discrete equation will behave. In studying the behavior of solutions to a discrete equation, it is useful to model the discrete equation by a differential equation, since the qualitative behavior of a differential equation is easier to predict than that of a system of algebraic equations. In addition to using the original differential equation as a model for the discrete equation, there is another differential equation called the modified equation \citep{warming1974modified} that can more accurately represent the discrete equation.
+
+The derivation of the modified equation for a discrete equation is closely related to the calculation of the local truncation error. If we use the differential equation that includes the original equation and the truncation error together to model the discrete equation
+\begin{equation}
+    \frac{\partial u}{\partial t} + a \frac{\partial u}{\partial x} + \frac{\Delta t}{2} \frac{\partial^2 u}{\partial t^2} + \frac{\Delta x^2}{6} \frac{\partial^3 u}{\partial x^3} + \dotsb = 0
+\end{equation}
+then the truncation error between this modified equation and the discrete equation is zero, which means that the discrete equation produces an exact solution to this modified equation.
+
+If we further replace the high-order time derivatives in the modified equation with spatial derivatives, we obtain an equation that is easier to analyze. Note that we now should not use the original differential equation since the solution $u$ no longer satisfies the original equation, but should use the modified equation to do the manipulation
+\begin{equation}
+    \begin{aligned}
+        \frac{\partial^2 u}{\partial t^2} &= - a \frac{\partial^2 u}{\partial t \partial x} - \frac{\Delta t}{2} \frac{\partial^3 u}{\partial t^3} - \frac{\Delta x^2}{6} \frac{\partial^4 u}{\partial t \partial x^3} + \dotsb\\
+        &= a^2 \frac{\partial^2 u}{\partial x^2} + \Order(\Delta t, \Delta x^2)\\
+    \end{aligned}
+\end{equation}
+Substitute into the modified equation, gives
+\begin{equation}
+    \frac{\partial u}{\partial t} + a \frac{\partial u}{\partial x} = - \frac{a^2 \Delta t}{2} \frac{\partial^2 u}{\partial x^2} - \frac{\Delta x^2}{6} \frac{\partial^3 u}{\partial x^3} + \Order(\Delta t^2, \Delta t \Delta x^2, \Delta x^3)
+\end{equation}
+For simplicity, ignore the high-order terms and generalize the modified equation into an advection-diffusion-dispersion form
+\begin{equation}
+    \frac{\partial u}{\partial t} + a \frac{\partial u}{\partial x} = \mu \frac{\partial^2 u}{\partial x^2} + \nu \frac{\partial^3 u}{\partial x^3}
+\end{equation}
+which is a linear homogeneous partial differential equation. Let $A(k,t)$ be the Fourier transform of the solution, then
+\begin{equation}
+    u(x,t) = \int_{0}^{\infty} A(k,t) e^{ikx}\,\mathrm{d}k
+\end{equation}
+Substitute the solution into the differential equation and use the orthogonality of the function space $\{e^{ikx}\}$, gives the solution as
+\begin{equation}
+    u(x,t) = \int_{0}^{\infty} e^{-\mu k^2 t} e^{i(kx - \omega t)}\,\mathrm{d}k, \,\, \omega(k) = a k + \nu k^3
+\end{equation}
+Therefore, using a constant phase plane $\phi = kx - \omega t$ and $\partial \phi / \partial t = 0$ to obtain the wave velocity $c_p$ as
+\begin{equation}
+    c_p = \frac{\mathrm{d} x}{\mathrm{d} t} = \omega / k = a + \nu k^2
+\end{equation}
+and the group velocity $c_g$ has
+\begin{equation}
+    c_g = \frac{\partial \omega}{\partial k} = a + 3\nu k^2
+\end{equation}
+where both the wave velocity and the group velocity are functions of the wavenumber $k$. 
+
+By observing the role of each item in affecting the solution behavior, in a modified equation, even-order spatial derivatives cause dissipation and introduce amplitude error, while odd-order spatial derivatives cause dispersion and introduce phase error. Dissipative terms with positive coefficients cause the solution to become smeared out as time evolves, and dissipative terms with negative coefficients cause the solution to grow unboundedly. As dispersion causes waves with different frequencies propagating at different speeds, the positive and negative coefficients of dispersive terms cause waves propagating at speeds leading before and lagging behind the true wave speeds, respectively. Consequently, different frequency components in a solution may become completely separated, leading to large spatial oscillations. Although dispersion never leads to unbounded growth of solution, large oscillations caused by dispersion is still considered as a form instability.
+
+Instead of finding the dominant spatial derivative term in the modified equation to analyze the stability of a discrete equation, for linear problems, the von Neumann stability analysis using Fourier series \citep{charney1950numerical} can be directly applied to the discrete equation for obtaining the stability results. Note that linearity is strongly required to facilitate the application of Fourier series, since nonlinear problems do not have the superposition property and different frequency components interact nonlinearly, making the analysis intractable.
+
+As stability is largely about the growth of error as time evolves, and the error obeys the same equation as the solution does for linear equations, one can study the behavior of the solution equivalently. Let the solution be represented by a linear superposition of base functions in the Fourier series function space
+\begin{equation}
+    u(x,t) = \sum_{k=-\infty}^{\infty} c_k(t) e^{ikx}
+\end{equation}
+Map $x \in [-\pi, \pi]$ to $j \in [0, J]$ by a linear map
+\begin{equation}
+    x_j = \frac{2\pi}{J}j - \pi, \,\, \Delta x = \frac{2 \pi}{J}
+\end{equation}
+By assuming the solution being continuous and periodic with period $J$, then, 
+\begin{equation}
+    u(x_j,t) = \sum_{k=-\infty}^{\infty} c_k(t) (-1)^k e^{i k \frac{2 \pi}{J} j} = \sum_{k=0}^{J-1} A_k(t) e^{i k \frac{2 \pi}{J} j} = \sum_{k=0}^{J-1} A_k(t) e^{i k \Delta x j}
+\end{equation}
+where the infinite series is converted into a finite sum of discrete Fourier modes. So, we look at the expansion of $u_i^n$ in the form
+\begin{equation}
+    u_i^n = \sum_{k=0}^{J-1} A_k^n w_j^k, \,\, w_j^k = e^{i k \Delta x j}
+\end{equation}
+Use the orthogonality relation
+\begin{equation}
+    \sum_{j=0}^{J-1} w_j^k \bar{w}_j^l =
+    \begin{cases}
+        J, &\ \text{if}\ k \equiv l \ \mathrm{mod}\ J\\
+        0, &\ \text{otherwise}\ 
+    \end{cases}
+\end{equation}
+it gives the Parseval relation stating that the transform does not modify the $L_2$ norm
+\begin{equation}
+    ||u^n||_2^2 \equiv u^n \cdot \bar{u}^n = \sum_{j=0}^{J-1} u_j^n \bar{u}_j^n = J \sum_{k=0}^{J-1} A_k^n \bar{A}_k^n = J A^n \cdot \bar{A}^n  \equiv J ||A^n||_2^2 
+\end{equation}
+Substitute the expansion form into the discrete equation and apply the orthogonality relation, gives
+\begin{equation}
+    A_k^{n+1} = M_k A_k^n, \,\, M_k = 1 - i \alpha \sin(2\theta), \ \alpha = \frac{a \Delta t}{\Delta x}, \ \theta  = \frac{1}{2} k \Delta x
+\end{equation}
+Then,
+\begin{equation}
+    A_k^{n} = M_k A_k^{n-1} = \dotsb = (M_k)^n A_k^0 
+\end{equation}
+Apply the Parseval relation, gives
+\begin{equation}
+    ||u^n||_2^2 = J \sum_{k=0}^{J-1} A_k^n \bar{A}_k^n = |M_k|^{2n} ||u^0||_2^2
+\end{equation}
+Use the polar form of $M_k = |M_k|e^{-i \phi_k}$, gives
+\begin{equation}
+    u_i^n = \sum_{k=0}^{J-1} |M_k|^n A_k^0 e^{i k \Delta x j - n \phi_k} = \sum_{k=0}^{J-1} |M_k|^n A_k^0 e^{i(kx - \omega t)}, \,\, \omega = \frac{\phi_k}{\Delta t}
+\end{equation}
+Assume a small $\theta$, which corresponds to well-resolved frequencies, the wave velocity
+\begin{equation}
+    c_p = \frac{\omega}{k} = \frac{\tan^{-1}(\alpha \sin(2\theta))}{k \Delta t} \approx \frac{\alpha \sin(2\theta) - \frac{1}{3}(\alpha \sin(2\theta))^3 + \dotsb}{k \Delta t} = a - \frac{1}{3} a^3 k^2 \Delta t^2
+\end{equation}
+
+$M_k$ gives the growth or decay of the $k$-th Fourier mode in one time step and is referred to as amplification factor. Note that $M_k$ does not dependent on time level $n$. Therefore, each Fourier coefficient changes by exactly the same factor at every time step, which is a direct consequence of linearity. Obviously, the numerical dissipation can be determined by the magnitude of the amplification factor $M_k$, and the numerical dispersion can be examined by the phase of $M_k$.
+
+In applying Fourier series analysis, the periodic boundary condition is assumed to make the solution periodic. Otherwise, the linear combination of finite base functions may not converge to the solution, and the von Neumann analysis are no longer valid. A more practical alternative is the matrix stability analysis \citep{laney1998computational}. As any linear numerical scheme can be written into the formula
+\begin{equation}
+    u_i^{n+1} = \sum_{j=-k}^{k}a_{ij} u_{i+j}^n
+\end{equation}
+where linearity requires that the coefficients $a_{ij}$ do not dependent on the solution. Then, an equivalent vector-matrix formulation is
+\begin{equation}
+    u^{n+1} = A u^n, \,\, u^n \equiv [u_0^n, u_1^n, \dotsc, u_{I-1}^n]^{\Des{T}}
+\end{equation}
+where $u^n$ is the vector of samples and the matrix $A$ is composed of the coefficients $a_{ij}$. Suppose that $A = Q^{-1} \Lambda Q$ where $\Lambda$ is a diagonal matrix of the characteristic values of $A$. Then,
+\begin{equation}
+    u^n = A u^{n-1} = \dotsb = A^n u^0 = Q^{-1} \Lambda^n Q u^0
+\end{equation}
+that is,
+\begin{equation}
+    Q u^n = \Lambda^n Q u^0
+\end{equation}
+
+Let the spectral radius $\rho(A)$ be the largest characteristic value of $A$ in magnitude. Then, $\rho(A)$ represents the solution amplification factor. Unlike von Neumann analysis, this matrix analysis can register the effects of boundary conditions, the number of grid points, and the variable spacing between grid points, all of which radically affect stability. However, the matrix stability analysis does not say anything about dispersion, and finding the spectral radius of $A$ may be difficult.
+
+For a mathematical model of a physical problem, if the solution exists and is unique as well as continuously depends on initial conditions such that small changes in initial conditions lead to bounded changes in solutions, then the model is said to be well-posed. When applying numerical methods to well-posed problems, the following concepts are particularly pertinent to the success or otherwise of the numerical discretization: convergence, consistency, and stability.
+
+\paragraph{Convergence} Solution of the discrete equation approaches the exact solution of the original equation as the discretization step sizes are reduced to zero. If this property is not guaranteed, the obtained numerical solution is useless. 
+
+\textit{Definition.} A numerical approximation is convergent on $0 < t \le T$, if $||e^n|| = ||u^n - u(x,t_n)|| \to 0$, as $n \to \infty$, $\Delta x \to 0$, $\Delta t \to 0$, $n \Delta t \le T$. The approximation is convergent of order $p$ in time and of order $q$ in space, if $||e^n|| = \Order(\Delta t^p, \Delta x^q)$.
+
+\paragraph{Consistency} The discrete equation approaches the original equation as the discretization step sizes are reduced to zero. Since a numerical method only solves the modified equation exactly but solves the original equation approximately, consistency establishes the essential connection between the original equation and the discrete equation, and it also guarantees that the error committed by the numerical discretization over each computational step is small.
+
+\textit{Definition.} A numerical approximation is consistent, if the truncation error $\tau_i^n \to 0$, as $\Delta x \to 0$, $\Delta t \to 0$. The approximation is of order $p$ in time and of order $q$ in space, if $\tau_i^n = \Order(\Delta t^p, \Delta x^q)$.
+
+Although the truncation error only measures the local order of accuracy of the approximation, but for smooth solutions the global error will be of the same order of the local error provided the approximation is stable.
+
+\paragraph{Stability} In numerical computation, floating-point round-off errors, truncation errors, and small fluctuations in initial data are inevitable. As the error propagation depends on the numerical algorithm, the discretization method must be stable to produce valid solutions under approximation errors introduced to the data. This means that the growth of error under the applied numerical method should be bounded. Otherwise, the solution would be destroyed by the error.
+
+\textit{Definition.} A numerical method is stable, if there is a constant $C$ and a value $\Delta t_0 > 0$ such that $||e^n|| \le C||e^0||$, as $\Delta t < \Delta t_0$, $n \Delta t \le T$. 
+
+In particular, the method is stable if the amplification factor $|M| \le 1$, since $||e^n|| \le |M|^n ||e^0|| \le ||e^0||$. More generally, some growth is allowed. For example, if $|M| \le 1 + \alpha \Delta t$, as $\Delta t < \Delta t_0$, then $|M|^n \le (1 + \alpha \Delta t)^n \le \mathrm{e}^{\alpha n \Delta t} \le \mathrm{e}^{\alpha T}$.
+
+Convergence, the ultimately desired property of a numerical method, is a global property and is difficult to establish theoretically. In contrast, consistency and stability are less complicated to demonstrate for a given numerical method. For linear problems, mathematical techniques such as Taylor series expansion, modified equation approach, von Neumann stability analysis, and matrix stability analysis have established a successful foundation for analyzing numerical consistency and stability.
+
+Intuitively, the introduced error in each computational step by a consistent method will be very small. If the method is also stable, then the growth of error is bounded. As a result, the error in the numerical solution will remain small, and the solution will converge to the exact solution. In fact, for well-posed linear problems, Lax's equivalence theorem \citep{lax1956survey} states that the combination of consistency and stability is a necessary and sufficient condition for convergence. However, only necessity rather than sufficiency is valid when problems are nonlinear.
+
+In nonlinear problems, shocks and contact discontinuities are often presented, in which scenario linear schemes with linear stability theories are no longer adequate due to the lack of smoothness. Therefore, nonlinear schemes with nonlinear stability analysis are required to be established. As spurious oscillations tend to be induced near discontinuities and are a major symptom of nonlinear instability, nonlinear stability analysis primarily studies the total size of oscillations in the solution, which is commonly measured by the total variation function
+\begin{equation}
+    TV(u(\cdot,t)) = \sum_{i} |u(x_{i+1},t) - u(x_i,t)|
+\end{equation}
+
+The total variation is a sum of extrema in the solution, in which extrema are counted twice with maxima counted positively and minima counted negatively. Obviously, only maxima and minima affect the total variation. Furthermore, the creation of new local extrema, the increase of existing local maxima, and the decrease of existing local minima all will increase the total variation, which inevitably happens when oscillations are produced or amplified. Therefore, one condition on nonlinear stability is to enforce the total variation diminishing (TVD) condition
+\begin{equation}
+    TV(u(\cdot,t^{n+1})) \le TV(u(\cdot,t^{n}))
+\end{equation}
+
+Although TVD may allow large spurious oscillations in theory with the number of oscillations decreases to maintain TVD property, TVD imposes a non-increasing upper bound on oscillations, eliminating unbounded growth instability. However, the practice to enforce a non-increasing TV often includes preventing maxima from increasing and minima from decreasing, which leads to clipping errors at local extrema. A less restricted condition is to enforce essentially non-oscillatory (ENO) condition
+\begin{equation}
+    TV(u(\cdot,t^{n+1})) \le TV(u(\cdot,t^{n})) + \Order(\Delta x^r)
+\end{equation}
+which allows a weak growth of the TV and becomes TVD in the limit $\Delta x \to 0$. ENO allows $r$-th order increases in the total variation at every time step, in particular $r$-th order increases in maxima and decreases in minima, which eliminates the need for clipping at local extrema and thus permits a $r$-th order of accuracy at local extrema. However, ENO theoretically allows large oscillations in the solution. To obtain arbitrarily high-order accuracy, an even weaker stability condition is required, such as the total variation bounded (TVB) condition
+\begin{equation}
+    TV(u(\cdot,t)) \le C \le \infty
+\end{equation}
+for all $t$ and some constant $C$. This condition only concerns a bounded TV. Therefore, the hierarchy of nonlinear stability conditions has
+\begin{equation}
+    \Set{S}_{\Des{TVD}} \subset \Set{S}_{\Des{ENO}} \subset \Set{S}_{\Des{TVB}}
+\end{equation}
+
+A strong nonlinear stability condition may effectively reduce or eliminate spurious oscillations in the solution, but it may restrict the formal order of accuracy, particularly at local extrema. By contrast, a weak nonlinear stability condition may place little or no restrictions on the formal order of accuracy at local extrema, but it may allow large spurious oscillations. To some extent, there is a trade-off between the oscillatory errors and the clipping errors at extrema.
+
+\section{Scalar conservation law}
+
+There are basically two classes of modern shock-capturing schemes for the calculation of weak solutions of nonlinear scalar conservation laws, namely the TVD and ENO schemes. Modern shock-capturing schemes are nonlinear schemes, and most of them are second- or higher-order in smooth regions and produce high-resolution nonoscillatory solutions near shock and contact discontinuities. The essential idea behind any method with high resolution and nonoscillatory is to use a high-order method at smooth regions, but to modify the method and increase the amount of numerical dissipation in the neighborhood of a discontinuity. By damping out the high-frequency modes of the solution, the introduced numerical dissipation removes many numerical difficulties, such as spurious oscillations, related to nonsmooth solutions.
+
+The damping effect of numerical dissipation on high-frequency modes is similar to that of physical viscosity, as described by the Kolmogoroff hypothesis: energy generally enters a system at low wave numbers and cascades upward via the high wave numbers at which the energy is eventually dissipated by molecular viscosity and transforms into heat of the system. In numerical calculations, the resolved energy spectrum is limited by the number of grid points, and any frequencies higher than the Nyquist frequency of the sampling grid are aliased and presented as noise. Hence, by damping out the unresolved high-frequency modes, the numerical dissipation is useful to maintain the energy cascade and avoid the accuracy of low frequency modes being destroyed by the aliasing of the high-frequency noise. Meanwhile, a reduced frequency spectrum is also less prone to numerical dissipation. In addition, numerical dissipation is helpful to obtain proper entropy production for selecting the physically relevant weak solutions. However, a large amount of numerical dissipation may severally degrade solution accuracy. Therefore, an appropriate amount of numerical dissipation is crucial to achieving nonoscillatory while avoiding overly-smeared solutions. Different from the numerical dissipation in a classical shock-capturing scheme, which is linear and has the same amount everywhere, the numerical dissipation in a modern shock-capturing scheme is designed to be nonlinear and solution sensitive.
+
+\subsection{Total variation diminishing scheme}
+
+For a one-dimensional scalar conservation law
+\begin{equation}
+    \frac{\partial u}{\partial t} + \frac{\partial f(u)}{\partial x} = 0
+\end{equation}
+The total variation function is constant for smooth solutions. Meanwhile, it should not increase for shocks since characteristics are continuously destroyed at shocks, causing energy decaying. As a result, total variation is a non-increasing function of time for any physically admissible weak solution.
+
+It is proved that a linear monotone scheme is at most first order accurate, and linear methods with order higher than one always produce oscillations near discontinuities \citep{harten1983high}. This is a direct consequence from linear stability analysis using Fourier series: dispersion always exists for a numerical scheme, and a discontinuity consists of infinite modes of frequencies. As time evolves, these wave components disperse, leading to an oscillatory solution. Although numerical dissipation in a linear monotone scheme is strong enough to damp spurious oscillations, and it also makes the convergence process simulate the vanishing viscosity limit which will select the unique physically relevant weak solution. However, a hefty amount of numerical dissipation severely smears the discontinuities and causes low order of accuracy. 
+
+Therefore, to achieve nonoscillatory weak solutions with order of accuracy higher than one, we need nonlinear schemes with nonlinear stability analysis. As total variation measures the level of oscillations in a solution, it turns out that the total variation non-increasing property naturally establishes a general nonlinear stability criterion. For a consistent and conservative numerical method, ensuring total variation non-increasing as time evolves
+\begin{equation}
+    TV(u^{n+1}) \le TV(u^n)
+\end{equation}
+is enough to guarantee convergence while preventing spurious oscillations. This requirement gives rise to a class of schemes called Total Variation Diminishing (TVD) methods \citep{harten1983high}.
+
+The design of TVD methods typically has two ingredients: first, employing flux or solution reconstruction to combine a low-order but nonlinearly stable method and a high-order but potentially unstable method; second, exploiting solution sensitivity in reconstruction to achieve high-order accuracy while enforcing nonlinear stability conditions, such as switching between the stable and the unstable methods according to the local solution structure.
+
+Although the TVD property leads to nonlinear stability, in most cases, it is too difficult to enforce the TVD condition directly. Hence, instead of addressing the overall growth of the spurious oscillations as measured by the TV, most nonlinear stability analyses actually employ much stronger conditions such as the upwind range condition, positivity condition, and the monotonicity property \citep{harten1983high} to imply TVD but be easier to enforce in designing numerical schemes.
+
+Depending on the type of reconstruction, the solution sensitivity can be achieved either by a flux-limiter or a slope-limiter, which corresponds to the flux-based and solution-based reconstruction, respectively.
+
+\paragraph{Solution reconstruction method}
+
+Most solution reconstruction methods are developed on Godunov's method, which is only first-order accurate. In van Leer's solution reconstruction scheme \citep{van1979towards}, the basic idea of improving the order of spatial accuracy is to replace the piecewise constant representation of the solution with a higher order of polynomial representation, such as piecewise linear reconstruction
+\begin{equation}
+    \hat{u}_i^n(x) = u_i^n + c_i^n(x - x_i), \,\, x \in \Omega_i
+\end{equation}
+here $c_i^n$ is a slope on the $i$-th cell. Taking $c_i^n = 0$ for all $i$ recovers the Godunov's method. This piecewise linear reconstruction preserves cell average for any choice of $c_i^n$, hence the method is conservative for any $c_i^n$.
+
+A TVD reconstruction can be achieved by ensuring the monotonicity property, which addresses the individual maxima and minima in the solution: no new local extrema will be created, existing local maxima is nonincreasing, and existing local minima is nondecreasing. The monotonicity property is a stronger condition than TVD. Nonetheless, we still need to prove the resulting scheme is TVD under the derived reconstruction, which is done by the positivity condition.
+
+Furthermore, we need to prove that the resulting scheme is consistent with an entropy condition for assuring convergence to physically relevant solutions. Assume the scalar conservation law possesses an entropy function $s(u)$, and admissible weak solutions satisfy, in weak sense, the inequality
+\begin{equation}
+    \frac{\partial s(u)}{\partial t} + \frac{\partial h(u)}{\partial x} \le 0
+\end{equation}
+where $h(u)$ is an entropy flux function, the inequality is called an entropy condition. A conservative numerical scheme is said to be consistent with the entropy condition if an inequality of the following discrete form is satisfied:
+\begin{equation}
+    s(u_i^{n+1}) \le s(u_i^n) - \frac{\Delta t}{\Delta x} (\hat{h}_{i+\frac{1}{2}}^n - \hat{h}_{i-\frac{1}{2}}^n)
+\end{equation}
+where $\hat{h}$ is a numerical entropy flux consistent with the entropy flux $h(u)$, i.e.,
+\begin{equation}
+    \hat{h}(u,\dotsc,u) = h(u)
+\end{equation}
+
+Since the numerical scheme guarantees uniformly bounded total variation, using compactness arguments one can deduce that there exist convergent subsequences for all initial data of bounded total variation. Since the scheme is conservative, each limit solution is a weak solution of the conservation law. Furthermore, as each limit solution satisfies the entropy condition, when the entropy condition implies uniqueness of an initial value problem, all subsequences converge to the same limit solution. As a result, the numerical scheme is convergent \citep{harten1983high}. 
+
+Under a linear reconstruction, in order to avoid violating the monotonicity property, the slope value $c_i^n$ should be confined by some slope limiter
+\begin{equation}
+    \begin{cases}
+        \begin{cases}
+            \hat{u}_i^n(x_{i+\frac{1}{2}}) = u_i^n + c_i^n \frac{\Delta x_i}{2} \le u_{i+1}^n\\
+            \hat{u}_i^n(x_{i-\frac{1}{2}}) = u_i^n - c_i^n \frac{\Delta x_i}{2} \ge u_{i-1}^n\\
+        \end{cases}
+        &\ \text{if}\ u_{i-1}^n \le u_i^n \le u_{i+1}^n\\
+        \begin{cases}
+            \hat{u}_i^n(x_{i+\frac{1}{2}}) = u_i^n + c_i^n \frac{\Delta x_i}{2} \ge u_{i+1}^n\\
+            \hat{u}_i^n(x_{i-\frac{1}{2}}) = u_i^n - c_i^n \frac{\Delta x_i}{2} \le u_{i-1}^n\\
+        \end{cases}
+        &\ \text{if}\ u_{i-1}^n \ge u_i^n \ge u_{i+1}^n\\
+        c_i^n = 0 &\ \text{otherwise}\ \\
+    \end{cases}
+\end{equation}
+which gives that the slope $c_i^n$ should satisfy
+\begin{equation}
+    c_i^n \frac{\Delta x_i}{2} = \mathrm{minmod}(\Delta_{i+\frac{1}{2}}^n, \Delta_{i-\frac{1}{2}}^n)
+\end{equation}
+where
+\begin{equation}
+    \begin{gathered}
+        \Delta_{i+\frac{1}{2}}^n = u_{i+1}^n - u_i^n\\
+        \mathrm{minmod}(x,y) = 
+        \begin{cases}
+            \mathrm{sign}(x) \min(|x|,|y|), &\ \text{if}\ \mathrm{sign}(x) = \mathrm{sign}(y)\\
+            0, &\ \text{otherwise}\ 
+        \end{cases}\\
+        \ \text{or equivalently,}\\
+        \mathrm{minmod}(x,y) = \mathrm{sign}(x) \max(0,\min(|x|, \mathrm{sign}(x) y))\\
+        \mathrm{sign}(x) = 
+        \begin{cases}
+            1, & x > 0\\
+            0, & x = 0\\
+            -1, & x < 0\\
+        \end{cases}
+    \end{gathered}
+\end{equation}
+This slope limiter is named as minmod limiter, which returns the argument closest to zero if all arguments have the same sign, and it returns zero if any two arguments have different signs.
+
+The resulting TVD scheme is nonlinear even when applied to linear equations, since $c_i^n$ depends on solution. When $u_i^n$ itself is a local extrema, the slope $c_i^n$ must be zero in order to maintaining TVD property. As a consequence, linear reconstruction reduces to constant average, and the order of accuracy of the scheme reduces to first order at local extrema.
+
+After choosing a slope value $c_i^n$ for each cell $\Omega_i$, a specific distribution of the solution is determined, and a jump condition exists at each cell interface $x_{i+1/2}$. The numerical flux then needs to be reconstructed on this jump condition
+\begin{equation}
+    \hat{f}_{i+\frac{1}{2}}^n = \hat{f}(u_{i+\frac{1}{2}}^+,u_{i+\frac{1}{2}}^-), \,\, u_{i+\frac{1}{2}}^+ = \hat{u}_{i}^n(x_{i+\frac{1}{2}}), \ u_{i+\frac{1}{2}}^- = \hat{u}_{i+1}^n(x_{i+\frac{1}{2}})
+\end{equation}
+
+In addition to using an analytical Riemann solver as in Godunov's scheme, a very popular form of the interpolation functions is an approximate Riemann solver represented by an upwind numerical flux function, which commonly represents a central difference approximation with additional artificial viscosity to stabilize the solution. Such as
+
+Lax--Friedrichs numerical flux
+\begin{equation}
+    \hat{f}_{\Des{LF}}(u^+,u^-) = \frac{1}{2}[f(u^+) + f(u^-) - \lambda^* (u^- - u^+)]
+\end{equation}
+where the constant $\lambda^* = \max\{|\lambda|\}$ taking over the relevant range of $u$.
+
+Roe's numerical flux
+\begin{equation}
+    \hat{f}_{\Des{Roe}}(u^+,u^-) = \frac{1}{2}[f(u^+) + f(u^-) - |\bar{\lambda}| (u^- - u^+)]
+\end{equation}
+where $\bar{\lambda}$ is the eigenvalue of the Jacobian matrix evaluated using a symmetric average between $u^+$ and $u^-$, such as $\lambda = 1/2(\lambda^+ + \lambda^-)$. The effect of the modulus bars in the extra term is to select the flux from the upwind side of the interface, according to the local direction of information flow, that is, the sign of the characteristic speed at the interface.
+
+Although both the Lax--Friedrichs and Roe's numerical fluxes are only first-order accurate, most high-order numerical schemes are very insensitive to this low order of accuracy. However, the Roe's numerical flux has a drawback that it may violate the entropy condition at sonic points \citep{harten1987uniformly}. For instance, when an entropy-violating characteristics-diverging shock with $\lambda^+=-1$ and $\lambda^-=+1$ exists in the field, the interface becomes a sonic point with $\bar{\lambda}=0$, and the Roe's numerical flux changes to the symmetric central difference, which admits the existence of this physically unstable shock as a stable solution rather than breaks up this unstable shock into rarefaction waves as happens in physical reality. Therefore, mechanisms that can, when necessary, break symmetry is needed. Such an additional mechanism is often called an entropy fix, which results in the Roe's numerical flux with entropy fix
+\begin{equation}
+    \hat{f}_{\Des{Roe}}(u^+,u^-) = \frac{1}{2}[f(u^+) + f(u^-) - \psi(\bar{\lambda}) (u^- - u^+)]
+\end{equation}
+where $\psi(x)$ modifies the coefficient of the artificial viscosity term to remedy the entropy-violating problem and has
+\begin{equation}
+    \psi(x) = 
+    \begin{cases}
+        |x|, & |x| \ge \varepsilon\\
+        \frac{1}{2}(\frac{x^2}{\varepsilon} + \varepsilon), & |x| < \varepsilon\\
+    \end{cases}
+\end{equation}
+The small positive parameter $\varepsilon \in [0.05, 0.25]$ such as $\varepsilon = 0.2$. For subsonic to low supersonic perfect gas flows, the resolution of shocks is insensitive to $\varepsilon$, and a constant $\varepsilon$ is sufficient. However, for hypersonic flows, a variable $\varepsilon$ as a function of the local velocity and sound speed is needed \citep{yee1989class}
+\begin{equation}
+    \varepsilon = 0.2(|u| + |v| + |w| + c)
+\end{equation}
+
+\paragraph{Flux reconstruction method}
+
+One example of the flux reconstruction methods is the Harten's scheme \citep{harten1984class}, which employs the Roe's numerical flux
+\begin{equation}
+    \hat{f}_{i+\frac{1}{2}} = \frac{1}{2} [\tilde{f}_i + \tilde{f}_{i+1} - \psi(\tilde{\lambda}_{i+\frac{1}{2}})\Delta_{i+\frac{1}{2}}]
+\end{equation}
+with
+\begin{equation}
+    \begin{gathered}
+        \tilde{f} = f + g, \,\, \tilde{\lambda} = \lambda + \gamma, \,\, \lambda = \frac{\mathrm{d} f}{\mathrm{d} u}\\
+        g_i = \mathrm{minmod}(\sigma(\lambda_{i+\frac{1}{2}})\Delta_{i+\frac{1}{2}}, \sigma(\lambda_{i-\frac{1}{2}})\Delta_{i-\frac{1}{2}})\\
+        \Delta_{i+\frac{1}{2}} = u_{i+1} - u_i\\
+        \gamma_{i+\frac{1}{2}} =
+        \begin{cases}
+            \frac{g_{i+1} - g_i}{\Delta_{i+\frac{1}{2}}}, & \Delta_{i+\frac{1}{2}} \ne 0\\
+            0, & \Delta_{i+\frac{1}{2}} = 0\\
+        \end{cases}\\
+        \sigma(x) = \frac{1}{2}\psi(x)\\
+    \end{gathered}
+\end{equation}
+where the second-order numerical flux is achieved by modifying the flux function and the mean characteristic speed in the first-order numerical flux such that the scheme is second-order at smooth regions and is first-order at local extrema. 
+
+In addition to the reducing of order of accuracy at local extrema, a TVD reconstruction suffers from lack of robust extensions to higher-order reconstructions. For instance, in solution reconstruction methods, the reconstruction process is determined in each cell $\Omega_i$ with ${\partial u}/{\partial x} = c_i$ for constant average and linear reconstruction. However, for higher-order reconstructions, the system is under-determined since no enough information is provided. Moreover, local extrema may be introduced in the interior of $\Omega_i$ when using higher-order polynomials. Currently, no known conditions have been established for higher-order polynomial reconstructions to be TVD. As a result, other less restricted nonlinear stability conditions such as essentially non-oscillatory or total variation bounded conditions are introduced for developing high-order nonlinear schemes.
+
+\subsection{Weighted essentially non-oscillatory scheme}
+
+In general, numerical approximation is to interpolate the approximated quantity by polynomials or other simple functions. As different from Galerkin methods, in which the degrees of freedom in interpolation are built on individual basis functions defined in an orthogonal function space, the degrees of freedom in interpolation of a finite difference approximation are based on individual stencil nodes. According to the interpolation theory, a wider stencil enables a higher order of accuracy of the interpolation, provided the interpolated quantity is smooth inside the stencil.
+
+As a high-order approximation in the finite difference framework inevitably requires a wide stencil containing multiple nodes, when the interpolated quantity is discontinuous in the stencil, a single continuous polynomial interpolation may introduce oscillations into the reconstructed variable. This oscillatory behavior originates from the inherent impossibility of approximating a discontinuous function by a finite series of continuous basis functions. By the Weierstrass M-test, a function series with absolutely convergent expansion coefficients will be uniformly convergent. Thus, if a discontinuous function has absolutely convergent expansion coefficients, then the discontinuous function will be the uniform limit of the continuous functions and therefore be continuous, which is a contradiction. Since no single finite series of continuous polynomials can adequately represent a discontinuous function, one may consider using piecewise-polynomial approximations instead. Piecewise polynomials naturally admit jump discontinuities and are more generic for solutions to hyperbolic conservation laws. 
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.45\textwidth]{weno_demo}
+    \caption{A schematic diagram illustrating WENO reconstruction.}
+    \label{fig:weno_demo}
+\end{figure}
+
+As illustrated in Fig.~\ref{fig:weno_demo}, since discontinuities are usually confined in a narrow region, WENO schemes \citep{shu1998essentially} employ the concept of adaptive stencils and divide the wide stencil into multiple candidate stencils in the interpolation procedure. While interpolations are conducted independently in each candidate stencil, a convex combination of all the interpolated values on candidate stencils is adopted as the value of the reconstructed variable. Compared with ENO schemes, in which only the locally smoothest stencil is adopted, WENO schemes combine all the smooth candidate stencils to achieve a higher-order approximation in smooth regions.
+
+In the convex combination, a weight is used to determine the contribution of its corresponding stencil to the reconstructed value and is based on the local smoothness of the solution, as measured by a smoothness factor. The weight for a candidate stencil in a smooth region approaches certain optimal value to achieve a high-order approximation and approaches zero when the stencil contains discontinuities to avoid the interpolation crossing discontinuities. As a result, information on candidate stencils containing discontinuities is avoided for using, and the reconstruction is essentially non-oscillatory. Moreover, in smooth regions, the convex combination of all the low-order approximations on candidate stencils converges to the highest order of approximation that can be obtained on the undivided stencil. 
+
+The construction of WENO scheme is based on the one-dimensional scalar conservation law
+\begin{equation}
+    \frac{\partial u}{\partial t} + \frac{\partial f(u)}{\partial x} = 0
+\end{equation}
+and scalar flux splitting is conducted to obtain two flux parts with unique upwind directions
+\begin{equation}
+    f(u) = f^+(u) + f^-(u), \,\, \frac{\mathrm{d} f^+(u)}{\mathrm{d} u} \ge 0, \,\, \frac{\mathrm{d} f^-(u)}{\mathrm{d} u} \le 0
+\end{equation}
+
+Since both the forward flux and backward flux are discretized in conservative form, the discretization can be equivalently written as
+\begin{equation}
+    \left. \frac{\partial f}{\partial x} \right|_i = \frac{1}{\Delta x} \left[ \hat{f}_{i+\frac{1}{2}} - \hat{f}_{i-\frac{1}{2}} \right], \,\, \hat{f}_{i+\frac{1}{2}} = \hat{f}_{i+\frac{1}{2}}^+ + \hat{f}_{i+\frac{1}{2}}^-, \,\, \hat{f}_{i-\frac{1}{2}} = \hat{f}_{i-\frac{1}{2}}^+ + \hat{f}_{i-\frac{1}{2}}^-
+\end{equation}
+
+For the reconstruction of numerical fluxes, the fifth-order finite difference WENO scheme \citep{jiang1996efficient} is presented, and higher-order finite difference WENO schemes may be referred to \citep{balsara2000monotonicity}. Since $\hat{f}_{i+{1}/{2}}^-$ and $\hat{f}_{i-{1}/{2}}^-$ are the reconstructed values of $f^-$ at different spatial positions, $\hat{f}_{i+{1}/{2}}^-$ is obtained from $\hat{f}_{i-{1}/{2}}^-$ by substituting $i$ with $i+1$. Similarly, $\hat{f}_{i-{1}/{2}}^+$ and $\hat{f}_{i+{1}/{2}}^+$ are the reconstructed values of $f^+$ at different spatial positions, $\hat{f}_{i-{1}/{2}}^+$ is obtained from $\hat{f}_{i+{1}/{2}}^+$ by substituting $i$ with $i-1$. Therefore, only the reconstruction of $\hat{f}_{i+{1}/{2}}^+$ and $\hat{f}_{i-{1}/{2}}^-$ requires to be expressed. Furthermore, since the numerical flux $\hat{f}_{i+{1}/{2}}^+$ and $\hat{f}_{i-{1}/{2}}^-$ are symmetric with respect to $x_i$, only the reconstruction of the former is described herein. The latter can be obtained via replacing all $+$ and $-$ signs in the superscript and subscript of each variable in the equations by the corresponding opposite signs $-$ and $+$, respectively.
+\begin{equation}
+    \hat{f}_{i+\frac{1}{2}}^{+} = \sum_{n=0}^{N} \omega_{n}^+ q_{n}^+(f_{i+n-N}^+, \dotsc, f_{i+n}^+), \,\, N=(r-1)=2
+\end{equation}
+where
+\begin{equation}
+    \begin{gathered}
+        q_0^+(f_{i-2}^+, \dotsc, f_{i}^+) = (2f_{i-2}^+ - 7f_{i-1}^+ + 11f_{i}^+) / 6\\
+        q_1^+(f_{i-1}^+, \dotsc, f_{i+1}^+) = (-f_{i-1}^+ + 5f_{i}^+ + 2f_{i+1}^+) / 6\\
+        q_2^+(f_{i}^+, \dotsc, f_{i+2}^+) = (2f_{i}^+ + 5f_{i+1}^+ - f_{i+2}^+) / 6\\
+        \omega_{n}^+ = \frac{\alpha_n^+}{\alpha_0^+ + \dotsb + \alpha_N^+}, \,\, \alpha_n^+ = \frac{C_n}{(\varepsilon + IS_n^+)^2}, \,\, \varepsilon = 10^{-6}\\
+        C_0 = \frac{1}{10}, \,\, C_1 = \frac{6}{10}, \,\, C_2 = \frac{3}{10}\\
+        IS_{0}^+ = \frac{13}{12}(f_{i-2}^+ - 2f_{i-1}^+ + f_{i}^+)^2 + \frac{1}{4}(f_{i-2}^+ - 4f_{i-1}^+ + 3f_{i}^+)^2\\
+        IS_{1}^+ = \frac{13}{12}(f_{i-1}^+ - 2f_{i}^+ + f_{i+1}^+)^2 + \frac{1}{4}(f_{i-1}^+ - f_{i+1}^+)^2\\
+        IS_{2}^+ = \frac{13}{12}(f_{i}^+ - 2f_{i+1}^+ + f_{i+2}^+)^2 + \frac{1}{4}(3f_{i}^+ - 4f_{i+1}^+ + f_{i+2}^+)^2
+    \end{gathered}
+\end{equation}
+where $r$ is the number of candidate stencils, $q_n$ are the $r$-th order approximations of $\hat{f}_{i+1/2}$ on the candidate stencils $S_n=(x_{i+n-N},\dotsc,x_{i+n})$, $\omega_{n}$ are the actual weights of $q_n$, which are determined by the smoothness of solution in the candidate stencils $S_n$, as measured by $IS_n$, and $C_n$ are optimal weights to ensure that the convex combination of $q_n$ converges to a $(2r-1)$-th order approximation of $\hat{f}_{i+1/2}$ on the undivided stencil $S=(x_{i-N},\dotsc,x_{i+N})$ in smooth regions.
+
+It is worth noting that a WENO reconstruction is a type of polynomial interpolation designed for problems with piecewise smooth solutions containing discontinuities. Therefore, as interpolation methods, WENO schemes can be used not only for flux reconstruction but also for solution reconstruction. In solution reconstruction, at the interface $x_{i+1/2}$, the left solution state $u^+_{i+1/2}$ and right solution state $u^-_{i+1/2}$ are reconstructed by the interpolation functions of $\hat{f}_{i+1/2}^{+}$ and $\hat{f}_{i+1/2}^{-}$, respectively. Then, the numerical flux $\hat{f}_{i+1/2}^{n}$ is reconstructed on this jump condition, such as by using the Roe's numerical flux function.
+
+\section{Convergence study}
+
+When solving problems numerically, we need to know how well the obtained numerical solution approximates the true solution. If defining the global error to be the distance between the true and computed solutions, then we need to know how to measure this distance as well as how to estimate its value.
+
+\subsection{Error measurement}
+
+The solution $u(x,t)$ of a partial differential equation ${\partial u}/{\partial t} = \Loptr u$ can be regarded as being an element of a function space, and the discrete numerical solution $\{u^n\}$ can be regarded as being an element of a linear vector space. To this end, we collect all of the unknowns at a given time level $n$ into a vector $u^n$, which is the restriction of the continuous exact solution $u(x,t_n)$ to the mesh
+\begin{equation}
+    u^n \equiv [u_0^n, u_1^n, \dotsc, u_{I-1}^n]^{\Des{T}}
+\end{equation}
+
+A positive scalar associated with the function space or vector space can then be introduced to measure the "size" of member elements and the "distance" between them. This kind of scalar is called a norm.
+
+\textit{Definition.} Let $\Set{V}$ be a vector space over $\Set{K}$. The map $||\cdot||$ from $\Set{V}$ into $\Set{R}$ is a norm on $\Set{V}$ if the following axioms are satisfied:
+\begin{enumerate}
+    \item $\text{(i)}\ ||\Vector{v}|| \ge 0 \ \forall \Vector{v} \in \Set{V} \ \text{and}\ \text{(ii)}\ ||\Vector{v}|| = 0 \ \text{if and only if}\ \Vector{v}= 0$;
+    \item $||\alpha \Vector{v}|| = |\alpha| ||\Vector{v}|| \ \forall \alpha \in \Set{K}, \ \forall \Vector{v} \in \Set{V} \ \text{(homogeneity property)}$
+    \item $||\Vector{v} + \Vector{w}|| \le ||\Vector{v}|| + ||\Vector{w}|| \ \forall \Vector{v}, \ \Vector{w} \in \Set{V} \ \text{(triangular inequality)}$
+\end{enumerate}
+where $|\alpha|$ denotes the absolute value of $\alpha$ if $\Set{K} = \Set{R}$, the module of $\alpha$ if $\Set{K} = \Set{C}$. The pair $(\Set{V}, ||\cdot||)$ is called a normed space.
+
+The $L_p$ norm for a function space is defined as
+\begin{equation}
+    ||u||_p = \left[\int_{\Omega} |u(x,t)|^p \,\mathrm{d}x \right]^{1/p}, \ \text{for}\ 1 \le p < \infty
+\end{equation}
+where $\Omega$ is the spatial domain of the function space.
+
+The norm on a vector space is similar to that for a function space.
+\begin{equation}
+    ||u^n||_p = \left(\sum_{i=0}^{I-1} |u_i^n|^p \right)^{1/p}, \ \text{for}\ 1 \le p < \infty
+\end{equation}
+
+Notice that the limit as $p$ goes to infinity, $||u^n||_p$ is finite and equals the maximum module of the components of $u^n$. Such a limit defines in turn a norm, called the $L_{\infty}$ norm (or maximum norm), given by
+\begin{equation}
+    ||u^n||_{\infty} = \left(\sum_{i=0}^{I-1} |u_i^n|^{\infty} \right)^{1/\infty} = \left((\max\{|u_i^n|\})^{\infty} \right)^{1/\infty} = \max\{|u_i^n|\}
+\end{equation}
+
+The $L_p$ norm $||u^n||_p$ of any given vector $u^n$ does not grow with $p$:
+\begin{equation}
+    ||u^n||_{p+q} \le ||u^n||_p
+\end{equation}
+for any vector $u^n$ and real numbers $p > 0$ and $q \ge 0$.
+
+For the opposite direction, for vectors in $\Set{C}^n$ where $0 < r < p$:
+\begin{equation}
+    ||u^n||_p \le ||u^n||_r \le I^{(\frac{1}{r} - \frac{1}{p})} ||u^n||_p
+\end{equation}
+This inequality depends on the dimension $I$ of the underlying vector space and follows directly from the Cauchy-Schwarz inequality.
+
+When measuring errors $e^n = u^n - u(x,t_n)$ for discrete data sets, the scaled $L^p$ norm
+\begin{equation}
+    ||e^n||_p = \left(\frac{1}{I} \sum_{i=0}^{I-1} |e_i^n|^p \right)^{1/p}
+\end{equation}
+is commonly used, which is consistent with the integral version for functions.
+
+Using the relations between $L_p$ norms, the scaled $L_1$, $L_2$, and $L_{\infty}$ norms have the relation
+\begin{equation}
+    ||e^n||_1 \le ||e^n||_2 \le ||e^n||_{\infty}
+\end{equation}
+
+With these preliminary considerations established, one is able to quantify errors through measuring distances and then investigate the convergence of numerical schemes. It is worth noting that a method is convergent in one norm but may not in another. For conservation laws, the natural norm to use is the $L_1$ norm, as it only requires integrating the function, and the conservation laws are essentially integrations. The $L_{\infty}$ norm captures the largest point-wise error in the entire domain and hence is the most stringent measure. Ideally one might hope for convergence in the $L_{\infty}$ norm. However, this is unrealistic in approximating discontinuous solutions. In the neighborhood of a discontinuity, the point-wise error generally does not go to zero uniformly as the grid is refined even though the numerical results may be perfectly satisfactory. Therefore, a method may converge in the $L_1$ norm but not in the $L_{\infty}$ norm. Even the $L_1$ norm is applied to computing the error of discontinuities solutions, the expected rates of convergence can not be observed. Instead a "first-order" method convergences with an error that is $\Order\left(\Delta h^{1/2}\right)$ whereas a "second-order" method has an error that is $\Order\left(\Delta h^{2/3}\right)$ at best. These convergence rates can be proved for very general initial data by an analysis using smooth approximations. For linear equations, a more widely used norm is the $L_2$ norm, as for linear problems Fourier analysis is applicable and Parseval's relation states that the Fourier transform of a function has the same $L_2$ norm as the function. This property can simplify the analysis of linear methods considerably.
+
+\subsection{$L_p$-optimisation}
+
+Many problems require to minimise the $L_p$-norm of a vector corresponding to some constraints, hence called "$L_p$-minimisation". A standard minimisation problem is formulated as:
+\begin{equation}
+    \min ||x||_p \text{subject to} Ax = b
+\end{equation}
+In the case of $L_2$ norm, the problem is usually known as least square optimisation.
+
+\subsection{Error analysis}
+
+One significant issue in numerical computations is what level of grid resolution is appropriate. Grid convergence study, which is to perform numerical solutions on successively refined grids, is a useful procedure for determining the level of discretization error existing in a numerical solution. According to the theory of truncation errors, which measures the difference between the continuous governing equation and the discrete equation, a consistent numerical method should provide numerical solutions that become asymptotically less sensitive to the grid size as the mesh is refined.
+
+In practice, the level of numerical error depends on the features of the flow. The presence of discontinuities, such as shocks, slip surfaces, and interfaces, develops numerical errors on a grid in a complex way and affects the error estimation process \citep{roache1998verification, oberkampf2002verification}. Therefore, convergence studies generally require test cases with smooth analytical solutions to avoid influence from discontinuities, at which values of derivatives are not bounded and the truncation error is not well defined. 
+
+In generating $n$ levels of successive refined grids, the number of grid points in the finest grid may satisfy the relation
+\begin{equation}
+    N = r^{n-1} m + 1
+\end{equation}
+where $m$ is the base number of meshes, which may be different for each coordinate direction. $r$ is the refinement ratio, which should be a minimum of $r \geq 1.1$ to allow the discretization error being differentiated from other error sources such as computer round-off error.
+
+Although non-integer refinement ratio $r$ can be used, particularly when the asymptotic range of convergence is limited, grid refinement with $r=2$, which is doubling the number of grid points in each coordinate direction, is commonly adopted for the purpose of maintaining grid similarity.
+
+Solution error is defined as the difference between the discrete solution and the exact solution, in which norms such as the maximum norm and $L_1$ norm may be used for measuring the difference between quantities,
+\begin{equation}
+    e = u(\Delta h) - u_{\Des{exact}} = C(\Delta h) \Delta h^p + \Des{H.O.T.}
+\end{equation}
+where $C(\Delta h)$ is a coefficient related to Taylor series expansion, $\Delta h$ is some measure of grid spacing, and $p$ is the theoretical order of convergence.
+
+When solutions, $\{u(\Delta h_n)\}$, are obtained from $n$ levels of successively refined grids with refinement ratios $r_n = \Delta h_{n-1} / \Delta h_n$, an observed order of convergence, $p'$, can be computed from the errors $\{e_n=C(\Delta h_n) \Delta h_n^p\}$,
+\begin{equation}
+    p' = \frac{{\log}_2 \frac{e_{n-1}}{e_{n}}}{{\log}_2^{r_n}}
+\end{equation}
+where higher-order terms are neglected, and $\lim_{\Delta h \to 0} C(\Delta h)$ is assumed to be a constant.
+
+In cases where the analytical solution is not available for determining errors, an evaluation using relative error may be adopted for obtaining $p'$ from solutions using a constant grid refinement ratio $r$,
+\begin{equation}
+    p' = \frac{{\log}_2 \frac{u_{n-2} - u_{n-1}}{u_{n-1} - u_{n}}}{{\log}_2^r}
+\end{equation}
+
+Due to errors introduced from numerical models, boundary conditions, and other sources, the observed order of convergence is frequently lower than the theoretical order of convergence. In addition, the global order of accuracy is generally estimated one degree less than the local order of accuracy. The order of accuracy of the boundary conditions can be one order of accuracy lower than the interior order of accuracy without degrading the overall global accuracy.
+
+To determine the error band for the quantities obtained from a specific grid solution, Richardson extrapolation method, which achieves a higher-order estimate of the solution from a series of lower-order discrete values, can be found useful.
+
+Using the series expansion relation between numerical solutions and the exact solution, the Richardson extrapolation estimates the solution at $\Delta h = 0$ with $(p+1)$-th order of accuracy via $p$-th order solutions on $r$-value grid ratio refined grids as
+\begin{equation}
+    u(\Delta h = 0) \approx u_{n} + \frac{u_n - u_{n-1}}{r^{p} - 1}
+\end{equation}
+
+Then, the obtained $u(\Delta h=0)$ may be used to give an error estimate of the solutions $\{u_n\}$,
+\begin{equation}
+    \varepsilon = \frac{u_n - u(\Delta h=0)}{u(\Delta h=0)} \approx \frac{u_{n-1} - u_n}{u_n (r^{p} - 1)}
+\end{equation}
+
+The error analysis and Richardson extrapolation are based on a Taylor series representation of quantities. If shocks and other discontinuities are presented in the solutions, the methods are invalid in the regions of discontinuities. Nonetheless, they may still be applied to solution functionals computed from the entire flow field.
+
+When conducting convergence studies for unsteady problems, the solution error consists of both temporal and spatial discretization errors. Moreover, the temporal and spatial discretization sizes are linked by the stability constraints. Therefore, close attention may be required in choosing temporal and spatial parameters, particularly when time and space are discretized by schemes with different order of accuracy. Suppose that the truncation error of numerical discretization is $\Order\left(\Delta h^p, \Delta t^q\right)$, the temporal step size $\Delta t$ is required to vary with the spatial step size $\Delta h$ as $\Delta t \propto \Delta h^{p/q}$ to hold down the errors from temporal discretization on successively refined grids. Consequently, the CFL coefficient has $C_{\Des{CFL}} \propto \Delta h^{p/q-1}$.
+
+\section{Vector conservation laws}
+
+When developing methods for the system of conservation laws, obtaining the nonlinear stability results necessary to prove convergence is nearly impossible. However, more analysis is possible in the case of a scalar conservation law. Therefore, the development of a numerical method is generally started from a scalar equation and is then extended to systems of equations. Even though the analysis and convergence proofs may not carry over, the resulting methods are mostly very successful in practice, as evaluated by numerical experiments.
+
+\subsection{Temporal discretization}
+
+In choosing a numerical method to integrate the differential equations through time, many factors, such as accuracy, stability, storage requirements, computational complexity and efficiency, are required to be considered. Compensations among these coupled factors must be made as to which criteria are more crucial for a particular problem, since optimizing one may affect another.
+
+There are mainly two widely used approaches for temporal discretization. One is the Lax--Wendroff discretization \citep{lax1960systems}, which is established on the Taylor series expansion
+\begin{equation}
+    \Vector{U}_i^{n+1} = \Vector{U}_i^n + \Delta t  \frac{\partial \Vector{U}}{\partial t} +  \frac{1}{2} \Delta t^2  \frac{\partial^2 \Vector{U}}{\partial t^2} + \dotsb
+\end{equation}
+and the observation that from
+\begin{equation}
+    \frac{\partial \Vector{U}}{\partial t} = \Loptr\Vector{U}
+\end{equation}
+one can compute
+\begin{equation}
+    \frac{\partial^2 \Vector{U}}{\partial t^2} = \frac{\partial (\Loptr\Vector{U})}{\partial t} = \Loptr(\frac{\partial \Vector{U}}{\partial t}) = \Loptr(\Loptr \Vector{U})
+\end{equation}
+so that
+\begin{equation}
+    \Vector{U}_i^{n+1} = \Vector{U}_i^n + \Delta t \Loptr \Vector{U} + \frac{1}{2} \Delta t^2 \Loptr(\Loptr \Vector{U}) + \dotsb
+\end{equation}
+where one starts with the temporal Taylor expansion of the partial differential equation and then replaces temporal discretization with spatial discretization through converting all the time derivatives into spatial derivatives with the aid of the original differential equation.
+
+The Lax--Wendroff discretization results in a fully-discrete equation. The temporal accuracy is determined by the number of spatial terms to approximate in the converted equation, and the spatial accuracy is determined by the approximation of spatial derivatives. Therefore, numerical schemes using the Lax--Wendroff approach are fully-discrete methods, in which the reconstruction of the numerical flux requires to treat temporal and spatial accuracy simultaneously. The main advantage of a fully-discrete method is that high-order temporal accuracy can be achieved by one-step marching in time, but these methods are difficult to derive and are not flexible in implementation.
+
+The other approach is to apply Runge--Kutta methods \citep{shu1988efficient} for time derivatives under the framework of the method of lines
+\begin{equation}
+    \frac{\mathrm{d} \Vector{U}}{\mathrm{d} t} = \Loptr_{\Delta}\Vector{U}
+\end{equation}
+Numerical schemes using the method of lines are semi-discrete methods. The semi-discrete form is particularly convenient in developing methods with high order of accuracy, since the issues of spatial and temporal accuracy are decoupled and can be considered separately. One can define high-order approximations to the spatial operators at one instant in time via high-order interpolation in space, and then achieve high-order temporal accuracy by applying a high-order ordinary differential equation solver in time. Therefore, the semi-discrete form enables modular approximations and implementations wherein a range of fully-discrete approximations can be obtained by pairing the semi-discrete form with numerous different time discretizations.
+
+Incorporating the method of lines, the Runge--Kutta methods maintain simplicity in concept and in implementation. When a strong-stability-preserving (SSP) Runge--Kutta method \citep{gottlieb2001strong} is employed, good numerical stability can also be achieved. For instance, the third-order SSP Runge--Kutta method is given as
+\begin{equation} \label{eq:tvd_rk}
+    \begin{aligned}
+        &\Vector{U}^{(1)} = \Toptr\Vector{U}^n\\
+        &\Vector{U}^{(2)} = 3/4\Vector{U}^n+1/4\Toptr\Vector{U}^{(1)}\\
+        &\Vector{U}^{n+1} = 1/3\Vector{U}^n+2/3\Toptr\Vector{U}^{(2)}\\
+        &\Toptr = (\Matrix{I} + \Delta t \Loptr)\\
+        &C_{\Des{CFL}} = 1
+    \end{aligned}
+\end{equation}
+The fractional steps in the scheme can be rearranged into a unified form
+\begin{equation}
+    \begin{gathered}
+        \Vector{U}^{(s+1)} = C_0^s \Vector{U}^n + C_1^s \Toptr\Vector{U}^{(s)}, \,\, s = 0,\dotsc, 2 \\
+        \Vector{U}^{(0)} = \Vector{U}^n, \,\, \Vector{U}^{n+1} = \Vector{U}^{(3)}
+    \end{gathered}
+\end{equation}
+where the coefficient vectors $C_0=(0, 3/4, 1/3)^{\Des{T}}$ and $C_1=(1, 1/4, 2/3)^{\Des{T}}$.
+
+For explicit schemes, the time step size $\Delta t$ is constrained by numerical stability. For a hyperbolic system, $\Delta t$ is generally related to the Courant--Friedrichs--Lewy (CFL) number \citep{courant1927partial}:
+\begin{equation} \label{eq:cfl}
+    \Delta t = C_{\Des{CFL}} \min_{s=x,y,z}(\frac{\Delta s}{\lambda_s^{\Des{max}}})
+\end{equation}
+where $C_{\Des{CFL}}$ is the CFL coefficient and is chosen according to the linear stability condition of the employed numerical method, $\lambda_s^{\Des{max}}$ is the maximum wave speed of the $s$ direction presented throughout the domain in $[t^n, t^{n+1}]$. A practical choice for $\lambda_s^{\Des{max}}$ is the maximum characteristic speed at time level $n$
+\begin{equation} \label{eq:dt}
+    \lambda_s^{\Des{max}} = \max_{\Omega_{i,j,k}}(|(V_s)^n_{i,j,k}| + c^n_{i,j,k}) 
+\end{equation}
+
+As the maximum characteristic speed at time level $n$ does not consider wave acceleration and may underestimate the maximum wave speed, the $C_{\Des{CFL}}$ should be small enough such that the fastest wave will not travel for more than one cell width $\Delta s$ under the determined $\Delta t$. In general, the sampling range $\Omega$ should include the boundaries, since data arising from boundary conditions may generate the largest wave speed, and an inappropriate choice of the maximum wave speed may result in the scheme becoming unstable, even a small $C_{\Des{CFL}}$ is used.
+
+Generally, the time step size $\Delta t$ determined by the CFL stability condition is about two magnitude less than $\Delta s$, that is, $\Delta t \approx \Order\left(10^{-2}\Delta s\right)$. Therefore, the temporal truncation error of a third-order accurate temporal scheme has
+\begin{equation}
+    \Order\left(\Delta t^3\right) \approx \Order\left(10^{-6}\Delta s^3\right) \approx \Order\left(\Delta s^5\right)
+\end{equation}
+where $\Delta s$ is assumed that $\Delta s \approx \Order\left(10^{-3}\right)$, which is generally true for practical problems.
+
+\subsection{Spatial discretization}
+
+Spatial derivatives in the governing equations are quantitative descriptions of convection and diffusion. As two forms of the transportation of mass, momentum, and energy, appropriate discretization of the convective and diffusive fluxes is vital to achieve an accurate solution. 
+
+If we define the domain of dependence, $\Omega_{\Des{D}}(\bar{\Vector{r}},t)$, for a spatial point $\bar{\Vector{r}}$ under a particular operator is the set of points $\Vector{r}$ whose solution data $\Vector{U}(\Vector{r},t)$ could possibly affect the solution at $(\bar{\Vector{r}},t)$, then as stated in the Courant--Friedrichs--Lewy theorem \citep{courant1927partial}, a necessary condition for the stability of numerical discretization is that the numerical domain of dependence governed by the numerical schemes contains the physical domain of dependence governed by the partial differential equations. Otherwise, changing the value of the initial data in the excluded region would affect the true solution but not the numerical solution, and hence it is not possible for the numerical solution to converge to the true solution for all initial data.
+
+A physical numerical discretization should correctly model the direction from which characteristic information propagates. Therefore, the numerical domain of dependence should properly and closely model the physical domain of dependence. Different differential operators, such as elliptic, parabolic, hyperbolic, or mixed operators, have different domains of dependence and ranges of influence, which property determines the suitability of the employed discretization schemes and boundary conditions. For example, in a hyperbolic system, information propagates along characteristics with finite speeds. Therefore, hyperbolic operators prefer upwind discretization schemes because the dependent and influential zones of these operators are bounded and directional. In contrast, elliptic operators prefer central difference schemes since these operators have global dependence and influence.
+
+\subsubsection{Multidimensional space}
+
+Most practical problems are in two or three space dimensions, and great challenges on numerical stability and computational efficiency are imposed in this extension. Nonlinear stability in multidimensions still have many unresolved issues, such as the system of conservation laws may no longer be nonoscillatory in multidimensions, and enforcing nonlinear stability conditions in multidimensions is very difficult. As a result, although there is some interest in developing "fully multidimensional" numerical methods that make use of the multidimensional structure of the solution locally, such as by some generalization of the Riemann problem, most methods in use are developed heavily on one-dimensional concepts and are then generalized to multidimensional problems.
+
+\paragraph{Operator splitting method}
+
+For solving system of conservation laws in multidimensional space, one practical approach for relaxing stability constrains and decreasing numerical complexities is to apply operator splitting methods \citep{goldman1996n}. The operator splitting technique represents a divide-and-conquer strategy. The original complex partial differential equations are transformed into a sequence of simple subproblems by the decomposition of operators, which further provides the capability that different subproblems can be effectively solved separately with different approaches. For instance, using implicit schemes for stiff subproblems and explicit schemes for subproblems with less stability constrains.
+
+Partial differential equation:
+\begin{equation} \label{eq:pde}
+    \frac{\partial \Vector{U}}{\partial t} = \Loptr\Vector{U}, \,\, \Loptr = \sum_{s = 0}^{S}\Loptr_s
+\end{equation}
+
+Differential splitting:
+\begin{equation} \label{eq:diff_split}
+    \begin{gathered}
+        \frac{\partial \Vector{U}}{\partial t} = \Loptr_s\Vector{U}^{(s)}, \,\, s = 0,\dotsc, S \\
+        \Vector{U}^{(0)} = \Vector{U}^n, \,\, \Vector{U}^{n+1} = \Vector{U}^{(S+1)}
+    \end{gathered}
+\end{equation}
+
+Let $\Soptr_s$ denote the solution operator of the subproblem
+\begin{equation}
+    \frac{\partial \Vector{U}}{\partial t} = \Loptr_s\Vector{U}^{(s)}
+\end{equation}
+
+Then, a compact form is given as
+\begin{equation}
+    \begin{gathered}
+        \Vector{U}^{(s+1)} = \Soptr_s\Vector{U}^{(s)}, \,\, s = 0,\dotsc, S \\
+        \Vector{U}^{(0)} = \Vector{U}^n, \,\, \Vector{U}^{n+1} = \Vector{U}^{(S+1)}
+    \end{gathered}
+\end{equation}
+
+A widely used second-order temporal accuracy splitting for the case of two operators is the Strang splitting \citep{strang1968construction}
+\begin{equation}
+    \Vector{U}^{n+1} = \Soptr_1(\frac{\Delta t}{2})\Soptr_0(\frac{\Delta t}{2})\Soptr_0(\frac{\Delta t}{2})\Soptr_1(\frac{\Delta t}{2}) \Vector{U}^n
+\end{equation}
+
+Traditionally, to reduce the computational load resulting from a symmetric splitting, the group property of the solution operator, $\Soptr(\Delta t_1)\Soptr(\Delta t_2) = \Soptr(\Delta t_1 +\Delta t_2)$, is applied in Strang splitting to concatenate consecutive operators of the same type \citep{strang1968construction, goldman1996n}. Consequently, the algorithmic uniformity are not preserved at the start and end steps of the computation cycle. By observing that a doubled range of the CFL number can be adopted, the present ungrouped form preserves algorithmic uniformity while achieving equivalent overall efficiency for temporal integration or higher efficiency when more than two solution operators are involved.
+
+The decomposition of operators can be physics-based splitting, in which sub-operators are built on different physical phenomena and processes, or dimension-based splitting. For a multidimensional problem, the dimension-based splitting technique is useful for reducing the multidimensional governing equations into multiple one-dimensional governing equations, which can then be solved sequentially.
+
+To apply the Strang splitting for the three dimensional governing equations, the following procedure can be derived
+\begin{equation}
+    \begin{aligned}
+        \Vector{U}^{n+1} &= \Soptr_z(\frac{\Delta t}{2})\Soptr_{xy}(\Delta t)\Soptr_z(\frac{\Delta t}{2}) \Vector{U}^n \\
+                                 &= \Soptr_z(\frac{\Delta t}{2})\Soptr_y(\frac{\Delta t}{2})\Soptr_x(\frac{\Delta t}{2})\Soptr_x(\frac{\Delta t}{2})\Soptr_y(\frac{\Delta t}{2})\Soptr_z(\frac{\Delta t}{2}) \Vector{U}^n
+    \end{aligned}
+\end{equation}
+
+\paragraph{Dimension-by-dimension approximation}
+
+When the limitation of temporal accuracy in operator splitting is undesirable, a dimension-by-dimension approximation \citep{laney1998computational} without splitting can be used. Consider the following hyperbolic system
+\begin{equation}
+    \frac{\partial \Vector{U}}{\partial t}+\nabla\cdot\Tensor{F} = 0, \ \text{on}\ \Omega \times T
+\end{equation}
+Discretize the continuous physical domain $\Omega \times T$ into a discrete computational domain $\bigcup \Omega_{i,j,k} \times \bigcup T_n$, and integrate on $\Omega_{i,j,k}$ to obtain a semi-discrete scheme
+\begin{equation}
+    \int_{\Omega_{i,j,k}} \frac{\partial \Vector{U}}{\partial t} \,\mathrm{d}\Omega = - \int_{\partial\Omega_{i,j,k}} \unitVector{n} \cdot \Tensor{F} \,\mathrm{d}S
+\end{equation}
+Introduce cell average solution
+\begin{equation}
+    \Vector{U}_{i,j,k} \approx \bar{\Vector{U}}_{i,j,k} \equiv \frac{1}{|\Omega_{i,j,k}|} \int_{\Omega_{i,j,k}} \Vector{U}(\Vector{r},t) \,\mathrm{d}\Omega
+\end{equation}
+and numerical flux
+\begin{equation}
+    \hat{\Tensor{F}}_{i,j,k}^{n} = \Tensor{F}(\Vector{U}(\partial \Omega_{i,j,k},t^n))
+\end{equation}
+it gives
+\begin{equation}
+    \frac{\mathrm{d} {U}_{i,j,k}}{\mathrm{d} t} = - \frac{1}{|\Omega_{i,j,k}|} \int_{\partial\Omega_{i,j,k}} \unitVector{n} \cdot \hat{\Tensor{F}}_{i,j,k}^n \,\mathrm{d}S
+\end{equation}
+
+Since the surface integration is in a multidimensional space, the determination of the numerical flux over the domain boundary inevitably involves the multidimensional structure of the solution. One way to simplify the solution process is to locally average and project the solution onto the normal direction and then solve a local one-dimensional problem. For instance, when choosing $\Omega_{i,j,k}$ as hexahedron $[x_{i-1/2}, x_{i+1/2}] \times [y_{j-1/2}, y_{j+1/2}] \times [z_{k-1/2}, z_{k+1/2}]$, it gives
+\begin{equation}
+    \begin{aligned}
+        \frac{\mathrm{d} {U}_{i,j,k}}{\mathrm{d} t} &= - \frac{1}{\Delta x}\left((\hat{\Vector{F}}_x)^{n}_{i+\frac{1}{2},j,k} - (\hat{\Vector{F}}_x)^{n}_{i-\frac{1}{2},j,k}\right) - \frac{1}{\Delta y}\left((\hat{\Vector{F}}_y)^{n}_{i,j+\frac{1}{2},k} - (\hat{\Vector{F}}_y)^{n}_{i,j-\frac{1}{2},k}\right)\\
+        &- \frac{1}{\Delta z}\left((\hat{\Vector{F}}_z)^{n}_{i,j,k+\frac{1}{2}} - (\hat{\Vector{F}}_z)^{n}_{i,j,k-\frac{1}{2}}\right)
+    \end{aligned}
+\end{equation}
+Where each spatial operator is approximated on its corresponding dimension, and one-dimensional numerical methods can be directly applied. However, in applying the dimension-by-dimension approximation, the stability condition is restricted by a factor of $1/s$, where $s$ is the dimension of the problem.
+
+\subsubsection{Convective flux discretization}
+
+The essentials of convective flux discretization can largely be discussed using the one-dimensional nonlinear hyperbolic system 
+\begin{equation} \label{eq:convective}
+    \frac{\partial \Vector{U}}{\partial t} + \frac{\partial \Vector{F}(\Vector{U})}{\partial x} = 0
+\end{equation}
+
+When solving nonlinear systems, the nonlinearity makes problems harder to analyze, and additional difficulties can arise in numerical solutions. For smooth solutions to nonlinear problems, the problem can generally be linearized and results from the linear theory can be applied to obtain convergence results for nonlinear problems. However, the rising of discontinuities such as shocks and contact discontinuities in the solutions imposes stringent requirements on the mathematical formulation of governing equations as well as on the numerical schemes employed for discretization.
+
+As jump discontinuities satisfying the entropy condition, shocks have extremely thin thickness and abrupt varying flow properties. While numerical diffusion may excessively smear shocks and affect their magnitude and thickness, numerical dispersion may produce severe oscillations at shocks. The oscillation is also related to the principle that the decay of Fourier coefficients of a function at high-frequency modes is controlled by the smoothness of the function. A very smooth function will have exponentially decaying Fourier coefficients, resulting in the rapid convergence of the Fourier series with relatively low frequency components. In contrast, a discontinuous function will have very slowly decaying Fourier coefficients, causing the Fourier series to converge very slowly and oscillatory. Meanwhile, the infinite wide Fourier spectrum is very prone to dispersion. These spurious oscillations not only decrease the solution accuracy by creating nonlinear instabilities but also may introduce unphysical features in the solution such as negative mass or pressure. Therefore, to achieve nonoscillatory weak solutions, nonlinear stability analysis with special efforts concerning numerical dissipation and dispersion needs to be established for numerical schemes applied to nonlinear problems.
+
+When solving problems with smooth solutions, derivatives are always well defined and have bounded values. Different forms of equations derived for the conservation laws are consistent, as the truncation errors among them converge to zero for smooth solutions. Therefore, the choice between the nonconservative form and the conservative form of governing equations as well as numerical schemes is not critical.
+
+However, for problems with nonsmooth solutions, truncation errors are not bounded at discontinuities, different forms of equations may no longer consistent with each other and hence have different weak solutions. A nonconservative form may give solution converging to a function that is not a weak solution of the original equation, due to that the transform from conservative form into nonconservative form modifies the shock speeds determined by the Rankine--Hugoniot condition. In general, in order to correctly predict shock speed and shock position in solving flow with discontinuities, which is critical for practical applications such as predicting the correct force field around an airfoil, the conservative form of governing equations should be adopted, and the convective flux should also be discretized in a conservative manner. \citet{lax1960systems} showed that a conservative discretization will guarantee that we do not converge to non-solutions.
+
+In summary, nonlinear stability and conservation property are especially vital for solution with discontinuities. In one sense, conservation addresses the location issue of the discontinuities, and nonlinear stability addresses the shape issue of the discontinuities. Another important issue in solving hyperbolic conservation laws is that weak solutions are not unique. A conservative method with nonlinear stability may converge to weak solutions violating the entropy condition. Therefore, in developing a numerical scheme, it is necessary to prove that the obtained solution will satisfy some discrete form of the entropy condition. A scheme that is consistent with an entropy condition can assure that a converged solution is a physically relevant solution. As a conclusion, conservation, nonlinear stability, and consistency to entropy conditions are essential properties for establishing convergence to physically relevant weak solutions of nonlinear hyperbolic conservation laws.  
+
+In a conservative discretization, the flux derivative at a node $i$ is approximated as
+\begin{equation} \label{eq:conservativediff}
+    \left. \frac{\partial \Vector{F}}{\partial x} \right|_i = \frac{1}{\Delta x}\left[\hat{\Vector{F}}_{i+\frac{1}{2}}-\hat{\Vector{F}}_{i-\frac{1}{2}}\right]
+\end{equation}
+where $\hat{\Vector{F}}_{i+{1}/{2}}$ is a numerical flux at cell interface.
+
+Under the conservative discretization framework, the realization of the numerical flux \(\hat{\Vector{F}}_{i+{1}/{2}}\) determines the underlying numerical schemes and related numerical properties such as accuracy and stability. In practice, the reconstruction of the numerical flux can either be solution-based or flux-based. In the solution-based approach, the interpolation function of the numerical flux treats the solution $\Vector{U}$ as the independent variable. Solution reconstruction is conducted and then is used for flux evaluation. This approach enables the possibility of exploring the spatial structure of the solution and is often referred to as the MUSCL approach \citep{yee1989class}. In the flux-based approach, the interpolation function of the numerical flux is developed by treating the flux $\Vector{F}$ as the independent variable. Obviously, when the flux $\Vector{F}$ is a linear function of $\Vector{U}$, these two approaches are then equivalent. 
+
+System of conservation laws are frequently indefinite systems with eigenvalues of mixed sign, which depends on the local data and may vary from point to point. In addition, the Jacobian matrix $\Matrix{A}$ is generally a nonlinear function of $\Vector{U}$. Therefore, the entire system of equations are tightly coupled. To extend numerical methods and ideas from scalar conservation laws to system of conservation laws, flux splitting techniques are often used to facilitate the generalization process while conforming to the hyperbolic properties of the system.
+
+\paragraph{Flux form: component-wise or characteristic-wise approximation}
+
+For a hyperbolic system, the form of flux used for approximation can be component-based or characteristics-based.
+
+When the component-based flux form is used, component-wise approximation is directly applied without decoupling the system of equations. In order to achieve upwinding discretization, flux splitting methods applied to the entire flux vector are required. A component-wise approximation is simple and cost effective but only works reasonably well for undemanding problems with lower order of accuracy, such as second or sometimes third order. For more demanding problems or when the order of accuracy is high, the characteristic-wise approximation is needed \citep{shu1998essentially}.
+
+In the characteristic-wise approximation, a nonlinear hyperbolic system is first locally linearised and then projected onto its characteristic fields to obtain a diagonalized system. Under the projection, the original coupled system is decomposed into a system of uncoupled scalar equations, which can be solved by well-established methods for scalar conservation laws.
+
+For a nonlinear hyperbolic system
+\begin{equation}\label{eq:onedimnon}
+    \frac{\partial \Vector{U}}{\partial t}+\Matrix{A}\frac{\partial \Vector{U}}{\partial x} = 0
+\end{equation}
+Locally linearise the system by freezing $\Matrix{A}$ into a constant $\bar{\Matrix{A}}$
+\begin{equation}
+    \frac{\partial \Vector{U}}{\partial t}+\bar{\Matrix{A}}\frac{\partial \Vector{U}}{\partial x} = 0
+\end{equation}
+where the approximated Jacobian matrix $\bar{\Matrix{A}}$ has
+\begin{equation}
+    \bar{\Matrix{A}} = \Matrix{A}(\bar{\Vector{U}})
+\end{equation}
+here, $\bar{\Vector{U}}$ is a local average state evaluated using a symmetric average between the left state $\Vector{U}^+$ and the right state $\Vector{U}^-$. The symmetric average can be the arithmetic mean
+\begin{equation}
+    \bar{\Vector{U}} = \frac{1}{2}(\Vector{U}^+ + \Vector{U}^-)
+\end{equation}
+or the Roe averages \citep{roe1981approximate}
+\begin{equation} \label{eq:Roeaverage}
+    \bar{\Vector{U}}
+    \begin{cases}
+        \bar{\rho} = \rho^+[(1+\bar{D})/2]^2\\
+        \bar{u} = (u^+ + \bar{D}u^-)/(1+\bar{D})\\
+        \bar{v} = (v^+ + \bar{D}v^-)/(1+\bar{D})\\
+        \bar{w} = (w^+ + \bar{D}w^-)/(1+\bar{D})\\
+        \bar{h}_{\Des{T}} = ({h_{\Des{T}}}^++\bar{D} {h_{\Des{T}}}^-)/(1+\bar{D})\\
+        \bar{D} = \sqrt{\rho^- / \rho^+}\\
+        \bar{c}^2 = (\gamma-1)(\bar{h}_{\Des{T}}-\frac{1}{2}(\bar{u}^2+\bar{v}^2+\bar{w}^2))\\
+        \bar{p} = \bar{\rho}\frac{\bar{c}^2}{\gamma}\\
+        \bar{e}_{\Des{T}} = \bar{h}_{\Des{T}}-\frac{\bar{p}}{\bar{\rho}}
+    \end{cases}
+\end{equation}
+Introduce characteristic decomposition of the constant Jacobian matrix
+\begin{equation}
+    \frac{\partial \Vector{U}}{\partial t}+\bar{\Matrix{R}}\bar{\Matrix{\Lambda}}\bar{\Matrix{R}}^{-1}\frac{\partial \Vector{U}}{\partial x} = 0
+\end{equation}
+Decompose the system through a projection into the characteristic space
+\begin{equation}\label{eq:chara}
+    \frac{\partial (\bar{\Matrix{R}}^{-1}\Vector{U})}{\partial t}+\bar{\Matrix{\Lambda}}\frac{\partial (\bar{\Matrix{R}}^{-1}\Vector{U})}{\partial x} = 0
+\end{equation}
+Introduce a change of variable by defining a local system of characteristic variables
+\begin{equation} \label{eq:change}
+    \Vector{W} = \bar{\Matrix{R}}^{-1}\Vector{U}
+\end{equation}
+Then gives a diagonalized system with $M$ decoupled scalar linear convection equations
+\begin{equation}\label{eq:reformchara}
+    \frac{\partial \Vector{W}}{\partial t}+\bar{\Matrix{\Lambda}}\frac{\partial \Vector{W}}{\partial x} = 0
+\end{equation}
+To obtain numerical discretization in a conservative form, it requires to be rewritten as
+\begin{equation}\label{eq:rewritechara}
+    \frac{\partial \Vector{W}}{\partial t}+\frac{\partial \Vector{H}}{\partial x} = 0
+\end{equation}
+where $\Vector{H}=\bar{\Matrix{R}}^{-1}\Vector{F}=\bar{\Matrix{\Lambda}}\Vector{W}$ is the local characteristic flux.
+
+Flux splitting methods applied to each scalar characteristic flux can then be used to obtain an upwinding discretization of the linearised hyperbolic system. After solution or flux reconstruction in the characteristic space, the obtained results in the characteristic space can then be projected back to the physical space by the inverse projection
+\begin{equation}
+    \Vector{R} = \bar{\Matrix{R}}\Vector{W}, \ \Vector{F}=\bar{\Matrix{R}}\Vector{H}
+\end{equation}
+
+\paragraph{Flux splitting: solution reconstruction or flux reconstruction}
+
+\subparagraph{Solution reconstruction: flux difference splitting}
+
+A specific distribution of the solution $\Vector{U}$ in each cell $\Omega_i$ or a certain reconstruction of the left and right solution states $\Vector{U}^{\pm}_{i+1/2}$ is first conducted:
+\begin{equation}
+    \Vector{U}^{\pm}_{i+1/2} = \delta^{\pm}\Vector{U}
+\end{equation}
+
+In the case of non-orthogonal cells, once the data is reconstructed within each cell, the cells are still presumed to interact in a one-dimensional manner by exchanging waves normal to their interfaces. Then, a jump condition exists at the interface $x_{i+{1}/{2}}$, and the numerical flux needs to be reconstructed on this jump condition
+\begin{equation}
+    \hat{\Vector{F}}_{i+\frac{1}{2}}^n = \hat{\Vector{F}}(\Vector{U}_{i+\frac{1}{2}}^+,\Vector{U}_{i+\frac{1}{2}}^-)
+\end{equation}
+
+To deal with this jump condition, a local Riemann problem can be established to split flux differences across the interface and to construct the numerical flux. Through establishing and solving local Riemann problems, the hyperbolic properties of the system are then naturally admitted and integrated into numerical solutions. 
+
+However, for the system of conservation laws, acquiring exact numerical solutions of the Riemann problem at each interface $x_{i+{1}/{2}}$ requires iteration and is unduly time-consuming. A more effective approach is to use an upwind numerical flux function as an approximate Riemann solver to select the upwind state, such as the HLLC numerical flux function \citep{toro1994restoration, toro1999riemann} or the Roe's numerical flux for the system of conservation laws, which is derived by the inverse projection of the Roe's numerical flux applied to the characteristic fields of the system after a local linearization of the system.
+\begin{equation}
+    \hat{\Vector{F}}_{\Des{Roe}}(\Vector{U}^+,\Vector{U}^-) = \frac{1}{2}[\Vector{F}(\Vector{U}^+) + \Vector{F}(\Vector{U}^-) - \bar{\Matrix{R}} \psi(\bar{\Matrix{\Lambda}}) \bar{\Matrix{R}}^{-1} (\Vector{U}^- - \Vector{U}^+)]
+\end{equation}
+
+In addition to being interpreted as selecting the upwind flux according to the local direction of information flow, Roe's numerical flux also represents a central difference approximation with additional artificial viscosity to stabilize the solution, in which $\psi(\bar{\Matrix{\Lambda}})$ is the coefficient of artificial viscosity with entropy fix.
+
+\subparagraph{Flux reconstruction: flux vector splitting}
+
+One simple way of introducing upwinding discretization into a hyperbolic system is to split the convective flux into a forward flux $\Vector{F}^+$ and a backward flux $\Vector{F}^-$ with each part dominated by a unique upwind direction
+\begin{equation}
+    \Vector{F} = \Vector{F}^+ + \Vector{F}^-
+\end{equation}
+where the Jacobian matrix ${\mathrm{d} \Vector{F}^+}/{\mathrm{d} \Vector{U}}$ has no negative eigenvalues, and the Jacobian matrix ${\mathrm{d} \Vector{F}^-}/{\mathrm{d} \Vector{U}}$ has no positive eigenvalues. If both the forward and backward flux are discretized in a conservative form
+\begin{equation} \label{eq:fluxvectorsplit}
+    \left.\frac{\partial \Vector{F}}{\partial x}\right|_i = \left.\frac{\partial \Vector{F}^+}{\partial x}\right|_i+\left.\frac{\partial \Vector{F}^-}{\partial x}\right|_i, \,\,
+    \left.\frac{\partial \Vector{F}^{\pm}}{\partial x}\right|_i = \frac{1}{\Delta x} \left[\hat{\Vector{F}}_{i+\frac{1}{2}}^{\pm}-\hat{\Vector{F}}_{i-\frac{1}{2}}^{\pm}\right]
+\end{equation}
+it can be rearranged as
+\begin{equation} \label{eq:rearrange}
+    \left. \frac{\partial \Vector{F}}{\partial x} \right|_i = \frac{1}{\Delta x}\left[\hat{\Vector{F}}_{i+\frac{1}{2}}-\hat{\Vector{F}}_{i-\frac{1}{2}}\right], \,\,
+    \hat{\Vector{F}}_{i+\frac{1}{2}} = \hat{\Vector{F}}^+_{i+\frac{1}{2}} + \hat{\Vector{F}}^-_{i+\frac{1}{2}} 
+\end{equation}
+where the forward and backward numerical flux are reconstructed on the forward and backward flux field, respectively. That is,
+\begin{equation} \label{eq:upwinddiff}
+    \hat{\Vector{F}}_{i+\frac{1}{2}}^{\pm} = \delta^{\pm}\Vector{F}^{\pm}
+\end{equation}
+where $\delta^+$ and $\delta^-$ are upwind-biased interpolation schemes.
+
+Widely used approaches for obtaining the forward and backward fluxes are Lax--Friedrichs splitting \citep{lax1957hyperbolic}, Steger--Warming splitting \citep{steger1981flux}, van Leer splitting \citep{van1982flux}, and Advection Upstream Splitting Method \citep{liou1996sequel}.
+
+Lax--Friedrichs splitting and Steger--Warming splitting use the homogeneity property of the flux function, and the splitting of flux are conducted through characteristic speed (eigenvalue) splitting 
+\begin{equation}
+    \begin{aligned}
+        \Vector{F}
+        &= \Matrix{A}\Vector{U} \\
+        &= \Matrix{R} \Matrix{\Lambda} \Matrix{R}^{-1}\Vector{U} \\
+        &= \Matrix{R} (\Matrix{\Lambda}^+ + \Matrix{\Lambda}^-) \Matrix{R}^{-1}\Vector{U} \\
+        &= \Matrix{R} \Matrix{\Lambda}^+ \Matrix{R}^{-1}\Vector{U} + \Matrix{R} \Matrix{\Lambda}^- \Matrix{R}^{-1}\Vector{U} \\
+        &= \Matrix{A}^+ \Vector{U} + \Matrix{A}^- \Vector{U} \\
+        &= \Vector{F}^+ + \Vector{F}^-
+    \end{aligned}
+\end{equation}
+
+The difference is to determine the splitting of characteristic speeds
+\begin{equation}
+    \Matrix{\Lambda} = \Matrix{\Lambda}^+ + \Matrix{\Lambda}^-, \,\, \Matrix{\Lambda}^{\pm} = \Diag\{\lambda^{\pm}\}, \,\, \lambda^+_m \ge 0, \,\, \lambda^-_m \le 0
+\end{equation}
+
+Steger--Warming splitting
+\begin{equation}
+    \lambda^{\pm}_m = \frac{1}{2}(\lambda_m \pm (\lambda_m^2+\varepsilon^2)^{1/2})
+\end{equation}
+where $\varepsilon$ is a small constant to improve smoothness of the characteristic speeds after splitting, as a lack of smoothness can leads to numerical instability.
+
+Lax--Friedrichs splitting
+\begin{equation}
+    \lambda^{\pm}_m = \frac{1}{2}(\lambda_m \pm \lambda^*)
+\end{equation}
+where $\lambda^*=|V_x|+c$ is called the local Lax--Friedrichs splitting, $\lambda^*=\max\limits_{x}(|V_x|+c)$ is called the global Lax--Friedrichs splitting.
+
+Lax--Friedrichs splitting is the smoothest while the most dissipative characteristic speed splitting method. Smoothness in flux splitting is important for high-order numerical schemes to retain the order of accuracy and reduce numerical instability \citep{shu1998essentially}.
+
+Different splitting methods of characteristic speeds generally can be unified as
+\begin{equation}
+    \Matrix{\Lambda}^{\pm} = \frac{1}{2}(\Matrix{\Lambda} \pm \Matrix{\Lambda}^*)
+\end{equation}
+Therefore,
+\begin{equation}
+    \Vector{F}^{\pm} = \Matrix{A}^{\pm} \Vector{U} = \Matrix{R} \Matrix{\Lambda}^{\pm} \Matrix{R}^{-1}\Vector{U} = \Matrix{R} (\frac{1}{2}(\Matrix{\Lambda} \pm \Matrix{\Lambda}^*)) \Matrix{R}^{-1}\Vector{U} = \frac{1}{2}(\Vector{F} \pm \Matrix{R} \Matrix{\Lambda}^* \Matrix{R}^{-1}\Vector{U})
+\end{equation}
+For Lax--Friedrichs splitting, $\Matrix{\Lambda}^*=\lambda^*\Matrix{I}$, hence,
+\begin{equation}
+    \Vector{F}^{\pm} = \frac{1}{2}(\Vector{F} \pm \lambda^*\Vector{U})
+\end{equation}
+An upwind-biased reconstruction of $\hat{\Vector{F}}_{i+\frac{1}{2}}^{\pm}$ is equivalent to adding artificial viscosity into the governing equations
+\begin{equation}
+    \begin{aligned}
+        \hat{\Vector{F}}_{i+\frac{1}{2}}^{\pm} &= \delta^{\pm}\Vector{F}^{\pm} \\
+                                               &= \frac{1}{2}\left[\delta^+ (\Vector{F} + \lambda^* \Vector{U}) + \delta^- (\Vector{F} - \lambda^* \Vector{U})\right] \\
+                                               &= \frac{1}{2}\left[\delta^+ \Vector{F} + \delta^- \Vector{F} - \lambda^* (\delta^- \Vector{U} - \delta^+ \Vector{U})\right] \\
+                                               &= \delta^0_{1} \Vector{F} - \lambda^*\delta^0_{2}\Vector{U}
+    \end{aligned}
+\end{equation}
+where $\delta^0_{1}$ and $\delta^0_{2}$ represent central difference approximation for the first-order and second-order derivatives, respectively.
+
+Therefore, flux difference splitting and flux vector splitting can both be represented as a central difference approximation with additional artificial viscosity to stabilize the solution. The primary difference is about choosing the coefficient of artificial viscosity. Moreover, when the characteristic-wise approximation is used, flux difference splitting with Roe's numerical flux function adopting a constant $\psi(x) = \lambda^*$ is equivalent to flux vector splitting with Lax--Friedrichs characteristic speed splitting.
+
+Note that component-wise flux vector splitting does not decouple the system of equations. In addition, although the forward and backward flux resulted from characteristic speed splitting have positive and negative eigenvalues \citep{steger1981flux}, respectively, these eigenvalues are not identical to those of $\Matrix{A}^{\pm}$:
+\begin{equation} \label{eq:modify}
+    \frac{\mathrm{d} \Vector{F}^{\pm}}{\mathrm{d} \Vector{U}} \neq \Matrix{A}^{\pm}
+\end{equation}
+
+\paragraph{Implementation procedure}
+
+In summary, to extend scalar methods to a nonlinear system of equations and to ensure upwinding discretization, two flux forms with several flux splitting techniques can be used. In general, to enhance numerical stability for resolving strong discontinuities and avoid numerical errors propagating among coupled equations, the characteristic-wise approximation with flux splitting is suggested. Therefore, the nonlinear system is locally linearised at the neighborhood of each interface $x_{i+1/2}$ via a local "freezing" Jacobian matrix obtained from symmetric average and is then projected onto its characteristic fields to obtain a characteristic flux form with a set of uncoupled scalar equations. Aided with either the flux difference splitting or the flux vector splitting, numerical schemes such as TVD and WENO are then applied to each scalar equation for the reconstruction of numerical fluxes. At last, the reconstructed numerical fluxes in the characteristic space are projected back to the physical space by an inverse projection. This procedure, which is detailed in \citep{shu1998essentially}, is briefly summarized as follows.
+
+\subparagraph{Characteristic-wise approximation with flux difference splitting}
+
+At each interface $x_{i+1/2}$:
+\begin{enumerate}
+    \item Evaluate the average state $\Vector{U}_{i+{1}/{2}}$ by a symmetric average, such as arithmetic mean or Roe average, of the left and right solution states
+    \item Decompose $\bar{\Matrix{A}} = \Matrix{A}(\bar{\Vector{U}}) = \Matrix{A}(\Vector{U}_{i+{1}/{2}}) = \Matrix{R}_{i+{1}/{2}} \Matrix{\Lambda}_{i+{1}/{2}} \Matrix{R}_{i+{1}/{2}}^{-1}$
+    \item Construct local characteristic variables $\Vector{W}_{n} = \Matrix{R}_{i+{1}/{2}}^{-1} \Vector{U}_{n}$, $n=i-N, \dotsc, i+N+1$
+    \item Solution reconstruction for $\Vector{W}_{i+{1}/{2}}^{+}$ and $\Vector{W}_{i+{1}/{2}}^{-}$
+    \item Construct characteristic numerical flux via Riemann solvers such as Roe's flux
+        \begin{equation}
+            \hat{\Vector{H}}_{\Des{Roe}}(\Vector{W}^+,\Vector{W}^-) = \frac{1}{2}[\Matrix{\Lambda}(\Vector{W}^+ + \Vector{W}^-) - \psi(\Matrix{\Lambda})(\Vector{W}^- - \Vector{W}^+)]
+        \end{equation}
+    \item Transform back to physical space by inverse projection $\hat{\Vector{F}}_{i+{1}/{2}} = \Matrix{R}_{i+{1}/{2}}\hat{\Vector{H}}_{i+{1}/{2}}$
+\end{enumerate}
+
+\subparagraph{Characteristic-wise approximation with flux vector splitting}
+
+At each interface $x_{i+1/2}$:
+\begin{enumerate}
+    \item Evaluate the average state $\Vector{U}_{i+{1}/{2}}$ by a symmetric average, such as arithmetic mean or Roe average, of the left and right solution states
+    \item Decompose $\bar{\Matrix{A}} = \Matrix{A}(\bar{\Vector{U}}) = \Matrix{A}(\Vector{U}_{i+{1}/{2}}) = \Matrix{R}_{i+{1}/{2}} \Matrix{\Lambda}_{i+{1}/{2}} \Matrix{R}_{i+{1}/{2}}^{-1}$
+    \item Construct local characteristic variables $\Vector{W}_{n} = \Matrix{R}_{i+{1}/{2}}^{-1} \Vector{U}_{n}$, $n=i-N, \dotsc, i+N+1$
+    \item Perform flux vector splitting $\Matrix{\Lambda}_{i+{1}/{2}} = \Matrix{\Lambda}^{\pm}_{i+{1}/{2}}$
+    \item Construct local characteristic fluxes $\Vector{H}_{n}^{\pm} = \Matrix{\Lambda}_{i+{1}/{2}}^{\pm} \Matrix{R}_{i+{1}/{2}}^{-1} \Vector{U}_{n} = \Matrix{\Lambda}_{i+{1}/{2}}^{\pm} \Vector{W}_{n}$
+    \item Flux reconstruction for $\hat{\Vector{H}}_{i+{1}/{2}}^{+}$ and $\hat{\Vector{H}}_{i+{1}/{2}}^{-}$
+    \item Inverse projection $\hat{\Vector{F}}_{i+{1}/{2}} = \Matrix{R}_{i+{1}/{2}}\hat{\Vector{H}}_{i+{1}/{2}} = \Matrix{R}_{i+{1}/{2}} (\hat{\Vector{H}}_{i+{1}/{2}}^+ + \hat{\Vector{H}}_{i+{1}/{2}}^-)$
+\end{enumerate}
+
+\subsubsection{Diffusive flux discretization}
+
+To conform with physical and mathematical properties, diffusive fluxes are commonly discretized by central difference schemes. A conservative discretization of the diffusive fluxes involves consecutive differentiation, which may lead to an even-odd decoupling issue \citep{pirozzoli2011numerical, brehm2015locally}. In order to avoid odd-even decoupling, one possible way is to expand the consecutive derivatives \citep{pirozzoli2011numerical}, for instance,
+\begin{equation} \label{eq:diffusiveflux}
+    \frac{\partial \tau_{ij}}{\partial x_k} = \frac{\partial \mu}{\partial x_k}\left(\frac{\partial V_i}{\partial x_j} + \frac{\partial V_j}{\partial x_i} - \frac{2}{3}\frac{\partial V_l}{\partial x_l}\delta_{ij}\right)
+    + \mu\left(\frac{\partial^2 V_i}{\partial x_j \partial x_k} + \frac{\partial^2 V_j}{\partial x_i \partial x_k} - \frac{2}{3} \frac{\partial^2 V_l}{\partial x_l \partial x_k}\delta_{ij}\right)
+\end{equation}
+Dedicated central difference discretization is applied to each derivative term on the right-hand side.
+
+However, by carefully devising the reconstruction function, a conservative discretization form for the diffusive fluxes is able to be achieved without producing odd-even decoupling.
+\begin{equation}
+    \left. \frac{\partial \Vector{F}^{\Des{v}}}{\partial x} \right|_i = \frac{1}{\Delta x}\left[\hat{\Vector{F}}^{\Des{v}}_{i+\frac{1}{2}}-\hat{\Vector{F}}^{\Des{v}}_{i-\frac{1}{2}}\right]
+\end{equation}
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[trim = 0mm 25mm 0mm 18mm, clip, width=0.48\textwidth]{diffusive_flux_demo}
+    \caption{A schematic diagram illustrating interfacial diffusive flux reconstruction.}
+    \label{fig:diffusive_flux_demo}
+\end{figure}
+
+For instance, for a second-order central difference discretization, the interfacial flux $\hat{\Vector{F}}^{\Des{v}}_{i+{1}/{2}}$ is reconstructed on the discretized space $[i, i+1] \times [j-1, j+1] \times [k-1, k+1]$, as illustrated in Fig.~\ref{fig:diffusive_flux_demo}. Let $\phi$ denote a physical quantity in $\Vector{F}^{\Des{v}}$, in order to avoid even-odd decoupling resulting from applying consecutive derivative discretization, the following reconstructions can be adopted:
+\begin{equation}
+    \begin{aligned}
+        \phi_{i+\frac{1}{2}, j, k} &= \frac{\phi_{i, j, k} + \phi_{i+1, j, k}}{2} \\
+        \left.\frac{\partial \phi}{\partial x}\right|_{i+\frac{1}{2}, j, k} &= \frac{\phi_{i+1, j, k} - \phi_{i, j, k}}{\Delta x} \\
+        \left.\frac{\partial \phi}{\partial y}\right|_{i+\frac{1}{2}, j, k} &= \frac{\phi_{i, j+1, k} + \phi_{i+1, j+1, k} - \phi_{i, j-1, k} - \phi_{i+1, j-1, k}}{4\Delta y} \\
+        \left.\frac{\partial \phi}{\partial z}\right|_{i+\frac{1}{2}, j, k} &= \frac{\phi_{i, j, k+1} + \phi_{i+1, j, k+1} - \phi_{i, j, k-1} - \phi_{i+1, j, k-1}}{4\Delta z}
+    \end{aligned}
+\end{equation}
+
+\subsection{Computation acceleration}
+
+The conservative discretization of fluxes enables an acceleration technique that can reduce nearly half of the computational work by using the fact that the same interfacial flux is shared by the two neighboring cells or nodes
+\begin{equation}
+    \hat{\Vector{F}}_{s-\frac{1}{2}} = \hat{\Vector{F}}_{(s-1)+\frac{1}{2}}
+\end{equation}
+where flux $\Vector{F}$ is either a convective flux or a diffusive flux, and $s$ is one of the $i$, $j$, $k$ index.
+
+Instead of using face-based computation, which sweeps through cell faces and assigns the computed interfacial flux to cells sharing the interface, the acceleration method can be directly implemented in node-based computation, which is natural for a structured grid and has advantages in computing flow with source terms. Specifically, let $\Loptr_s$ denote the spatial operator in the $s$ dimension for a multidimensional problem with dimension-by-dimension approximation, and let $\Soptr_s$ denote the solution operator of the subproblem
+\begin{equation}
+    \frac{\partial \Vector{U}}{\partial t} = \Loptr_s\Vector{U}^{(s)}
+\end{equation}
+for a multidimensional problem with dimensional-splitting. When computing $\Loptr_s$ or $\Soptr_s$, if the $s$ index is arranged as the innermost loop of the spatial sweep, then only the interfacial flux $\hat{\Vector{F}}_{s+1/2}$ is always required to be computed, while $\hat{\Vector{F}}_{s-1/2}$ can be inherited from the previous node $(s-1)$ unless the node $(s-1)$ is a boundary node. If $(s-1)$ is a boundary node, then $\hat{\Vector{F}}_{s-1/2}$ requires to be computed. When the type of each computational node is classified in advance, the implementation of this acceleration technique is straightforward, and the computational overhead of the implementation is one single conditional statement.
+
+\subsection{Boundary condition and treatment}
+
+For a computational domain with irregular boundaries, a map from curvilinear grid to Cartesian grid may be conducted when the irregularity of the domain is not strong. Otherwise, instead of using body-fitted unstructured grids, a viable alternative is to adopt the immersed boundary approach, in which irregular domains are able to be discretized on generic Cartesian grids.
+

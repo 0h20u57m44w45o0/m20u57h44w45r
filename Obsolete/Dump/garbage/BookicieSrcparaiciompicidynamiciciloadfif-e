@@ -1,0 +1,63 @@
+#include <omp.h> /* parallel header file */
+#include <stdio.h>
+
+/*
+ * Parallelized pipelined processing. This code uses a dynamic
+ * worksharing schedule to overlap I/O and computation.
+ * The idea here is to read in a new data set, while at the same
+ * time processing the previous set and writing out results from
+ * the one before that. Parallel performation is improved via 
+ * overlapping reading data, processing data, and writing results.
+ *
+ * The dynamic schedule used here not only provides the overlap of
+ * computation and I/O that is required in many codes; it also 
+ * provides the necessary, but minimum, amount of synchronization 
+ * needed by the computation.
+ */
+int main (int argc, char* argv[])
+{
+    /* 
+     * One parallel region encloses all the work to minimize overhead
+     * from the parallel construct
+     */
+    #pragma omp parallel
+    {
+        /* load a data chunk to be used in first iteration of the j-loop */
+        #pragma omp single
+        {
+            ReadFromFile(0,...);
+        }
+        for (j = 0; j < N; j++) {
+            /* 
+             * one thead preloads data for next iteration of the j-loop,
+             * other threads immediately begin to execute the processing loop
+             */
+            #pragma omp single nowait
+            {
+                 ReadFromFile(j+1...);
+            }
+            /* parallel construct is avoided in inner loops */
+            #pragma omp for schedule(dynamic)
+            for (i = 0; i < ProcessingNum; i++)
+            {
+                ProcessChunkOfData(); /* here is the work */
+            } 
+            /* 
+             * there is a barrier at the end of the above for loop.
+             * it ensures that data for the next loop iteration is 
+             * available and that the results of the previous iteration
+             * have been written out before work proceeds
+             */
+            /* 
+             * one thread writes data, while other threads immediately
+             * move on to next iteration of j-loop
+             */
+            #pragma omp single nowait
+            {
+                WriteResultsToFile(j);
+            }
+        }
+    } 
+    return 0;
+}
+

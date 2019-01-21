@@ -1,0 +1,58 @@
+#!/usr/bin/env python3
+
+#---------------------------------------------------------------------------#
+#-                   Data Operation and Manipulation                       -#
+#-                          <By Huangrui Mo>                               -#
+#- Copyright (C) Huangrui Mo <huangrui.mo@gmail.com>                       -#
+#- This file is part of ArtraDOAM.                                         -#
+#- ArtraDOAM is free software: you can redistribute it and/or modify it    -#
+#- under the terms of the GNU General Public License as published by       -#
+#- the Free Software Foundation, either version 3 of the License, or       -#
+#- (at your option) any later version.                                     -#
+#---------------------------------------------------------------------------#
+
+#---------------------------------------------------------------------------#
+#->> Environment configuration
+#---------------------------------------------------------------------------#
+
+import artraoptr as optr
+import numpy as np
+#import os
+
+#workpath = os.getcwd() # current working directory
+#scriptpath = os.path.dirname(os.path.abspath(__file__)) # script's directory
+#os.chdir(scriptpath) # change working directory to script's own directory
+csys = optr.sys_env() # obtain system and running environment
+
+#---------------------------------------------------------------------------#
+#->> Process: load data -> process data -> write data
+#---------------------------------------------------------------------------#
+
+#- create file object of case information
+cin = open(csys['procdir'] + csys['cinfo'], 'r')
+#- head comments
+cin.readline()
+cin.readline()
+cin.readline()
+#- total number of cases
+cin.readline()
+cn = int(cin.readline().strip())
+#- operator identifier
+cin.readline()
+pid = cin.readline().strip()
+cin.readline()
+#- processing loop
+for n in range(cn):
+    #- obtain case name
+    cname = cin.readline().strip()
+    #- detect data delimiter
+    cdelim = optr.delim_detect(csys['imdir'] + cname, csys['delimld'])
+    #- load case data
+    cdata = np.loadtxt(csys['imdir'] + cname, delimiter=cdelim, usecols=csys['cols'], ndmin=csys['cdim'])
+    #- process data
+    crlt, headinfo = optr.process_data(pid, [cn, n, cname], cdata)
+    #- export data
+    np.savetxt(csys['exdir'] + cname, crlt, fmt=csys['fmt'], delimiter=csys['delimsv'], header=headinfo)
+#- close file object of case list
+cin.close()
+

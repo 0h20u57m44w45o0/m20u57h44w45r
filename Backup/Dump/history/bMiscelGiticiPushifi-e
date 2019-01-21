@@ -1,0 +1,29 @@
+#!/bin/bash
+set -e
+
+#- read target file name
+if [[ "$#" != "2" ]]; then
+    echo "#---------------------------------------------------------------------------#"
+    echo "Usage: "$0" fname comment"
+    echo "#---------------------------------------------------------------------------#"
+    exit
+fi
+#* set the file name to execute
+fname="$1"
+comment="$2"
+if [[ -n "$fname" ]]; then
+    if [[ -n "$comment" ]]; then
+        git add "$fname"
+        git commit -m "$comment"
+        git push origin master
+    else
+        echo "#---------------------------------------------------------------------------#"
+        echo "Error! $comment is empty!"
+        echo "#---------------------------------------------------------------------------#"
+        exit
+    fi
+else
+    echo "#---------------------------------------------------------------------------#"
+    echo "Error! file $fname not exist..."
+    echo "#---------------------------------------------------------------------------#"
+fi

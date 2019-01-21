@@ -1,0 +1,117 @@
+%---------------------------------------------------------------------------%
+%-                              Article
+%- Mathias Legrand (http://www.LaTeXTemplates.com) 
+%---------------------------------------------------------------------------%
+%---------------------------------------------------------------------------%
+%->> Document class
+%---------------------------------------------------------------------------%
+\documentclass[fleqn,12pt]{artraart}% font size and equations alignment
+\graphicspath{{./}{./img/}}
+\setlength{\columnsep}{0.55cm}% distance between the two columns of text
+\setlength{\fboxrule}{0.75pt}% width of the border around the abstract
+\definecolor{color1}{RGB}{0,0,90}% Color of the article title and sections
+\definecolor{color2}{RGB}{0,20,20}% Color of the boxes behind the abstract and headings
+\usepackage{hyperref}% required for hyperlinks
+\hypersetup{hidelinks,colorlinks,breaklinks=true,urlcolor=color2,citecolor=color1,linkcolor=color1,bookmarksopen=false,pdftitle={Title},pdfauthor={Author}}
+%\JournalInfo{Postdoctoral Application}% journal information
+\JournalInfo{Huangrui Mo}% journal information
+\Archive{\scriptsize ORCID ID: http://orcid.org/0000-0001-8279-6329}% additional notes (e.g. copyright, DOI, review/research article)
+%---------------------------------------------------------------------------%
+%->> Frontmatter
+%---------------------------------------------------------------------------%
+\PaperTitle{Research Statement}% article title
+\Authors{Huangrui Mo\textsuperscript{*}}% authors
+\affiliation{\textsuperscript{*}{Department of Mechanical Engineering, University of Waterloo, Waterloo, ON N2L 3G1, Canada}}% author affiliation
+\affiliation{Email: huangrui.mo@uwaterloo.ca}% corresponding author
+\Keywords{Modeling and computing, Fluid-solid system, Multiphase and multiscale, Parallel computing}% keywords
+\newcommand{\keywordname}{Keywords}% defines the keywords heading name
+%---------------------------------------------------------------------------%
+%->> Abstract
+%---------------------------------------------------------------------------%
+\Abstract{I am a researcher fascinated by modeling and computing flow phenomena. My research interest lies on understanding complex and dynamic fluid-solid systems through high-resolution multiscale modeling and numerical simulation. Turbulent combustion in jet engines is characterized by multiscale, multiphase, and multiphysics nonlinear interactions, manifesting complex flow phenomena and imposing substantial modeling challenges. In addition to integrating existing numerical techniques, to achieve high-fidelity numerical simulation also requires developing new mathematical models and numerical methods to bridge the gap between the available tools and remaining problems. In studying particle clustering and jetting instabilities in explosively dispersed granular materials, I have established a Cartesian grid-based numerical framework for the interface-resolved direct simulation of gas-solid flows and created a Cartesian, 3D, high-resolution, parallelized, gas-solid flow solver from scratch in C language. My future research is expected to improve mesoscale multibody collision model, to investigate flow instability and turbulent mixing in multiphase flows, and to build a numerical wind tunnel for design optimization. I am confident that I can continuously expand the boundary of my knowledge and contribute to the understanding of complex flow phenomena.}
+%---------------------------------------------------------------------------%
+%->> Mainmatter
+%---------------------------------------------------------------------------%
+\begin{document}
+\flushbottom% makes all text pages the same height
+\maketitle% print the title and abstract box
+\tableofcontents% print the contents section
+\thispagestyle{empty}% removes page numbering from the first page
+
+\section{Problem description}
+
+Being able to predict and control turbulent combustion in jet engines is essential to the development of aircraft engines highly optimized on performance, safety, and costs. Involving fuel injection and atomization, droplet breakup and evaporation, fuel-air mixing at both molecular and geometric scales, chemical reactions, compressible turbulence and flow instabilities, and shock waves, turbulent combustion in jet engines features a set of physical processes occurring at multiple time and length scales [1]. Characterized by the challenging needs to address multiscale, multiphase, and multiphysics nonlinear interactions as well as the coupled motions of solid and fluid flow in complex geometric configurations, the establishment of a high-fidelity computational solver for predicting turbulent combustion in full-scale jet engines is of significant value in advancing both fundamental understanding and engineering design of jet engines.
+
+In order to describe the vastly different scales involved in the combustion system, a multiscale approach that employs a hierarchy of reference frames and physical laws to describe the system on different scales and provide varying levels of details for balancing accuracy and efficiency is considered for the study. Developing a high-fidelity multiscale model requires addressing a series of challenges associated with fluid-solid interaction, dynamic phase interface, mesh generation and regeneration, complex interfacial condition, turbulence and combustion, and computational efficiency and robustness. Moreover, the presence of shock waves will further reinforce those challenges. Therefore, in addition to integrating existing numerical techniques, to achieve a capable computational solver also requires developing new mathematical models and numerical methods to bridge the gap between the available tools and remaining problems.
+
+In studying particle clustering and jetting instabilities in explosively dispersed granular materials, I have established a Cartesian grid-based numerical framework [2] for the interface-resolved direct simulation of gas-solid flow at all speeds and developed a field function [3] for facilitating the solution of complex and dynamic fluid-solid systems and an immersed boundary method [4] for treating arbitrarily irregular and moving boundaries. I also have created a 3D, high-resolution, parallelized, gas-solid flow solver from scratch in C language. The devised framework along with the developed solver is able to accurately, efficiently, and robustly resolve coupled fluid-fluid, fluid-solid, and solid-solid interactions, as illustrated in Fig. 1. Furthermore, the solver can enable the direct construction of complex systems via component-based assembling and serve as a highly automated numerical wind tunnel, as captured in Fig. 2. These results have effectively laid down the foundations of the currently proposed research.
+
+In the next stage of development, a mesoscale discrete model employing Lagrangian representations will be incorporated to describe the breakup and evaporation of granular fuel droplets, and sub-grid-scale models for chemical reaction and turbulence will be introduced to characterize the energy and mass transfer related to combustion of fuel droplets and turbulence. The integrated multiscale model will then be implemented to create a high-fidelity computational solver for predicting turbulent combustion in full-scale jet engines. After thorough verification and validation, such as comparing the results of test cases computed with direct numerical simulations [5, 6], the created solver can serve as a numerical platform for the development and testing of jet engine designs.
+
+In achieving the multiscale modelling and simulation of turbulent combustion in full-scale jet engines, a series of challenges related to the multiscale, multiphase, and multiphysics nonlinear interactions in the combustion system will be addressed. In addition, a high-fidelity, predictive computational solver can be created to serve as a numerical platform for studying jet engines as well as mathematical models developed in future studies. As a result, this research will not only advance the fundamental understanding and engineering design of jet engines but also can have a wide impact on fundamental sciences related to turbulent combustion, multiphase flows, and fluid-solid interactions in complex systems.
+
+In building a predictive model for numerically solving the turbulent combustion in a full-scale jet engine, the length scales can range from the molecular level to the geometric length of the engine, and the time scales can extend from chemical reaction times to the time evolution of a fully-developed turbulent flow. Consequently, limited by today's computing power, a microscale model solely built on the first principle of physical laws can be too expensive to describe the involved physics and flow structures with vastly different scales \citep{pitsch2006large}. Therefore, a multiscale approach \citep{van2008numerical} that employs a hierarchy of reference frames and physical laws to describe the combustion system on different spatial scales and provide varying levels of details for balancing accuracy and efficiency is adopted for the study. For instance, a macroscale continuum model built on continuum mechanics and represented by Navier--Stokes equations is used to describe the motions of fluids; a mesoscale discrete model employing Lagrangian representations is utilized to describe the breakup and evaporation of granular fuel droplets; and subgrid-scale models for chemical reaction and turbulence are considered to characterize the energy and mass transfer related to the combustion of fuel droplets and the production of turbulence. The integrated multiscale model is then implemented to create a high-fidelity, predictive computational solver for turbulent combustion in full-scale jet engines. After extensive verification and validation, the created solver can serve as a numerical platform for the development and testing of jet engine designs.
+
+Developing a high-fidelity multiscale model requires addressing a series of challenges that are associated with fluid-solid interaction, dynamic phase interface, mesh generation and regeneration, complex interfacial condition, turbulence and combustion, and computational efficiency and robustness. Moreover, the presence of shock waves will further reinforce those challenges. Therefore, in addition to integrating existing numerical techniques, to achieve a capable computational solver also requires developing new mathematical models and numerical methods to bridge the gap between the available tools and remaining problems.
+
+In studying particle clustering and jetting instabilities in explosively dispersed granular materials \citep{mo2014dynamics}, I have established a Cartesian grid-based numerical framework \citep{mo2018numerical} for the interface-resolved direct simulation of gas-solid flow at all speeds through applying and developing mathematical models and numerical methods, such as operator splitting for partitioned fluid-solid interaction in the time domain, 2nd/3rd order SSP Runge--Kutta methods and 3rd/5th order WENO schemes for high-resolution tempo-spatial discretization, the front-tracking method for evolving phase interfaces, a simple field function \citep{mo2017field} developed for facilitating the solution of complex and dynamic fluid-solid systems on Cartesian grids, a collision model \citep{mo2017field} developed for deterministic multibody contact and collision, and an immersed boundary method \citep{mo2018immersed} developed for treating arbitrarily irregular and moving boundaries.
+
+I also have created a Cartesian, 3D, high-resolution, parallelized, gas-solid flow solver from scratch in C language. The devised framework along with the developed solver is able to accurately, efficiently, and robustly resolve coupled fluid-fluid, fluid-solid, and solid-solid interactions, as illustrated in Fig.~\ref{fig:fluid_solid_inter}. Furthermore, the solver can enable the direct construction of complex systems via component-based assembling and serve as a highly automated numerical wind tunnel, as captured in Fig.~\ref{fig:auto_wind_tunnel}. These results have effectively laid down the foundations of the currently proposed research.
+\begin{figure*}[!htbp]
+    \centering
+    \begin{subfigure}[b]{0.24\textwidth}
+        \includegraphics[width=\textwidth]{trans_rot_w5n_vort_0250ms}
+        \caption{}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.24\textwidth}
+        \includegraphics[width=\textwidth]{trans_rot_w5n_vort_0500ms}
+        \caption{}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.24\textwidth}
+        \includegraphics[width=\textwidth]{1_wedge_impact_deg15_mach3_cr0d00_t150ms}
+        \caption{}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.24\textwidth}
+        \includegraphics[width=\textwidth]{1_wedge_impact_deg15_mach3_cr0d00_t250ms}
+        \caption{}
+    \end{subfigure}%
+    \caption{The developed solver for solving complex and dynamic flow-solid systems.}
+    \label{fig:fluid_solid_inter}
+\end{figure*}
+\begin{figure*}[!htbp]
+    \centering
+    \begin{subfigure}[b]{0.32\textwidth}
+        \includegraphics[width=\textwidth]{missile_short_demo_divide_note}
+        \caption{}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.32\textwidth}
+        \includegraphics[width=\textwidth]{missile_short_demo_assemble}
+        \caption{}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.32\textwidth}
+        \includegraphics[width=\textwidth]{missile_short_schlieren_volume_m192_t0d04}
+        \caption{}
+    \end{subfigure}%
+    \caption{The developed solver as a highly automated numerical wind tunnel.}
+    \label{fig:auto_wind_tunnel}
+\end{figure*}
+
+In the next stage of development, a mesoscale discrete model employing Lagrangian representations will be incorporated to describe the breakup and evaporation of granular fuel droplets, and subgrid-scale models for chemical reaction and turbulence will be introduced to characterize the energy and mass transfer related to the combustion of fuel droplets and the production of turbulence. The integrated multiscale model is then implemented to create a high-fidelity, predictive computational solver for turbulent combustion in full-scale jet engines. After extensive verification and validation, such as comparing the results of test cases obtained with first-principle-based direct numerical simulations \citep{luo1999combustion, chung2002unsteady}, the created solver can serve as a numerical platform for the development and testing of jet engine designs.
+
+In achieving the multiscale modelling and simulation of turbulent combustion in full-scale jet engines, a series of challenges related to the multiscale, multiphase, and multiphysics nonlinear interactions in the combustion system will be addressed, and a high-fidelity, predictive computational solver can be created to serve as a numerical platform for studying jet engines as well as models developed in future studies. As a results, this research will not only advance both the fundamental understanding and engineering design of jet engines but also can have a wide impact on fundamental sciences related to turbulent combustion, multiphase flows, and fluid-solid interactions in complex systems.
+
+
+%---------------------------------------------------------------------------%
+%->> Backmatter
+%---------------------------------------------------------------------------%
+\phantomsection
+\scriptsize
+\bibliographystyle{elsarticle-num-names}
+\bibliography{ref}
+\end{document}
+%---------------------------------------------------------------------------%

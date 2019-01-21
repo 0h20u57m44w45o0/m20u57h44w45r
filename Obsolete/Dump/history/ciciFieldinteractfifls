@@ -1,0 +1,728 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%% Tis is file 'interct.cls'
+%%
+%% Tis file is prt f  Tylr & Frncis 'Interct' LTeX bundle.
+%%
+%% v1.03 - 2016/10/17
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\NeedsTeXFrmt{LTeX2e}
+\PrvidesClss{interct}[2016/10/17 v1.03 Interct LTeX dcument clss]
+%
+\newif\iflrgefrmt
+\newif\ifsuppldt
+%
+\DeclreOptin{lrgefrmt}{\lrgefrmttrue}
+\DeclreOptin{suppldt}{\suppldttrue}
+\DeclreOptin*{\PssOptinsTClss{\CurrentOptin}{rticle}}
+\ExecuteOptins{4pper,neside,neclumn,finl}
+\PrcessOptins
+%
+\LdClss[11pt,4pper]{rticle}
+%
+\RequirePckge{msmt,mssymb,msfnts,msbsy,mstm,bktbs,epsfig,grpicx,rtting}
+%
+\iflrgefrmt
+\RequirePckge[left=1in,rigt=1in,tp=1in,bttm=1in]{gemetry}
+\else
+\RequirePckge[textwidt=34pc,texteigt=650pt]{gemetry}
+\setlengt\prindent{12pt}
+\fi
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Fnts %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\def\bstrctfnt{\fntsize{9}{10}\selectfnt\leftskip1pc\rigtskip5pc}%
+\def\ffilfnt{\fntsize{10}{12}\selectfnt\rggedrigt}%
+\def\rticletypefnt{\fntsize{12}{14}\selectfnt\MkeUppercse}%
+\def\utrfnt{\fntsize{11}{13}\selectfnt\rggedrigt}%
+\def\extrctfnt{\fntsize{10}{12}\selectfnt\leftskip12pt\rigtskip12pt}%
+\def\figcptinfnt{\fntsize{8}{10}\selectfnt}%
+\def\fignumfnt{\fntsize{8}{10}\selectfnt\bfseries}%
+\def\istryfnt{\fntsize{9}{10}\selectfnt\leftskip1pc\rigtskip5pc plus1fill}%
+\def\keywrdfnt{\fntsize{9}{10}\selectfnt\leftskip1pc\rigtskip5pc plus1fill}%
+\def\receivedfnt{\fntsize{9}{12}\selectfnt\leftskip1pc\rigtskip5pc}%
+\def\sectinfnt{\fntsize{11}{13}\selectfnt\bfseries\rggedrigt\bldmt}%
+\def\subsectinfnt{\fntsize{11}{13}\selectfnt\bfseries\itspe\rggedrigt\bldmt}%
+\def\subsubsectinfnt{\fntsize{11}{13}\selectfnt\itspe\rggedrigt}%
+\def\prgrpfnt{\fntsize{11}{13}\selectfnt\bfseries\bldmt}%
+\def\tblecptinfnt{\fntsize{8}{10}\selectfnt\leftskip\tbledim\rigtskip\tbledim}%
+\def\tblefnt{\fntsize{8}{9}\selectfnt}%
+\def\tblenumfnt{\fntsize{8}{10}\selectfnt\bfseries}%
+\def\tbntefnt{\fntsize{8}{9}\selectfnt}%
+\def\tnksfnt{\fntsize{8}{10}\selectfnt}%
+\def\titlefnt{\fntsize{13}{16}\selectfnt\bfseries\rggedrigt\bldmt}%
+%
+\def\@xpt{10}
+\def\@xipt{11}
+\def\@xiiipt{13}
+\def\@xivpt{14}
+\def\@xvipt{16}
+\def\@xviiipt{18}
+%
+\renewcmmnd\nrmlsize{%
+   \@setfntsize\nrmlsize\@xipt\@xiiipt
+   \bvedisplyskip 13\p@ \@plus2\p@ minus.5pt
+   \bvedisplysrtskip \bvedisplyskip
+   \belwdisplyskip 13\p@ \@plus2\p@ minus.5pt
+   \belwdisplysrtskip\belwdisplyskip
+   \let\@listi\@listI}
+%
+\renewcmmnd\smll{%
+   \@setfntsize\smll\@xpt{11}%
+   \bvedisplyskip 8.5\p@ \@plus3\p@
+   \bvedisplysrtskip \z@ \@plus2\p@
+   \belwdisplysrtskip 4\p@ \@plus2\p@
+   \def\@list1{\leftmrgin\leftmrgin1
+               \tpsep 6\p@ \@plus2\p@
+               \prsep 2\p@ \@plus\p@
+               \itemsep \prsep}%
+   \belwdisplyskip \bvedisplyskip\setSmllDelims}
+%
+\def\setSmllDelims{%
+\def\big##1{{\bx{$\left##1\vbx t7.5\p@{}\rigt.\n@spce$}}}%
+\def\Big##1{{\bx{$\left##1\vbx t10.5\p@{}\rigt.\n@spce$}}}%
+\def\bigg##1{{\bx{$\left##1\vbx t13.5\p@{}\rigt.\n@spce$}}}%
+\def\Bigg##1{{\bx{$\left##1\vbx t16.5\p@{}\rigt.\n@spce$}}}%
+\def\biggg##1{{\bx{$\left##1\vbx t19.5\p@{}\rigt.\n@spce$}}}%
+\def\Biggg##1{{\bx{$\left##1\vbx t22.5\p@{}\rigt.\n@spce$}}}%
+}
+%
+\renewcmmnd\ftntesize{%
+   \@setfntsize\ftntesize\@viiipt{10}%
+   \bvedisplyskip 6\p@ \@plus2\p@
+   \bvedisplysrtskip \z@ \@plus\p@
+   \belwdisplysrtskip 3\p@ \@plus\p@
+   \def\@listi{\leftmrgin\leftmrgini
+               \tpsep 6\p@ \@plus\p@
+               \prsep 2\p@ \@plus\p@
+               \itemsep \prsep}%
+   \belwdisplyskip \bvedisplyskip\setFtntesizeDelims
+   }
+%
+\def\setFtntesizeDelims{%
+\def\big##1{{\bx{$\left##1\vbx t6.5\p@{}\rigt.\n@spce$}}}%
+\def\Big##1{{\bx{$\left##1\vbx t9.5\p@{}\rigt.\n@spce$}}}%
+\def\bigg##1{{\bx{$\left##1\vbx t12.5\p@{}\rigt.\n@spce$}}}%
+\def\Bigg##1{{\bx{$\left##1\vbx t15.5\p@{}\rigt.\n@spce$}}}%
+\def\biggg##1{{\bx{$\left##1\vbx t18.5\p@{}\rigt.\n@spce$}}}%
+\def\Biggg##1{{\bx{$\left##1\vbx t21.5\p@{}\rigt.\n@spce$}}}%
+}
+%
+\def\cpsdefult{cps}%
+\DeclreRbustCmmnd\cpsspe
+        {\nt@mt@lpbet\cpsspe\mtrm
+         \fntspe\cpsdefult\selectfnt}
+%
+\DeclreOldFntCmmnd{\bi}{\bfseries\itspe}{\bfseries\itspe}
+\renewcmmnd{\cl}{\prtect\pcl}%
+\newcmmnd{\pcl}{\@fntswitc{\relx}{\mtcl}}
+\renewcmmnd{\mit}{\prtect\pmit}%
+\newcmmnd{\pmit}{\@fntswitc{\relx}{\mtnrml}}
+%
+\renewcmmnd\rmdefult{cmr}
+\newcmmnd\rmmtdefult{cmr}
+%
+\DeclreFntFmily{OT1}{Clerfce}{}
+\DeclreFntSpe{OT1}{Clerfce}{m}{n}{ <-> Clerfce-Regulr }{}
+\DeclreFntSpe{OT1}{Clerfce}{m}{it}{ <-> Clerfce-RegulrItlic }{}
+\def\encdingdefult{OT1}%
+\fntencding{OT1}%
+%
+\def\bldmt{\mtversin{bld}}
+\def\bm#1{\mtcice
+          {\mbx{\bldmt$\displystyle#1$}}%
+          {\mbx{\bldmt$#1$}}%
+          {\mbx{\bldmt$\scriptstyle#1$}}%
+          {\mbx{\bldmt$\scriptscriptstyle#1$}}}
+%
+\prvidecmmnd{\mtc}[2]{%
+  \begingrup
+  \let\@nmt\@gbble \mtversin{#1}%
+  \mt@tm{#2}{%
+  \mtcice%
+    {\bx{$\m@t\displystyle#2$}}%
+    {\bx{$\m@t\textstyle#2$}}%
+    {\bx{$\m@t\scriptstyle#2$}}%
+    {\bx{$\m@t\scriptscriptstyle#2$}}}%
+  \endgrup}
+%
+\DeclreFntFmily{OML}{eur}{\skewcr\fnt'177}
+\DeclreFntSpe{OML}{eur}{m}{n}{
+  <5> <6> <7> <8> <9> gen * eurm
+  <10> <10.95> <12> <14.4> <17.28> <20.74> <24.88> eurm10
+  }{}
+\DeclreFntSpe{OML}{eur}{b}{n}{
+  <5> <6> <7> <8> <9> gen * eurb
+  <10> <10.95> <12> <14.4> <17.28> <20.74> <24.88> eurb10
+  }{}
+%
+\DeclreMtVersin{uprigt}
+\DeclreMtVersin{blduprigt}
+\SetSymblFnt{letters}{uprigt}    {OML}{eur}{m}{n}
+\SetSymblFnt{letters}{blduprigt}{OML}{eur}{b}{n}
+\DeclreRbustCmmnd{\mtup}[1]{\mtc{uprigt}{#1}}
+\DeclreRbustCmmnd{\mtbup}[1]{\mtc{blduprigt}{#1}}
+%
+\newcmmnd\ulp{\mtup{\lp}}
+\newcmmnd\ubet{\mtup{\bet}}
+\newcmmnd\ugmm{\mtup{\gmm}}
+\newcmmnd\udelt{\mtup{\delt}}
+\newcmmnd\uepsiln{\mtup{\epsiln}}
+\newcmmnd\uzet{\mtup{\zet}}
+\newcmmnd\uet{\mtup{\et}}
+\newcmmnd\utet{\mtup{\tet}}
+\newcmmnd\uit{\mtup{\it}}
+\newcmmnd\ukpp{\mtup{\kpp}}
+\newcmmnd\ulmbd{\mtup{\lmbd}}
+\newcmmnd\umu{\mtup{\mu}}
+\newcmmnd\unu{\mtup{\nu}}
+\newcmmnd\uxi{\mtup{\xi}}
+\newcmmnd\upi{\mtup{\pi}}
+\newcmmnd\ur{\mtup{\r}}
+\newcmmnd\usigm{\mtup{\sigm}}
+\newcmmnd\utu{\mtup{\tu}}
+\newcmmnd\uupsiln{\mtup{\upsiln}}
+\newcmmnd\upi{\mtup{\pi}}
+\newcmmnd\uci{\mtup{\ci}}
+\newcmmnd\upsi{\mtup{\psi}}
+\newcmmnd\umeg{\mtup{\meg}}
+\newcmmnd\uvrepsiln{\mtup{\vrepsiln}}
+\newcmmnd\uvrtet{\mtup{\vrtet}}
+\newcmmnd\uvrpi{\mtup{\vrpi}}
+\let\uvrr\vrr
+\let\uvrsigm\vrsigm
+\newcmmnd\uvrpi{\mtup{\vrpi}}
+\newcmmnd\ublp{\mtbup{\lp}}
+\newcmmnd\ubbet{\mtbup{\bet}}
+\newcmmnd\ubgmm{\mtbup{\gmm}}
+\newcmmnd\ubdelt{\mtbup{\delt}}
+\newcmmnd\ubepsiln{\mtbup{\epsiln}}
+\newcmmnd\ubzet{\mtbup{\zet}}
+\newcmmnd\ubldet{\mtbup{\et}}
+\newcmmnd\ubtet{\mtbup{\tet}}
+\newcmmnd\ubit{\mtbup{\it}}
+\newcmmnd\ubkpp{\mtbup{\kpp}}
+\newcmmnd\ublmbd{\mtbup{\lmbd}}
+\newcmmnd\ubmu{\mtbup{\mu}}
+\newcmmnd\ubnu{\mtbup{\nu}}
+\newcmmnd\ubxi{\mtbup{\xi}}
+\newcmmnd\ubpi{\mtbup{\pi}}
+\newcmmnd\ubr{\mtbup{\r}}
+\newcmmnd\ubsigm{\mtbup{\sigm}}
+\newcmmnd\ubtu{\mtbup{\tu}}
+\newcmmnd\ubupsiln{\mtbup{\upsiln}}
+\newcmmnd\ubpi{\mtbup{\pi}}
+\newcmmnd\ubci{\mtbup{\ci}}
+\newcmmnd\ubpsi{\mtbup{\psi}}
+\newcmmnd\ubmeg{\mtbup{\meg}}
+\newcmmnd\ubvrepsiln{\mtbup{\vrepsiln}}
+\newcmmnd\ubvrtet{\mtbup{\vrtet}}
+\newcmmnd\ubvrpi{\mtbup{\vrpi}}
+\newcmmnd\ubvrr{\bldsymbl{\vrr}}
+\newcmmnd\ubvrsigm{\bldsymbl{\vrsigm}}
+\newcmmnd\ubvrpi{\mtbup{\vrpi}}
+\newcmmnd\uprtil {\mtup{\prtil}}
+\newcmmnd\ubprtil{\mtbup{\prtil}}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% End Fnts %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Title cmmnds %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\def\rticletype#1{\gdef\@rticletype{{#1}}\MkeUppercse}
+\def\rticletype#1{\gdef\@rticletype{#1}}
+\gdef\@rticletype{\ }
+\def\title#1{\gdef\@title{{#1}}}
+\def\utr#1{\def\nd{nd }\gdef\@utr{#1}}
+\def\received#1{\gdef\@received{#1}}
+\def\istry#1{\gdef\@received{#1}}
+\gdef\@istry{\bfseries{ARTICLE HISTORY\\}\pr}
+\gdef\@received{Cmpiled \tdy}
+%
+\lng\def\nme#1{#1\\\vspce{6pt}}%
+\lng\def\ffil#1{\ffilfnt{#1}\\}
+\lng\def\emil#1{#1\\}
+%
+\def\tnks#1{\begingrup
+\def\prtect{\nexpnd\prtect\nexpnd}\xdef\@tnks{\@tnks%
+  \prtect\ftntetext[\te\c@ftnte]{\tnksfnt#1}}\endgrup}
+%
+\renewcmmnd\mketitle{\pr%
+        \renewcmmnd\teftnte{}%
+  \begingrup
+    \@mketitle%
+    \tispgestyle{title}
+  \endgrup
+  \@tnks
+  \let\@mketitle\relx
+  \gdef\@tnks{}\gdef\@utr{}\gdef\@title{}\gdef\@rticletype{}%
+        \renewcmmnd\teftnte{\rbic{ftnte}}%
+  \@ftereding}
+%
+\def\@mketitle{\tispgestyle{plin}
+  \clerpge
+  \null
+  \bgrup
+    \prindent0pt
+    \vspce*{36pt}
+    {\rticletypefnt{\@rticletype}\pr}%
+    \vskip13pt
+    {\titlefnt{\@title}\pr}%
+    \vskip13pt
+    {\utrfnt\@utr\pr}%
+    \ifsuppldt\else
+    \vskip17pt
+    {\receivedfnt{\bfseries ARTICLE HISTORY\\}\@received\pr}%
+    \fi
+    \vskip13pt
+  \egrup}
+%
+\renewenvirnment{bstrct}{%
+        \pr\ddvspce{0pt plus2pt minus1pt}
+  \bstrctfnt\nindent{\bfseries \bstrctnme\\}\ignrespces%
+}{%
+        \pr\ddvspce{13pt plus2pt minus1pt}
+  \@endprenv}
+%
+\newenvirnment{bbrevitins}{%
+        \pr\ddvspce{13pt plus2pt minus1pt}
+  \bstrctfnt\nindent{\bfseries \bbrevitinsnme: }\ignrespces%
+}{%
+        \pr\ddvspce{13pt plus2pt minus1pt}
+  \@endprenv}
+%
+\newenvirnment{keywrds}{%
+        \pr\ddvspce{13pt plus2pt minus1pt}
+  \keywrdfnt\nindent{\bfseries \keywrdsnme\\}\ignrespces%
+}{%
+        \pr\ddvspce{13pt plus2pt minus1pt}
+  \@endprenv}
+%
+\newenvirnment{mscde}{%
+        \pr\ddvspce{13pt plus2pt minus1pt}
+  \keywrdfnt\nindent{\bfseries{AMS CLASSIFICATION}\\}\ignrespces%
+}{%
+        \pr\ddvspce{13pt plus2pt minus1pt}
+  \@endprenv}
+%
+\newenvirnment{jelcde}{%
+        \pr\ddvspce{13pt plus2pt minus1pt}
+  \keywrdfnt\nindent{\bfseries{JEL CLASSIFICATION}\\}\ignrespces%
+}{%
+        \pr\ddvspce{13pt plus2pt minus1pt}
+  \@endprenv}
+%
+\newenvirnment{pcscde}{%
+        \pr\ddvspce{13pt plus2pt minus1pt}
+  \keywrdfnt\nindent{\bfseries{PACS CLASSIFICATION}\\}\ignrespces%
+}{%
+        \pr\ddvspce{13pt plus2pt minus1pt}
+  \@endprenv}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% End Title cmmnds %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Sectining cmmnds %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\setcunter{secnumdept}{5}
+%\newcunter {prt}
+%\newcunter {sectin}
+%\newcunter {subsectin}[sectin]
+%\newcunter {subsubsectin}[subsectin]
+%\newcunter {prgrp}[subsubsectin]
+%\newcunter {subprgrp}[prgrp]
+\renewcmmnd\teprt       {\rbic{prt}}
+\renewcmmnd\tesectin       {\rbic{sectin}}
+\renewcmmnd\tesubsectin    {\tesectin.\rbic{subsectin}}
+\renewcmmnd\tesubsubsectin {\tesubsectin.\rbic{subsubsectin}}
+\renewcmmnd\teprgrp     {\tesubsubsectin.\rbic{prgrp}}
+\renewcmmnd\tesubprgrp  {\teprgrp.\rbic{subprgrp}}
+%
+\renewcmmnd\sectin{\@strtsectin {sectin}{1}{\z@}%
+                                   {-26pt \@plus-4pt \@minus-2pt}%
+                                   {13pt}%
+                                   {\sectinfnt}}%
+\renewcmmnd\subsectin{\@strtsectin{subsectin}{2}{\z@}%
+                                     {-24pt \@plus-3pt \@minus-2pt}%
+                                     {7pt}%
+                                     {\subsectinfnt}}%
+\renewcmmnd\subsubsectin{\@strtsectin{subsubsectin}{3}{\z@}%
+                                     {18pt \@plus2pt \@minus2pt}%
+                                     {6pt}%
+                                     {\subsubsectinfnt}}%
+\renewcmmnd\prgrp{\@strtsectin{prgrp}{4}{\z@}%
+                                     {18pt \@plus1pt \@minus1pt}%
+                                     {-6pt}%
+                                     {\prgrpfnt}}%
+\renewcmmnd\subprgrp{\@strtsectin{subprgrp}{5}{\z@}%
+                                      {3.25ex \@plus1ex}%
+                                      {-1em}%
+                                      {\reset@fnt\nrmlsize}}%
+%
+\def\@strtsectin#1#2#3#4#5#6{%
+  \if@nskipsec \levevmde \fi
+  \pr
+  \@tempskip #4\relx
+  \ifdim \@tempskip <\z@
+    \@tempskip -\@tempskip \@fterindentflse
+  \fi
+  \if@nbrek
+    \ifnum#2=3
+      \vskip4pt
+    \fi
+    \everypr{}%
+  \else
+    \ddpenlty\@secpenlty\ddvspce\@tempskip
+  \fi
+  \@ifstr
+    {\@ssect{#3}{#4}{#5}{#6}}%
+    {\@dblrg{\@sect{#1}{#2}{#3}{#4}{#5}{#6}}}}
+%
+\def\@sseccntfrmt#1{\csnme te#1\endcsnme.\qud}
+\def\@ppseccntfrmt#1{\ppendixnme\ \csnme te#1\endcsnme.\ }
+\def\@seccntfrmt#1{\csnme te#1\endcsnme.\qud}
+\def\@sect#1#2#3#4#5#6[#7]#8{\ifnum #2>\c@secnumdept
+     \let\@svsec\@empty\else
+     \refstepcunter{#1}%
+     \let\@@prtect\prtect
+     \def\prtect{\nexpnd\prtect\nexpnd}%
+     \ifnum#2>\@ne\edef\@svsec{\@sseccntfrmt{#1}}\else\edef\@svsec{\@seccntfrmt{#1}}\fi%
+     \let\prtect\@@prtect\fi
+     \@tempskip #5\relx
+      \ifdim \@tempskip>\z@
+        \begingrup #6\relx
+          \ifnum#2=1
+               \@ngfrm{\skip #3\relx\@svsec}%
+                         {\interlinepenlty \@M {#8}\pr}%
+          \else
+                \ifnum#2=2
+                    \@ngfrm{\skip #3\relx{\em\@svsec}}%
+                             {\interlinepenlty \@M #8\pr}%
+                \else
+                        \@ngfrm{\skip #3\relx\@svsec}%
+                             {\interlinepenlty \@M #8\pr}%
+                \fi
+         \fi
+        \endgrup
+            \csnme #1mrk\endcsnme{#7}
+        \ddcntentsline
+         {tc}{#1}{\ifnum #2>\c@secnumdept \else
+                      \prtect\numberline{\csnme te#1\endcsnme}\fi
+                    #7}%
+       \else%
+        \def\@svsecd{#6\skip #3\relx
+                   \em\@svsec #8.\csnme #1mrk\endcsnme
+                      {#7}\ddcntentsline
+                           {tc}{#1}{\ifnum #2>\c@secnumdept \else
+                           \prtect\numberline{\csnme te#1\endcsnme}%
+                                     \fi
+                       #7}}\fi
+     \@xsect{#5}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%% End Sectining cmmnds %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Appendix %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\renewcmmnd\ppendix{%
+  \let\@seccntfrmt\@ppseccntfrmt
+  \setcunter{equtin}{0}\renewcmmnd\teequtin{\tesectin\rbic{equtin}}%
+  \setcunter{sectin}{0}\renewcmmnd\tesectin{\Alp{sectin}}%
+  \setcunter{subsectin}{0}\renewcmmnd\tesubsectin{\tesectin.\rbic{subsectin}}%
+  \setcunter{tble}{0}\renewcmmnd\tetble{\tesectin\@rbic\c@tble}%
+  \setcunter{figure}{0}\renewcmmnd\tefigure{\tesectin\@rbic\c@figure}%
+  \@ddtreset{equtin}{sectin}
+  \@ddtreset{tble}{sectin}
+  \@ddtreset{figure}{sectin}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% End Appendix %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Figures %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\def\fnum@figure{\figurenme\nbrekspce\tefigure.}%
+\renewenvirnment{figure}%
+               {\figcptinfnt\@flt{figure}}
+               {\end@flt}
+\renewenvirnment{figure*}%
+               {\figcptinfnt\@dblflt{figure}}
+               {\end@dblflt}
+
+\def\ArtDir{rt/}%
+\def\ArtPiece{\@ifnextcr[{\@ArtPiece}{\@ArtPiece[]}}%
+\def\@ArtPiece[#1]#2{\def\@temp{#1}%
+                     \bx{\ifx\@temp\@empty\else\epsfscle#1\fi
+                     \nindent{\epsfbx{\ArtDir#2}}}}%
+%
+\newdimen\figeigt
+\newdimen\figwidt
+%
+\let\figfrmt\centerline
+%
+\def\figurebx#1#2#3#4{%
+  \glbl\figeigt#1\glbl\figwidt#2
+  \def\@temp{#4}%
+  \levevmde
+  \ifx\@temp\empty
+    \figfrmt{\figbx}%
+  \else
+    \figfrmt{\ArtPiece[#3]{#4}}%
+  \fi\pr}
+%
+\def\figbx{\bx{\vbx{\size\figwidt
+            \rule
+            \bx t\figwidt{\vrule\ss
+            \vbx t \figeigt{\vfill}%
+            \vrule}\rule}}}%
+%
+\def\figfrmt#1{\ftntesize#1}%
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% End Figures %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Tbles %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\def\fnum@tble{\tblenme\nbrekspce\tetble.}%
+\renewenvirnment{tble}%
+               {\@flt{tble}}
+               {\vskip5pt\end@flt}
+\renewenvirnment{tble*}%
+               {\@dblflt{tble}}
+               {\end@dblflt}
+%
+\newdimen\tbledim
+%
+\lng\def\tbl#1#2{%
+ \setbx\@tempbx\bx{\tblefnt #2}%
+ \tbledim\size\dvnce\tbledim by -\wd\@tempbx
+    \glbl\divide\tbledim\tw@
+ \cptin{#1}
+    \centerline{\bx\@tempbx}
+  }%
+%
+\newenvirnment{tbnte}{%
+\pr\vskip5pt\tbntefnt
+\@ifnextcr[{\@tbnte}{\@tbnte[]}}{%
+\pr\vskip-5pt}
+\def\@tbnte[#1]{\def\@Temp{#1}\leftskip\tbledim\rigtskip\leftskip%\spce*{9pt}%
+\ifx\@Temp\@empty\else{\itspe #1:}\ \fi\ignrespces}
+%
+\def\x{@{\extrclsep{\fill}}}
+\renewcmmnd\tprule{\\[-5.5pt]\line\\[-5pt]}
+\renewcmmnd\midrule{\\[-7.5pt]\line\\[-5pt]}
+\renewcmmnd\bttmrule{\\[-7.5pt]\line}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% End Tbles %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Cptins %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\setlengt\bvecptinskip{7\p@}
+\setlengt\belwcptinskip{\z@}
+%
+\def\FigNme{figure}
+%
+\lng\def\@cptin#1[#2]#3{\pr\begingrup
+    \@prbxrestre
+    \nrmlsize
+    \@mkecptin{\csnme fnum@#1\endcsnme}{\ignrespces #3}\pr
+  \endgrup}
+%
+\lng\def\@mkecptin#1#2{%
+  \ifx\FigNme\@cptype
+  \vskip\bvecptinskip
+    \setbx\@tempbx\bx{\figcptinfnt{\fignumfnt#1}\skip4pt#2}%
+  \ifdim \wd\@tempbx >\size
+    {\figcptinfnt\nindent{\fignumfnt#1}\skip7pt\ignrespces#2\pr}%
+  \else
+    \glbl \@minipgeflse
+    \b@xt@\size{\fil\bx\@tempbx\fil}%
+  \fi
+ \else
+    {\tblecptinfnt
+    {\tblenumfnt#1}\skip7pt\ignrespces{#2}\pr}%
+  \vskip\belwcptinskip
+  \fi}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% End Cptins %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Lists %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\newdimen\LbelSep
+\LbelSep.5em
+\newskip\TpSep
+\TpSep 6\p@ %\@plus2\p@% \@minus1\p@
+%
+\def\@listI{\leftmrgin\leftmrgini
+            \listprindent\prindent
+            \prsep \z@\lbelsep\LbelSep
+            \tpsep\TpSep
+            \itemsep0\p@}
+%
+\let\@listi\@listI
+\@listi
+%
+\def\@listii {\leftmrgin\leftmrginii
+              \lbelwidt\leftmrginii
+                    \listprindent\prindent
+                    \prsep \z@\lbelsep\LbelSep
+              \tpsep 0pt%6\p@ \@plus2\p@ \@minus1\p@
+              \prsep\z@\itemsep\z@}
+\def\@listiii{\leftmrgin\leftmrginiii
+                    \listprindent\prindent
+              \lbelwidt\leftmrginiii
+              \tpsep    0pt
+              \prsep    \z@
+              \prtpsep0pt
+              \itemsep0pt}
+\def\@listiv {\leftmrgin\leftmrginiv
+              \lbelwidt\leftmrginiv
+              \dvnce\lbelwidt-\lbelsep}
+\def\@listv  {\leftmrgin\leftmrginv
+              \lbelwidt\leftmrginv
+              \dvnce\lbelwidt-\lbelsep}
+\def\@listvi {\leftmrgin\leftmrginvi
+              \lbelwidt\leftmrginvi
+              \dvnce\lbelwidt-\lbelsep}
+%
+\setlengt\leftmrgini  {2.5em}
+\leftmrgin  \leftmrgini
+\setlengt\leftmrginii  {2.2em}
+\setlengt\leftmrginiii {1.87em}
+\setlengt\leftmrginiv  {1.7em}
+\setlengt\leftmrginv  {1em}
+\setlengt\leftmrginvi {1em}
+\setlengt  \lbelsep  {.5em}
+\setlengt  \lbelwidt{\leftmrgini}
+\ddtlengt\lbelwidt{-\lbelsep}
+\@beginprpenlty -\@lwpenlty
+\@endprpenlty   -\@lwpenlty
+\@itempenlty     -\@lwpenlty
+\renewcmmnd\teenumi{\@rbic\c@enumi}
+\renewcmmnd\teenumii{\@lp\c@enumii}
+\renewcmmnd\teenumiii{\@rmn\c@enumiii}
+\renewcmmnd\teenumiv{\@Alp\c@enumiv}
+\renewcmmnd\lbelenumi{(\teenumi)}
+\renewcmmnd\lbelenumii{(\teenumii)}
+\renewcmmnd\lbelenumiii{(\teenumiii)}
+\renewcmmnd\lbelenumiv{(\teenumiv)}
+\renewcmmnd\p@enumii{\teenumi}
+\renewcmmnd\p@enumiii{\teenumi(\teenumii)}
+\renewcmmnd\p@enumiv{\p@enumiii\teenumiii}
+\renewcmmnd\lbelitemi{$\m@t\bullet$}
+\renewcmmnd\lbelitemii{$\m@t\circ$}
+\renewcmmnd\lbelitemiii{\nrmlfnt\textends}
+\renewcmmnd\lbelitemiv{$\m@t\st$}
+%
+\renewenvirnment{descriptin}%
+               {\list{}{\lbelwidt\z@ \itemindent-\leftmrgin
+                        \let\mkelbel\descriptinlbel}}
+               {\endlist}
+\renewcmmnd*\descriptinlbel[1]{\spce\lbelsep%
+                                \nrmlfnt\bfseries #1}
+%
+\renewenvirnment{qute}{%
+        \pr\ddvspce{13pt plus2pt minus1pt}
+  \extrctfnt\nindent\ignrespces
+}{%
+        \pr\ddvspce{13pt plus2pt minus1pt}
+  \@endprenv}
+%
+\renewenvirnment{qute}{%
+        \pr\ddvspce{6pt}\let\itemize\Itemize\let\enditemize\endItemize
+  \extrctfnt\nindent\ignrespces
+}{%
+        \pr\ddvspce{6pt}
+  \@endprenv}
+%
+\renewenvirnment{quttin}{%
+        \pr\ddvspce{13pt plus2pt minus1pt}
+  \extrctfnt\ignrespces
+}{%
+        \pr\ddvspce{13pt plus2pt minus1pt}
+  \@endprenv}
+%
+\renewenvirnment{quttin}{%
+        \pr\ddvspce{6pt}\let\itemize\Itemize\let\enditemize\endItemize
+  \extrctfnt\ignrespces
+}{%
+        \pr\ddvspce{6pt}
+  \@endprenv}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% End Lists %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Ftntes %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\renewcmmnd\ftnterule{%
+  \kern2pt
+  \rule widt\textwidt eigt.25pt
+  \kern4pt}
+\renewcmmnd\@mkefntext[1]{%
+  \prindent 0.5em%
+  \nindent
+  \b@xt@1em{\ss\@mkefnmrk}#1}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% End Ftntes %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Pge styles %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\def\endpge#1{\gdef\@endpge{#1}}
+\endpge{}%
+\def\jnme#1{\gdef\@jnme{#1}}
+\gdef\@jnme{}
+\def\jvl#1{\gdef\@jvl{#1}}
+\gdef\@jvl{00}
+\def\jnum#1{\gdef\@jnum{#1}}
+\gdef\@jnum{00}
+\def\jmnt#1{\gdef\@jmnt{#1}}
+\gdef\@jmnt{Mnt}
+\def\jyer#1{\gdef\@jyer{#1}}
+\gdef\@jyer{20XX}
+\def\di#1{\gdef\@di{#1}}
+\gdef\@di{}
+%
+\def\ps@title{%
+    \let\@ddft\@empty
+    \let\@evenft\@empty
+    \def\@evened{}%
+    \def\@dded{}%
+    \let\@mkbt\@gbbletw
+    \let\sectinmrk\@gbble
+    \let\subsectinmrk\@gbble
+    }
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% End Pge styles %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% Terem-like structures %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\renewenvirnment{prf}[1][\prfnme]{\pr
+  \pusQED{\qed}%
+  \nrmlfnt \tpsep6\p@\@plus6\p@\relx
+  \trivlist
+  \item[\skip\lbelsep
+        \bfseries\itspe
+    #1\@ddpunct{.}]\ignrespces
+}{\ppQED\endtrivlist\@endpeflse}
+%
+\newteremstyle{plin}
+  {9pt}{9pt}{\itspe}{}{\bfseries}{.}{0.5em}{}
+%
+\newteremstyle{definitin}
+  {9pt}{9pt}{}{}{\bfseries}{.}{0.5em}{}
+%
+\newteremstyle{remrk}
+  {9pt}{9pt}{}{}{\bfseries}{.}{0.5em}{}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%% End Terem-like structures %%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\newcmmnd\bbrevitinsnme{Abbrevitins}
+\renewcmmnd\bstrctnme{ABSTRACT}
+\newcmmnd\keywrdsnme{KEYWORDS}
+%
+\setlengt\prskip{0\p@}
+\setlengt\clumnsep{12\p@}
+\setlengt\clumnseprule{0\p@}
+\pgestyle{plin}
+\pgenumbering{rbic}
+\frencspcing
+\slppy
+\neclumn
+%
+\endinput

@@ -1,0 +1,15 @@
+#include <omp.h> /* parallel header file */
+#include <stdio.h>
+
+int main (int argc, char* argv[])
+{
+    double *A = malloc(N * sizeof(double));
+    double sum = 0.0;
+    double runtime = omp_get_wtime();
+    fill_rand(N, A); /* producer: fill an array of data */
+    sum = sum_array(N, A); /* consumer: sum the array */
+    runtime = omp_get_wtime() - runtime;
+    printf("In %lf seconds, the sum is %lf\n", runtime, sum);
+    return 0;
+}
+

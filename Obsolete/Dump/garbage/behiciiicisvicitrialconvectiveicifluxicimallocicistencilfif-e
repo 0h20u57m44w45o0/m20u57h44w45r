@@ -1,0 +1,284 @@
+/****************************************************************************
+ *                              ArtraCFD                                    *
+ *                          <By Huangrui Mo>                                *
+ * Copyright (C) Huangrui Mo <huangrui.mo@gmail.com>                        *
+ * This file is part of ArtraCFD.                                           *
+ * ArtraCFD is free software: you can redistribute it and/or modify it      *
+ * under the terms of the GNU General Public License as published by        *
+ * the Free Software Foundation, either version 3 of the License, or        *
+ * (at your option) any later version.                                      *
+ ****************************************************************************/
+/****************************************************************************
+ * Required Header Files
+ ****************************************************************************/
+#include "convective_flux.h"
+#include <math.h> /* common mathematical functions */
+#include <string.h> /* manipulating strings */
+#include "numerical_scheme.h"
+#include "cfd_commons.h"
+#include "commons.h"
+/****************************************************************************
+ * Function Pointers
+ ****************************************************************************/
+typedef void (*FhatSolver)(const int, Real [restrict][DIMU], const Model *, Real [restrict]);
+typedef void (*FhatReconstructor)(Real [restrict][DIMU], Real [restrict]);
+/****************************************************************************
+ * Static Function Declarations
+ ****************************************************************************/
+static void CharactWiseFVS(const int, Real [restrict][DIMU], const Model *, Real [restrict]);
+static void CharactWiseFDS(const int, Real [restrict][DIMU], const Model *, Real [restrict]);
+static void CompontWiseFVSEigen(const int, Real [restrict][DIMU], const Model *, Real [restrict]);
+static void CompontWiseFVSAUSM(const int, Real [restrict][DIMU], const Model *, Real [restrict]);
+static void CompontWiseFNS(const int, Real [restrict][DIMU], const Model *, Real [restrict]);
+static void LocalVariable(const int, const int [restrict], const int, const int, const int,
+        const int, const int, const int [restrict], const Node *const, Real [restrict][DIMU]);
+static void CharactVariable(const int, Real [restrict][DIMU], Real [restrict][DIMU], Real [restrict][DIMU]);
+static void CharactFlux(const Real [restrict], Real [restrict][DIMU],
+        const int, const int, const int,  Real [restrict][DIMU]);
+static void InverseProjection(Real [restrict][DIMU], const Real [restrict],
+        const Real [restrict], Real [restrict]);
+static void Assemble(Real [restrict][DIMU], const int, const int, const int, Real [restrict][DIMU]);
+static void RiemannFlux(const Real [restrict], const Real [restrict],
+        const Real [restrict], const Real [restrict], Real [restrict]);
+static Real Psi(const Real, const Real);
+static void LocalPrimi(const int, const Real, Real [restrict][DIMU], Real [restrict][DIMUo]);
+static void LocalEigen(const int, const int, const int, Real [restrict][DIMUo],
+        Real [restrict], Real [restrict][DIMU], Real [restrict][DIMU]);
+static void LocalFluxEigen(const int [restrict], const Real, Real [restrict][DIMU],
+        Real [restrict][DIMUo], const int, const int, const int, Real [restrict][DIMU]);
+static void CombineFlux(const Real [restrict], const Real [restrict], Real [restrict]);
+static void LocalFluxFNS(const int, const int [restrict], const int,
+        const Real, Real [restrict][DIMU], Real [restrict][DIMU]);
+/****************************************************************************
+ * Global Variables Definition with Private Scope
+ ****************************************************************************/
+static FhatSolver SolveFhat[2][3] = {
+    {CharactWiseFVS, CharactWiseFDS, NULL},
+    {CompontWiseFVSEigen, CompontWiseFVSAUSM, CompontWiseFNS}};
+static FhatReconstructor ReconstructFhat[3] = {
+    WENOJS3,
+    WENOJS5,
+    CD2};
+/****************************************************************************
+ * Function definitions
+ ****************************************************************************/
+void ComputeFhat(const int tn, const int s, const int k, const int j, const int i,
+        const int partn[restrict], const Node *const node, const Model *model, Real Fhat[restrict])
+{
+    /* construct local variables for all potential stencils */
+    LocalVariable(tn, model->e[s], k, j, i, model->sL, model->sR, partn, node, model->U);
+    /* solve numerical flux */
+    SolveFhat[model->fluxForm][model->fluxSplit](s, model->U, model, Fhat);
+}
+static void CharactWiseFVS(const int s, Real U[restrict][DIMU], const Model *model, Real Fhat[restrict])
+{
+    /* evaluate interface values by averaging */
+    Real *Uo = model->Uo[0]; /* store averaged primitives */
+    Average(model->jacobMean, model->gamma, U[-model->sL], U[-model->sL+1], Uo);
+    /* decompose Jacobian matrix */
+    Real *E = U[model->sN]; /* eigenvalues */
+    Real (*L)[DIMU] = U + model->sN + 1; /* vector space {Ln} */
+    Real (*R)[DIMU] = L + DIMU; /* vector space {Rn} */
+    Eigenvalue(s, Uo, E);
+    EigenvectorL(s, model->gamma, Uo, L);
+    EigenvectorR(s, Uo, R);
+    /* construct local characteristic variables for all potential stencils */
+    Real (*W)[DIMU] = R + DIMU;
+    CharactVariable(model->sN, U, L, W);
+    /* flux vector splitting */
+    Real *EP = L[0]; /* eigenvalues */
+    Real *EN = L[1]; /* eigenvalues */
+    EigenvalueSplit(model->eigenSplit, E, EP, EN);
+    /* construct local characteristic fluxes for direct stencils */
+    Real (*HP)[DIMU] = W + model->sN; /* forward stencil */
+    Real (*HN)[DIMU] = HP + model->sD; /* backward stencil */
+    CharactFlux(EP, W, 0, +1, model->sD, HP);
+    CharactFlux(EN, W, model->sN - 1, -1, model->sD, HN);
+    /* flux reconstruction */
+    Real *HhatP = L[0]; /* forward numerical flux */
+    Real *HhatN = L[1]; /* backward numerical flux */
+    ReconstructFhat[model->sScheme](HP, HhatP);
+    ReconstructFhat[model->sScheme](HN, HhatN);
+    /* inverse projection */
+    InverseProjection(R, HhatP, HhatN, Fhat);
+}
+static void LocalVariable(const int tn, const int e[restrict], const int k, const int j, const int i,
+        const int sL, const int sR, const int partn[restrict], const Node *const node, Real U[restrict][DIMU])
+{
+    int idx = 0; /* linear array index math variable */
+    for (int n = sL, m = 0; n <= sR; ++n, ++m) {
+        idx = IndexNode(k + n * e[Z], j + n * e[Y], i + n * e[X], partn[Y], partn[X]);
+        memcpy(U[m], node[idx].U[tn], sizeof(*U));
+    }
+}
+static void CharactVariable(const int tot, Real U[restrict][DIMU], Real L[restrict][DIMU], Real W[restrict][DIMU])
+{
+    for (int m = 0; m < tot; ++m) {
+        for (int r = 0; r < DIMU; ++r) {
+            W[m][r] = 0.0;
+            for (int c = 0; c < DIMU; ++c) {
+                W[m][r] = W[m][r] + L[r][c] * U[m][c];
+            }
+        }
+    }
+}
+static void CharactFlux(const Real E[restrict], Real W[restrict][DIMU],
+        const int start, const int wind, const int tot, Real H[restrict][DIMU])
+{
+    for (int n = start, m = 0; m < tot; n = n + wind, ++m) {
+        for (int r = 0; r < DIMU; ++r) {
+            H[m][r] = E[r] * W[n][r];
+        }
+    }
+}
+static void InverseProjection(Real R[restrict][DIMU], const Real HhatP[restrict],
+        const Real HhatN[restrict], Real Fhat[restrict])
+{
+    for (int r = 0; r < DIMU; ++r) {
+        Fhat[r] = 0.0;
+        for (int c = 0; c < DIMU; ++c) {
+            Fhat[r] = Fhat[r] + R[r][c] * (HhatP[c] + HhatN[c]);
+        }
+    }
+}
+static void CharactWiseFDS(const int s, Real U[restrict][DIMU], const Model *model, Real Fhat[restrict])
+{
+    /* evaluate interface values by averaging */
+    Real *Uo = model->Uo[0]; /* store averaged primitives */
+    Average(model->jacobMean, model->gamma, U[-model->sL], U[-model->sL+1], Uo);
+    /* decompose Jacobian matrix */
+    Real *E = U[model->sN]; /* eigenvalues */
+    Real (*L)[DIMU] = U + model->sN + 1; /* vector space {Ln} */
+    Real (*R)[DIMU] = L + DIMU; /* vector space {Rn} */
+    Eigenvalue(s, Uo, E);
+    EigenvectorL(s, model->gamma, Uo, L);
+    EigenvectorR(s, Uo, R);
+    /* construct local characteristic variables for all potential stencils */
+    Real (*W)[DIMU] = R + DIMU;
+    CharactVariable(model->sN, U, L, W);
+    /* construct local characteristic variables for direct stencils */
+    Real (*WF)[DIMU] = W; /* forward stencil */
+    Real (*WB)[DIMU] = W + model->sN ; /* backward stencil */
+    Assemble(W, model->sN - 1, -1, model->sD, WB);
+    /* solution reconstruction */
+    Real *WP = L[0];
+    Real *WN = L[1];
+    ReconstructFhat[model->sScheme](WF, WP);
+    ReconstructFhat[model->sScheme](WB, WN);
+    /* characteristic numerical flux via Riemann solver */
+    Real *Hhat = L[2];
+    RiemannFlux(Uo, E, WP, WN, Hhat);
+    /* inverse projection */
+    const Real O[DIMU] = {0.0};
+    InverseProjection(R, O, Hhat, Fhat);
+}
+static void Assemble(Real W[restrict][DIMU], const int start, const int wind,
+        const int tot, Real V[restrict][DIMU])
+{
+    for (int n = start, m = 0; m < tot; n = n + wind, ++m) {
+        memcpy(V[m], W[n], sizeof(*V));
+    }
+}
+static void RiemannFlux(const Real Uo[restrict], const Real E[restrict],
+        const Real WP[restrict], const Real WN[restrict], Real F[restrict])
+{
+    const Real eps = 0.2 * (fabs(Uo[1]) + fabs(Uo[2]) + fabs(Uo[3]) + Uo[5]);
+    for (int r = 0; r < DIMU; ++r) {
+        F[r] = 0.5 * (E[r] * (WP[r] + WN[r]) - Psi(E[r], eps) * (WN[r] - WP[r]));
+    }
+}
+static Real Psi(const Real x, const Real eps)
+{
+    return (fabs(x) >= eps) ? fabs(x) : 0.5 * (x * x / eps + eps);
+}
+static void CompontWiseFVSEigen(const int s, Real U[restrict][DIMU], const Model *model, Real Fhat[restrict])
+{
+    /* construct local primitive variables */
+    Real (*Uo)[DIMUo] = model->Uo;
+    LocalPrimi(model->sN, model->gamma, U, Uo);
+    /* eigenvalue splitting */
+    Real *E = U[0];
+    Real (*EP)[DIMU] = U + model->sN;
+    Real (*EN)[DIMU] = EP + model->sN;
+    LocalEigen(s, model->sN, model->eigenSplit, Uo, E, EP, EN);
+    /* construct local forward and backward fluxes for direct stencils */
+    Real (*FP)[DIMU] = EN + model->sN; /* forward stencil */
+    Real (*FN)[DIMU] = FP + model->sD; /* backward stencil */
+    LocalFluxEigen(model->e[s], model->gamma, EP, Uo, 0, +1, model->sD, FP);
+    LocalFluxEigen(model->e[s], model->gamma, EN, Uo, model->sN - 1, -1, model->sD, FN);
+    /* flux reconstruction */
+    Real *FhatP = U[0]; /* forward numerical flux */
+    Real *FhatN = U[1]; /* backward numerical flux */
+    ReconstructFhat[model->sScheme](FP, FhatP);
+    ReconstructFhat[model->sScheme](FN, FhatN);
+    /* combine fluxes */
+    CombineFlux(FhatP, FhatN, Fhat);
+}
+static void LocalPrimi(const int tot, const Real gamma, Real U[restrict][DIMU], Real Uo[restrict][DIMUo])
+{
+    for (int m = 0; m < tot; ++m) {
+        MapCharact(gamma, U[m], Uo[m]);
+        Uo[m][5] = Calc_c(gamma, Uo[m]);
+    }
+}
+static void LocalEigen(const int s, const int tot, const int split, Real Uo[restrict][DIMUo],
+        Real E[restrict], Real EP[restrict][DIMU], Real EN[restrict][DIMU])
+{
+    for (int m = 0; m < tot; ++m) {
+        Eigenvalue(s, Uo[m], E);
+        EigenvalueSplit(split, E, EP[m], EN[m]);
+    }
+}
+static void LocalFluxEigen(const int e[restrict], const Real gamma, Real E[restrict][DIMU],
+        Real Uo[restrict][DIMUo], const int start, const int wind, const int tot, Real F[restrict][DIMU])
+{
+    for (int n = start, m = 0; m < tot; n = n + wind, ++m) {
+        Calc_F_Eigen(e, gamma, E[n], Uo[n], F[m]);
+    }
+}
+static void CombineFlux(const Real FhatP[restrict], const Real FhatN[restrict], Real Fhat[restrict])
+{
+    for (int r = 0; r < DIMU; ++r) {
+        Fhat[r] = FhatP[r] + FhatN[r];
+    }
+}
+static void CompontWiseFVSAUSM(const int s, Real U[restrict][DIMU], const Model *model, Real Fhat[restrict])
+{
+    /* construct local primitive variables */
+    Real (*Uo)[DIMUo] = model->Uo;
+    LocalPrimi(model->sN, model->gamma, U, Uo);
+    /* eigenvalue splitting */
+    Real *E = U[0];
+    Real (*EP)[DIMU] = U + model->sN;
+    Real (*EN)[DIMU] = EP + model->sN;
+    LocalEigen(s, model->sN, model->eigenSplit, Uo, E, EP, EN);
+    /* construct local forward and backward fluxes for direct stencils */
+    Real (*FP)[DIMU] = EN + model->sN; /* forward stencil */
+    Real (*FN)[DIMU] = FP + model->sD; /* backward stencil */
+    LocalFluxEigen(model->e[s], model->gamma, EP, Uo, 0, +1, model->sD, FP);
+    LocalFluxEigen(model->e[s], model->gamma, EN, Uo, model->sN - 1, -1, model->sD, FN);
+    /* flux reconstruction */
+    Real *FhatP = U[0]; /* forward numerical flux */
+    Real *FhatN = U[1]; /* backward numerical flux */
+    ReconstructFhat[model->sScheme](FP, FhatP);
+    ReconstructFhat[model->sScheme](FN, FhatN);
+    /* combine fluxes */
+    CombineFlux(FhatP, FhatN, Fhat);
+}
+static void CompontWiseFNS(const int s, Real U[restrict][DIMU], const Model *model, Real Fhat[restrict])
+{
+    /* construct local fluxes for direct stencils */
+    Real (*F)[DIMU] = U + model->sN;
+    LocalFluxFNS(s, model->e[s], model->sN, model->gamma, U, F);
+    /* flux reconstruction */
+    ReconstructFhat[model->sScheme](F, Fhat);
+}
+static void LocalFluxFNS(const int s, const int e[restrict], const int tot,
+        const Real gamma, Real U[restrict][DIMU], Real F[restrict][DIMU])
+{
+    for (int m = 0; m < tot; ++m) {
+        Calc_F_Primi(s, e, gamma, U[m], F[m]);
+    }
+}
+/* a good practice: end file with a newline */
+

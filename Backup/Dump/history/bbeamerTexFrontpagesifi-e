@@ -1,0 +1,87 @@
+%---------------------------------------------------------------------------%
+%->> Titlepage information
+%---------------------------------------------------------------------------%
+\title[]% optional, abbreviated title
+{ArtraBeamer}
+
+\subtitle% optional
+{-- How to?}
+
+\author[Huangrui Mo]% optional, abbreviated authors
+{Huangrui Mo\inst{*}{\scriptsize \\[1.5ex]advised by\\[1.5ex]} {Dr. Fue-Sang Lien\inst{*} \and Dr. Fan Zhang\inst{\dag} \and Dr. Duane Cronin\inst{*}}}
+%\author[H. Mo, F.-S. Lien, F. Zhang, D. S. Cronin]% optional, abbreviated authors
+%{\underline{Huangrui Mo}\inst{*} \and Fue-Sang Lien\inst{*} \and Fan Zhang\inst{\dag} \and Duane S. Cronin}
+
+\institute[]% optional, abbreviated name
+{
+  \inst{*}%
+  Mechanical and Mechatronics Engineering, University of Waterloo
+  \and
+  \inst{\dag}%
+  Defense Research and Development Canada
+}
+
+\date[MME 2018]{MME, 2018}% or simply: \date{\today}
+%\date[IDS 2018]% optional, abbreviated conference name
+%{International Detonation Symposium, 2018}% full conference name
+
+%\logo{\includegraphics[height=0.05\textheight]{logo}}% logo on each slide 
+%\titlegraphic{\vspace*{-0.8cm}\hspace*{+0.8\textwidth}\includegraphics[width=3cm]{logo}}% logo only on title page
+% use \vspace{+ or - ...cm} and \hspace{+ or - ...cm} to adjust the position
+% can also use any field given by \author, \title, \date, \institute, or \tikz to place image in the title page
+\addtobeamertemplate{headline}{}{%
+    \begin{tikzpicture}[remember picture, overlay]
+        \node at([shift={(0.462\paperwidth,-0.024\paperheight)}]current page.north) {\includegraphics[width=1.0cm]{logo}};
+    \end{tikzpicture}
+}
+%---------------------------------------------------------------------------%
+%->> Create titlepage
+%---------------------------------------------------------------------------%
+%- create the title page, \frame[plain]{\titlepage} for a titlepage filling the whole frame.
+{% these braces make the change local to the single frame.
+    \setbeamertemplate{headline}{%
+        \begin{beamercolorbox}[wd=\paperwidth,ht=2.5ex,dp=1.5ex,right]{section in head/foot}%
+        \end{beamercolorbox}%
+    }
+    \setbeamertemplate{footline}{%
+        \leavevmode%
+        \hbox{%
+            \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+            \end{beamercolorbox}%
+            \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+            \end{beamercolorbox}%
+            \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,right]{date in head/foot}%
+            \end{beamercolorbox}}%
+        \vskip0pt%
+    }
+    \begin{frame}[plain]
+        \titlepage%
+        \note{
+            \begin{itemize}
+                \item Good afternoon everyone.
+                \item In the next 15 minutes, I would like to present you my research on the topic "..."
+            \end{itemize}
+        }
+        \begin{tikzpicture}[remember picture, overlay]
+            \node[anchor=center, xshift=0.40\paperwidth, yshift=0.45\paperheight] at (current page.center) {\includegraphics[width=3cm]{logo}};
+        \end{tikzpicture}
+        %\begin{tikzpicture}[remember picture, overlay]
+        %    \node[anchor=center, xshift=0.00\paperwidth, yshift=-0.40\paperheight] at (current page.center) {\includegraphics[width=3cm]{logo}};
+        %\end{tikzpicture}
+        \addtocounter{framenumber}{-1}% modify the counter to exclude a frame from total count
+    \end{frame}%
+}
+%---------------------------------------------------------------------------%
+%->> Outline page
+%---------------------------------------------------------------------------%
+%\section[Outline]{}%
+\begin{frame}[plain]%
+    \frametitle{Outline}%
+    \tableofcontents% may add the option [pausesections]
+    \addtocounter{framenumber}{-1}% modify the counter to exclude a frame from total count
+\end{frame}%
+%---------------------------------------------------------------------------%
+%->> Content centering
+%---------------------------------------------------------------------------%
+%\centering% automatic horizontal centering of frame content
+%---------------------------------------------------------------------------%

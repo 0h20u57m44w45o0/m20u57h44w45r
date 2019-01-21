@@ -1,0 +1,163 @@
+\chapter{Parallel computing}
+
+\section{General concepts}
+
+\subsection{Parallel architecture}
+
+Shared memory and distributed memory are two basic architectures for parallel computers. In the shared memory architecture, multiple processor units share a global memory space accessed via a high-speed memory bus. This global memory space allows the processors to share access to data and efficiently exchange data. However, the number of processors deployed in shared memory architectures is limited by the bandwidth of the memory bus connecting the processors. The distributed memory architecture is essentially a collection of computer nodes working cooperatively to solve a problem. Each node has rapid access to its own local memory, and data are exchanged among nodes via communication network.
+
+\subsection{Decomposition strategy}
+
+Designing a parallel algorithm requires decomposing the problem into a set of smaller problems that are then assigned to different processes to solve simultaneously. Generally, there are two types of problem decompositions.
+
+\subsubsection{Domain decomposition}
+
+In domain decomposition or data parallelism, data are divided into portions of balanced size and then mapped to different processes. Each process works only on the assigned data while communicating periodically with other processes to exchange data. Such strategies are commonly employed in scientific computing where processes are able to operate independently on large portions of data, communicating only the much smaller shared boundary data at each solution step.
+
+To organize parallel calculations, a space decomposition of the domain into nonintersecting parallelepipeds is used. Each of these parallelepipeds is assigned to a specific processor element. The time spent on such exchanges is a loss, and the greater the volume of exchange data, the greater the loss and, hence, the lower the efficiency of the software. The volume of exchange data and, hence, the software efficiency, depends on the domain decomposition geometry. Fig.~\ref{fig:para_mpi_partition_types} shows that the 3D decomposition is the most efficient. This follows from the following well-known fact: among all parallelepipeds with a fixed volume, a cube has the smallest surface area. It is just this decomposition that is used to organize parallel calculations and allows us to achieve maximal software efficiency.
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.6\textwidth]{para_mpi_partition_types}
+    \caption{Domain decomposition types of a 3D domain and their theoretical estimates of acceleration. }
+    \label{fig:para_mpi_partition_types}
+\end{figure}
+
+Primary Domain Decomposition is shown in Fig.~\ref{fig:para_mpi_partition_3d}. A three-dimensional domain decomposition is employed for the field arrays. The number of processors is given as the product $npx*npy*npz$; there are, correspondingly, $npx*npy*npz$ subdomains. Each subdomain spans $ncx/npx$ grid cells in the $x$-direction, $ncy/npy$ grid cells in the $y$-direction, and $ncz/npz$ grid cells in the $z$-direction; where $ncx$ is the number of grid cells in the $x$-dimension of the simulation box, etc. To handle particle and grid operations near the subdomain boundaries, special extra cells called guard cells are employed. It is possible to extend the memory array of the internal grid points to cover the ghost zones on the side faces of the subdomain. However, with three-dimensional domain decomposition, the resultant non-contiguous memory alignment in the ghost zones has to be sent separately and was found to impose quite long time in data transfer. This problem was solved by using contiguous memory buffers for ghost zones so that we are able to copy the data by a single call of memory transfer function.(Idea: use extended memory to cover the ghost zone, but use a contiguous memory buffer for communication, add a local mapping between the extended zone and the buffer zone.) Also, we overlap the communication and computation by using the asynchronous data transfer function and non-blocking MPI functions.
+
+Each processor processes only the particles in its subdomain. That processing includes charge accumulation and force computation. At each timestep, those particles which traverse subdomain boundaries are collected in buffers and sent with as messages to the appropriate neighbor processors. 
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.6\textwidth]{para_mpi_partition_3d}
+    \caption{3D domain decomposition.}
+    \label{fig:para_mpi_partition_3d}
+\end{figure}
+
+\subsubsection{Functional decomposition}
+
+In functional decomposition or task parallelism, which is frequently implemented in a client-server paradigm, a complex and multi-component problem is decomposed by a master process into a set of simpler disjoint tasks that are then allocated to and solved by a group of slave processes. In addition, data parallelism can be employed in divided tasks when necessary.
+
+\subsection{Parallel programming model}
+
+After determining a specific decomposition strategy, the determined strategy requires to be implemented by using a programming model. A programming model is the flow and execution of the data manipulation for an application \citep{bruaset2006numerical}. Historically, two approaches have been adopted to write parallel programs according to the target parallel architectures. One is to use a directives-based data parallel language, such as OpenMP, on shared memory architectures. The other called message passing approach is to use explicit message passing via library calls from standard programming languages on a wide variety of architectures and platforms \citep{dongarra2003sourcebook}. 
+
+\section{Design methodology}
+
+One design methodology for parallel programming is to structure the design process as four stages \citep{ian1995designing}: partitioning, communication, agglomeration, and mapping.
+\begin{enumerate}
+    \item Partitioning. The problem is decomposed into small tasks associated with divided data and computation. The partitioning procedure identifies the opportunities for parallel execution.
+    \item Communication. The communication required for coordinating problem solving and task execution is analyzed and determined. Subsequently, appropriate communication structures and algorithms are defined.
+    \item Agglomeration. The determined task and communication structures are evaluated according to performance and implementation requirements. Tasks are grouped into larger tasks if necessary in order to reduce development costs or improve performance.
+    \item Mapping. Tasks are assigned to processes, specified by static or dynamic load balancing algorithms, in a manner that maximizes processor utilization and minimizes communication costs.
+\end{enumerate}
+
+\subsection{Parallel programming issues}
+
+Several issues requiring to be considered when designing a parallel code in order to obtain the best performance within the constraints of the problem being solved.
+
+\paragraph{Load balancing}
+
+The solving task shall be equally divided and distributed among the available processes since the performance of the code is limited by the slowest process with remaining processes stay in idle.
+
+\paragraph{Minimizing communication}
+
+The total execution time for a process in parallel computing consists of three main components: computation time, idle time, and communication time. Computation time is the time spent performing computations on the data. Idle time is the time a process spends waiting for data from other processes. Finally, communication time is the time for processes to send and receive messages, whose execution cost can be measured by latency and bandwidth. Latency is the time for setting up the communication envelope, and bandwidth is the speed of transmission. The communication time must be minimized to achieve the best performance improvements since serial programs do not have interprocess communication costs.
+
+\paragraph{Overlapping communication and computation}
+
+Overlapping communication and computation involves occupying a process with another task while waiting for completing current communication in order to minimize idle time within processes.
+
+\subsection{Implementation style}
+
+On distributed-memory message-passing systems, the single-program, multiple-data (SPMD) style is frequently employed for implementing the data-parallel programming model. In an SPMD program, data are divided up among memory systems in a manner that each global array is replaced by a collection of local arrays in each memory and scalar variables are typically replicated on all of the processes. The same operation is executed and performed by each process on its corresponding portion of data, and explicit communication must be occupied in order to exchange data between processes \citep{dongarra2003sourcebook}.
+
+A common way to approach the necessary data exchange is to introduce halo data region, also known as ghost cell layers, at subdomain interfaces. Halos replicate the values of neighboring domain boundaries and are updated accordingly when the original values changed. The introduction of halo data simplifies the parallelization since data dependencies among neighboring subdomains are removed during concurrent computation in each subdomain. Depending on the type of data dependencies the halo may consist of a single or more layers.
+
+Fig.~\ref{fig:para_mpi_partition} shows a simple one-dimensional domain partitioning for a two dimensional rectangular grid. It is feasible to combine one-dimensional domain partitioning with an adapted memory layout in which data for one cell layer is contiguously distributed in memory. Therefore, the data of a cell layer is able to be sent from one process to its neighbor without repacking to achieve efficient communication and re-partitioning. It is also viable to use a two-dimensional domain partitioning to obtain a better surface-to-volume ratio of each subdomain and thus less communication. However, communication complexity and frequency are subsequently increased as compensation due to that more domain interfaces are created.
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.6\textwidth]{para_mpi_partition}
+    \caption{Example of a one-dimensional domain partitioning for a two dimensional rectangular grid \citep{bruaset2006numerical}.}
+    \label{fig:para_mpi_partition}
+\end{figure}
+
+A communication structure for data parallelism with a nine-point stencil numerical algorithm is illustrated in Fig.~\ref{fig:para_mpi_communicate}. If communication for the exchange of halo data occupies a significant contribution to the overall computing time, then communication can be overlapped with computation to improve performance. This may be accomplished by updating cells that are halos of neighbouring subdomains first and then data of these cells are sent simultaneously while computing the remaining cells in the interior of each subdomain.
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.6\textwidth]{para_mpi_communicate}
+    \caption{Communication structure for data parallelism with a nine-point stencil numerical algorithm \citep{dongarra2003sourcebook}.}
+    \label{fig:para_mpi_communicate}
+\end{figure}
+
+In summary, data parallelism leads to the parallel program that consists of a loop over iterations divided into two phases.
+\begin{enumerate}
+    \item Communicate. At the start of each iteration, each subdomain communicate with neighbouring subdomains to update halo data.
+    \item Compute. Each subdomain update data values concurrently without the need to synchronize with others.
+\end{enumerate}
+
+\subsection{Dynamic load balancing scheme}
+
+The efficiency of parallel solution for scientific computing is highly related to the distribution of data among cooperating processes, which is generally accomplished by a data-partitioning procedure. Partitioning approaches attempt to distribute computational work equally while minimizing interprocess communication costs. In applications with constant workloads, a pre-computed static partition can be used throughout the computation. In other applications with unpredictable or changing workloads during computation, such as adaptive mesh refinement methods, dynamic load balancers that adjust the decomposition as the computation proceeds are required for load balancing \citep{bruaset2006numerical}.
+
+\paragraph{Global load balancing.} A master node performs a global re-partitioning of the domain according to the performance and load data of all processes. This provides fast adaptation to large-scale load changes with a considerable overhead for global communication and re-partitioning as compensation.
+
+\paragraph{Local load balancing.} Starting from an initial balanced domain partitioning, each process measures the waiting time for halo data updating during communication phase. When the waiting time successively exceeds a given threshold for a certain number of iteration steps, a layer of cells of the overloaded process is shifted to the waiting process. Therefore, any deviation from a balanced computational load will be compensated within a few iteration steps. This scheme is applicable for slow and diffusive load changes and avoids costly global re-partitioning and communication.
+
+\subsection{Parallel input/output}
+
+The parallel I/O problem is multifaceted and often quite complex. This is due to the need to deal with issues at multiple levels. The parallel programmer can take two different approaches to achieving concurrency in I/O operations. One approach is for each process to perform read and write operations to a distinct file. While simple, this approach has significant disadvantages: programs cannot easily be restarted on different numbers of processors, the underlying file system has little information on which to base optimization decisions, and files are not easily shared with other programs. In general, it is preferable to perform true parallel I/O operations which allow all processes to access a single shared file.
+
+\section{Practice}
+
+With a parallel program, there can also be a positive effect, offsetting some of the performance loss caused by sequential code and the various overheads. This is because a parallel program has more aggregate cache capacity at its disposal, since each thread will have some amount of local cache. This might result in a superlinear speedup: the speedup exceeds the number of processors used.
+
+\citet{amritkar2012openmp}:
+
+In order to exploit the flexibility of OpenMP in parallelizing large scale multi-physics applications where different modes of parallelism are needed for efficient computation, it is first necessary to be able to scale OpenMP codes as well as MPI on large core counts. It is shown that in irregular multiphysics applications which do not adhere solely to the SPMD (Single Process, Multiple Data) mode of computation, as encountered in tightly coupled fluid-particulate systems, the flexibility of OpenMP can have a big performance advantage over MPI.
+
+MPI has provided scalability on large applications by forcing data locality. Data locality together with SPMD style programming using spatial decomposition has been a very successful model for high-end computing.
+
+The often quoted drawback of MPI is the high programming, development, and maintenance costs. Additionally, a major drawback stems from what gives MPI its strength - explicit array partitioning. Within this framework, any parallelism which deviates from this model incurs additional costs. In engineering computations, one example is dispersed two phase flow in which solid particles are individually tracked in a fluid domain. The particle distribution is a function of the physical attributes of the solid-fluid system and could well lead to all particles accumulating on a few processors leading to severe load imbalances. Similar irregularities exist in a number of multi-physics applications (Eulerian--Lagrangian two-phase flows, gasdynamical cosmological simulations to name a few) in which the explicit data partitioning becomes inefficient.
+
+OpenMP directives are easy to implement, and can be used for incremental parallelism in a serial application. It is more flexible than MPI in that it lends itself to different types of parallelism. It can exploit SPMD type parallelism (similar to that in MPI), functional parallelism, and task parallelism in a single program unit and is not tied down to any single mode. For instance in the above example, in an OpenMP code, the fluid domain could be parallelized using a domain decomposition style of programming similar to what would be used in an MPI decomposition, whereas N-body parallelism could be used for the dispersed phase. Undoubtedly, OpenMP is more suitable for dynamic irregular applications. However, it has not seen widespread use in high-end HPC applications because of its inability to scale to a large number of processors and also, to a large extent, the lack of portability (re-compile and run) across distributed clusters.
+
+The current work is motivated by the flexibility afforded by OpenMP in multiphysics applications where the physics does not permit a single mode of parallelism, but dictates the use of multiple modes for optimal parallel efficiency. The solution of grid based field equations like the Navier-Stokes equations maps to the spatial decomposition mode of parallelism, whereas discrete N-body type of computations maps to the discrete particle numbers. When both are combined in a single multiphysics code, spatial decomposition type parallelism is not an efficient choice for parallelizing the N-body problem. In such situations OpenMP is more flexible with less overhead in changing from one mode of parallelism to the other, if OpenMP can be made to efficiently scale to a large number of processors. Thus, the objective of this paper is to parallelize a large production CFD code (100,000 lines) with OpenMP and show that its scalability can match that of MPI over O(100) processors.
+
+The overlapping multiblock framework used in GenIDLEST provides a natural framework for parallelization. The degree of overlap between adjoining blocks in GenIDLEST is dictated by the order of spatial discretization used and is one computaional cell wide. This offers the framework within which independent computations can be performed in each block, provided that the ghost cell has been updated at inter-block boundaries by a suitable data transfer from the adjoining block.
+
+The most important performance issue encountered was that of process/thread and data placement. Keeping the data local to the core gave vastly improved performance. On SGI Altix systems, the data placement was done by the first touch placement policy. According to the policy, the data is placed within a node that contains that core which allocates and initializes the memory block first. Hence, the initialization of all arrays is performed in parallel such that each core ini- tializes data that it is likely to access later for calculation. This configuration ensures that the data is placed where it is most frequently accessed. This is supplemented with the ‘‘dplace'' option during runtime which ensured thread affinity to a particular processor for the duration of the run.
+
+In fluid particulate systems (e.g. circulating fluidized beds (CFBs), rotary kilns, and pneumatic transport) particles are often heavily concentrated in a small part of the full computational domain. In these applications, the spatially decomposed fluid field is calculated in an Eulerian framework, while the particles are treated in a Lagrangian framework. Since the particles are tracked individually in the Lagrangian framework, data associated with each particle (location, mass, properties, velocities, temperatures) needs to be communicated from one fluid domain to the next as they traverse the computation domain.
+
+If the workload associated with these particles is large, as is often the case, then treating them in the domain decomposition framework of MPI can lead to severe load imbalances and inefficiencies. In these systems, while the data structure of the fluid field variables map to the domain decomposed framework, the particle data structure maps to particle number. In the OpenMP framework, by parallelizing the discrete phase computational loops over the total number of particles and not over the computational grid, the workload can be evenly distributed across all the threads in OpenMP. Whereas in MPI, only those cores on which the particles exist can be used for particle related computations. To parallelize the particulate phase uniformly in the MPI framework, all particle data (which includes fluid field data at particle location) needs to be gathered onto a single processor in order to evenly scatter the particle workload across all the processors. After the particulate phase calculations are performed, the particle data again needs to be gathered and scattered to perform the fluid field calculation, which depends on spatial particle concentration. Thus, at every fluid time step, the entire data structure has to be reshuffled twice. This method of dealing with the discrete phase in the MPI framework leads to large overheads and inefficiencies, to the extent of making the parallelization futile. Other alternate strategies can be devised, but which would be equally com- plex with large overheads, particularly when the two phases are tightly coupled and interdependent. Hence, in such cases OpenMP has a clear advantage over MPI, in spite of some inefficiency introduced by the non-locality of fluid data which the particles require for their computations. The mismatch in data locality arises because the fluid flow data is distributed by first touch based on the domain decomposition, whereas the particles are distributed by first touch based on particle number. However, the relatively large amount of work done on the dense particulate phase offsets the remote memory access costs associated with the fluid data.
+
+The paper describes parallelization strategies for the Discrete Element Method (DEM) used for simulating dense particulate systems coupled to Computational Fluid Dynamics (CFD).  While the field equations of CFD are best parallelized by spatial domain decomposition techniques, the N-body particulate phase is best parallelized over the number of particles.
+
+Just like ghost cells or overlap regions are required for the parallel solution of the fluid equations, similarly, the calculation of collision forces requires a list of ghost or halo particles (particles from neighboring processor in parallel computing environment) at each time step. Since particle locations are dynamic, the list has to be constructed at each time step.
+
+For parallelization, the solution of grid based field equations like the Navier–Stokes equations is best mapped to the spatial decomposition mode of parallelism, whereas discrete N-body type of computations is best mapped to discrete particle numbers. Thus when grid based methods have to interface with N-body methods in a tightly coupled frame- work, careful consideration has to be given to the mode of parallelism used in the calculation for optimal performance. There are various algorithms to accelerate parallel N-body calculations of which the most common are mirror domain technique, particle subset method and domain decomposition. In the mirror domain technique each CPU has a copy of all the particle data but only works on part of it. The advantage of this method is that there is no communication during computations but it has large memory foot print. The particle subset method involves an even distribution of particle workload amongst CPUs. This method has ideal load balancing at the cost of data communication during computations. For the domain decomposition based parallelization method, spatial decomposition of the computational domain is performed irrespective of number of particles in each domain. This method is easy to implement but does not address load balancing issues when they exist.
+
+To summarize, there have been various attempts to combine the domain decomposition strategy with N-body simulation for efficient parallelization of E–L type systems but with limited success. All previous efforts have been fundamentally limited by the static nature of MPI decomposition and the high cost of implementing dynamic modes of parallelism into this framework. Thus, the current work is motivated by the flexibility afforded by OpenMP.
+
+CFD-DEM coupling algorithm
+
+At the start of a time step, first the fluid velocity field and temperature are advanced in time using a fractional-step method with void fractions and interphase exchange terms calculated at the new particle locations from the previous time step. The discrete phase calculation is then invoked using the following steps which are applicable in domain decomposed framework:
+
+1. Locate particles with known ( x , y , z ) coordinates by assigning them ( i , j , k ) values on the background grid of each block. During this step, particles which have traveled to another block or processor and cannot be found are packed and sent to the appropriate neighboring block and/or processor to which they have moved.
+
+2. Particles which lie in overlap or ghost cells in blocks are exchanged between adjoining blocks to construct a list of ghost particles on each processor. The ghost particles are used to construct the neighbor list for collision force and inter-particle heat transfer calculation.
+
+3. The neighbor list of colliding particles is constructed by binning the particles in individual particle cells and then cycling through all particles in neighboring cells to identify overlapping or colliding particles.
+
+4. Fluid velocity and temperature are interpolated from the fluid grid to particle locations for calculation of interphase momentum and energy transfer.
+
+5. Particle–particle collision forces and particle–wall collision forces and heat transfer are calculated based on the soft sphere model.
+
+6. Other forces characterizing interphase drag and energy transfer and gravitational forces are calculated.
+
+7. Particle acceleration is calculated and new particle ( x , y , z ) locations are calculated.
+
+8. Interphase momentum and energy terms are transferred to the fluid grid for inclusion in the fluid momentum and energy equations respectively.
+
+9. Void fractions are calculated on the particle grid and transferred to the fluid grid for inclusion in the fluid momentum and energy equations.
+
+My thought: use the field function to adopt domain decomposition type parallelization for particle phase. Mesoscale parallelization is more challenge that DEM.

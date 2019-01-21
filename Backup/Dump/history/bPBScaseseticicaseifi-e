@@ -1,0 +1,140 @@
+#!/bin/bash
+set -e
+
+#- directory hierarchy
+dir_work="$(pwd)"
+dir_base="base"
+dir_data="data"
+dir_tmp="tmp"
+
+idx_key_a_min=1
+idx_key_a_max=4
+idx_sub_key_min=1
+idx_sub_key_max=3
+fmt_sub_key="%03g"
+key_a[1]="L1_"
+key_a[2]="L2_"
+key_a[3]="L3_"
+key_a[4]="L4_"
+
+n_dir_a=0
+for i in $(seq -w $idx_key_a_min $idx_key_a_max)
+do
+    for j in $(seq -f $fmt_sub_key $idx_sub_key_min $idx_sub_key_max)
+    do
+        n_dir_a=$((n_dir_a + 1))
+        dir_a[$n_dir_a]="${key_a[$i]}$j"
+        echo "case list: ${dir_a[$n_dir_a]}"
+    done
+done
+
+idx_key_b_min=1
+idx_key_b_max=3
+dir_b[1]="B1" # primary case
+dir_b[2]="B2"
+dir_b[3]="B3"
+
+idx_key_c_min=1
+idx_key_c_max=3
+dir_c[1]="C1"
+dir_c[2]="C2" # primary case
+dir_c[3]="C3"
+
+#- modification file list
+f_a="artracfd.cas"
+f_b="artracfd.geo"
+
+#- modification string
+str_num_ana="strnumana"
+str_sta_ana="sphere state begin"
+
+#- corresponding modification substitution for dir[n] and vstr[n]
+str_a="strtime"
+vstr_a[1]="" # [L1: 2.970e-05, L2: 4.031e-05, L3: 4.455e-05, L4: 6.505e-05]
+vstr_a[2]="" # [L1: 2.100e-05, L2: 2.850e-05, L3: 3.150e-05, L4: 4.600e-05]
+vstr_a[3]="" # [L1: 1.328e-05, L2: 1.803e-05, L3: 1.992e-05, L4: 2.909e-05]
+str_b="strpre"
+vstr_b[1]="5066250000"
+vstr_b[2]="10132500000"
+vstr_b[3]="25331250000"
+str_c="1e-100, 0, 0, 2"
+vstr_c[1]="1e-100, 0, 0, 0"
+vstr_c[2]="1e-100, 0, 0, 2"
+vstr_c[3]="1e-100, 0, 0, 4"
+
+#- submission script
+f_sh="slurm_omp.sh"
+
+#- preliminary check
+if [[ -z "$(ls "$dir_base")" ]]; then
+    echo "error: $dir_base should contain $f_a, $f_b, and $f_sh..."
+    exit
+fi
+if [[ -z "$(ls "$dir_data")" ]]; then
+    echo "error: $dir_data should contain raw data for $f_b..."
+    exit
+fi
+
+#- operation
+for i in $(seq 1 $n_dir_a)
+do
+    if [[ -d "${dir_a[$i]}" ]]; then
+        echo "error: case directory already exists..."
+        exit
+    fi
+    #- prepare case file for main class
+    ptr_case="$dir_data"/"${dir_a[$i]}"
+    sed -i '/#/d' "$ptr_case"
+    sed -i 's/  */ /g' "$ptr_case"
+    num_case=$(wc -l "$ptr_case" | awk '{print $1}')
+    num_case=$((num_case / 2))
+    if [[ -d "$dir_tmp" ]]; then
+        rm -rf "$dir_tmp"
+    fi
+    cp -r "$dir_base" "$dir_tmp"
+    sed -i "s/$str_num_ana/$num_case/g" "$dir_tmp"/"$f_b"
+    sed -i -e "/$str_sta_ana/r $ptr_case" "$dir_tmp"/"$f_b"
+    #- corresponding modification substitution for subclass
+    if [[ -n $(echo "${dir_a[$i]}" | grep "${key_a[1]}") ]]; then 
+        vstr_a[1]="2.970e-05"
+        vstr_a[2]="2.100e-05"
+        vstr_a[3]="1.328e-05"
+    else
+        if [[ -n $(echo "${dir_a[$i]}" | grep "${key_a[2]}") ]]; then 
+            vstr_a[1]="4.031e-05"
+            vstr_a[2]="2.850e-05"
+            vstr_a[3]="1.803e-05"
+        else
+            if [[ -n $(echo "${dir_a[$i]}" | grep "${key_a[3]}") ]]; then 
+                vstr_a[1]="4.455e-05"
+                vstr_a[2]="3.150e-05"
+                vstr_a[3]="1.992e-05"
+            else
+                vstr_a[1]="6.505e-05"
+                vstr_a[2]="4.600e-05"
+                vstr_a[3]="2.909e-05"
+            fi
+        fi
+    fi
+    for j in $(seq -w $idx_key_b_min $idx_key_b_max)
+    do
+        mkdir -p "${dir_a[$i]}"/"${dir_b[$j]}"
+        for k in $(seq -w $idx_key_c_min $idx_key_c_max)
+        do
+            dir_cur="${dir_a[$i]}"/"${dir_b[$j]}"/"${dir_c[$k]}"
+            cp -r "$dir_tmp" "$dir_cur"
+            sed -i "s/$str_a/${vstr_a[$j]}/g" "$dir_cur"/"$f_a"
+            sed -i "s/$str_b/${vstr_b[$j]}/g" "$dir_cur"/"$f_a"
+            sed -i "s/$str_c/${vstr_c[$k]}/g" "$dir_cur"/"$f_b"
+            #sed -i '/--time=/c\#SBATCH --time=07-00:00' "$dir_cur"/"$f_sh"
+            #sed -i '/--mem=/c\#SBATCH --mem=0' "$dir_cur"/"$f_sh"
+            cd "$dir_cur"
+            echo "dir: "$(pwd)""
+            #sbatch "$f_sh"
+            #sleep 1s
+            echo "$f_sh"
+            cd "$dir_work"
+        done
+    done
+done
+

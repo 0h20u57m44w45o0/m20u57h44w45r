@@ -1,0 +1,57 @@
+#include <omp.h> /* parallel header file */
+#include <stdio.h>
+
+int main (int argc, char* argv[])
+{
+    /*
+     * Going through critical region excessively
+     */
+    #pragma omp parallel for
+    for (int i = 0; i < N; ++i) {
+        #pragma omp critical
+        {
+            if (arr[i] > max) {
+                max = arr[i];
+            }
+        }
+    }
+    /*
+     * A slightly improved version for entering critical region less ofthen
+     */
+    #pragma omp parallel for
+    for (int i = 0; i < N; ++i) {
+        #pragma omp flush (max)
+        if (arr[i] > max) {
+            #pragma omp critical
+            {
+                if (arr[i] > max) {
+                    max = arr[i];
+                }
+            }
+        }
+    }
+    /*
+     * A correct implementation
+     */
+    #pragma omp parallel
+    {
+        int priv_max;
+        #pragma omp for
+        for (int i = 0; i < N; ++i) {
+            if (arr[i] > priv_max) {
+                priv_max = arr[i];
+            }
+        }
+        #pragma omp flush (max)
+        if (priv_max > max) {
+            #pragma omp critical
+            {
+                if (priv_max > max) {
+                    max = priv_max;
+                }
+            }
+        }
+    }
+    return 0;
+}
+

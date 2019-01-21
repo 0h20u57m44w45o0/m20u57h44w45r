@@ -1,0 +1,169 @@
+#!/bin/bash
+set -e
+
+#- operation
+optr=0
+
+#- directory hierarchy
+dir_work="$(pwd)"
+dir_base="base"
+dir_data="data"
+dir_tmp="tmp"
+
+idx_key_a_min=1
+idx_key_a_max=3
+idx_sub_key_min=1
+idx_sub_key_max=10
+fmt_sub_key="%03g"
+key_a[1]="L1_"
+key_a[2]="L2_"
+key_a[3]="L3_"
+
+n_dir_a=0
+for i in $(seq -w $idx_key_a_min $idx_key_a_max)
+do
+    for j in $(seq -f $fmt_sub_key $idx_sub_key_min $idx_sub_key_max)
+    do
+        n_dir_a=$((n_dir_a + 1))
+        dir_a[$n_dir_a]="${key_a[$i]}$j"
+        #echo "case list: ${dir_a[$n_dir_a]}"
+    done
+done
+
+if [[ $optr -eq 0 ]]; then
+    echo "warning: operator optr is not specified..."
+fi
+
+#- mirror case
+if [[ $optr -eq 1 ]]; then
+f_a[1]="L1_1"
+f_a[2]="L2_1"
+f_a[3]="L3_1"
+for i in $(seq 1 $n_dir_a)
+do
+    if [[ -n $(echo "${dir_a[$i]}" | grep "${key_a[1]}") ]]; then 
+        cp "${f_a[1]}" "${dir_a[$i]}"
+    else
+        if [[ -n $(echo "${dir_a[$i]}" | grep "${key_a[2]}") ]]; then 
+            cp "${f_a[2]}" "${dir_a[$i]}"
+        else
+            cp "${f_a[3]}" "${dir_a[$i]}"
+        fi
+    fi
+done
+fi
+
+#- rename case via search and extract numbers from strings of names
+if [[ $optr -eq 2 ]]; then
+f_key="omega"
+for file in $(ls *"$f_key"*)
+do
+    nums="$(echo -e "$file" | tr '\n' ' ' | sed -e 's/[^0-9]/ /g' -e 's/^ *//g' -e 's/ *$//g' | tr -s ' ')"
+    i=$(echo "$nums" | awk '{print $1}')
+    j=$(echo "$nums" | awk '{print $2}')
+    printf -v var "%03d" $j
+    mv "$file" "${key_a[$i]}$var"
+done
+fi
+
+#- rename case via prescription
+if [[ $optr -eq 3 ]]; then
+f_pre="omega-l"
+f_suf="_rand-"
+for i in $(seq $idx_key_a_min $idx_key_a_max)
+do
+    for j in $(seq $idx_sub_key_min $idx_sub_key_max)
+    do
+        printf -v var "%03d" $j
+        mv "$f_pre"$i"$f_suf""$j" "${key_a[$i]}$var"
+    done
+done
+fi
+
+#- search and modify
+if [[ $optr -eq 4 ]]; then
+dir_list="" #- specify directory list
+dir_list="$(ls)" #- search directory list
+dir_key="L"
+dir_data="data_collector"
+f_sh="slurm_omp.sh"
+pv_cmd="pvbatch"
+pv_sci="pv_random_jet.py"
+pv_str_cas="casefilepath"
+pv_str_fig="figfilepathname"
+mkdir -p "$dir_data"
+for dir in $(echo $dir_list)
+do
+    if [[ ! -d "$dir" || -z "$(echo "$dir" | grep "$dir_key")" ]]; then
+        echo "warning: $dir is not a directory or not valid and is skipped..."
+        continue
+    fi
+    cd "$dir"
+    for sdir in $(ls)
+    do
+        if [[ ! -d "$sdir" ]]; then
+            echo "warning: $sdir is not a directory and is skipped..."
+            continue
+        fi
+        cd "$sdir"
+        for ssdir in $(ls)
+        do
+            if [[ ! -d "$ssdir" ]]; then
+                echo "warning: $ssdir is not a directory and is skipped..."
+                continue
+            fi
+            cd "$ssdir"
+            #-------------------- operations ------------------
+            dir_cur="$(pwd)"
+            echo "dir: $dir_cur"
+            #- modify case settings
+            #sed -i '/--time=/c\#SBATCH --time=07-00:00' "$f_sh"
+            #sed -i '/--mem=/c\#SBATCH --mem=0' "$f_sh"
+            #rm geo*
+            #rm field*
+            #sed -i '/termination time/c\0.00015 # termination time' "artracfd.cas"
+            #sed -i 's/10132500000/25331250000/g' "artracfd.cas"
+            #sed -i 's/1e-100, 0, 0, 2/1e-100, 0, 0, 4/g' "artracfd.geo"
+            #sbatch "$f_sh"
+            #sleep 5s
+            #- set names
+            if [[ ! -f "field.case" ]]; then
+                echo "warning: $ssdir has no data and is skipped..."
+                cd ..
+                continue
+            fi
+            fname=${dir_cur/"$dir_work/"/} # remove prefix path
+            fname=${fname//"/"/-} # replace all / with -
+            fnum=$(grep 'number of steps' "field.case" | awk '{print $4}')
+            fnum=$((fnum - 1))
+            printf -v var "%05d" $fnum
+            fsrc="geo_sph"$var".state"
+            fder="$fname"_"$var"
+            #- collect data files
+            cp "$fsrc" "$dir_work"/"$dir_data"/"$fder"_"$fsrc"
+            cp "field.case" "$dir_work"/"$dir_data"/"$fname"_"field.case"
+            if [[ -n "$(grep 'nan' "$fsrc")" ]]; then
+                echo "warning: $fsrc -> $fder contains 'nan'..." >> "$dir_work"/"$dir_data"/"nan_list"
+            fi
+            mkdir "$dir_work"/"$dir_data"/"$fname"
+            cp *.state "$dir_work"/"$dir_data"/"$fname"/
+            #- postprocess data
+            cp "$dir_work"/"$dir_base"/"$pv_sci" ./
+            sed -i "s:$pv_str_cas:$dir_cur:g" "$pv_sci"
+            ffig="$dir_work"/"$dir_data"/"$fder"
+            sed -i "s:$pv_str_fig:$ffig:g" "$pv_sci"
+            cp "field.case" "field.bak"
+            cp "geo_sph.case" "geo_sph.bak"
+            cp "field"$var".case" "field.case"
+            cp "geo_sph"$var".case" "geo_sph.case"
+            $pv_cmd "$pv_sci"
+            cp "field.bak" "field.case"
+            cp "geo_sph.bak" "geo_sph.case"
+            #---------------------------------------------------
+            cd ..
+        done
+        cd ..
+    done
+    cd ..
+done
+fi

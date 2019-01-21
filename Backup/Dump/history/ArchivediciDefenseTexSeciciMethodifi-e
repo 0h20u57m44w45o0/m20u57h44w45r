@@ -1,0 +1,318 @@
+%---------------------------------------------------------------------------%
+\section{Research design and methodology}
+%---------------------------------------------------------------------------%
+\subsection{Numerical framework}
+%---------------------------------------------------------------------------%
+\begin{frame}[fragile]
+    \frametitle{A numerical framework: governing equations and discretization}
+    \centering
+    \begin{tikzpicture}[scale=1]
+        \begin{scope}[
+                grow=down, font=\normalsize, 
+                every node/.style={scale=1, text ragged, inner sep=2mm},
+                sa/.style={rectangle, rounded corners, draw=black!40, very thick},
+                sb/.style={text width=2cm, text centered, sloped, above},
+                edge from parent/.style={draw=black!40, very thick},
+                edge from parent path={(\tikzparentnode.south) -- (\tikzchildnode.north)},
+                level 1/.style={sibling distance=6cm, level distance=3.0cm},
+                level 2/.style={sibling distance=3.5cm, level distance=3.0cm}
+            ]
+            \node[sa] {FSI: $\Vector{U}^{n+1} = \Soptr_{\Des{s}}(\frac{\Delta t}{2})\Soptr_{\Des{f}}(\frac{\Delta t}{2})\Soptr_{\Des{f}}(\frac{\Delta t}{2})\Soptr_{\Des{s}}(\frac{\Delta t}{2}) \Vector{U}^n$}
+            child [level distance=4.0cm] {
+                node [sa] [rectangle split, rectangle split parts=5, text ragged] {
+                    $\frac{\partial \Vector{U}}{\partial t} = \Loptr_{\Des{c}}\Vector{U} + \Loptr_{\Des{d}}\Vector{U}$
+                    \nodepart{two} {$\Loptr_{\Des{c}}\Vector{U}$: $3$rd/$5$th WENO}
+                    \nodepart{three} {$\Loptr_{\Des{d}}\Vector{U}$: $2$nd CD}
+                    \nodepart{four} {$\frac{\partial \Vector{U}}{\partial t}$: $2$nd/$3$rd SSP RK}
+                    \nodepart{five} {BC: An IBM}
+                }
+                edge from parent {node [sb] {$\Soptr_{\Des{f}}$}}
+            }
+            child [level distance=2.5cm] {
+                node [sa] {Kinetics $+$ Collision}
+                child {
+                    node [sa] [rectangle split, rectangle split parts=3, text ragged] {
+                        $\frac{\mathrm{d} \Vector{U}}{\mathrm{d} t} = \Vector{\Phi}$
+                        \nodepart{two} {$\Vector{\Phi}$: $\frac{1}{m}\int\limits_{\partial\Omega} \unitVector{n} \cdot \Tensor{\sigma} \, \mathrm{d}S$}
+                        \nodepart{three} {$\frac{\mathrm{d} \Vector{U}}{\mathrm{d} t}$: $2$nd RK}
+                    }
+                    edge from parent{node [sb] {$\Soptr_{\Des{k}}$}}
+                }
+                child {
+                    node [sa] [rectangle split, rectangle split parts=2, text ragged, text width=2.5cm] {
+                        Detection: A field function
+                        \nodepart{two} {Response: A multibody collision model}
+                    }
+                    edge from parent{node [sb] {$\Soptr_{\Des{c}}$}}
+                }
+                edge from parent {node [sb] {$\Soptr_{\Des{s}}$}}
+            };
+        \end{scope}
+    \end{tikzpicture}
+
+    \begin{tikzpicture}[remember picture, overlay]
+        \node [anchor=south east, inner sep=0pt, text width=4cm] at (0.50\paperwidth,0.59\paperheight) {%
+            {\raggedright\tiny \textsc{Source:} \fullcite{mo2018numerical}\par}
+        };
+    \end{tikzpicture}
+
+    \note{
+        \begin{itemize}
+            \item This slide summarizes the main governing equations and numerical discretizations.
+            \item Strang splitting is used to obtain a partitioned fluid-solid interaction algorithm.
+            \item The fluid dynamics is govern by the Navier-Stokes equations. Time integration is conducted using the 2nd/3rd order SSP RK schemes, the convective fluxes are discretized using the 3rd/5th order WENO schemes, and the diffusive fluxes are discretized using a $2$nd order central difference scheme.
+            \item For solid dynamics, the kinetics of particles is governed by the equation system comprising the Newton's second law of translational motion and the Euler equations of rotational motion. The time integration is done using a $2$nd RK scheme. The source vector mainly involves surface force integration. The collision process includes collision detection and collision response.
+        \end{itemize}
+    }
+\end{frame}
+%---------------------------------------------------------------------------%
+\begin{frame}[fragile]
+    \frametitle{Interface description and domain discretization}
+    \begin{center}
+        \includegraphics[trim = 00mm 10mm 00mm 10mm, clip, width=.90\textwidth]{cartesian_domain_demo}
+    \end{center}
+
+    \note{
+        \begin{itemize}
+            \item Currently, the solid particles are treated as rigid bodies.
+            \item Interface description and evolution are conducted using the front-tracking method. Therefore, interfaces are explicitly tracked via individual Lagrangian grids such as triangulated facets, and the evolution of interfaces is governed by the laws of solid motion.
+            \item To deal with dynamic phase interfaces in the computational domain, a Cartesian grid rather than a body-conformal grid is used for domain discretization.
+        \end{itemize}
+    }
+\end{frame}
+%---------------------------------------------------------------------------%
+\subsection{Field function}
+%---------------------------------------------------------------------------%
+\begin{frame}[fragile]
+    \frametitle{Multidomain problem}
+    \centering
+    \begin{center}
+        \includegraphics[trim = 00mm 10mm 00mm 10mm, clip, width=.90\textwidth]{n_domain_basis_demo}
+    \end{center}
+
+    \medskip
+
+    \begin{itemize}
+        \item $\{\Omega_p: \ p = 0, \dotsc, P\}$: a set of polyhedron domains.
+    \end{itemize}
+
+    \note{
+        \begin{itemize}
+            \item We have a Cartesian-grid-discretized computational domain segmented by a set of solid bodies.
+            \item Thus, classifying the ownership of computational nodes and identifying numerical boundaries are prerequisites for numerical discretization implementation and interface condition enforcement.
+            \item This node classification and boundary identification procedure regarding multiple solids is referred to as a multidomain node mapping problem herein.
+        \end{itemize}
+    }
+\end{frame}
+%---------------------------------------------------------------------------%
+\begin{frame}[fragile]
+    \frametitle{A field function: single-integer-based multidomain node mapping}
+    \centering
+    \begin{center}
+        \includegraphics[trim = 00mm 10mm 00mm 10mm, clip, width=.90\textwidth]{n_domain_demo}
+    \end{center}
+
+    $\Vector{\Phi} = \{(\phi, \varphi): \phi \in \{0, \dotsc, P\}, \varphi \in \{0, \dotsc, R\}\}$, $\Phi = \phi + \varphi * (P+1)$
+
+    \medskip
+
+    \begin{itemize}
+        \item $\phi$: domain identifier, represented by geometric shapes.
+        \item $\varphi$: interfacial layer identifier, represented by colors.
+    \end{itemize}
+
+    \note{
+        \begin{itemize}
+            \item To solve this multidomain node mapping problem, we introduce a two-component field function to link each node with its polyhedron domain and the interfacial layer that it locates.
+            \item For a computational node $(i,j,k)$, $\phi_{i,j,k}$ provides the domain inclusion state of the node, and $\varphi_{i,j,k}$ gives the interfacial state of the node. 
+            \item For a computational domain segmented by a set of solid bodies, the proposed field function $\Vector{\Phi}(\phi,\varphi)$ explicitly tracks each subdomain with multiple layers of interfacial nodes.
+            \item Therefore, it is straightforward to enforce designated governing equations, constitutive models, numerical schemes, and interface conditions for each subdomain.
+            \item Compared with signed distance and traditional binary mapping integer functions, the memory cost is only a single integer field and is independent from the number of particles.
+        \end{itemize}
+    }
+\end{frame}
+%---------------------------------------------------------------------------%
+\begin{frame}[fragile]
+    \frametitle{A field function: efficient node remapping}
+    \centering
+    \begin{center}
+        \includegraphics[trim = 00mm 10mm 00mm 10mm, clip, width=.90\textwidth]{node_remapping_demo}
+    \end{center}
+
+    $\Vector{\Phi} = \{(\phi, \varphi): \phi \in \{0, \dotsc, P\}, \varphi \in \{0, \dotsc, R\}\}$, $\Phi = \phi + \varphi * (P+1)$
+
+    \medskip
+
+    \begin{itemize}
+        \item $\phi$: domain identifier, represented by geometric shapes.
+        \item $\varphi$: interfacial layer identifier, represented by colors.
+    \end{itemize}
+
+    \note{
+        \begin{itemize}
+            \item During the solution process, when the positions of the polyhedrons are changeable, the requirement for node remapping arises.
+            \item If the stability condition restricts the value of travelling distance to no more than one grid size, and the maximum number of identified interfacial layers has $R \ge 2$, one can safely assume that a node $(i,j,k)$ with $\Vector{\Phi}_{i,j,k}(\phi=p,\varphi=0)$ in $\Omega_p^n$ will remain in $\Omega_p^{n+1}$ and then only reset the interfacial nodes.
+            \item As a result, nodes with $\Vector{\Phi}_{i,j,k}(\phi=p,\varphi=0)$ can be exempted from future point-inclusion tests.
+            \item As volume nodes are exempted, and only interfacial nodes need to be recomputed, this enables efficient node remapping.
+        \end{itemize}
+    }
+\end{frame}
+%---------------------------------------------------------------------------%
+\begin{frame}[fragile]
+    \frametitle{A field function: linear-time collision detection $+$ response}
+    \centering
+    \begin{center}
+        \includegraphics[trim = 00mm 10mm 00mm 10mm, clip, width=.90\textwidth]{n_domain_collide_demo}
+    \end{center}
+
+    $\unitVector{e}_{pn} = \frac{\sum^{C}_{c=1}\sum^{D}_{d=1} [(i'_d - i_c)\unitVector{e}_1 + (j'_d - j_c)\unitVector{e}_2 + (k'_d - k_c)\unitVector{e}_3]}{|\sum^{C}_{c=1}\sum^{D}_{d=1} [(i'_d - i_c)\unitVector{e}_1 + (j'_d - j_c)\unitVector{e}_2 + (k'_d - k_c)\unitVector{e}_3]|}$
+
+    \medskip
+
+    $\Delta \Vector{V}_{p,n}' = - \frac{m_n}{m_p+m_n} (1+C_{\Des{R}}) (\Vector{V}_{pn} \cdot \unitVector{e}_{pn}) \unitVector{e}_{pn} - C_{\Des{f}} [\Vector{V}_{pn} - (\Vector{V}_{pn} \cdot \unitVector{e}_{pn}) \unitVector{e}_{pn}]$
+
+    \medskip
+
+    $\Vector{V}_p' = \Vector{V}_p + \sum_{n=1}^{N} \Delta \Vector{V}_{p,n}'$
+
+    \note{
+        \begin{itemize}
+            \item Line of impact.
+            \item Exact pairwise collision for velocity changes.
+            \item Vector summation of the pre-collision velocity and velocity changes.
+            \item Sweep each particle, and update the system simultaneously.
+        \end{itemize}
+    }
+\end{frame}
+%---------------------------------------------------------------------------%
+\begin{frame}[fragile]
+    \frametitle{A field function: expedient surface force integration}
+    \begin{columns}
+        \begin{column}{.48\textwidth}
+            \centering
+            \includegraphics[trim = 10mm 0mm 10mm 0mm, clip, width=\textwidth]{wall_shear_stress_layer}
+        \end{column}
+
+        \begin{column}{.48\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{wall_shear_stress_demo}
+        \end{column}
+    \end{columns}
+
+    \medskip
+
+    \begin{center}
+        $\Vector{T}_{O}^{(\unitVector{n})} = -p_G \unitVector{n} + \Vector{\tau}_{\Des{w}} = -p_G \unitVector{n} - \mu \frac{\Vector{V}_{GO} - (\Vector{V}_{GO} \cdot \unitVector{n}) \unitVector{n}}{||\Vector{x}_G - \Vector{x}_O||}$
+    \end{center}
+
+    \note{
+        \begin{itemize}
+            \item Pressure force and wall shear stress.
+            \item Integration in the global Eulerian frame.
+        \end{itemize}
+    }
+\end{frame}
+%---------------------------------------------------------------------------%
+\subsection{Immersed boundary method}
+%---------------------------------------------------------------------------%
+\begin{frame}[fragile]
+    \frametitle{Immersed boundary treatment: general form}
+    \begin{columns}
+        \begin{column}{.48\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{gcibm_demo_2D}
+        \end{column}
+
+        \begin{column}{.48\textwidth}
+            \begin{itemize}
+                \item $G$: ghost node
+                \item $O$: boundary point
+                \item $I$: image point
+                \item $IB$: immersed boundary
+                \item $\Omega_D$: domain of dependence
+            \end{itemize}
+        \end{column}
+    \end{columns}
+
+    \begin{center}
+        Method of images
+        $
+        \begin{cases}
+            \psi_G = 2\psi_O - \psi_I\\
+            \psi_I = f(x_I, y_I, z_I)
+        \end{cases}
+        $
+    \end{center}
+
+    \note{
+        \begin{itemize}
+            \item Boundaries are not conformal with but immersed in the Cartesian grid.
+            \item Construct the flow at numerical boundaries.
+            \item Suppose $\psi$ is a generic field variable, using the method of images.
+            \item A reconstruction function based a chosen domain of dependence.
+        \end{itemize}
+    }
+\end{frame}
+%---------------------------------------------------------------------------%
+\begin{frame}[fragile]
+    \frametitle{Immersed boundary treatment: a three-step flow reconstruction}
+
+    $\psi_I = f(\{\psi_N\}, \psi_O)$
+
+    \smallskip
+
+    \begin{enumerate}
+            \small
+        \item Prediction step $\psi_I^* = \left[\sum w(d_N) \psi_N\right] / \left[\sum w(d_N)\right]$
+        \item Boundary condition enforcement step $\psi_O = C \psi_I + \Des{RRHS}$
+        \item Correction step $\psi_I = \left[\psi_I^* + \frac{w(d_O)}{\sum w(d_N)}\psi_O\right] / \left[1+\frac{w(d_O)}{\sum w(d_N)}\right]$
+    \end{enumerate}
+
+    \smallskip
+
+    \centering\tiny
+    \setlength{\tabcolsep}{3pt}
+    \renewcommand{\arraystretch}{1.15}
+    \begin{tabular}{lccc}
+        \hline
+        Type & Example form & $C$ & $\Des{RRHS}$\\
+        \hline
+        Dirichlet & $\psi_O = g$ & $0$ & $g$ \\[8pt]
+        Neumann & $\left. \frac{\partial \psi}{\partial n} \right|_O = \frac{\partial \psi_O}{\partial n}$ & $1$ & $- ||\Vector{x}_I - \Vector{x}_O||\frac{\partial \psi_O}{\partial n}$ \\[8pt]
+        Robin & $\alpha \psi_O + \beta \left. \frac{\partial \psi}{\partial n} \right|_O = g$ & $\frac{\beta}{\beta - ||\Vector{x}_I - \Vector{x}_O|| \alpha}$ & $\frac{- ||\Vector{x}_I - \Vector{x}_O|| g}{\beta - ||\Vector{x}_I - \Vector{x}_O|| \alpha}$ \\[8pt]
+        Cauchy & $\begin{aligned} \left. (\Vector{V} \cdot \unitVector{n}) \right|_{\Vector{x}=\Vector{x}_O} &= \Vector{V}_{S} \cdot \unitVector{n} \\ \left. \frac{\partial (\Vector{V} \cdot \hat{\Vector{t}})}{\partial n} \right|_{\Vector{x}=\Vector{x}_O} &= 0 \\ \left. \frac{\partial (\Vector{V} \cdot \tilde{\Vector{t}})}{\partial n} \right|_{\Vector{x}=\Vector{x}_O} &= 0 \end{aligned}$ & $\begin{bmatrix} n_x & n_y & n_z \\ \hat{t}_x & \hat{t}_y & \hat{t}_z \\ \tilde{t}_x & \tilde{t}_y & \tilde{t}_z \end{bmatrix}^{\Des{T}} \begin{bmatrix} 0 & 0 & 0 \\ \hat{t}_x & \hat{t}_y & \hat{t}_z \\ \tilde{t}_x & \tilde{t}_y & \tilde{t}_z \end{bmatrix}$ & $\begin{bmatrix} n_x & n_y & n_z \\ \hat{t}_x & \hat{t}_y & \hat{t}_z \\ \tilde{t}_x & \tilde{t}_y & \tilde{t}_z \end{bmatrix}^{\Des{T}} \begin{bmatrix} n_x & n_y & n_z \\ 0 & 0 & 0 \\ 0 & 0 & 0 \end{bmatrix} \cdot \Vector{V}_S$\\
+            \hline
+    \end{tabular}
+
+    \begin{tikzpicture}[remember picture, overlay]
+        \node [anchor=south east, inner sep=0pt, text width=4.2cm] at (0.50\paperwidth,0.62\paperheight) {%
+            {\raggedright\tiny \textsc{Source:} \fullcite{mo2018immersed}\par}
+        };
+    \end{tikzpicture}
+
+    \note{
+        \begin{itemize}
+            \item Devises a second-order three-step flow reconstruction scheme.
+            \item Enforces the Dirichlet, Neumann, Robin, and Cauchy boundary conditions in a straightforward and consistent manner.
+            \item Enables efficient, accurate, and robust boundary treatment.
+        \end{itemize}
+    }
+\end{frame}
+%---------------------------------------------------------------------------%
+\subsection{Computational solver}
+%---------------------------------------------------------------------------%
+\begin{frame}[fragile]
+    \frametitle{ArtraCFD: an open source gas-solid flow solver}
+    \begin{center}
+        \includegraphics[trim = 5mm 150mm 5mm 10mm, clip, width=\textwidth]{artracfd}
+    \end{center}
+
+    \note{
+        \begin{itemize}
+            \item Created from scratch.
+            \item C language.
+            \item About 10k code lines.
+        \end{itemize}
+    }
+\end{frame}
+%---------------------------------------------------------------------------%

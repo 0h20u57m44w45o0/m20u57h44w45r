@@ -1,0 +1,27 @@
+#include <omp.h> /* parallel header file */
+#include <stdio.h>
+
+int main (int argc, char* argv[])
+{
+    /*
+     * Protect resources with critical clause
+     */
+    double res = 0.0;
+    double tmp = 0.0;
+    #pragma omp parallel private(tmp)
+    {
+        int id = omp_get_thread_num();
+        int nthrds = omp_get_num_threads();
+        for (int i = id; i < niters; i = i + nthrds) {
+            tmp = neat_stuff(i);
+            /*
+             * Threads wait their turn -- only one at a time enter the
+             * critical region
+             */
+            #pragma omp critical
+            res += consume(tmp);
+        }
+    }
+    return 0;
+}
+

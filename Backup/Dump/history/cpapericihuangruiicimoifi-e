@@ -1,0 +1,980 @@
+%---------------------------------------------------------------------------%
+%->> Document class declaration
+%---------------------------------------------------------------------------%
+\documentclass[sort&compress,AMA,STIX1COL]{WileyNJD-v2}
+\articletype{Article Type}%
+\received{<day> <Month>, <year>}
+\revised{<day> <Month>, <year>}
+\accepted{<day> <Month>, <year>}
+%---------------------------------------------------------------------------%
+%->> Document settings
+%---------------------------------------------------------------------------%
+%\usepackage{microtype}% improves general appearance of the text
+%\usepackage{amsmath,amssymb,amstext}% math support
+%\usepackage{newtxtext,newtxmath}% font support
+\usepackage{subcaption}% subfigures
+\graphicspath{{./}{./img/}}
+\hypersetup{colorlinks=true,citecolor=blue}
+%---------------------------------------------------------------------------%
+%->> User defined commands
+%---------------------------------------------------------------------------%
+\providecommand{\Vector}[1]{\boldsymbol{#1}}% General vectors in bold italic
+\providecommand{\unitVector}[1]{\boldsymbol{\mathbf{#1}}}% Unit vectors in bold roman
+\providecommand{\Tensor}[1]{\boldsymbol{\mathsf{#1}}}% Tensor in sans-serif bold italic
+\providecommand{\unitTensor}[1]{\boldsymbol{{\mathsf{#1}}}}% Identity tensor in sans-serif bold
+\providecommand{\Matrix}[1]{\boldsymbol{\mathbf{#1}}}% Matrix in bold roman
+\providecommand{\unitMatrix}[1]{\boldsymbol{\mathbf{#1}}}% Identity matrix in bold roman
+\providecommand{\Unit}[1]{\,\mathrm{#1}}% Units in roman
+\providecommand{\Const}[1]{\mathrm{#1}}% Math constants, functions
+\providecommand{\Set}[1]{\mathbb{#1}}% Special sets (e.g. real numbers) in blackboard bold
+\providecommand{\Des}[1]{\mathrm{#1}}% description
+\providecommand{\Div}{\operatorname{div}}% divergence operator
+\providecommand{\Order}{\operatorname{O}}% order operator
+\providecommand{\Trace}{\operatorname{tr}}% trace operator
+\providecommand{\Diag}{\operatorname{diag}}% diagonal
+\providecommand{\Def}{\operatorname{def}}% define
+\providecommand{\Loptr}{\operatorname{\mathcal{L}}}% spatial operator
+\providecommand{\Toptr}{\operatorname{\mathcal{LL}}}% temporal operator
+\providecommand{\Soptr}{\operatorname{\mathcal{S}}}% solution operator
+%---------------------------------------------------------------------------%
+%->> Document content
+%---------------------------------------------------------------------------%
+\begin{document}
+
+\title{Parallelization of interface-resolved dense particulate flow with multibody collision}
+\title{Unsteady drag of explosively dispersed granular materials through mesoscale modeling and direct simulation}
+\title{An immersed boundary framework for solving n-fluid and m-solid problem}
+\title{An algorithm for fast computing conservative discretization on Cartesian grid with immersed boundary}
+\title{A multibody contact and collision model}
+\title{Discontinusous Galerkin + subcell WENO reconstruction for interfacial values}
+
+\author[1]{Huangrui Mo*}
+%\ead{huangrui.mo@uwaterloo.ca}
+
+\author[1]{Fue-Sang Lien}
+%\ead{fslien@uwaterloo.ca}
+
+\author[2]{Fan Zhang}
+%\ead{fan.zhang@drdc-rddc.gc.ca}
+
+\author[1]{Duane S. Cronin}
+%\ead{duane.cronin@uwaterloo.ca}
+
+\address[1]{\orgdiv{Department of Mechanical Engineering}, \orgname{University of Waterloo}, \orgaddress{200 University Avenue West, Waterloo, ON N2L 3G1, Canada}}
+\address[2]{\orgname{Defence Research and Development Canada}, \orgaddress{P.O. Box 4000, Station Main, Medicine Hat, AB T1A 8K6, Canada}}
+
+\corres{*Huangrui Mo. \email{huangrui.mo@uwaterloo.ca}}
+
+\abstract[Abstract]{}
+
+\keywords{Fluid-structure interaction; Compressible flow; Navier-Stokes; Immersed boundary; Irregular geometry; Moving geometry}
+
+\maketitle
+
+\section{Introduction}\label{sec:intro}
+
+\section{Method development}\label{sec:method}
+
+\subsection{Problem description}
+
+\subsection{Basic idea}
+1. n-domain node mapping, dynamic-domain remapping, fresh node detection for an arbritraly complex and dynamic fluid-solid system, Eulerian collision detection.
+2. unification of 1D, 2D, 3D computation, component-based boolean operation supported geometry generation.
+3. mathematical level accerlation via combining conservative discretization and multidomain node mapping, method of line + conservative discretization
+4. reconstruct them for any types of boundaries codnitions while adapting to stencils
+5. Code level: store minimum set of information and calculate derived information on-the-fly (only store conservation variables, closest facet linking), linearized array, time-level data locality via compound data type
+
+\subsection{1d}
+
+\subsection{2d or 3d}
+
+\subsection{complex geometry}
+
+\subsection{A unified algorithm}
+
+\section{Numerical experiments}
+
+acceleration rate for different dimensions with different complexity of geometries.
+
+\section{Numerical experiments}
+
+\subsection{Von Karman vortexs street}
+
+Galilean transform: Subsonic viscous flow around cylinder vs moving cylinder
+
+\subsection{Shock-cylinder diffraction}
+
+\subsection{Oblique shock relation}
+
+Galilean transform: Supersonic inviscid flow passing a wedge vs moving wedge
+
+\subsection{Multibody collision model}
+
+equivalent mass and velocity: prove 1 body, 2 body, 3 body, recursive proof from n to n+1 body
+
+\subsection{n-fluid and m-solid problem}
+
+n-domain node mapping; phase interaction: ibm with non-ghost cell approach: layer-by-layer three-step flow reconstruction from extension node, interface node, and bounary point, 1) \psi_e = f(n), 2) \psi_o = c \psi_e + RRHS, 3) \psi_e = f(n, o), then \psi_i = 1/2(\psi_e + \psi_o); solid-solid: collision detection + collision response; domain solution: governing equations + EOS + FDM + FEM; interface tracking: n narrow band level set stored in a single float field mapped by an integer field; interface evolution: evolve phase interface using velocity field.
+
+\subsection{}
+
+Keywords: flow, high speed, mechanics, sonic, compressible, impact, computational, aerothermodynamics
+
+Modern aeronautical structures are increasingly made of composite layered materials. The structural design parameters that have to be determined and optimized for an aircraft during its design process. need for developing advanced computational schemes and optimization processes, able to reliably provide the optimal design of the composite structure under consideration. advanced computational models to predict and to optimise the multidisciplinary (static, weight, dynamic etc.) performance of complex aerospace components. combine substantial theoretical and computational developments together with numerical and/or experimental validation tasks. a solid background in composite structures and/or computational modelling. investigation of pressure and strain rate dependent behaviour of composite materials for high-performance aerospace applications. developing a better understanding of composite materials subjected to rapidly applied loads. developing novel methodologies for experimental characterization and numerical simulation of deformation and failure of rapidly loaded materials. development of deterministic and probabilistic experimental and analytical simulation techniques aimed at predictive modelling of the response of materials to impact loading such as that imposed by bird strikes. Strong knowledge of the mechanical behaviour, deformation, damage and failure of composite materials for applications in aerospace. ability to develop experimental capability using LabView and Matlab softwares. high speed aerothermodynamics and cooling technologies. transpiration cooling technology for hypersonic flight vehicles. boundary layer transition and broader flow field properties. develop and apply theoretical and computational models to simulate fluid flows at the molecular level under extreme conditions. Develop and implement highly scalable computational techniques for grid adaptation, load balancing, heterogeneous computing. Connecting molecular scale phenomena to macroscale behavior. Experience with parallel programming models using bulk-synchronous and asynchronous (e.g. MPI, threading) parallelism and modern heterogeneous computing architectures (e.g. GPUs, etc.). Experience with modern task based parallel programming models. Advanced knowledge and experience with numerical algorithms and a strong ability to analyze and provide creative solutions for technically complex problems. Programming experience with languages such as C, C++, or Fortran 90+ for scientific applications; must be able to work effectively in a collaborative software development environment. Experience in other related science and application areas beyond those mentioned above, e.g., turbulence, plasma physics, thermal hydraulics, radiation health physics, radiation detection, radiation-hydrodynamics, multiphase flow, or materials science. computational algorithm development (familiarity with code review, compilers, portability, continuous integration, unit testing, and regression testing). finite element methods. develop computational models that run at scale on the latest high-performance computers. the development of numerical methods and processes for aerodynamic aircraft design and analysis. development of physical models for complex flows and cutting-edge solution algorithms. development and implementation of coupling methods within the C++/Python-based FlowSimulator framework, where high-performance computing (HPC) aspects are critical. define and develop the next-generation multiphysics massively parallel research simulator, compatible with next-generation supercomputers, with a strong emphasis on coupled flow, transport and geomechanics in the presence of strong heterogeneities and fractures. 
+
+    Nonlinear optimization, including mixed-integer, multiobjective, stochastic/robust, PDE-constrained, simulation-based, dynamics, derivative-free, and parallel/concurrent optimization
+    Machine learning, data analysis, and applied statistics
+    Statistical inference and analysis, sampling, spectral estimation
+    Stochastic processes, stochastic differential equations
+    Data assimilation, inverse problems
+    High-order methods for PDEs/CFD including spectral element methods
+    Numerical linear algebra focusing on highly scalable preconditioners including matrix-free methods
+    Numerical methods for ordinary and partial differential equations including error estimators and adjoints
+    Automatic/algorithmic differentiation
+
+
+ Optimization areas of interest to this project include derivative-free, mixed-integer nonlinear, parallel/concurrent, robust, multi-objective, and simulation-based optimization.
+
+    Knowledge of one or more of machine learning, data mining and statistics.
+    Significant experience in analysis of data with applications; also with analysis packages such as Matlab and R, and experience with one or more machine learning toolkits such as tensorflow, pytorch, caffe, scikit-learn.
+    Knowledge and experience in one or more programming languages such as Python, C, C++, Java, and Scala.
+    Knowledge in mathematical optimization or linear algebra.
+
+Applicants should have comprehensive experience/expertise in computational mathematics, optimization, or statistics, and programming in C/C++, Matlab, Python, or another scientific programming language. Considerable knowledge is desired in at least one of theory/analysis of optimization algorithms or parallel computing. 
+
+Numerical methods for multi-objective optimization, discrete optimization, topology optimization, or dara-driven science.
+
+Argonne is a multidisciplinary science and engineering research center, where world-class researchers work alongside experts from industry, academia, and other government laboratories to address vital national challenges in clean energy, environment, technology, and national security. We pursue big, ambitious ideas that redefine what is possible. Our pursuit of groundbreaking discoveries pushes the boundaries of fundamental science, applied science, and engineering to solve complex challenges and develop useful technologies that can transform the marketplace and change the world.
+
+All applications should be submitted through Interfolio. The electronic application should include (i) a cover letter describing the principal expertise and accomplishments of the applicant, (ii) a curriculum vita, (iii) a 3 page research statement including research directions, future plans, and potential funding sources, and (iv) three representative journal publications. Candidates applying for the position should also enter the names and contact information of at least three (3) references in the online application system. 
+
+    Develop new methods and software tools that enable scientific knowledge discovery using high performance computational platforms and advance the state-of-the-art in data-intensive analysis.
+    Conduct R and D in the areas of data-intensive, high-performance analysis, visualization, and data management.
+    Work as part of a multi-disciplinary team composed of computer scientists, mathematicians, and experimental/computational bioscientists engaged in areas like biomedical data analysis and precision medicine.
+    Design and implement parallel algorithms in image analysis, topological analysis, and machine learning applied to scientific domain problems; develop software tools involving data-intensive computing, analytics and machine learning, with a focus on reproducibility.
+
+    Publish and present research results in journals and conferences; actively engage in R and D, publication, outreach, in a highly dynamic and collaborative environment.
+
+What is Required:
+
+    PhD in Computer Science or equivalent/related field, the degree must have been awarded in the past five years to be eligible for a postdoctoral researcher position.
+    Excellent oral and written communication skills.
+    Ability to work productively both independently and as part of a diverse team.
+    Demonstrable research experience in one or more of the following areas: machine learning, image processing, image analysis, computer vision, feature/pattern detection/analysis, graph-based analysis, computational topology/geometry, as evidenced by original, published work and software implementation of methods/algorithms.
+    Demonstrated ability to design and implement data analysis software, preferably shared and distributed memory parallel software, in one or more of the following programming languages and parallel libraries/languages/environments: C++, Python, R, Julia, MPI, pthreads, OpenMP, OpenCL, CUDA.
+
+Additional Desired Qualifications:
+
+    Software engineering tools: make, cmake, revision control systems (git), gdb, valgrind, vtune.
+    Data analysis libraries, for example, scikit-image, scikit-learn, TensorFlow.
+    Prior work experience designing and implementing data analysis software.
+Knowledge of two-point spectral closure theories for turbulence.
+Knowledge of standard numerical methods for nonlinear flows.
+Experience with single-point RANS closures.
+
+Expertise in free surface flows and thermodynamics. 
+
+numerical solution and analysis of viscoelastic fluid models using the software package OpenFoam. He/she should have a solid background in fluid mechanics and computational rheology. Previous experience with OpenFoam is required. 
+
+Knowledge of and experience with optimization methods, such as Genetic Algorithms, Simulated Annealing, MCMC and Direct Signal Analysis (damped least-squares method) applied to complex systems
+Knowledge of and experience with metamodeling methods applied to problems of transport phenomena, namely neural networks, neurofuzzy algorithms, kriging, support-vector regression and fractal theory
+Knowledge of and experience in neural networks, fuzzy logic, Bayesian statistical tools and/or discriminant and cluster analyses, applied to pattern-recognition problems
+
+performs innovative research that enhances high performance computational science application codes used in scientific discovery across a broad range of scientific disciplines. 
+develops advanced mathematical models and efficient computational algorithms for solving a broad range of scientific and engineering problems
+develops advanced numerical algorithms and software for solving the partial differential equations which arise in problems of scientific and engineering interest. The primary focus of our work is in the development of high-resolution and adaptive finite volume/difference methods for partial differential equations in complex geometries with applications in a diverse range of fields such as compressible and incompressible fluid flows, plasma physics, porous-media flows, ice sheet modeling, carbon sequestration, climate, and astrophysics. 
+ Chombo, an open-source publicly distributed scalable adaptive mesh refinement (AMR) library that incorporates solver technologies developed in the group. These technologies include hyperbolic and elliptic solvers, PIC methods, and embedded boundary and mapped-multiblock approaches to complex geometries. 
+develops and applies advanced computational methodologies to solve large-scale scientific and engineering problems arising
+designing algorithms for multiscale, multiphysics problems described by nonlinear systems of partial differential equations, and in developing implementations of algorithms that target current and next-generation massively parallel computational architectures. 
+low Mach number methods for weakly compressible flows, and the use of block-structured adaptive mesh refinement. Combustion efforts have focused on direct numerical simulation of laboratory-scale turbulent flames using detailed models for chemical kinetics. In the area of mesocale fluid mechanics we are developing stochastic continuum models that represent thermodynamic fluctuations in hydrodynamic variables and hybrid algorithms that combine continuum and particle descriptions of a fluid. We have also begun a new project area in which we are integrating simulation and experimental data to improve predictions of the behavior of complex systems.
+
+Highly self-motivated and willing to learn new technologies.
+Keen interest in solving mathematical and scientific computing problems
+Keen interest in solving science challenges.
+    Experience with scientific programming languages (e.g., Python, R, C/C++, Fortran) and parallel languages and execution environments (e.g., MPI, OpenMP, OpenCL, CUDA, UPC, CAF, other advanced languages)
+
+    Deep understanding of advanced computer and systems architecture (CPU, caches, memory systems), and their contributions to the overall system performance.
+Research and development of mathematical models of physical phenomena
+    Experience in parallel computing and programming experience in C, C++, and Fortran preferred, as well as MPI and OpenMP
+
+    Experience as part of a multidisciplinary, collaborative team that includes mathematicians, computer/computational scientists and domain scientists
+Experience with one or more of the following areas: Real gas effects, boundary layer transition, high temperature ablating wall effects.
+
+Implementation of new and existing algorithms, tools and technologies for tackling scientific and engineering problems
+
+Evaluation of existing and new techniques
+
+Work in a multidisciplinary team environment including mathematicians, computer/computational scientists, and domain scientists
+Experience in developing and running massively parallel codes (MPI), and familiarity with software development in collaborative, multidisciplinary environments.
+
+Experience using large-scale codes to provide detailed simulation studies for verification and validation (V and V) analysis of algorithms and integrated codes and experience in the development of the V and V and Uncertainty Quantification (UQ) methodology. 
+conduct original and independent research in boundary layer transition or thermal protection systems in the context of hypersonic flight mechanics, real gas effects, and high temperature ablating wall conditions. You will analyze flight vehicles over a range of conditions requiring multi-physics modeling across disciplines.
+
+Organize, analyze, and present data from research.
+Contribute to and actively participate in the conception, design, and execution of research to address defined problems.
+ talented and motivated postdoctoral fellows to become part of our team working on exciting research projects in applied mathematics and scientific computing. 
+
+advanced mathematical models and efficient computational algorithms for solving a broad range of scientific and engineering problems of interest to the Department of Energy (DOE), including in particular those related to energy and environment. Some of the current scientific and engineering areas include accelerator physics, astrophysics, climate, combustion, and seismic imaging. Many of the algorithms have scalable implementations that are targeted at current and next-generation massively parallel computer architectures, such as those available at the DOE National Energy Research Scientific Computing Center. 
+
+develops advanced numerical algorithms and software for solving the partial differential equations which arise in problems of scientific and engineering interest.
+
+ The primary focus of our work is in the development of high-resolution and adaptive finite volume/difference methods for partial differential equations in complex geometries with applications in a diverse range of fields such as compressible and incompressible fluid flows, plasma physics, porous-media flows, ice sheet modeling, carbon sequestration, climate, and astrophysics.
+
+The primary focus of CCSE researchers is on designing algorithms for multiscale, multiphysics problems described by nonlinear systems of partial differential equations, and in developing implementations of algorithms that target current and next-generation massively parallel computational architectures. 
+
+Application areas have included combustion, porous media flow, mesoscale models for hydrodynamics, atmospheric modeling, cosmology and astrophysics. A common theme in a number of CCSE projects is low Mach number methods for weakly compressible flows, and the use of block-structured adaptive mesh refinement. Combustion efforts have focused on direct numerical simulation of laboratory-scale turbulent flames using detailed models for chemical kinetics. In the area of mesocale fluid mechanics we are developing stochastic continuum models that represent thermodynamic fluctuations in hydrodynamic variables and hybrid algorithms that combine continuum and particle descriptions of a fluid. We have also begun a new project area in which we are integrating simulation and experimental data to improve predictions of the behavior of complex systems. 
+
+
+The Mathematics Group develops new mathematical models, devises new algorithms, explores new applications, exports key technologies, and trains young scientists in support of DOE. We use mathematical tools from a variety of areas in mathematics, physics, statistics, and computer science, including statistical physics, differential geometry, asymptotics, graph theory, partial differential equations, discrete mathematics, and combinatorics. Rather than focus on a specific software or algorithmic approach, our orientation is to invent, implement, and use appropriate mathematics to tackle a range of scientific and engineering problems.
+
+
+ Another set of topics focuses on tools for the analysis of energy processes, and includes stochastic methods in environmental science, data analysis for meteorological data, data synthesis for wind energy and large-scale ocean currents, seismic imaging, image processing and analysis for analyzing cellular structures, and complex fluid-membrane solvers for understanding the dynamics behind cellular development in new biofuels and path planning for determining chemical accessibility in new materials such as zeolite and metal organic frameworks for gas separation sieves in carbon sequestration.
+Demonstrated proficient verbal and written communication skills to collaborate effectively in a team environment and present and explain technical information.
+Demonstrated initiative and interpersonal skills and ability to work in a collaborative, multidisciplinary team environment.
+Experience with computational formulations and solution methods for at least two of the following: compressible fluid flow, electromagnetics, magnetohydrodynamics (MHD) or multifluid plasma physics, hybrid methods (e.g. combining transport/collisional interactions, continuum/kinetic models, etc). 
+
+Experience with finite element or unstructured finite volume methods for PDEs
+
+Experience with numerical methods for partial differential equations with particular emphasis on hyperbolic problems and compressible plasma systems
+
+Experience with computational models for magnetic confinement fusion applications or magnetic implosion dynamics with relevance to z-pinch devices
+Experience with numerical methods for partial differential equations with particular emphasis on hyperbolic problems and compressible plasma systems
+
+Computational fluid dynamics has only recently[when?] reached a position to make reasonable computations in solving scramjet operation problems. Boundary layer modeling, turbulent mixing, two-phase flow, flow separation, and real-gas aerothermodynamics continue to be problems on the cutting edge of CFD. Additionally, the modeling of kinetic-limited combustion with very fast-reacting species such as hydrogen makes severe demands on computing resources. Reaction schemes are numerically stiff requiring reduced reaction schemes.
+
+Unlike jet or rocket propulsion systems facilities which can be tested on the ground, testing scramjet designs uses extremely expensive hypersonic test chambers or expensive launch vehicles, both of which lead to high instrumentation costs. Tests using launched test vehicles very typically end with destruction of the test item and instrumentation.
+
+In the solution of complex and dynamic fluid-solid systems involving hypersonic flow conditions, a balance for accuracy, efficiency, and robustness of the underlying numerical framework is valuable. This balance requirement particularly applies to space discretization and numerical boundary treatment.
+
+For compressible flows with hypersonic motions, the ability of capturing flow discontinuities is crucial to a spatial discretization scheme. One of the key ideas is to utilize the upwinding nature of a hyperbolic system according to the characteristics of the system. However, conservation laws in 2D and 3D spaces are frequently indefinite systems with eigenvalues of mixed sign, which depend on the local flow and can vary from point to point. In addition, the Jacobian matrix of the hypersonic system is generally a nonlinear function of the conservative variables. Therefore, the entire system of equations are tightly coupled. To extend numerical methods and ideas from scalar conservation laws to system of conservation laws, flux splitting techniques are widely used to facilitate the generalization process while conforming to the hyperbolic properties of the system.
+
+AUSM treats the convective and pressure terms separately. The convective terms are upstream-biased using a properly defined cell-interface velocity, while the pressure term is strictly dealt with by using acoustic waves. ASUM was designed with the purpose of combining the efficiency of flux vector splitting and the accuracy of finite difference spliting. yielding vanishing numerical diffusivity at stagnation points. It does not involve matrix operation (does not involve differentiation of fluxes - Jacobian matrix, which is a great advantage for general equation of states) and is simple to construct.
+
+As the motion of each particle follows Newton's second law, the instability arising from the dynamics of a particle system is unavoidable due to the stochastic nature of particle morphology (including size distribution), particle bed configu- ration and material properties. The instability of particle trajectories, for example during explosive dispersal, can cause clustering, collisions and agglomeration, which may lead to a significant change in the average particle dynamics and form a nonuniform spatial distribution or macroscopic particle jet structures. Careful studies of these fundamental differences, with the help of experiments and direct numerical simulations of a large number of particles at the “microscopic” particle scale, are necessary and may lead to a novel analysis of dissipative statistical mechanics.
+
+\section{High Fidelity Simulation of Atmospheric Dispersion}
+
+Understanding the dispersion of pollutants in atmospheric flow is of vital importance for infrastructure planning and urban development as well as forecasting the spread of air-borne hazards in outdoor and indoor environments. To provide analyses in minimal time, empirical approaches, like Gaussian puff methods and single or multizone models, are presently used. Puff methods assume an idealised outdoor emission plume and neglect interaction with complex topologies. Zone models can provide reasonable predictions of dispersion through buildings, but their applicability is questionable for large spaces, where their homogeneous mixing assumption is invalid.
+
+Three-dimensional computational fluid dynamics simulations can overcome the limitations of empirical dispersion models, however the turn-around times for solving the incompressible Navier-Stokes equations on complex meshes are enormous. As an alternative, a novel parallel adaptive lattice Boltzmann method (LBM) for large eddy simulation (LES) of atmospheric flows is currently under development within our AMROC software framework. In this approach, geometries are represented with automatically generated Cartesian meshes that are non-uniformly refined and de-refined at run time.
+
+In this PhD project, you will work on fine-tuning the LBM-LES approach for atmospheric dispersion prediction and supplement the method with the following features: realistic inflow conditions to model the atmospheric boundary layer, representation of complex release sources, efficient import of complex geometries. In addition, you will develop a version of the parallel LBM-LES code (written in C++) that is tailored especially for execution on sets of graphical processing units (GPUs) using CUDA or OpenACC. Together, these developments will lead to a step-change in atmospheric flow prediction. The new capability will be evaluated in close collaboration with subject matter experts at the Defence Science and Technology Laboratory (Dstl) in Porton Down and you will spend at least 3 months in total on site.
+
+\section{ High Fidelity Computational modelling of Intake Aerodynamics}
+
+The Department of Aeronautics is seeking a researcher to assess the suitability of a high-fidelity spectral element code, Nektar++, to model the shock wave boundary layer interaction arising in intakes at incidence. This project is funded through the Aeronautics Technology Institute (ATI).
+
+Duties and responsibilities
+
+You will explore the application of the high fidelity CFD solver, Nektar++, on prediction of shock-wave boundary layer interaction in intakes at incidence. The project will explore the use of the Nektar++ framework using an under-resolved DNS/iLES simulations. The simulation methodology will be validated on a simplified, but realistic 2D test case and it is expected to demonstrate/deliver:
+
+    understanding of the sensitivity to Reynolds number:
+    distinguish stable from unstable flow conditions with varying inflow incidence and Mach
+    identify the requirements for high fidelity “experimental like”, accuracy including computing costs, procedures and best practice.
+
+Applicants should be able to demonstrate a genuine passion and excellence in research via their track record. The applicant should have extensive knowledge on the development of computational fluid dynamics methods, C++ and preferably high order methods using spectral/hp element discretisations.
+
+\section{Modeling SI Ignition}
+
+conducting computational fluid dynamics (CFD) studies of fuel injection, ignition and combustion processes in advanced spark-ignition (SI) internal combustion engines (ICEs). The candidate will expand and develop conventional and non-conventional ignition and combustion models, evaluate fuel properties and kinetic mechanisms, perform engine multi-dimensional simulations, analyzing data, and reporting results. The candidate must have considerable knowledge of internal combustion engine theory and a solid background in CFD applied to SI engine multi-dimensional modeling. The Candidate is also required to have a good knowledge of the physics underlying ignition and combustion processes in SI engines and be familiar with conventional and non-conventional ignition technologies and fuels used in transportation. The candidate will plan, schedule, prepare and perform numerical simulations of ignition and combustion processes in internal combustion engines. The candidate will collect numerical data including flame propagation, cylinder pressure traces and related information. The candidate will post-process and analyze numerical data with particular focus on ignition/combustion behavior and thermal efficiency. Improve state-of-the-art models and develop advanced models.
+The candidate will prepare internal reports, proposals, conference papers, and other publications. The candidate will maintain current knowledge of developments in the transportation field, particularly with engine modeling and advanced combustion concepts.
+Internal combustion engine multi-dimensional modeling.
+Skills to use engine CFD codes.  Knowledge of CONVERGE is a plus.
+Spark-ignition and combustion processes.
+Conventional and advanced ignition technologies for transportation.
+Transportation fuel properties, fuel kinetics and detailed mechanisms.
+
+\section{}
+
+The effort will be devoted to the application of theoretical chemical kinetics and chemical kinetic modeling to the study of gas-phase processes.  The theoretical predictions will be used to guide the development of coupled kinetic models with a view to interpreting gas-phase reacting systems at high temperatures or highly energized/nonthermal environments.  A particular emphasis will be on the unimolecular and bimolecular kinetics of molecules and radicals relevant to combustion and atmospheric processes.
+
+In this role, you will:
+
+    Perform theoretical calculations of the electronic structure and/or kinetics for key combustion reactions.
+    Develop generic theory-based rate rules for incorporation into detailed combustion chemical kinetics models.  Communicate effectively with the supervisor, peers, and Laboratory management through research reports, project presentations, and other regular channels.
+    Maintain comprehensive knowledge of pertinent literature.
+    Develop new ideas, concepts, and/or research proposals to create programmatic growth and intellectual property for the Division.
+
+    Skills to use engine CFD codes and multi-dimensional multi-physics solvers.
+Knowledge of plasma and fuel chemistry and kinetic mechanisms.
+Knowledge of engine CFD tools. Knowledge of CONVERGE is a plus.
+Knowledge of advanced engines and fuels for transportation.
+
+    Assist Principal Investigator (PI) in conducting numerical studies of advanced ignition systems for internal combustion engines (ICEs).
+    Use, expand, and develop conventional and non-conventional ignition models, evaluate plasma and fuel kinetic mechanisms, perform multi-dimensional engine simulations and explore advanced engine combustion concepts, analyzing data, and reporting results.
+    The Candidate must have considerable knowledge of the internal combustion engine flow, combustion, and fuel chemistry theory and a solid background in CFD.
+    The Candidate is also required to have a considerable knowledge of ignition processes in engines and be familiar with advanced engine combustion concepts.
+    Plan, schedule, prepare and perform numerical simulations of ignition and combustion processes in internal combustion engines.
+    Collect numerical data.
+    Post-process and analyze numerical data with particular focus on ignition/combustion behavior and thermal efficiency.
+    Improve state-of-the-art models and develop advanced models.
+    Prepare internal reports, proposals, conference papers, and other publications.
+    Maintain current knowledge of developments in the transportation field, particularly with engine modeling and advanced combustion concepts.
+
+\section{Optima Fuel Properties}
+
+    Knowledge of combustion fundamentals is required.
+    Experience using experimental devices and various diagnostic techniques to measure fundamental combustion properties, e.g., ignition delay, flame speed, fuel decomposition/oxidation intermediates and products.
+    Experience programming with Labview and Fortran/C++/Python, and developing control systems is required, along with the capability to utilize statistical analysis techniques.
+    Knowledge of combustion chemistry is desired.
+    Strong knowledge and experience with various diagnostic techniques, e.g., mass spectrometry and optical diagnostics, are desired.
+    Collaborative skills, including the ability to work well with other divisions, laboratories, and universities are required, as is the ability to work independently.
+    Strong oral and written communication skills are required.
+    High motivation, energy and ability to originate, carry out and publish significant original research are required.
+
+\section{CFD Modelling of Large Diesel Engines}
+
+A position exists, for a Research Assistant/Associate in the Department of Engineering, to work on multi-dimensional Computational Fluid Dynamics simulations with detailed chemistry modelling, with focus on computational efficiency and pollutant emissions (NOx and soot), for large diesel engines for marine applications. The successful candidate must have experience in turbulent combustion modelling, with special emphasis on diesel engine combustion, and with very good knowledge of Fortran and C++ languages, high-performance computing, CFD codes, and combustion chemistry.
+
+This research is supported by the National Research Foundation, Prime Minister's Office, Singapore under its Campus for Research Excellence and Technological Enterprise (CREATE) programme. The post holder will be located in Central Cambridge, Cambridgeshire, UK.
+
+The key responsibilities and duties are to execute research in the field of diesel combustion modelling, using multi-dimensional Computational Fluid Dynamics, with emphasis on spray and emissions processes; to prepare written descriptions of the work and communicate the results effectively with papers and presentations; prepare reports for the sponsor; and to develop RANS and LES codes for diesel engines, including new codes for the combustion model, meshing, running on high-performance parallel computers.
+
+Applicants must have (or be close to obtaining) a PhD in turbulent combustion modelling, with special emphasis on diesel engine combustion. Requirements: very good knowledge of Fortran and C++ languages, experience with high-performance computing experience, CFD codes, and combustion chemistry. Deep knowledge of turbulent combustion modelling approaches and adequate understanding of diesel engines is expected, while expertise with marine engines is preferable. The candidate must have excellent writing and presentation skills and must be able to work in a team and must be willing to interface with industry.
+
+\section{}
+
+The research at the Division covers turbulent flow (both compressible and incompressible), aero-acoustics and turbomachines. Our tools include both computations and experiments. The research covers a wide range of topics. In some research projects the smallest turbulent scales are studied whereas in others the function of a complete gas turbine is analyzed and modelled.
+
+Our applied research is carried out in close cooperation with industry, both in national projects and in EU projects. Vehicles (cars, trucks, busses and trains), airplanes, gas turbines, water and wind turbines are important applications. The Division of Fluid Dynamics is part of Chalmers Sustainable Transport Initiative, Chalmers eScience Initiative and Chalmers Energy Initiative.
+
+Chalmers is intensifying its collaboration with Brazil and SAAB in the aeronautical sector by offering a post doc position in advanced propulsion and conceptual design of future aircraft. The propulsion system activities are devoted mainly to high performance compressors and engine integration, whereas system level activities are focusing on the integration of propulsion and its interrelations with the aircraft.
+
+The role of the successful applicant will be to design and lead the development of new high-speed turbomachinery working commercial software and optimization methods. The work will also draw on geometry optimization methods collaboratively developed between Chalmers and ITA in on-going funded research projects.
+
+\section{}
+
+The University of Notre Dame, Center for Shock Wave-processing of Advanced 
+Reactive Materials (C-SWARM), is seeking a highly qualified candidate for the postdoctoral 
+associate position in the area of computational mechanics/physics with emphasis on 
+chemically reactive solids. C-SWARM is center of excellence established by National 
+Nuclear Security Administration (NNSA) whose primary focus is on the emerging field of 
+predictive science. The main mission of C-SWARM is to predict shock conditions under 
+which new materials can be synthesized using predictive computational models that are 
+verified and validated with quantified uncertainty on future high-performance Exascale 
+computer platforms.
+	The successful candidates will be a key part of a team that is developing and 
+implementing adaptive, multiscale, high-performance (parallel) computational algorithms 
+for numerical solutions of chemo-thermo-mechanical PDE’s with emphasis on complex 
+heterogeneous materials, such as heterogeneous reactive composites, etc. 
+
+Qualifications:
+•	Ph.D. in Mechanical Engineering, Theoretical and Applied Mechanics, Applied 
+Mathematics, Physics or related engineering or science discipline 
+•	Knowledge of computational nonlinear solid/fluid mechanics and/or chemical kinetics 
+and solid-solid phase transformations
+•	Knowledge of numerical methods for solution of nonlinear PDEs
+•	Knowledge of C/C++ and UNIX operating system is required
+•	Experience in parallel programming
+
+\section{}
+
+    Perform Computational Fluid Dynamics (CFD) simulations of Internal Combustion Engine (ICE) fuel spray and after-treatment processes using High-Performance Computing (HPC) tools.
+    Develop two-phase flow models for coupling nozzle flow with spray simulations for both diesel and gasoline direct injection.
+    Import these two-phase flow simulations on leadership class supercomputing resources, identify and improve the bottlenecks in scaling the simulations.
+    Use high-fidelity turbulence models to improve two-phase flow predictions.
+    Incorporate state-of-the-art experimental measurements in improving the accuracy of two-phase flow models.
+    The successful candidate’s research will involve synergetic collaborations with a multidisciplinary team involving engine modelers and experimentalists, and computational scientists to enhance the predictive capability of engine modeling codes.
+
+        Knowledge of multi-dimensional code development (in Fortran/C/C++) for two-phase flow applications, after-treatment modeling, turbulence modeling, internal combustion engine theory and operation, and parallel scientific computing is required.
+    Experience in running CONVERGE or OpenFoam codes is desired.
+    Understanding of turbulent combustion modeling is desired.
+    Knowledge of large scientific code management and optimization is desirable.
+    Strong collaborative skills, including the ability to work well with other divisions, laboratories, and universities. Strong communication skills.
+    Experience in interdisciplinary collaborative research is desirable.
+    Candidates should have a Ph.D. in mechanical/aerospace engineering, applied mathematics, chemical engineering, or a related discipline.
+
+Additional Experience:
+
+    Knowledge of internal combustion engines and various modes of combustion, including Advanced Compression Ignition (ACI) is desired.
+
+\section{}
+
+The virtual flight and preliminary design of conceptual vehicles require running hundreds or even thousands of aerodynamic simulations. Practical computation of such large test matrices places a premium on automation of the entire simulation process and on automated control of data flow and job execution. In recent years, Cartesian mesh methods have made rapid strides toward the goal of fully automated aerodynamic analysis. Based on this technology, Ames researchers, with partners from the Courant Institute (New York University), have developed systems for automatically running the extremely large matrices of simulations required for preliminary design and virtual flight. When design permutations or control surface deflections modify the shape of a vehicle, the system automatically generates the new geometry, remeshes the design, and runs simulations covering a wide range of flight conditions.
+
+\section{}
+
+We are seeking a Postdoctoral Researcher to develop models and computational methods for the simulation of complex reacting flows and heat transfer, including flows in porous media, turbulent reacting flows, and radiative heat transfer. The successful candidate will implement new multi-physics models in Sandia simulation codes, and work with analysts and experimentalists to verify and validate these models. Applications of particular interest are the response of organic materials in fire environments, combustion of composite materials, and/or gas storage and reaction in powder beds. Opportunities will exist to expand these modeling capabilities to impact several of Sandia’s key mission areas, including nuclear stockpile safety and energy security. External publication and presentation of unclassified research and analysis work is encouraged wherever possible. Members of our department interact closely with engineers and other researchers and analysts across the laboratory at both the California and New Mexico sites.
+
+On any given day, you may be called on to:
+
+    Work on a number of projects concurrently and must work across several diverse teams.
+
+Qualifications We Require
+
+    Ph.D. degree in aerospace, mechanical, material science, computer science, applied mathematics, or a closely related field
+    Knowledge and experience with code development for complex physics, such as reacting flows, porous media flows, thermal transport, electrochemistry, pyrolysis chemistry, or a closely related field is required
+    Experience with numerical methods for coupled multi-physics simulations and experience with finite element method are also required.
+    Experience and proficiency in C++ coding
+    Strong publication record and a demonstrated ability to make original contributions to engineering science
+    Ability to obtain and maintain a U.S. DOE Q security clearance
+
+Qualifications We Desire
+
+    Knowledge and experience with computational modeling of turbulent combustion, pyrolysis chemistry, heat transfer, and multiphase flows are desired
+    Background including applied math is also beneficial. Knowledge of multiple programming languages (python, etc) is a plus
+    Experience with machine learning and other data science methodologies
+    Experience programming for parallel computing on GPUs
+
+\section{}
+
+    Perform high-fidelity Computational Fluid Dynamics (CFD) simulations of Internal Combustion Engine (ICE) flows using spectral element method (SEM). 
+    Develop tools to generate SEM grids for complex, moving domains in a seamless fashion. 
+    Implement submodels for turbulence, two-phase flow, and combustion into SEM codes. 
+    Perform scalability studies and port these simulations on leadership class supercomputing resources, identify and improve the bottlenecks in scaling the simulations.
+
+The successful candidate’s research will involve synergetic collaborations with a multidisciplinary team involving engine modelers and experimentalists, and computational scientists to enhance the predictive capability of engine modeling codes.
+
+    Expertise in Nek5000 or other comparable spectral element method codes.
+    Experience in running high-fidelity simulations on leadership class supercomputers.
+    Knowledge of large scientific code management and optimization is desirable.
+    Knowledge of performing scalability studies to identify and improve bottlenecks in large codes.
+    Understanding of high-order methods for fluid flows.
+    Collaborative skills, including the ability to work well with other divisions, laboratories, and universities.
+    Strong communication skills
+    Some experience in two-phase flow applications, after-treatment modeling, turbulence modeling, internal combustion engine theory and operation is desirable.
+    Some experience in interdisciplinary collaborative research is desirable.
+    Candidates should have a Ph.D. in mechanical/aerospace engineering, applied mathematics, chemical engineering, or a related discipline.
+
+        Perform development and validation of Computational Fluid Dynamics (CFD) models for gas turbine combustors.
+    Involve the use of high fidelity simulations on supercomputers and leverage machine learning algorithms to optimize gas turbine combustor designs for lower emissions.
+    Work in collaboration with a multidisciplinary team of experimentalists and modelers.
+
+        Experience in NOx and soot modeling for gas turbine combustors is desired.
+    Experience in using CFD codes, on HPC systems, for complex geometries involving multiphase and turbulent combustion.
+    Knowledge of combustion concepts is desired.
+    Knowledge of multi-dimensional code development (in Fortran/C/C++) for CFD models along with understanding of turbulent combustion models.
+    Understanding of chemical kinetics is desired.
+    Understanding of multi-phase modeling is desired.
+    Collaborative skills, including the ability to work well with other divisions, laboratories, and universities.
+    Strong communication skills.
+    Experience in interdisciplinary collaborative research is desirable.
+    Understanding of machine learning techniques is desirable.
+    Candidates should have a Ph.D. in mechanical/aerospace engineering, applied mathematics, chemical engineering, or a related discipline.
+
+ to develop new, high-fidelity computational fluid mechanics models capable of capturing multi-phase processes in fuels sprays, and to apply these models to investigate spray physics;
+
+Utilize the fundamental understanding gained through this research to create engineering-level models and predictive tools for engine and fuel behavior;
+Conducting and reporting on independent research;
+Participating in program development;
+Participating in international collaborations with leading engineers and scientists from industry, universities, and other technical institutions.
+
+\section{Supersonic propulsion}
+
+    Perform model development and Computational Fluid Dynamics (CFD) simulations of high speed reacting flows.
+    Implement combustion models for supersonic combustion applications. 
+    Optimize CFD codes for future supercomputing architectures.
+    The successful candidate’s research will involve synergetic collaborations and co-development activities with a multidisciplinary team of modelers and experimentalists.
+
+Position Requirements
+
+We expect you to have:
+
+    Knowledge of multi-dimensional code development (in Fortran/C/C++) for CFD models along with experience in turbulent combustion models. 
+    Ability to work in a team environment.
+    Knowledge of air-breathing propulsion concepts is desired.
+    Experience in implementing models in CFD codes is desired.
+    Understanding of turbulent combustion modeling and chemical kinetics is desired.
+    Knowledge of large scientific code management and optimization is desired.
+    Experience in modeling supersonic reacting flows is desired.
+    Experience with tabulated flamelet models is desired.
+    Collaborative skills, including the ability to work well with other divisions, laboratories, and universities. 
+    Strong communication skills.
+    Experience in interdisciplinary collaborative research is desirable.
+    Understanding of machine learning techniques is desired.
+    Candidates should have a Ph.D. in mechanical/aerospace engineering, applied mathematics, chemical engineering, or a related discipline.
+    Candidates with research experience
+and expertise in computational modelling and simulation (DNS, LES, LBM, MD and multiscale modelling
+multiscale modelling) are especially welcome.
+
+\section{Fire modeling}
+
+fire 
+modelling using FireFOAM, the LES based fire simulation solver within the frame 
+of open source CFD code OpenFOAM. 
+
+Your will undertake research to improve the fire modelling capability within 
+Warwick FIRE by consolidating various sub-models in fire simulations developed 
+by previous researchers into the latest release of FireFOAM code and conduct 
+original research to improve some of the sub-models within FireFOAM. This could in
+include those for soot formation and oxidation as well as the existing tr
+treatment for coupled simulations of pool fire mass burning rate and fire de
+development.
+
+You should hold a PhD (or be expecting the imminent award of one) in 
+mechanical, chemical engineering or a related discipline. Experience in CFD 
+modelling of premixed turbulent combustion will be essential. 
+
+\section{}
+ Experimental and/or computational and/or theoretical fluid mechanics
+related to turbulent flows, droplet/particle interaction with turbulence, microphysics of
+turbulent atmospheric cloud, atmospheric turbulence.
+
+Brief introduction: Fluid turbulence is often quoted as the last unsolved problem in classical
+physics, a statement usually associated with R.P. Feynman (Nobel prize in Physics).
+Turbulent flows and interaction between turbulence and particle/droplets is at the heart of
+many processes in nature such as in the atmosphere (clouds, pollutants motion, weather-
+climate feedback etc.) and many engineering processes such as inside combustion
+engines, chemical and food processing, aircraft flights etc. However fundamental
+understanding of these subject is challenging and represents the forefront of scientific
+inquiry, owing to the non-linear and complex nature of these problems. Our lab aims at
+better understanding turbulence and particle-turbulence interaction (with emphasis in
+either atmospheric or engineering processes) using cutting-edge experimental and/or
+computational methods and theoretical considerations.
+Sample projects: observing droplet/particle motion and collisions in turbulence chamber
+via cutting-edge experiments or numerical simulation (e.g. using the Tianhe-2
+supercomputer); numerical simulation and fundamental analysis of turbulent flows, with or
+without particles; designing new experimental tools or techniques to observe
+particle/droplet dynamics in atmospheric clouds; designing and/or conducting wind-tunnel
+experiments to observe pollution dispersion turbulent environments (or via simulation) etc.
+Exact project to be designed based on interest/ability of candidates.
+prior experience with numerical simulations (DNS, LES,
+lattice Boltzmann) of turbulence and/or parallel computation would be helpful.
+
+\section{}
+
+The Methods and Algorithms group in the Computational Physics division at Los Alamos National 
+Laboratory is seeking exceptional candidates for a postdoctoral appointment in the computational 
+multiphase reacting flow. The postdoc researcher will be expected to conduct fundamental, applied, and
+interdisciplinary research towards improving predictive capabilities in modeling multiphase reacting flow. 
+Emphasis will be on sub-zonal modeling of evolution of high explosives. The successful candidate will 
+pursue model development, implementation, and validation against experimental data.  Collaboration with
+experimental investigators, theoretical and computational chemists, and materials model developers will 
+be essential.
+
+What You Need
+Minimum Job Requirements:
+·         A doctoral degree in engineering, physics, applied mathematics or related fields completed within 
+the past five years or soon to be completed.
+
+·         Demonstrated experiences in computational fluid dynamics (CFD) code development.
+
+·         Experience in multiphase flow modeling.
+
+·         Knowledge in chemically reacting flows.
+
+·         Programming experience with languages such as Fortran, C, C++ or python for scientific 
+applications
+
+Desired Skills:
+
+·         Experience in modeling of high explosives, damage, fracture, or plasmas.
+
+\section{Data Integrated Modelling of Fluid Flows and Forces}
+
+Computational methods for predicting complex unsteady flows are computationally demanding, while full-field experimental methods are very expensive. This project is at the forefront of the emerging field of machine learning and data-driven computational modelling. The student will develop unique new models to predict fluid mechanic characteristics by integrating experimental data from high-resolution Particle Image Velocimetry (PIV) and force measurements into Computational Fluid Dynamics (CFD) simulations. The resulting learning-based models will vastly reduce the computational cost of running CFD simulations. This reduction in cost will expand the potential applications of CFD into new areas such as generative design, digital twins, and life-cycle forecasting for engineering structures.
+
+\section{Computational reacting flows}
+
+
+Prof. Suo Yang’s research lab (http://www.me.umn.edu/people/yang_s.shtml) in 
+the Department of Mechanical Engineering (ME) at the University of Minnesota 
+(UMN) is looking for 2 Postdoc Scholars starting in Spring 2019 or later. Prof. 
+Yang’s lab conducts research broadly on the first-principles based modeling and 
+simulation of reacting flows, including combustion, turbulence, soot aerosols, 
+plasma physics, and their multiscale interactions. The goals are developing and 
+utilizing high-fidelity and computationally efficient predictive tools (1) to 
+gain fundamental understanding of the physico-chemical processes in reacting 
+flows; and (2) to design and control advanced propulsion and power-generation 
+systems (primarily reciprocating engines and gas turbines) for energy 
+sustainability.
+
+
+Required qualifications:  
+•	A PhD in Mechanical Engineering, Aerospace Engineering, or other 
+closely-related discipline. 
+•	Demonstrated experience in the mathematical modeling and numerical 
+simulation of turbulent combustion, including large eddy simulations (LES) and 
+turbulence-chemistry interactions.
+•	Demonstrated experience with chemical kinetic modeling using platform 
+such as Cantera, ChemKin, and FlameMaster.
+•	Demonstrated Experience with scientific computing using C++, Fortran 
+90, and MPI in parallel computing.
+•	Strong publication record as a first author in peer-reviewed journal 
+papers.
+•	Ability and high self-motivation to work productively both 
+independently and as part of a diverse team.
+•	Excellent verbal and written communication skills in English
+
+Preferred qualifications: 
+•	Prior experience and training in OpenFOAM and/or KIVA for combustion 
+CFD of internal combustion engines.
+•	Experience using OpenMP and/or CUDA in high performance computing 
+(HPC).
+•	Experience in writing research funding proposals.
+•	Experience in helping to supervise undergraduate and/or graduate 
+projects.
+
+ numerical and analytical expertise in particle-laden 
+turbulent flows with combustion for an initially 12-month post-doctoral position in the Multi-Physics 
+Interaction Lab at the University of Waterloo, Canada.  The ideal candidate should have extensive knowledge 
+of turbulent flows, more specifically related to multi-species/multi-phase flows, particle-laden turbulent 
+flows, Lagrangian-Eulerian coupling methods, complex turbulent heat transfer and/or combustion. Applicants 
+with expertise in high-speed or compressible turbulent flows will also be considered.
+
+\section{Efficient and robust high-order simulation of the gas dynamics equations}
+
+Full title: Efficient and robust high-order numerical simulation of the gas dynamics equations
+
+Keywords: discontinuous Galerkin method, entropy stability, positivity preserving, compressible Euler and Navier-Stokes equations.
+
+Context: This work will consider the nonlinear analysis of a robust high-order discretization, based on a discontinuous Galerkin (DG) method, of the compressible Euler and Navier-Stokes equations. Approximations based on expansion coefficients, such as the DG method, suffer from spurious oscillations in the vicinity of discontinuities due to the Gibbs phenomenon and may cause the solution to become locally nonphysical leading to robustness issues for the computation. Besides, DG methods are also prone to nonlinear instabilities due to under integration of the variational formulation of the nonlinear equations.  Stabilization techniques are thus necessary to restore positivity of the variables (density, internal energy, etc.) and nonlinear stability (via an entropy inequality) at the discrete level. The method introduced in [1,2] is based on a DG approximation in space and a decomposition between acoustic and transport operators associated to an implicit-explicit time integration, thus relaxing the constraint of acoustic waves on the time step as proposed in [3].  Conditions on the time step and on numerical dissipation parameters are derived to keep positivity of the discrete density and internal energy and to satisfy a discrete inequality for the physical entropy at any approximation order of the discretization. Numerical experiments highlight stability and robustness of the present method for a wide range of applications from low Mach number to supersonic flows.
+
+References:
+[1] F. Renac, A robust high-order Lagrange-projection like scheme with large
+time steps for the isentropic Euler equations, Numer. Math., 135 (2017), pp.
+493-519 (arXiv:1602.01598 [math.NA]).
+[2] F. Renac, A robust high-order discontinuous Galerkin method with large time
+steps for the compressible Euler equations, Comm. Math. Sci., 15 (2017), pp.
+813-837.
+[3] F. Coquel, Q. Long-Nguyen, M. Postel and Q. H. Tran, Entropy-satisfying
+relaxation method with large time-steps for Euler IBVPs, Math. Comput., 79
+(2010), pp. 1493-1533.
+
+Description of work: The main objective of this post-doctoral project is the
+investigation of the method when applied to multiple space dimensions on
+non-structured meshes and to the compressible Navier-Stokes equations. A
+nonlinear analysis of the discrete scheme will be applied to investigate its
+properties (positivity, nonlinear stability, etc.). Other techniques for the
+time integration that avoid the splitting of operators will also be considered.
+Numerical experiments in the code Aghora developed at Onera will be conducted to
+assess the performances of the method. The results will be the subject of
+publications in journals and scientific conferences.
+
+\section{Computational framework}\label{sec:framework}
+
+In this section, we first present a computational framework that outlines the the major difficulties in high-resolution shock-capturing computations, concisely systhesizes most practices and their references, and describes our justifications in choosing a specific approach. We then present our development for rapid prototyping and fast computation.
+
+\subsection{Governing equations}
+
+NS equation
+
+\subsection{Multidimension}
+
+Operator splitting (our numerical convergence test on 2D vortex preservation show negible difference between opt-split and dim-by-dim, since the temporal discretization error is draged down by a small CFL coefficient) or dim-by-dim
+
+\subsection{Nonlinear vector system}
+
+characteristic-based or component-based, flux reconstruction or solution reconstruction (linear equivalence)
+
+\subsection{Time-space coupling}
+
+Lax-wendroff or method of line
+
+\subsection{Spatial discretization}
+
+conservative discretization, convective + diffusive.
+
+\subsection{Temporal discretization}
+
+SSP RK
+
+\subsection{Boundary treatment}
+
+body-conformal, non-body conformal: ibm
+
+\subsection{Rapid prototyping}
+
+multidomain node mapping + boolean/arithemic operation supported (geometry + Cartesian: logical negative; geometry + geometry: logical or) and overlapped surface permited assembling : 1 cone + 1 cylinder + 1 sphere + 2 Naca0012 + 1 wind tunnel + 1 Cartesian grid
+
+\subsection{Fast computation}
+
+1D, 2D, 3D
+
+\section{results}
+
+oblique shock for cone, computation acceleration, compare dimsplit and dimbydim
+
+\section{Conclusion}
+
+\title{A multibody contact and collision model}
+
+A new multibody collision model with confined direct domain of dependence based on grouped pairwise collision on the line of impact. Originate from grouped governing equations for two groups acting as a pair with a new group mass and group velocity.
+
+\title{Discontinusous Galerkin + subcell WENO reconstruction for interfacial values}
+
+Add a line of uniformly distributed seeds in the two neighbouring cells to interpolate interfacial values using WENO for high-order , stable, local interpolation.
+
+\section{Structural reactive material}
+
+Metal reactive materials such as Aluminum have large combustion energy densities. When experiencing high-strain-rate plastic deformation, these materials can provide significant energy release for high explosives through intermetallic reactions and oxidation initiated by the heat generated from shear instability and local plastic deformation as well as fragmentation in the shear band. However, under an explosive loading, the energy release rate of metal reactive materials strongly depends on the metal particle sizes. For instance, in order to complete oxidation within $1 \Unit{ms}$, the diameters of Al particles requires to be on the order of about $20 \Unit{\mu m}$, which is very difficult to generate from the explosive expansion of either homogeneous solid Al samples or consolidated Al powders. In order to overcome the magnitude discrepancy between the characteristic size of explosively fragmented solid/porous Al and the required size of Al for fast oxidation, a highly heterogeneous granular material combing Al and W components is introduced to establish the \emph{in situ} generation of small size Al fragments under explosive loadings. The high heterogeneity of this material, which mostly originates from component density differences, facilitates the pulverization of the material with fragment sizes determined by the initial mesostructure of the material rather than the self-organization of macrocracks. Through conducting explosive fragmentation of Al-W rings under the same conditions of the explosive fragmentation of densified Al powders to elucidate the effects of mesostructures on fragment sizes, it is demonstrated that highly heterogeneous Al-W granular materials can produce characteristic sizes much smaller than those of homogeneous solid/porous Al materials under the same explosive loading conditions \citep{chiu2017dynamic}.
+
+For the purpose of preserving both high energy density and mechanical strength, a fine granular mixture of reactive materials is consolidated to form a structural reactive material (SRM) solid made of various metal elements and compounds and towards the theoretical maximum density with little porosity. In order to augment air blast through the rapid oxidation of the reactive materials, a SRM solid should be effectively fragmented into fine fragments under given explosive loadings. A reactive hotspot concept that uses the intermetallic reactions of microsized reactive additives such as $\Des{MoO}_3$ distributed in a base SRM solid such as $\Des{Al}$ to create microscale hotspots is investigated to initiate local fractures and to produce subsequent fine fragments of a SRM solid. Experimental results demonstrated that a SRM solid casing can produce an observable larger amount of fine fragments than that of a pure Al casing, and the prompt reaction of the produced fine fragments after detonation significantly enhanced the primary and near-field blast waves \citep{zhang2017dynamic}.
+
+The mesostructures of the formed granular ring such as interfaces resulting from the grain-scale heterogeneities in shape, density, impedance, and hardness create structure discontinuities \citep{chiu2017dynamic}, and the intermetallic reactions under explosive loading creates mesoscale hotspots \citep{zhang2017dynamic}, which initiate local fractures.
+
+\section{Deduced jetting process}
+
+\begin{enumerate}
+    \item Under shock compaction, a large pressure difference is created between the inside and outside of the particle bed, which accelerates flow through the particle bed and the particle bed itself. Inner-layer particles experience high-strain-rate plastic deformation and agglomerate to form a solid ring with granular dissimilarity;
+    \item The mesostructures of the formed granular ring such as interfaces resulting from the grain-scale heterogeneities in shape, density, impedance, and hardness create structure discontinuities \citep{chiu2017dynamic}, and the intermetallic reactions under explosive loading creates mesoscale hotspots \citep{zhang2017dynamic}, which initiate local fractures;
+    \item High-speed fluid jets form at the fractures of the solid ring. These fluid jets force the clustering of outer-layer particles, producing particle jets. As a result, the fragmented ring dictates the number of jets.
+\end{enumerate}
+
+The computed dispersal process of the particle system in the form of numerical Schlieren is presented. During the particle dispersal, complex shock-shock, shock-particle, and particle-particle interactions are resolved. When reaching the particle payload, shocks diffract and reflect over the particle surfaces. Diffracted shocks propagate along particle surfaces and later collide at the concave regions, forming locally heavy fluids. Richtmyer--Meshkov instability is then induced by the injection of the heavy fluid into ambient light fluid. The reflected shock waves propagate back toward the payload after coalescing at the domain center, which then collide with the growing fluid jets and severely disturb the jet structure. The impacts of repetitive reflected shocks effectively destabilize the particle system, producing gaps among particles. High-speed fluid jets are then generated at those gaps, which further fracture the particle system.
+
+\section{Unsteady drag analysis and model using mesoscale modeling}
+
+\subsection{Overall drag calculation}
+
+A shock wave with three shock Mach numbers $M_{\Des{s}} = 1.22$, $1.40$, and $1.45$ impacts on a particle curtain immersed in an initial temperature $300 \Unit{K}$ and absolute pressure $84.1 \Unit{kPa}$. Particle diameter $D_{\Des{p}} = 106-125 \Unit{\mu m}$ and $300-355 \Unit{\mu m}$ corresponding to curtain width $\delta = 1.5 \Unit{mm}$ and $3.5 \Unit{mm}$, respectively \citep{demauro2017unsteady}. 
+
+Particle volume fraction $\phi$:
+\begin{equation}
+    \phi = \frac{\sum_{p}m_p}{A\delta}
+\end{equation}
+
+\begin{figure}[!htbp]
+    \centering
+    \begin{subfigure}[b]{0.40\textwidth}
+        \includegraphics[trim = 0mm 25mm 0mm 20mm, clip, width=\textwidth]{drag_compute_domain_demo}
+        \caption{}
+        \label{fig:drag_compute_domain_demo}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.40\textwidth}
+        \includegraphics[trim = 0mm 25mm 0mm 20mm, clip, width=\textwidth]{drag_control_volume_demo}
+        \caption{}
+        \label{fig:drag_control_volume_demo}
+    \end{subfigure}%
+    \caption{Drag analysis of shock impingement on a particle curtain. (a) Computational domain. $H = 76 \Unit{mm}$, $W = X \delta$. (b) Control volume.}
+    \label{fig:drag_shock_curtain}
+\end{figure}
+
+Estimation of the overall drag as a function of time
+\begin{enumerate}
+    \item Control volume approach (Fluid perspective)
+
+        Through applying momentum conservation to the control volume, the overall external force exerted on the control volume has
+        \begin{equation}
+            \Vector{F}_{\Des{E}} = \frac{\partial }{\partial t} \int_{\Omega}^{} \rho \Vector{V} \,\mathrm{d}\Omega + \int_{S}^{} \unitVector{n} \cdot (\rho \Vector{V}\Vector{V} + p \unitTensor{I}) \,\mathrm{d}S
+        \end{equation}
+        where $\Omega$, $S$, and $\unitVector{n}$ are the spatial domain, boundary surface, and unit outward normal vector of the control volume, respectively. $\unitTensor{I}$ is the second-order identity tensor.
+
+        Using the one-dimensional flow assumption and the control volume property, the overall drag has
+        \begin{equation}
+            \Vector{F}_{\Des{D}} = \frac{\partial }{\partial t} \int_{\Omega}^{} \rho u \,\mathrm{d}\Omega - \int_{A_{\Des{L}}}^{} (\rho u^2 + p) \,\mathrm{d}A_{\Des{L}} + \int_{A_{\Des{R}}}^{} (\rho u^2 + p) \,\mathrm{d}A_{\Des{R}}
+        \end{equation}
+        Compared to the control volume analysis established on experimental measurements \citep{demauro2017unsteady}, the presented analysis exempts from additional assumptions on the value distribution of involved flow quantities, as all the required information is readily available via the mesoscale modeling. 
+
+    \item Force integration approach (Particle perspective)
+        \begin{equation}
+            \Vector{F}_{\Des{D}} = \sum_{p}^{} \Vector{f}_{\Des{D},p}
+        \end{equation}
+        where $\Vector{f}_{\Des{D},p}$ is the drag force on the $p$-th particle.
+\end{enumerate}
+The overall drag calculations can only be applied to one-dimensional flows, in which all the drag forces on individual particles are in the same direction.
+
+\subsection{Drag law} \label{subsec:Drag law}
+
+Drag model for individual particles
+\begin{equation}
+    \Vector{f}_{\Des{D},p} = f(\Vector{u}_p, \Vector{u}_f)
+\end{equation}
+where $\Vector{u}_p$ is the particle velocity, and $\Vector{u}_f$ is the ambient fluid velocity.
+
+Such as in Discrete Element Model (DEM): The interaction between the two phases is incorporated by drag force correlations, which depend on the local relative velocity of the phases and the local solid volume fraction.
+\begin{equation}
+    \Vector{f}_{\Des{D},p} = \frac{V_{p,i} \beta}{1 - \phi} (\Vector{u}_{f} - \Vector{u}_{p,i})   
+\end{equation}
+where $V_{p,i}$ is the particle volume of the $i$-th particle, $\beta$ is the momentum exchange coefficient between the solid and fluid phase, $\phi$ is the void fraction of particle bed, $\Vector{u}_f$ is fluid velocity, and $\Vector{u}_{p,i}$ is particle velocity of the $i$-th particle.
+
+\section{Jet formation}
+
+\begin{enumerate}
+    \item Simulations:
+        \begin{enumerate}
+            \item 2D
+            \item 3D
+        \end{enumerate}
+    \item Analysis and models for two velocities:
+        \begin{enumerate}
+            \item maximum expansion velocity of surface layer of particles
+            \item particle velocity within the dense expanding solid flow (or sometimes called "drag" law in dense solid flow still involving collisions)
+            \item Gurney velocity deficit with regard to maximum expansion velocity of surface layer of particles
+        \end{enumerate}
+    \item Comments:
+        \begin{enumerate}
+            \item The relation of $M/C$ ratio on jetting ($M$ is the solid payload mass and $C$ is the driver fluid mass). With an increase in $M/C$ (more layers of particles), the jet number would decrease due to more dissipation of fluid jets in the solid payload. Eventually there would be not jetting instability at a certain large $M/C$. Instead, the outer layers of particles would expand radially more uniformly.
+            \item Increase the driver density. The real explosive density is on the order of $10^3 kg/m^3$, while the particles (say, Al) have a density of $2700kg/m^3$. Due to the computer power, you may not reach the real densities. But an increase in driver density and make it different from the ambient would make the problem more realistic.
+            \item Can you do the problem where the high pressure driver is in the direct contact with the particulate payload?
+        \end{enumerate}
+\end{enumerate}
+
+\section{Cases}
+
+\subsection{Subsonic flow around a cylinder}
+
+The subsonic viscous flow around a cylinder resulting from the passing of a uniform free-stream flow $(\rho_{\infty}, u_{\infty}, v_{\infty}, p_{\infty})=(1.176 \Unit{kg/m^3}, 34.7 \Unit{m/s}, 0, 101327 \Unit{Pa})$ is computed to validate the proposed field function applied to subsonic fluid-solid interactions. For flow around a cylinder, when the Reynolds number of the free-stream flow, $Re$, is less than about $47$, the flow is steady, and two symmetric recirculating vortices form behind the cylinder. As $Re$ increases to a higher value, the flow becomes unsteady with vortex shedding \citep{gao2007improved}. In the present calculation, flow conditions with $Re=20$, $40$, $100$, and $200$ are considered, which cover both the steady and unsteady flow regimes and have a considerable amount of published data for comparison.
+
+As illustrated in Fig.~\ref{fig:flow_cylinder_demo_a}, a cylinder with diameter $D=1 \Unit{m}$ is positioned in a domain of size $L \times H = [0, 45D] \times [0, 30D]$, and the center of the cylinder is located at $C(10D, 15D)$. A subsonic inflow condition is imposed at the left domain boundary, in which the flow states have the same values as the free-stream ones except that the density is extrapolated, and the outflow condition is used for the right domain boundary. In addition, the slip-wall boundary condition is applied for the lower and upper domain boundaries, while the no-slip wall boundary condition is enforced on the cylinder. The dynamic viscosity of the flow is set to a constant value determined from $\mu = \rho_{\infty} u_{\infty} D / Re$. After a grid convergence test, a $1350\times900$ grid was found to be sufficient for producing reliable results, which has a grid resolution of about $0.03D$ ($30$ nodes per diameter) and is comparable to the grid resolutions used in references \citep{gao2007improved, brehm2015locally}.
+
+As illustrated in Fig.~\ref{fig:flow_cylinder_demo_b}, the steady flows can be quantified through a variety of vortex parameters such as the vortex location $a$, vortex distance $b$, length of separation $c$, and angle of separation $\theta$. In addition, the drag coefficient $C_{\Des{D}} = F_x / (0.5\rho_{\infty} u_{\infty}^2 D)$ can be used to validate the force behaviour, where $F_x$ is the $x$-component of the total force acting on the cylinder.
+\begin{figure}[!htbp]
+    \centering
+    \begin{subfigure}[b]{0.40\textwidth}
+        \includegraphics[width=\textwidth]{flow_cylinder_demo_a}
+        \caption{}
+        \label{fig:flow_cylinder_demo_a}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.40\textwidth}
+        \includegraphics[width=\textwidth]{flow_cylinder_demo_b}
+        \caption{}
+        \label{fig:flow_cylinder_demo_b}
+    \end{subfigure}%
+    \caption{Schematic diagrams illustrating the flow around a cylinder problem. (a) Computational setup. (b) Vortex parameters for steady flows. [Nomenclature: $L$, domain length; $H$, domain height; $C$, cylinder center; $D$, cylinder diamter; $a$, horizontal distance from vortex center to cylinder rear; $b$, vertical distance between vortex centers; $c$, length of separation; $\theta$, angle of separation.]}
+    \label{fig:flow_cylinder_demo}
+\end{figure}
+
+The predicted local streamlines of the steady flows at Reynolds numbers $Re=20$ and $Re=40$ are shown in Fig.~\ref{fig:1_cyn_vortex_stream_steady}. As the Reynolds number increases, the attached, steady, and symmetric vortex pair grow in length. A comparison of the predicted flow properties with the published ones in the literature is presented in Table~\ref{tab:1_cyn_vortex_para_steady}, in which excellent agreement is presented among all the quantities of interest.
+\begin{figure}[!htbp]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{1_cyn_vortex_stream_re020}
+        \caption{}
+        \label{fig:1_cyn_vortex_stream_re020}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{1_cyn_vortex_stream_re040}
+        \caption{}
+        \label{fig:1_cyn_vortex_stream_re040}
+    \end{subfigure}%
+    \caption{Local streamlines of the steady flows around a cylinder at different Reynolds numbers. (a) $Re=20$. (b) $Re=40$.}
+    \label{fig:1_cyn_vortex_stream_steady}
+\end{figure}
+\begin{table}[!htbp]
+    \centering
+    %\footnotesize% fontsize
+    %\setlength{\tabcolsep}{4pt}% column separation
+    %\renewcommand{\arraystretch}{1.5}% row space 
+    \begin{tabular}{lccccc}
+        \hline\hline
+        %\multicolumn{num_of_cols_to_merge}{alignment}{contents} \\
+        %\cline{i-j}% partial hline from column i to column j
+         & $a$ & $b$ & $c$ & $\theta$ & $C_{\Des{D}}$ \\
+        \hline
+        $Re=20$ & & & & & \\
+        \citet{coutanceau1977experimental}$^*$ & $0.33$ & $0.46$ & $0.93$ & $45.0^{\circ}$ & $--$\\
+        \citet{linnick2005high} & $0.36$ & $0.43$ & $0.93$ & $43.5^{\circ}$ & $2.06$\\
+        \citet{brehm2015locally} & $0.36$ & $0.42$ & $0.96$ & $44.0^{\circ}$ & $2.02$\\
+        \emph{Present study} & $0.36$ & $0.42$ & $0.93$ & $43.8^{\circ}$ & $2.01$\\
+        $Re=40$ & & & & & \\
+        \citet{coutanceau1977experimental}$^*$ & $0.76$ & $0.59$ & $2.13$ & $53.8^{\circ}$ & $--$\\
+        \citet{linnick2005high} & $0.72$ & $0.60$ & $2.28$ & $53.6^{\circ}$ & $1.54$\\
+        \citet{brehm2015locally} & $0.72$ & $0.58$ & $2.26$ & $52.9^{\circ}$ & $1.51$\\
+        \emph{Present study} & $0.73$ & $0.60$ & $2.27$ & $52.4^{\circ}$ & $1.50$\\
+        \hline\hline
+    \end{tabular}
+    \caption{Comparison of results for steady flows around a cylinder. [Nomenclature: $a$, horizontal distance from vortex center to cylinder rear; $b$, vertical distance between vortex centers; $c$, length of separation; $\theta$, angle of separation; $C_{\Des{D}}$, drag coefficient; $*$, experimental results.]}
+    \label{tab:1_cyn_vortex_para_steady}
+\end{table}
+
+The temporal evolution of the unsteady flows at $Re=100$ and $200$ are shown in Fig.~\ref{fig:1_cyn_vortex_stream_unsteady}, in which the development of von K\'{a}rm\'{a}n vortex shedding in the wake region is captured in detail. The unsteady flows can be quantified via several flow parameters, such as the Strouhal number $St = f D / u_{\infty}$, drag coefficient $C_{\Des{D}}$, and lift coefficient $C_{\Des{L}} = F_y / (0.5\rho_{\infty} u_{\infty}^2 D)$, where $f$ is the vortex shedding frequency (in this study, two point probes are positioned at $(15D, 15D)$ and $(20D, 15D)$ to record the time signals of the $y$-component of the velocity, whose FFT are then used to determine the vortex shedding frequency) and $F_y$ is the $y$-component of the total force acting on the cylinder, respectively. A comparison of flow results is shown in Table~\ref{tab:1_cyn_vortex_para_unsteady}, in which good agreement is obtained.
+\begin{figure}[!htbp]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[trim = 0mm 80mm 0mm 80mm, clip, width=\textwidth]{1_cyn_vortex_re100_t0500ms}
+        \caption{$t = 0.5 \Unit{s}$}
+        \label{fig:1_cyn_vortex_re100_t0500ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[trim = 0mm 80mm 0mm 80mm, clip, width=\textwidth]{1_cyn_vortex_re200_t0500ms}
+        \caption{$t = 0.5 \Unit{s}$}
+        \label{fig:1_cyn_vortex_re200_t0500ms}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[trim = 0mm 80mm 0mm 80mm, clip, width=\textwidth]{1_cyn_vortex_re100_t1000ms}
+        \caption{$t = 1.0 \Unit{s}$}
+        \label{fig:1_cyn_vortex_re100_t1000ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[trim = 0mm 80mm 0mm 80mm, clip, width=\textwidth]{1_cyn_vortex_re200_t1000ms}
+        \caption{$t = 1.0 \Unit{s}$}
+        \label{fig:1_cyn_vortex_re200_t1000ms}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[trim = 0mm 80mm 0mm 80mm, clip, width=\textwidth]{1_cyn_vortex_re100_t1500ms}
+        \caption{$t = 1.5 \Unit{s}$}
+        \label{fig:1_cyn_vortex_re100_t1500ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[trim = 0mm 80mm 0mm 80mm, clip, width=\textwidth]{1_cyn_vortex_re200_t1500ms}
+        \caption{$t = 1.5 \Unit{s}$}
+        \label{fig:1_cyn_vortex_re200_t1500ms}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[trim = 0mm 80mm 0mm 80mm, clip, width=\textwidth]{1_cyn_vortex_re100_t3000ms}
+        \caption{$t = 3.0 \Unit{s}$}
+        \label{fig:1_cyn_vortex_re100_t3000ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[trim = 0mm 80mm 0mm 80mm, clip, width=\textwidth]{1_cyn_vortex_re200_t3000ms}
+        \caption{$t = 3.0 \Unit{s}$}
+        \label{fig:1_cyn_vortex_re200_t3000ms}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[trim = 0mm 80mm 0mm 80mm, clip, width=\textwidth]{1_cyn_vortex_re100_t5000ms}
+        \caption{$t = 5.0 \Unit{s}$}
+        \label{fig:1_cyn_vortex_re100_t5000ms}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[trim = 0mm 80mm 0mm 80mm, clip, width=\textwidth]{1_cyn_vortex_re200_t5000ms}
+        \caption{$t = 5.0 \Unit{s}$}
+        \label{fig:1_cyn_vortex_re200_t5000ms}
+    \end{subfigure}%
+    \caption{Instantaneous vorticity contours of the unsteady flows around a cylinder at different Reynolds numbers. (a), (c), (e), (g), (i) $Re=100$. (b), (d), (f), (h), (j) $Re=200$.}
+    \label{fig:1_cyn_vortex_stream_unsteady}
+\end{figure}
+\begin{table}[!htbp]
+    \centering
+    %\footnotesize% fontsize
+    %\setlength{\tabcolsep}{4pt}% column separation
+    %\renewcommand{\arraystretch}{1.5}% row space 
+    \begin{tabular}{lccc}
+        \hline\hline
+        %\multicolumn{num_of_cols_to_merge}{alignment}{contents} \\
+        %\cline{i-j}% partial hline from column i to column j
+         & $St$ & $C_{\Des{D}}$ & $C_{\Des{L}}$\\
+        \hline
+        $Re=100$ & & & \\
+        \citet{berger1972periodic}$^*$ & $0.160-0.170$ & $-$ & $-$\\
+        \citet{linnick2005high} & $0.165$ & $1.320$ & $\pm 0.320$\\
+        \citet{brehm2015locally} & $0.170$ & $1.380$ & $\pm 0.342$\\
+        \emph{Present study} & $0.163$ & $1.304$ & $\pm0.310$\\
+        $Re=200$ & & & \\
+        \citet{berger1972periodic}$^*$ & $0.180-0.190$ & $-$ & $-$\\
+        \citet{linnick2005high} & $0.192$ & $1.300$ & $\pm 0.660$\\
+        \citet{brehm2015locally} & $0.198$ & $1.380$ & $\pm 0.700$\\
+        \emph{Present study} & $0.187$ & $1.286$ & $\pm 0.613$\\
+        \hline\hline
+    \end{tabular}
+    \caption{Comparison of results for unsteady flows around a cylinder. [Nomenclature: $St$, Strouhal number; $C_{\Des{D}}$, drag coefficient; $C_{\Des{L}}$, lift coefficient; $*$, experimental results.]}
+    \label{tab:1_cyn_vortex_para_unsteady}
+\end{table}
+
+\section{}
+
+Ablator: something that conducts heat poorly, boils at the right temperature, and has an extremely high latent heat of vaporisation. The point of an ablative heat shield is that material slowly boils way, and in doing so, carries away heat. Carbon-carbon composite don't ablate, they're just crazy heat resistant. Ablative heat shields are usually made of phenolic plastics or cork.
+
+the ablative material is essentially a sacrificial layer of materials that boil off of the surface of the heat shield. The material boils off and caries waste heat away from the spacecraft essentially cooling the heat shield.
+
+Imagine a hot summer day and you spray water on your neck. The water absorbs heat from your skin and the air around you. When the water absorbs enough heat, it evaporates and caries that heat energy away from your body. In this example the water is the "ablative material"
+
+Ablator is a resource that is a vital component of most heat shields. During atmospheric entry, ablator will slowly be consumed, dissipating heat in the process. Ablator can not be replenished or transferred between parts. If a heat shield runs out of ablator it will stop preventing overheating for shielded parts. Ablation shields work by allowing the material to burn away to dissipate heat. The exception to this is the Heat Shield (10m), which relies on drag to slow it down before overheating. As of version 1.2.2, an overheating bar shows up on ablative heat shields. This bar never reaches the point of explosion reentering at "sane" speeds, but will do so when ablator runs out or the entry is too fast or long. Ablator is consumed when closer than 2,500 Megameters from kerbol.
+
+
+\bibliography{ref}
+
+\end{document}
+%---------------------------------------------------------------------------%

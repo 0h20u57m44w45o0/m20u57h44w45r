@@ -1,0 +1,71 @@
+%---------------------------------------------------------------------------%
+%-                              Article
+%---------------------------------------------------------------------------%
+%---------------------------------------------------------------------------%
+%->> Document class
+%---------------------------------------------------------------------------%
+\documentclass[12pt]{article}
+%---------------------------------------------------------------------------%
+%->> Configuration
+%---------------------------------------------------------------------------%
+\usepackage[utf8]{inputenc}% set input encoding, document must use utf-8 encoding
+\usepackage[T1]{fontenc}% set font encoding to enable modern font encoding
+\usepackage{newtxtext}%
+\usepackage{bibentry}%
+\usepackage[normalem]{ulem}%for \uline
+\usepackage{xstring}% string substitution
+\usepackage[paper=a4paper,left=25.4mm,right=25.4mm,top=25.4mm,bottom=25.4mm]{geometry}
+
+\let\originalbibitem\bibitem% redefine \bibitem to highlight authors
+\def\bibitem#1#2\par{%
+  \noexpandarg%
+  \originalbibitem{#1}%
+  \StrSubstitute{#2}{Huangrui Mo}{\uline{Huangrui Mo}}\par}%
+%---------------------------------------------------------------------------%
+%->> Mainmatter
+%---------------------------------------------------------------------------%
+\begin{document}
+\title{Publication list}%
+\author{Huangrui Mo}
+\date{\today}
+
+\maketitle
+
+\nobibliography{ref}
+\bibliographystyle{unsrt}
+
+\section*{Peer-reviewed Journal Papers}
+\begin{enumerate}
+    \item \bibentry{mo2018immersed}
+    \item \bibentry{mo2017numerical}
+\end{enumerate}
+
+\section*{International Conference Presentations}
+\begin{enumerate}
+    \item \bibentry{mo2018mesoscale}
+    \item \bibentry{mo2016direct}
+\end{enumerate}
+
+\section*{Theses (Ph.D. and M.S.)}
+\begin{enumerate}
+    \item \bibentry{mo2018mesoscalemodel}
+    \item \bibentry{mo2014aerodynamic}
+\end{enumerate}
+
+%\section*{Books}
+%\begin{enumerate}
+%    \item \bibentry{}
+%\end{enumerate}
+
+\section*{Work Submitted or In Preparation}
+\begin{enumerate}
+    \item \bibentry{mo2017field}
+\end{enumerate}
+
+\section*{Miscellaneous}
+\begin{enumerate}
+    \item \bibentry{mo2014dynamics}
+\end{enumerate}
+
+\end{document}
+%---------------------------------------------------------------------------%

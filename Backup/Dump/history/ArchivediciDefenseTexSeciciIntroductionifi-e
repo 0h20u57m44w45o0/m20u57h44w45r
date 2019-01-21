@@ -1,0 +1,188 @@
+%---------------------------------------------------------------------------%
+\section{Introduction}
+%---------------------------------------------------------------------------%
+%- Assess the audience: different situations require different styles and 
+%- technical levels. If you dive right into technical details without providing
+%- a broader context and motivation for the problem, people would not appreciate 
+%- the contribution. If you talk only about your ideas at a high level with 
+%- insufficient detail, the weight of your contributions might be undervalued
+%- or misinterpreted -- Anderson-Cook.
+%- Time management: tell a complete story within the time limit. Adjust the
+%- level of details to meet the time requirement. Leave the uncovered details
+%- into the question period.
+%- An extemporaneous quality to your delivery is the goal for interesting
+%- presentations. Prepare and rehearse some parts (especially the introduction
+%- and conclusion), plan out your points for the whole presentation, but allow
+%- yourself some spontaneity. This method of delivery gives you more flexibility
+%- than reading or reciting your talk from memory; it allows you to respond to
+%- your audience and the feedback they are giving you.
+%- You need to look and sound enthused in order to enthuse your audience.
+%- If you are not interested in your talk, no one else would be.
+%---------------------------------------------------------------------------%
+\subsection{Particle clustering and jetting phenomenon}
+%---------------------------------------------------------------------------%
+\begin{frame}[b]
+    \frametitle{Particle clustering and jetting phenomenon}
+    \begin{minipage}[c][.8\textheight][c]{\textwidth}% a fixed height minipage to control vertical alignment
+        \begin{columns}
+            \begin{column}{.48\textwidth}
+                \centering
+                \includegraphics[trim = 20mm 10mm 20mm 10mm, clip, width=\textwidth]{jet_formation_5ms}
+
+                5ms
+            \end{column}
+
+            \begin{column}{.48\textwidth}
+                \centering
+                \includegraphics[trim = 20mm 10mm 20mm 10mm, clip, width=\textwidth]{jet_formation_50ms}
+
+                50ms
+            \end{column}
+        \end{columns}
+    \end{minipage}
+
+    \vfill
+
+    %- insert external multimedia play icon at frame corner
+    %\begin{tikzpicture}[remember picture, overlay]
+    %    \node [anchor=south east, inner sep=0pt] at (0.95\paperwidth,0.00\paperheight) {%
+    %        \movie[width=0.05\paperwidth, height=0.05\paperheight, externalviewer]{%
+    %            \includegraphics[width=0.05\paperwidth]{jet_b}%
+    %        }{./Video/particle_jet_exp.mpg}%
+    %    };
+    %\end{tikzpicture}
+
+    {\raggedright\tiny \textsc{Source:} \fullcite{zhang2015large}\par}
+
+    \note{
+        \begin{itemize}
+            \item This slide shows two time instants of an explosively dispersed aluminum powder.
+            \item Here we can clearly observe the formation of coherent particle clustering and jetting structures.
+            \item Influencing the mass concentration and related particle reaction and energy release.
+            \item The underlying mechanism of this phenomenon is of significant interest to study instability and mixing in heterogeneous detonation and explosion but remains unclear.
+        \end{itemize}
+    }
+\end{frame}
+%---------------------------------------------------------------------------%
+\begin{frame}[fragile]
+    \frametitle{A multiscale problem}
+    \begin{center}
+        \vspace{-0.8ex}
+        \scalebox{1.0}{%
+            \smartdiagramset{planet size=2cm, distance planet-text=0.2cm, planet text width=2cm, planet color=orange!60, distance planet-satellite=3cm, satellite text width=2cm, satellite size=2cm,%
+            }%
+            \smartdiagram[connected constellation diagram]{%
+                Inhomogeneities\\\&\\Interactions,\lolight{Microscale},\hilight[2]{Mesoscale},\lolight{Macroscale}%
+            }
+        }
+    \end{center}
+    \note{
+        \begin{itemize}
+            \item The formation of particle clusters and jets can involve inhomogeneities and interactions ranging from microscale to macroscales.
+            \item Among them, the mesoscale multiphase interactions introduced by particles can be crucial.
+            \item Relying solely on experiments is difficult to fully capture these interactions. 
+            \item Therefore, direct simulations built on mesoscale modeling can be helpful in advancing the understanding.
+        \end{itemize}
+    }
+\end{frame}
+%---------------------------------------------------------------------------%
+\subsection{Current status and challenges}
+%---------------------------------------------------------------------------%
+\begin{frame}[fragile]
+    \frametitle{Mesoscale modeling and challenges}
+    \centering
+    \begin{tikzpicture}[scale=1]
+        \begin{scope}[
+                mindmap, grow cyclic, text=white,
+                every node/.style={scale=1, concept},
+                root concept/.append style={concept color=black, fill=white, text=black, line width=0.4ex, scale=0.9},
+                sa/.style={concept color=brown},
+                sb/.style={concept color=blue},
+                sc/.style={concept color=gray},
+                sd/.style={concept color=green!50!black},
+                level 1/.append style={level distance=4.5cm, sibling angle=60, text width=5.4em, inner sep=0pt},
+                level 2/.append style={level distance=3.0cm, sibling angle=30, font=\small, inner sep=0pt}
+            ]
+            \node [root concept] (Root) {\includegraphics[trim = 95mm 20mm 95mm 20mm, clip, width=\textwidth]{jet_SL3_001}}% root node
+            [counterclockwise from=180]% child grow rule
+            child [sa] {node (C1) {Fluid-Solid Interaction}}
+            child [sb] {node (C2) {Dynamic Phase Interfaces}}
+            child [sc] {node (C3) {Multibody Contact and Collision}}
+            child [sd] {node (C4) {Complex Interfacial Conditions}};
+        \end{scope}
+    \end{tikzpicture}
+
+    \note{
+        \begin{itemize}
+            \item In building a mesoscale model for direct simulations, we need to address coupled shock-shock, shock-particle, and particle-particle interactions.
+            \item Therefore, we need to deal with fluid-solid interaction, dynamic phase interfaces due to moving particles, multibody contact and collision as we are dealing with a dense granular system, and complex interfacial conditions, since a variety of boundary conditions need to be enforced on each particle surface.
+        \end{itemize}
+    }
+\end{frame}
+%---------------------------------------------------------------------------%
+\subsection{Motivations and objectives}
+%---------------------------------------------------------------------------%
+\begin{frame}[fragile]
+    \frametitle{Motivations and objectives}
+    \centering
+    \tikzset{%
+        invisible/.style={opacity=0,text opacity=0},
+        visible on/.style={alt={#1{}{invisible}}},
+            alt/.code args={<#1>#2#3}{\alt<#1>{\pgfkeysalso{#2}}{\pgfkeysalso{#3}}},
+    }
+    \tikzstyle{sa}=[
+        draw=gray, fill=white, rectangle, rounded corners, inner sep=5pt, inner ysep=20pt
+    ]
+    \tikzstyle{sb}=[
+        draw=gray, fill=white, rectangle, rounded corners, inner sep=5pt, inner ysep=20pt
+    ]
+    \tikzstyle{sc}=[fill=white, text=gray]
+    \tikzstyle{sd}=[fill=white, text=black]
+    \begin{tikzpicture}[baseline=(current bounding box.north)]
+        \node [sa] (Box1) {%
+            \begin{minipage}[t]{0.46\textwidth}
+                \begin{itemize}
+                    \item Experiment-correlated, or repulsive-force, or non-deterministic sequential pairwise collision
+                    \item Non-contact particles with predefined distances
+                \end{itemize}
+            \end{minipage}
+        };
+        \node [sc, right=10pt] at (Box1.north west) {Existing studies};
+    \end{tikzpicture}
+    \hfill
+    \begin{tikzpicture}[baseline=(current bounding box.north)]
+        \node [sb] (Box2) {%
+            \begin{minipage}[t]{0.46\textwidth}
+                \begin{itemize}
+                    \item A field function for facilitating direct simulations
+                    \item A deterministic multibody collision model
+                    \item An immersed boundary method
+                \end{itemize}
+            \end{minipage}
+        };
+        \node [sd, right=10pt] at (Box2.north west) {This study};
+    \end{tikzpicture}
+
+    \medskip
+
+    \begin{alertblock}<2->{Objectives}
+        \begin{itemize}
+            \item Create a direct simulation gas-solid flow solver.
+            \item Investigate particle clustering and jetting instabilities.
+        \end{itemize}
+    \end{alertblock}
+
+    \note{
+        \begin{itemize}
+            \item Existing studies on particulate flows are abundance but often adopt assumptions like
+            \item Experiment-correlated collisions, which can simplify fluid-solid coupling and interface tracking but has limited description for flow with dense-to-dilute transitions.
+            \item Or short-range repulsive-force collisions, which usually only consider the position of solids and omit size and shape effects.
+            \item Or sequential pairwise collision to approximate multibody collisions but scarifies deterministic property.
+            \item Due to the numerical instabilities introduced by contacting particles, some studies assume particles being non-contact with predefined inter-particle distances.
+            \item In order to achieve a more comprehensive description of the particle clustering and jetting problem via direct simulations, in this study
+            \item a field function for facilitating direct simulations, a collision model for deterministic multibody contact and collision, and an immersed boundary method for treating arbitrarily irregular and moving boundaries to address these assumptions.
+            \item The objective is first to create an interface-resolved direct simulation gas-solid flow solver, which is then used to investigate particle clustering and jetting instabilities.
+        \end{itemize}
+    }
+\end{frame}
+%---------------------------------------------------------------------------%

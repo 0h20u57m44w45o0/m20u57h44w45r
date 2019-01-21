@@ -1,0 +1,400 @@
+%---------------------------------------------------------------------------%
+%->> Appendix
+%---------------------------------------------------------------------------%
+\appendix% begin appendix
+\section{\appendixname}% the end page.
+\frame{\tableofcontents}% outline for appendix
+%---------------------------------------------------------------------------%
+\subsection{Test Cases}
+%---------------------------------------------------------------------------%
+\begin{frame}[fragile]
+    \frametitle{Vortex preservation problem \autocite{balsara2000monotonicity}}
+
+    \begin{minipage}[c][.5\textheight][c]{\textwidth}% a fixed height minipage to control vertical alignment
+        \begin{columns}
+            \begin{column}{.30\textwidth}
+                \centering
+                \includegraphics[trim = 60mm 0mm 60mm 0mm, clip, width=\textwidth]{vortex_preserve_t00}
+
+                {$t=0$}
+            \end{column}
+
+            \begin{column}{.30\textwidth}
+                \centering
+                \includegraphics[trim = 60mm 0mm 60mm 0mm, clip, width=\textwidth]{vortex_preserve_t05}
+
+                {$t=5$}
+            \end{column}
+
+            \begin{column}{.30\textwidth}
+                \centering
+                \includegraphics[trim = 60mm 0mm 60mm 0mm, clip, width=\textwidth]{vortex_preserve_t10}
+
+                {$t=10$}
+            \end{column}
+        \end{columns}
+    \end{minipage}
+
+    \vfill
+
+    \begin{minipage}[c][.45\textheight][c]{\textwidth}% a fixed height minipage to control vertical alignment
+        \centering\scriptsize
+        \setlength{\tabcolsep}{5pt}
+        %\renewcommand{\arraystretch}{1.15}
+        \begin{tabular}{lc>{\columncolor[gray]{0.8}}cc>{\columncolor[gray]{0.8}}cc>{\columncolor[gray]{0.8}}c}
+            \hline\hline
+            %\multicolumn{2}{c}{Item} \\
+            %\cline{1-2}
+            $N \times N$ & $L_1$ error & $L_1$ order & $L_{2}$ error & $L_{2}$ order & $L_{\infty}$ error & $L_{\infty}$ order\\
+            \hline
+            $25\times25$ & $6.614\mathrm{e}{-3}$ & $-$ & $1.522\mathrm{e}{-2}$ & $-$ & $1.092\mathrm{e}{-1}$ & $-$\\
+            $50\times50$ & $4.682\mathrm{e}{-4}$ & $3.8$ & $1.195\mathrm{e}{-3}$ & $3.7$ & $1.677\mathrm{e}{-2}$ & $2.7$\\
+            $75\times75$ & $9.520\mathrm{e}{-5}$ & $3.9$ & $2.278\mathrm{e}{-4}$ & $4.1$ & $2.571\mathrm{e}{-3}$ & $4.6$\\
+            $100\times100$ & $3.337\mathrm{e}{-5}$ & $3.6$ & $6.891\mathrm{e}{-5}$ & $4.2$ & $7.109\mathrm{e}{-4}$ & $4.5$\\
+            $150\times150$ & $1.084\mathrm{e}{-5}$ & $2.8$ & $1.652\mathrm{e}{-5}$ & $3.5$ & $9.757\mathrm{e}{-5}$ & $4.9$\\
+            \hline\hline
+        \end{tabular}
+
+        \smallskip
+
+        {RK3-WENO5-LF}
+    \end{minipage}
+
+    %- insert external multimedia play icon at frame corner
+    \begin{tikzpicture}[remember picture, overlay]
+        \node [anchor=south east, inner sep=0pt] at (0.95\paperwidth,0.05\paperheight) {%
+            \movie[width=0.05\paperwidth, height=0.05\paperheight, externalviewer]{%
+                \includegraphics[width=0.05\paperwidth]{vortex_preserve_t00}%
+            }{./Video/vortex_preservation_density_100x100.avi}%
+        };
+    \end{tikzpicture}
+\end{frame}
+%---------------------------------------------------------------------------%
+\begin{frame}[fragile]
+    \frametitle{Sod's problem \autocite{sod1978survey}}
+
+    \begin{columns}
+        \begin{column}{.48\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{sod_rho_x_n100}
+
+            {$n=100$}
+        \end{column}
+
+        \begin{column}{.48\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{sod_rho_x_n500}
+
+            {$n=500$}
+        \end{column}
+    \end{columns}
+
+    \bigskip\vfill
+
+    \[
+        \begin{gathered}
+            \begin{aligned}
+                \rho &= 1; & u &= 0; & p &= 1 & \ \text{if}\ & 0 \le x < 1 \\
+                \rho &= 0.125; & u &= 0; & p &= 0.1 & \ \text{if}\ & 1 < x \le 2
+            \end{aligned}
+        \end{gathered}
+    \]
+\end{frame}
+%---------------------------------------------------------------------------%
+\begin{frame}[fragile]
+    \frametitle{Lax's problem \autocite{jiang1996efficient}}
+
+    \begin{columns}
+        \begin{column}{.48\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{lax_rho_y_n100}
+
+            {$n=100$}
+        \end{column}
+
+        \begin{column}{.48\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{lax_rho_y_n500}
+
+            {$n=500$}
+        \end{column}
+    \end{columns}
+
+    \bigskip\vfill
+
+    \[
+        \begin{gathered}
+            \begin{aligned}
+                \rho &= 0.445; & u &= 0.698; & p &= 3.528 & \ \text{if}\ & 0 \le x < 1 \\
+                \rho &= 0.5; & u &= 0; & p &= 0.571 & \ \text{if}\ & 1 < x \le 2
+            \end{aligned}
+        \end{gathered}
+    \]
+\end{frame}
+%---------------------------------------------------------------------------%
+\begin{frame}[fragile]
+    \frametitle{Woodward and Colella problem \autocite{toro1999riemann}}
+
+    \begin{columns}
+        \begin{column}{.48\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{woodward_rho_z_n100}
+
+            {$n=100$}
+        \end{column}
+
+        \begin{column}{.48\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{woodward_rho_z_n500}
+
+            {$n=500$}
+        \end{column}
+    \end{columns}
+
+    \bigskip\vfill
+
+    \[
+        \begin{gathered}
+            \begin{aligned}
+                \rho &= 1; & u &= 0; & p &= 1000 & \ \text{if}\ & 0 \le x < 0.5 \\
+                \rho &= 1; & u &= 0; & p &= 0.01 & \ \text{if}\ & 0.5 < x \le 1
+            \end{aligned}
+        \end{gathered}
+    \]
+\end{frame}
+%---------------------------------------------------------------------------%
+\begin{frame}[fragile]
+    \frametitle{Stationary contact \autocite{toro1999riemann}}
+
+    \begin{columns}
+        \begin{column}{.48\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{contact_rho_x_n100}
+
+            {$n=100$}
+        \end{column}
+
+        \begin{column}{.48\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{contact_rho_x_n500}
+
+            {$n=500$}
+        \end{column}
+    \end{columns}
+
+    \bigskip\vfill
+
+    \[
+        \begin{gathered}
+            \begin{aligned}
+                \rho &= 1; & u &= -19.59745; & p &= 1000 & \ \text{if}\ & 0 \le x < 0.8 \\
+                \rho &= 1; & u &= -19.59745; & p &= 0.01 & \ \text{if}\ & 0.8 < x \le 1
+            \end{aligned}
+        \end{gathered}
+    \]
+\end{frame}
+%---------------------------------------------------------------------------%
+\begin{frame}[fragile]
+    \frametitle{Two interacting blast waves \autocite{woodward1984numerical}}
+
+    \begin{columns}
+        \begin{column}{.48\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{blast_rho_x_n100}
+
+            {$n=100$}
+        \end{column}
+
+        \begin{column}{.48\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{blast_rho_x_n500}
+
+            {$n=500$}
+        \end{column}
+    \end{columns}
+
+    \bigskip\vfill
+
+    \[
+        \begin{gathered}
+            \Vector{U}(x,0) = 
+            \begin{cases}
+                \Vector{U}_{\Des{L}}, & \ \text{if}\ 0 < x < 0.1\\
+                \Vector{U}_{\Des{M}}, & \ \text{if}\ 0.1 < x < 0.9\\
+                \Vector{U}_{\Des{R}}, & \ \text{if}\ 0.9 < x < 1
+            \end{cases}, \ \ 
+            \begin{cases}
+                (\rho_{\Des{L}}, u_{\Des{L}}, p_{\Des{L}}) = (1, 0, 1000)\\
+                (\rho_{\Des{M}}, u_{\Des{M}}, p_{\Des{M}}) = (1, 0, 0.01)\\
+                (\rho_{\Des{R}}, u_{\Des{R}}, p_{\Des{R}}) = (1, 0, 100)
+            \end{cases} 
+        \end{gathered}
+    \]
+\end{frame}
+%---------------------------------------------------------------------------%
+\begin{frame}[fragile]
+    \frametitle{Shu and Osher problem \autocite{shu1989efficient}}
+
+    \begin{columns}
+        \begin{column}{.48\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{shu_rho_x_n100}
+
+            {$n=100$}
+        \end{column}
+
+        \begin{column}{.48\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{shu_rho_x_n500}
+
+            {$n=500$}
+        \end{column}
+    \end{columns}
+
+    \bigskip\vfill
+
+    \[
+        \begin{gathered}
+            \begin{aligned}
+                \rho &= 3.857143; & u &= 2.629369; & p &= 10.333333 & \ \text{if}\ & 0 \le x < 1 \\
+                \rho &= 1 + 0.2 \sin(5 x); & u &= 0; & p &= 1 & \ \text{if}\ & 1 < x \le 10
+            \end{aligned}
+        \end{gathered}
+    \]
+\end{frame}
+%---------------------------------------------------------------------------%
+\begin{frame}[fragile]
+    \frametitle{2D Riemann problem -- configuration 1 \autocite{lax1998solution}}
+
+    \begin{columns}
+        \begin{column}{.30\textwidth}
+            \centering
+            \includegraphics[trim = 60mm 0mm 60mm 0mm, clip, width=\textwidth]{2d_riemann_config1_weno_lf}
+
+            {RK3-WENO5-LF}
+        \end{column}
+
+        \begin{column}{.30\textwidth}
+            \centering
+            \includegraphics[trim = 60mm 0mm 60mm 0mm, clip, width=\textwidth]{2d_riemann_config1_weno_sw}
+
+            {RK3-WENO5-SW}
+        \end{column}
+    \end{columns}
+
+    \bigskip\vfill
+
+    \[
+        \begin{gathered}
+            \begin{aligned}
+                \rho &= 1; & u &= -0.75; & v &= -0.5; & p &= 1 & \ \text{if}\ & 0.5 < x < 1, \ 0.5 < y < 1 \\
+                \rho &= 2; & u &= -0.75; & v &= 0.5; & p &= 1 & \ \text{if}\ & 0 < x < 0.5, \ 0.5 < y < 1 \\
+                \rho &= 1; & u &= 0.75; & v &= 0.5; & p &= 1 & \ \text{if}\ & 0 < x < 0.5, \ 0 < y < 0.5 \\
+                \rho &= 3; & u &= 0.75; & v &= -0.5; & p &= 1 & \ \text{if}\ & 0.5 < x < 1, \ 0 < y < 0.5
+            \end{aligned}\\
+            t \in [0, 0.23],\ \ C_{\Des{CFL}} = 0.6
+        \end{gathered}
+    \]
+\end{frame}
+%---------------------------------------------------------------------------%
+\begin{frame}[fragile]
+    \frametitle{2D Riemann problem -- configuration 2 \autocite{lax1998solution}}
+
+    \begin{columns}
+        \begin{column}{.30\textwidth}
+            \centering
+            \includegraphics[trim = 60mm 0mm 60mm 0mm, clip, width=\textwidth]{2d_riemann_config2_weno_lf}
+
+            {RK3-WENO5-LF}
+        \end{column}
+
+        \begin{column}{.30\textwidth}
+            \centering
+            \includegraphics[trim = 60mm 0mm 60mm 0mm, clip, width=\textwidth]{2d_riemann_config2_weno_sw}
+
+            {RK3-WENO5-SW}
+        \end{column}
+    \end{columns}
+
+    \bigskip\vfill
+
+    \[
+        \begin{gathered}
+            \begin{aligned}
+                \rho &= 1; & u &= 0.75; & v &= -0.5; & p &= 1 & \ \text{if}\ & 0.5 < x < 1, \ 0.5 < y < 1 \\
+                \rho &= 2; & u &= 0.75; & v &= 0.5; & p &= 1 & \ \text{if}\ & 0 < x < 0.5, \ 0.5 < y < 1 \\
+                \rho &= 1; & u &= -0.75; & v &= 0.5; & p &= 1 & \ \text{if}\ & 0 < x < 0.5, \ 0 < y < 0.5 \\
+                \rho &= 3; & u &= -0.75; & v &= -0.5; & p &= 1 & \ \text{if}\ & 0.5 < x < 1, \ 0 < y < 0.5
+            \end{aligned}\\
+            t \in [0, 0.25],\ \ C_{\Des{CFL}} = 0.6
+        \end{gathered}
+    \]
+\end{frame}
+%---------------------------------------------------------------------------%
+%\begin{frame}[fragile]
+%    \frametitle{Data processing}
+%    \centering
+%    \begin{tikzpicture}[
+%            auto, scale=0.8,
+%            every node/.style={scale=0.8, align=center},
+%            every matrix/.style={column sep=1.2cm, row sep=1.5cm},
+%            %- flow chart style
+%            sa/.style={draw, thick, rounded corners, fill=yellow!20, inner sep=.2cm},
+%            sb/.style={draw, thick, circle, fill=blue!20},
+%            sc/.style={sa, fill=green!20},
+%            sd/.style={sa, fill=blue!20},
+%            se/.style={draw, thick, ellipse, inner sep=.2cm},
+%            sf/.style={cloud, cloud puffs=22, cloud ignores aspect, draw, fill=gray!20},
+%            %- edge style
+%            to/.style={->, >=stealth', shorten >=1pt, semithick}
+%        ]
+%        %- position nodes using matrix layout
+%        \matrix{
+%            \node [sa, xshift=-1cm] (N1) {Data files}; &
+%            \node [sd] (N2) {Case list}; & \\ &
+%            \node [sb] (N3) {Python}; & \\ 
+%            \node [se] (N4) {Processed data}; &
+%            \node [sf] (N5) {Processed data}; &
+%            \node [sc] (N6) {Figures}; \\
+%        };
+%        %- draw arrows and labels between nodes
+%        \draw [to] (N1) -- node [midway, above] {stream} (N2);
+%        \draw [to] (N2) -- node [midway, right] {input} (N3);
+%        \draw [to] (N3) -- node [midway, sloped, above] {{\tiny FFT}} (N5);
+%        \draw [to] (N3) to [bend right=30]  node [midway, sloped, below] {{\tiny Mean}} (N5);
+%        \draw [to] (N3) to [bend left=30] node [midway, above, sloped] {{\tiny ...}} (N5);
+%        \draw [to] (N5) to [bend right=30] node [midway, above] {more operators} (N4);
+%        \draw [to] (N4) to [bend right=30] node [midway, above] {plot} (N6);
+%        \draw [to] (N5) -- node[midway, above] {plot} (N6);
+%    \end{tikzpicture}
+%    \par
+%\end{frame}
+%---------------------------------------------------------------------------%
+%- embedding multimedia on full frame without any background
+%\begin{frame}[plain]
+%    \begin{tikzpicture}[remember picture, overlay]
+%        \node [anchor=south west, inner sep=0pt] at (current page.south west) {%
+%            %- xetex
+%            \includemedia[
+%                addresource=Acoustic.flv,% video files
+%                transparent,% transparent background
+%                %activate=pageopen,
+%                width=\paperwidth, height=\paperheight,
+%                flashvars={
+%                    source=Acoustic.flv
+%                    &scaleMode=letterbox% preserve aspect ratio while scaling the video
+%                }
+%            ]{}{VPlayer.swf}%
+%            %- pdftex
+%            \movie[width=\paperwidth, height=\paperheight, poster, showcontrols]{}{Acoustic.avi}%
+%        };
+%    \end{tikzpicture}
+%\end{frame}
+%---------------------------------------------------------------------------%
+\subsection{References}
+%---------------------------------------------------------------------------%
+\begin{frame}[allowframebreaks]
+    \frametitle{References}
+    \printbibliography[heading=none]%
+\end{frame}
+%---------------------------------------------------------------------------%

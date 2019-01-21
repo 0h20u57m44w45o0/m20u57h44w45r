@@ -1,0 +1,132 @@
+#include <omp.h> /* parallel header file */
+#include <stdio.h>
+/* Example of implied sharing - By default, variable Xshared is shared. 
+ * The assignment to Xshared causes a data race: if multiple threads 
+ * are used, they simultaneously store a value in the same variable. */
+fun()
+{
+    Xshared = 0.0
+    #pragma omp parallel
+    {
+        int Xlocal = omp_get_thread_num(); /* implicitly declared as private */
+        Xshared = omp_get_thread_num(); /*-- Data race --*/
+    }
+}
+/* In C, the index variables of the parallel for-loop are private by default,
+ * but this does not extend to the index variables of loops at a deeper nesting level. */
+int i, j;
+#pragma omp parallel for
+for (i=0; i<n; i++)
+for (j=0; j<m; j++) { /* race condition on j, should be private using local scope rule for(intj=0,...) */
+    a[i][j] = compute(i,j);
+}
+/* Whenever a piece of work within a parallel region needs to be performed by only
+one thread, either the single or the master construct can be used. Unfortunately,
+the master construct does not have an implied barrier. in many cases, the simplest solution 
+is to use the single construct, because it implies
+a barrier at the end of the construct.*/
+void main()
+{
+    int Xinit, Xlocal;
+    #pragma omp parallel shared(Xinit) private(Xlocal)
+    {
+    #pragma omp master /* Incorrect use of the master construct */
+        {Xinit = 10;}
+        Xlocal = Xinit; /*-- Xinit might not be available yet --*/
+    } /*-- End of parallel region --*/
+}
+/* Example of incorrectly nested directives - Nested parallelism is
+implemented at the level of parallel regions, not work-sharing constructs, as erroneously
+attempted in this code fragment. This kind of error may also inadvertently occur if orphan directives are used. */
+#pragma omp parallel shared(n,a,b)
+{
+    #pragma omp for
+    for (int i=0; i<n; i++)
+    {
+        a[i] = i + 1;
+        #pragma omp for // WRONG - Needs a new parallel region
+        for (int j=0; j<n; j++)
+            b[i][j] = a[i];
+    }
+}
+/* the following case generates orphan directives */
+void update_a(void)
+{ 
+    int i;
+    #pragma omp for
+    for (i=0;i<1000;i++)
+        a[i]= b[i] + (double)i/2.0;
+}
+int main(void){
+    #pragma omp parallel
+    {
+        init_all();
+        compute_b();
+        #pragma omp single
+        {
+            update_a();
+        }
+    }
+}
+/* There are other ways in which invalid nesting of directives can lead to unexpected
+program behavior. The following are examples of the erroneous use of directives:
+A barrier is in a work-sharing sharing construct, a critical section, or a master construct.  A master construct is within a work-sharing construct.  The barrier is not executed by all threads in the team. one of the
+restrictions on the barrier is as follows: 'Each barrier region must be encountered
+by all threads in a team, or none at all'*/
+
+/* Illegal use of the barrier - The barrier is not encountered by all
+threads in the team, and therefore this is an illegal OpenMP program. The runtime
+behavior is undefined. */
+#pragma omp parallel // Incorrect use of the barrier
+{
+    if ( omp_get_thread_num() == 0 )
+    {
+        .....
+    #pragma omp barrier
+    }
+    else
+    {
+        .....
+    #pragma omp barrier
+    }
+}
+/* a case for easily generating orphan barriers */
+if (time->now > time->end) { /* rectify dt */
+    dt = time->end - (time->now - dt);
+    #pragma omp barrier /* wait before update to avoid orphan barrier */
+    #pragma omp single
+    {
+        time->now = time->end;
+    }
+}
+/* Using libraries can potentially introduce side effects if they are not
+ * thread-safe. The
+ * terminology thread-safe refers to the situation that, in a multithreaded
+ * program, the same functions and the same resources may be accessed
+ * concurrently by multiple
+ * flows of control. The use of global data is not thread-safe. For example,
+ * library
+ * routines for multithreaded programs that make use of global data must be
+ * written
+ * such that shared data is protected from concurrent writes. Example of a function call that is not thread-safe - The library
+keeps track of how often its routines are called by incrementing a global counter. If
+executed by multiple threads within a parallel region, all threads read and modify the
+shared counter variable, leading to a race condition.*/
+int icount;
+void lib_func()
+{
+    icount++;
+    do_lib_work();
+}
+main ()
+{
+    #pragma omp parallel
+    {
+        lib_func();
+    } /*-- End of parallel region -- */
+}
+/* At the OpenMP level, data race conditions could also be introduced as the result
+of missing private clauses, missing critical regions, or incorrectly applied nowait
+clauses. Because of the lack of a barrier, the master construct can also introduce a
+data race if not used carefully. Other potential sources of data race conditions are
+the static or extern in C. make sure not use static variables in functions when multithreading */
