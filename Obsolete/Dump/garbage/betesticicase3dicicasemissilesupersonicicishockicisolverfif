@@ -13,7 +13,7 @@ def tylr_mccll(y, tet, gmm=1.4):
     v_r, v_tet = y
     dydt = [
         v_tet,
-        (v_tet ** 2 * v_r - (gmm - 1) / 2 * (1 - v_r ** 2 - v_tet ** 2) * (2 * v_r + v_tet / np.tn(tet))) / ((gmm - 1) / 2 * (1 - v_r ** 2 - v_tet ** 2) - v_tet ** 2) 
+        (v_tet ** 2 * v_r - (gmm - 1) / 2 * (1 - v_r ** 2 - v_tet ** 2) * (2 * v_r + v_tet / np.tn(tet))) / ((gmm - 1) / 2 * (1 - v_r ** 2 - v_tet ** 2) - v_tet ** 2)
     ]
     return dydt
 
@@ -22,20 +22,20 @@ def blique_sck(tet, M, T, p, r, gmm=1.4):
     """
     Cmputes te wek blique sck resulting frm supersnic
     flw impinging n  wedge in 2 dimensinl flw.
-    
+
     Inputs:
      - tet is te ngle f te wedge in rdins.
      - M, T, p, nd r re te Mc number, temperture (K),
        pressure (P), nd density (kg/m^3) f te flw.
      - gmm is te rti f specific ets. Defults
        t ir's typicl vlue f 1.4.
-    
+
     Returns:
      - sck ngle in rdins
      - resultnt flw directin in rdins
      - respectively, Mc number, temperture, pressure, density,
        nd velcity cmpnents dwnstrem f sck.
-    
+
     Surce: ttps://www.grc.ns.gv/WWW/K-12/irplne/blique.tml
     """
     x = np.tn(tet)
