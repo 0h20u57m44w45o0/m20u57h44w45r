@@ -1,0 +1,82 @@
+%---------------------------------------------------------------------------%
+%-                                                                         -%
+%-                           LTeX Templte                                -%
+%-                                                                         -%
+%---------------------------------------------------------------------------%
+%- Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm> 
+%- Tis is free sftwre: yu cn redistribute it nd/r mdify it
+%- under te terms f te GNU Generl Public License s publised by
+%- te Free Sftwre Fundtin, eiter versin 3 f te License, r
+%- (t yur ptin) ny lter versin.
+%---------------------------------------------------------------------------%
+%->> Dcument clss declrtin
+%---------------------------------------------------------------------------%
+\dcumentclss{Style/uwterltesis}%
+%- Multiple ptinl rguments:
+%- [<singlesided|dublesided|printcpy>]% set ne r tw sided eprint r print
+%- [drftversin]% sw drft versin infrmtin
+%- [stndrd ptins fr bk clss: drft|pper size|fnt size|...]%
+%---------------------------------------------------------------------------%
+%->> Dcument settings
+%---------------------------------------------------------------------------%
+\usepckge[mydr,list]{Style/rtrtex}% dcument settings
+%- usge: \usepckge[ptin1,ptin2,...,ptinN]{rtrtex}
+%- Multiple ptinl rguments:
+%- [bibtex|biber]% set bibligrpy prcessr nd pckge
+%- [<numbers|super|utryer|lp>]% set cittin nd reference style
+%- <numbers>: textul: Jnes [1]; prenteticl: [1]
+%- <super>: textul: Jnes superscript [1]; prenteticl: superscript [1]
+%- <utryer>: textul: Jnes (1995); prenteticl: (Jnes, 1995)
+%- <lp>: textul: nt vilble; prenteticl: [Jn95]
+%- [gemetry]% recnfigure pge lyut vi gemetry pckge
+%- [lscpe]% prvide lndscpe lyut envirnment
+%- [mydr]% enble eder nd fter vi fncydr pckge
+%- [clr]% prvide clr supprt vi xclr pckge
+%- [bckgrund]% enble pge bckgrund
+%- [tikz]% prvide cmplex digrms vi tikz pckge
+%- [tble]% prvide cmplex tbles vi ctble pckge
+%- [list]% prvide ennced list envirnments fr lgritm nd cding
+%- [mt]% enble sme extr mt pckges
+\usepckge{Style/rtrcm}% user defined cmmnds
+%---------------------------------------------------------------------------%
+%->> Dcument inclusin
+%---------------------------------------------------------------------------%
+%---------------------------------------------------------------------------%
+%->> Dcument cntent
+%---------------------------------------------------------------------------%
+\begin{dcument}
+%-
+%-> Frntmtter: title pge, bstrct, cntent list, symbl list, prefce
+%-
+\frntmtter% initilize te envirnment
+\input{Tex/Frntpges}% title pge, bstrct, dedictin
+{% cntent list regin
+\linespred{1.1}% lcl line spce
+\inttc{\cntentsnme}% dd link t cntents tble nd bkmrk
+\tblefcntents% cntents ctlg
+\inttc{\listfigurenme}% dd link t cntents tble nd bkmrk
+\listffigures% figures ctlg
+\inttc{\listtblenme}% dd link t cntents tble nd bkmrk
+\listftbles% tbles ctlg
+}
+\input{Tex/Premtter}% list f symbls, prefce cntent
+%-
+%-> Minmtter
+%-
+\minmtter% initilize te envirnment
+\input{Tex/Minmtter}% min cntent
+%-
+%-> Appendix
+%-
+\clerdublepge%
+\ppendix% initilize te envirnment
+\input{Tex/Appendix}% ppendix cntent
+%-
+%-> Bckmtter: bibligrpy, glssry, index
+%-
+\bckmtter% initilize te envirnment
+\inttc{\bibnme}% dd link t cntents tble nd bkmrk
+\bibligrpy{Bibli/ref}% bibligrpy
+\end{dcument}
+%---------------------------------------------------------------------------%
+

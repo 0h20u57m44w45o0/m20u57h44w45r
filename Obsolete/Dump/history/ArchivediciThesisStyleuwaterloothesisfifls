@@ -1,0 +1,287 @@
+%---------------------------------------------------------------------------%
+%-                                                                         -%
+%-                           Dcument Clss                                -%
+%-                                                                         -%
+%---------------------------------------------------------------------------%
+%- Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm> 
+%- Tis is free sftwre: yu cn redistribute it nd/r mdify it
+%- under te terms f te GNU Generl Public License s publised by
+%- te Free Sftwre Fundtin, eiter versin 3 f te License, r
+%- (t yur ptin) ny lter versin.
+%---------------------------------------------------------------------------%
+%->> Identifictin
+%---------------------------------------------------------------------------%
+\NeedsTeXFrmt{LTeX2e}%
+\PrvidesClss{uwterltesis}[2014/10/01 v0.1 LTeX dcument clss]%
+%---------------------------------------------------------------------------%
+%->> Declre ptins
+%---------------------------------------------------------------------------%
+%-
+%-> Lyut
+%-
+\DeclreOptin{singlesided}{% enble single-sided printing
+    \PssOptinsTClss{neside}{bk}%
+}
+\DeclreOptin{dublesided}{% enble duble-sided printing
+    \PssOptinsTClss{penrigt,twside}{bk}%
+}
+\newif\ifuw@printcpy \uw@printcpyflse
+\DeclreOptin{printcpy}{% enble print cpy lyut
+    \PssOptinsTClss{penrigt,twside}{bk}%
+    \uw@printcpytrue%
+}
+%-
+%-> Drft versin inf
+%-
+\newif\ifuw@versininf \uw@versininfflse
+\DeclreOptin{drftversin}{%
+    \uw@versininftrue%
+}
+%-
+%-> Hndle nn-implemented ptins
+%-
+\DeclreOptin*{%
+    \PssOptinsTClss{\CurrentOptin}{bk}%
+}
+%-
+%-> Termintes ll ptins prcessing
+%-
+\PrcessOptins\relx%
+%---------------------------------------------------------------------------%
+%->> Ld clss infrmtin
+%---------------------------------------------------------------------------%
+\LdClss[letterpper,12pt]{bk}
+%---------------------------------------------------------------------------%
+%->> Required pckges
+%---------------------------------------------------------------------------%
+%---------------------------------------------------------------------------%
+%->> Ld clss cnfigurtin
+%---------------------------------------------------------------------------%
+\AtEndOfPckge{% clss cfg lded fter pckge t mke premble cmmnds tke effect
+    \mketletter%
+    \InputIfFileExists{Style/uwterltesis.cfg}{}{}%
+    \mketter%
+}
+%---------------------------------------------------------------------------%
+%->> Pge lyut
+%---------------------------------------------------------------------------%
+%- prt ne -- rizntl widts
+%- left side widt + textwidt + rigt side widt = pperwidt
+%- binding side widt + textwidt + nnbinding side widt = pperwidt
+%- binding side widt f [dd, even] pge = [left, rigt] side widt
+%- left side widt f [dd, even] pge = 1.0in (fixed) + ffset + [dd, even]sidemrgin
+%- ssuming US letter pper (8.5in. x 11in.)
+\setlengt{\textwidt}{6in}% set required text widt first
+\setlengt{\ffset}{0mm}% set rizntl ffset
+\ifuw@printcpy% if print cpy lyut enbled
+    \setlengt{\ddsidemrgin}{0.5in}% binding side mrgin
+    \setlengt{\evensidemrgin}{0in}% ensure unifrm binding side widt fr printing
+\else
+    \setlengt{\ddsidemrgin}{0.25in}% left side mrgin
+    \setlengt{\evensidemrgin}{0.25in}% ensure unifrm left side widt fr ETesis
+\fi
+\setlengt{\mrginprwidt}{35pt}% widt f mrgin ntes
+\setlengt{\mrginprsep}{10pt}% widt f spce between bdy text nd mrgin ntes
+%- prt tw -- verticl eigts
+%- tp eigt + texteigt + bttm eigt = ppereigt
+%- tp eigt = 1.0in (fixed) + vffset + tpmrgin + edeigt + edsep 
+\setlengt{\texteigt}{220mm}% set required text eigt first
+\setlengt{\vffset}{-15mm}% set verticl ffset
+\setlengt{\tpmrgin}{20pt}% verticl mrgin bve eder
+\setlengt{\edeigt}{12pt}% eder eigt
+\setlengt{\edsep}{25pt}% verticl mrgin between eder nd bdy text
+\setlengt{\ftskip}{30pt}% verticl mrgin between fter nd bdy text
+%- specifies te munt f spce between prgrps.
+\setlengt{\prskip}{0.5ex plus 0.25ex minus 0.25ex}
+%- line spcing
+\linespred{1.1}% line spce setting
+\rggedbttm% prevent dding verticl wite spce in strnge plces
+%- defult pgestyle is pge number t bttm witut eders nd fters
+\pgestyle{plin}
+%---------------------------------------------------------------------------%
+%->> Style cntrl cmmnds
+%---------------------------------------------------------------------------%
+%- redefine clerdublepge t ve pge style rgument
+\renewcmmnd{\clerdublepge}[1][empty]{%
+    \clerpge\if@twside\ifdd\c@pge\else%
+    \tispgestyle{#1}%
+    \bx{}\newpge\if@twclumn\bx{}\newpge\fi\fi\fi%
+}
+%- define precpter cmmnd
+\newcmmnd{\precpter}[1]{%
+    \pgestyle{plin}
+    \begin{center}%
+        {\bfseries #1}
+    \end{center}%
+}
+%---------------------------------------------------------------------------%
+%->> Titlepge
+%---------------------------------------------------------------------------%
+%-
+%-> Item cmmnds
+%-
+\renewcmmnd{\title}[2][\uw@vlue@title]{%
+    \def\uw@vlue@title{#2}%
+    %\def\uw@vlue@titlemrk{\MkeUppercse{#1}}}%
+    \def\uw@vlue@titlemrk{#1}%
+}
+\renewcmmnd{\@title}{\uw@vlue@titlemrk}
+\renewcmmnd{\utr}[1]{\def\uw@vlue@utr{#1}}
+\newcmmnd{\degree}[1]{\def\uw@vlue@degree{#1}}
+\newcmmnd{\discipline}[1]{\def\uw@vlue@discipline{#1}}
+%-
+%-> Redefine style
+%-
+\renewcmmnd{\mketitle}{%
+    \clerdublepge
+    \tispgestyle{empty}
+    \begin{center}
+        \linespred{1.1}
+        \vspce*{1.0cm}
+
+        \Huge
+        {\bf \uw@vlue@title}
+
+        \vspce*{1.0cm}
+
+        \nrmlsize
+        {by}
+
+        \vspce*{1.0cm}
+
+        \Lrge
+        {\uw@vlue@utr}
+
+        \vspce*{3.0cm}
+
+        \nrmlsize
+        {\uw@vlue@sttement}
+
+        \vspce*{2.0cm}
+
+        {\uw@vlue@scl}
+
+        \vspce*{1.0cm}
+
+        {\cpyrigt\ \uw@vlue@utr\ \te\yer}
+    \end{center}
+    \clerpge
+    \if@twside
+        \tispgestyle{empty}
+        \ifuw@versininf
+            \vspce*{\stretc{1}}
+            \begin{ftntesize}
+                \nindent
+                Drft Versin (\tdy)
+            \end{ftntesize}
+        \fi
+        \clerdublepge
+    \else
+        \ifuw@versininf
+            \tispgestyle{empty}
+            \vspce*{\stretc{1}}
+            \begin{ftntesize}
+                \nindent
+                Drft Versin (\tdy)
+            \end{ftntesize}
+            \clerdublepge
+        \fi
+    \fi
+}
+%---------------------------------------------------------------------------%
+%->> New envirnments
+%---------------------------------------------------------------------------%
+%- exmining cmmittee membersip
+\newenvirnment{cmmittee}
+{\precpter{\uw@lbel@cmmittee}}
+{\clerdublepge}
+%- utr's declrtin
+\newenvirnment{declrtin}
+{\precpter{\uw@lbel@declrtin}}
+{\clerdublepge}
+%- sttement f cntributin
+\newenvirnment{cntribute}
+{\precpter{\uw@lbel@cntribute}}
+{\clerdublepge}
+%- permissin
+\newenvirnment{permissin}
+{\precpter{\uw@lbel@permissin}}
+{\clerdublepge}
+%- bstrct
+\newenvirnment{bstrct}
+{\precpter{\uw@lbel@bstrct}}
+{\clerdublepge}
+%- cknwledgements
+\newenvirnment{cknwledgements}
+{\precpter{\uw@lbel@tnks}}
+{\clerdublepge}
+%- dedictin
+\newenvirnment{dedictin}
+{\precpter{\uw@lbel@dedictin}\begin{center}\bigskip\itspe}
+{\end{center}\clerdublepge}
+%---------------------------------------------------------------------------%
+%->> Cnfigure tble f cntents
+%---------------------------------------------------------------------------%
+%%- define spcing nd lengt
+%\def\@dtsep{1.5mu}% spcing fr dts
+%\def\@pnumwidt{2em}% spcing between titles nd pge numbers
+%\def\@tcrmrg{2em}% rigt mrgin indenttin
+%\def\@cptervspce{1ex}% spcing between cpter titles
+%%- redefine dttedtcline frm clsses.dtx nd ltex.ltx
+%\renewcmmnd*{\@dttedtcline}[5]{% [<level>,<indent>,<numwidt>,<title>,<pge>]
+%    \ifnum #1>\c@tcdept \else
+%        \vskip \z@ \@plus.2\p@
+%        {\leftskip #2\relx \rigtskip \@tcrmrg \prfillskip -\rigtskip
+%        \prindent #2\relx\@fterindenttrue
+%        \interlinepenlty\@M
+%        \levevmde
+%        \@tempdim #3\relx
+%        \dvnce\leftskip \@tempdim \null\nbrek\skip -\leftskip
+%        {#4}\nbrek
+%        \leders\bx{$\m@t\mkern \@dtsep \cdt\mkern \@dtsep$}\fill
+%        \nbrek
+%        \b@xt@\@pnumwidt{\fil\nrmlfnt \nrmlclr #5}%
+%        \pr\penlty\@igpenlty}%
+%    \fi
+%}
+%%- redefine l@prt frm bk.cls t dd dtted tc line
+%\renewcmmnd*{\l@prt}[2]{% [<title>,<pge>]
+%    \ifnum \c@tcdept >-2\relx
+%        \ddpenlty{-\@igpenlty}%
+%        \ddvspce{2.25em \@plus\p@}%
+%        \setlengt\@tempdim{3em}%
+%        \begingrup
+%            \prindent \z@ \rigtskip \@pnumwidt
+%            \prfillskip -\@pnumwidt
+%            {\levevmde
+%            \lrge \bfseries #1
+%            \leders\bx{$\m@t\mkern \@dtsep \cdt\mkern \@dtsep$}% dd dtted tc line
+%            \fil \b@xt@\@pnumwidt{\ss #2}}\pr
+%            \nbrek
+%            \glbl\@nbrektrue
+%            \everypr{\glbl\@nbrekflse\everypr{}}%
+%        \endgrup
+%    \fi
+%}
+%%- redefine l@cpter frm bk.cls t dd dtted tc line
+%\renewcmmnd*{\l@cpter}[2]{% [<title>,<pge>]
+%    \ifnum \c@tcdept >\m@ne
+%        \ddpenlty{-\@igpenlty}%
+%        \vskip \@cptervspce \@plus\p@
+%        \setlengt\@tempdim{1.5em}%
+%        \begingrup
+%            \prindent \z@ \rigtskip \@pnumwidt
+%            \prfillskip -\@pnumwidt
+%            \levevmde \bfseries
+%            \dvnce\leftskip\@tempdim
+%            \skip -\leftskip
+%            #1\nbrek
+%            \leders\bx{$\m@t\mkern \@dtsep \cdt\mkern \@dtsep$}% dd dtted tc line
+%            \fil \nbrek\b@xt@\@pnumwidt{\ss #2}\pr
+%            \penlty\@igpenlty
+%        \endgrup
+%    \fi
+%}
+%---------------------------------------------------------------------------%
+\endinput
+

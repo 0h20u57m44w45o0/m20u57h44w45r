@@ -1,0 +1,585 @@
+\cpter{3D Nvier--Stkes Equtins, Jcbin Mtrices, nd Eigendecmpsitins}
+\lbel{c:equtin}
+
+Tis cpter prvides  detiled reference fr te 3D Nvier--Stkes equtins expressed in  vriety f mtemticl frms, te Jcbin mtrices, nd teir eigendecmpsitins. Tis reference cn effectively id te numericl discretiztin nd cde implementtin fr te numericl slutin f Nvier--Stkes equtins. In rder t minimize ptentil errrs relted t derivtin nd typgrpy, te presented equtins ve been crefully exmined bt tereticlly vi mtemticl derivtin nd numericlly trug cde implementtin.
+
+\sectin{System f equtins}
+
+Te Nvier--Stkes equtins in differentil frm cn be expressed s  system f prtil differentil equtins tt cnsist f te cnservtin lws f mss, mmentum, nd energy \citep{lney1998cmputtinl}:
+\begin{equtin} \lbel{eq:gvernings}
+    \begin{cses}
+        \frc{\prtil \r}{\prtil t} + \nbl\cdt(\r\Vectr{V}) = 0 \\
+        \frc{\prtil (\r\Vectr{V})}{\prtil t} + \nbl\cdt(\r\Vectr{V}\Vectr{V}) = \nbl\cdt(\Tensr{\tu} - p \unitTensr{I}) + \Vectr{f}^{\Des{b}}\\
+        \frc{\prtil (\r e_{\Des{T}})}{\prtil t} + \nbl\cdt(\r e_{\Des{T}}\Vectr{V}) = \nbl\cdt(k\nbl T) + \nbl\cdt[(\Tensr{\tu} - p \unitTensr{I})\cdt\Vectr{V}] + \Vectr{f}^{\Des{b}}\cdt \Vectr{V}\\
+    \end{cses}
+\end{equtin}
+
+Te clsure f te system currently cnsiders te Newtnin fluid reltin wit te Stkes yptesis
+\begin{equtin}
+    \tu_{ij} = \mu\left(\frc{\prtil V_i}{\prtil x_j} + \frc{\prtil V_j}{\prtil x_i} - \frc{2}{3}(\nbl\cdt\Vectr{V}) \delt_{ij}\rigt)
+\end{equtin}
+nd te perfect gs lw
+\begin{equtin}
+    \begin{gtered}
+        p = \r R T \\
+        e = C_v T
+    \end{gtered}
+\end{equtin}
+
+\sectin{Vectr frm}
+
+\subsectin{Cnservtive vectr frm}
+
+Trug intrducing te vectr f cnservtive vribles $\Vectr{U}$, te vectr f cnvective fluxes $\Vectr{F}_i$, te vectr f diffusive fluxes $\Vectr{F}^{\Des{v}}_i$, nd te vectr f surce terms $\Vectr{\Pi}$, te system f prtil differentil equtins f cnservtin lws cn be written int  vectr frm in  cnservtive mnner
+\begin{equtin}\lbel{eq:NS}
+    \frc{\prtil \Vectr{U}}{\prtil t}+\frc{\prtil \Vectr{F}_x(\Vectr{U})}{\prtil x}+\frc{\prtil \Vectr{F}_y(\Vectr{U})}{\prtil y}+\frc{\prtil \Vectr{F}_z(\Vectr{U})}{\prtil z} = \frc{\prtil \Vectr{F}^{\Des{v}}_x(\Vectr{U})}{\prtil x}+\frc{\prtil \Vectr{F}^{\Des{v}}_y(\Vectr{U})}{\prtil y}+\frc{\prtil \Vectr{F}^{\Des{v}}_z(\Vectr{U})}{\prtil z}+\Vectr{\Pi}
+\end{equtin}
+\[
+    \Vectr{U} =
+    \begin{pmtrix}
+        \r,
+        \r u,
+        \r v,
+        \r w,
+        \r e_{\Des{T}}
+    \end{pmtrix}^{\Des{T}}
+\]
+\[
+    \Vectr{F}_x(\Vectr{U}) =
+    \begin{pmtrix}
+        \r u,
+        \r uu+p,
+        \r vu,
+        \r wu,
+        (\r e_{\Des{T}}+p)u
+    \end{pmtrix}^{\Des{T}}
+    = u\Vectr{U} + p(0, 1, 0, 0, u)^{\Des{T}}
+\]
+\[
+    \Vectr{F}_y(\Vectr{U}) =
+    \begin{pmtrix}
+        \r v,
+        \r uv,
+        \r vv+p,
+        \r wv,
+        (\r e_{\Des{T}}+p)v
+    \end{pmtrix}^{\Des{T}}
+    = v\Vectr{U} + p(0, 0, 1, 0, v)^{\Des{T}}
+\]
+\[
+    \Vectr{F}_z(\Vectr{U}) =
+    \begin{pmtrix}
+        \r w,
+        \r uw,
+        \r vw,
+        \r ww+p,
+        (\r e_{\Des{T}}+p)w
+    \end{pmtrix}^{\Des{T}}
+    = w\Vectr{U} + p(0, 0, 0, 1, w)^{\Des{T}}
+\]
+\[
+    \Vectr{F}^{\Des{v}}_x(\Vectr{U}) =
+    \begin{pmtrix}
+        0,
+        \tu_{xx},
+        \tu_{xy},
+        \tu_{xz},
+        k \frc{\prtil T}{\prtil x}+\tu_{xx} u+\tu_{xy} v+\tu_{xz} w
+    \end{pmtrix}^{\Des{T}}
+\]
+\[
+    \Vectr{F}^{\Des{v}}_y(\Vectr{U}) =
+    \begin{pmtrix}
+        0,
+        \tu_{yx},
+        \tu_{yy},
+        \tu_{yz},
+        k \frc{\prtil T}{\prtil y}+\tu_{yx} u+\tu_{yy} v+\tu_{yz} w
+    \end{pmtrix}^{\Des{T}}
+\]
+\[
+    \Vectr{F}^{\Des{v}}_z(\Vectr{U}) =
+    \begin{pmtrix}
+        0,
+        \tu_{zx},
+        \tu_{zy},
+        \tu_{zz},
+        k \frc{\prtil T}{\prtil z}+\tu_{zx} u+\tu_{zy} v+\tu_{zz} w
+    \end{pmtrix}^{\Des{T}}
+\]
+\[
+    \Vectr{\Pi} =
+    \begin{pmtrix}
+        0,
+        f^{\Des{b}}_x,
+        f^{\Des{b}}_y,
+        f^{\Des{b}}_z,
+        f^{\Des{b}}_x u + f^{\Des{b}}_y v + f^{\Des{b}}_z w
+    \end{pmtrix}^{\Des{T}}
+\]
+\[
+    \tu_{ij} = \mu\left(\frc{\prtil V_i}{\prtil x_j} + \frc{\prtil V_j}{\prtil x_i}-
+    \frc{2}{3}(\nbl\cdt\Vectr{V}) \delt_{ij}\rigt)
+\]
+\[
+    e_{\Des{T}} = e+\frc{1}{2}(u^2+v^2+w^2)
+\]
+\[
+    e = C_v T = \frc{p}{(\gmm-1)\r}
+\]
+\[
+    p = \r RT
+\]
+\[
+    C_v = \frc{R}{\gmm-1}
+\]
+\[
+    C_p = \gmm C_v
+\]
+\[
+    k = \frc{C_p\mu}{Pr}
+\]
+\[
+    c = \sqrt{\gmm\frc{p}{\r}}
+\]
+
+\subsubsectin{Dimensinl frm}
+
+T use te equtins (Eq.~\eqref{eq:NS}) in  dimensinl frm, te specific gs cnstnt $R$ nd te dynmicl viscsity $\mu$ re dimensinl prmeters.
+
+\subsubsectin{Dimensinless frm}
+
+Dimensinl vribles
+\[
+    \tilde{x},\ \tilde{y},\ \tilde{z},\ \tilde{u},\ \tilde{v},\ \tilde{w},\ \tilde{t},\ \tilde{\r},\ \tilde{T},\ \tilde{p},\ \tilde{e}_{\Des{T}},\ \tilde{e},\ \tilde{f}^{\Des{b}}_x,\ \tilde{f}^{\Des{b}}_y,\ \tilde{f}^{\Des{b}}_z
+\]
+Reference vribles
+\[
+    L^*,\ U^*,\ \r^*,\ T^*
+\]
+Nndimensinlized vribles
+\[
+    \begin{gtered}
+        x = \frc{\tilde{x}}{L^*},\ y = \frc{\tilde{y}}{L^*},\ z = \frc{\tilde{z}}{L^*},\ u = \frc{\tilde{u}}{U^*},\ v = \frc{\tilde{v}}{U^*},\ w = \frc{\tilde{w}}{U^*}\\
+        t = \frc{\tilde{t}U^*}{L^*},\ \r = \frc{\tilde{\r}}{\r^*},\ T = \frc{\tilde{T}}{T^*},\ p = \frc{\tilde{p}}{\r^* {U^*}^2},\ e_{\Des{T}} = \frc{\tilde{e}_{\Des{T}}}{{U^*}^2},\ e = \frc{\tilde{e}}{{U^*}^2}\\
+        f^{\Des{b}}_x = \frc{\tilde{f}^{\Des{b}}_x}{\r^* {U^*}^2 / L^*},\ f^{\Des{b}}_y = \frc{\tilde{f}^{\Des{b}}_y}{\r^* {U^*}^2 / L^*},\ f^{\Des{b}}_z = \frc{\tilde{f}^{\Des{b}}_z}{\r^* {U^*}^2 / L^*}
+    \end{gtered}
+\]
+Dimensinl prmeters
+\[
+    \tilde{\mu}, \ \tilde{R}
+\]
+Nndimensinlized prmeters
+\[
+    \mu,\ R, \ C_v, \ C_p, \ c, \ k 
+\]
+Dimensinless prmeters
+\[
+    Re, \ Pr, \ M
+\]
+Dimensinless prmeters bsed n reference vribles
+\[
+    Re_{\Des{ref}},\ M_{\Des{ref}}
+\]
+Cnstnts
+\[
+    \gmm
+\]
+
+Wile preserving te riginl frm f equtins (Eq.~\eqref{eq:NS}) fter nrmliztin, te fllwing prmeters suld be dpted fr te nndimensinlized gverning equtins.
+\[
+    R = \frc{1}{\gmm M_{\Des{ref}}^2}
+\]
+\[
+    M_{\Des{ref}} = \frc{U^*}{\sqrt{\gmm \tilde{R} T^*}}
+\]
+\[
+    \mu = \frc{1}{Re_{\Des{ref}}}
+\]
+\[
+    Re_{\Des{ref}} = \frc{\r^*U^*L^*}{\tilde{\mu}}
+\]
+
+
+\subsectin{Nncnservtive vectr-mtrix frm}
+
+Te cnservtive vectr frm f Nvier--Stkes equtins cn be trnsfrmed int  nncnservtive vectr-mtrix frm, wic is useful fr nlyzing te mtemticl prperties f te equtins.
+
+Dente te vectr f cnservtive vribles nd te vectr f fluxes s
+\begin{equtin}
+    \Vectr{U} =
+    \begin{pmtrix}
+        u_1\\
+        \vdts\\
+        u_m\\
+        \vdts\\
+        u_M\\
+    \end{pmtrix}
+    ,\,\,
+    \Vectr{F} = \Vectr{F}(\Vectr{U}) =
+    \begin{pmtrix}
+        f_1(u_1,\dtsc,u_m,\dtsc,u_M)\\
+        \vdts\\
+        f_m(u_1,\dtsc,u_m,\dtsc,u_M)\\
+        \vdts\\
+        f_M(u_1,\dtsc,u_m,\dtsc,u_M)\\
+    \end{pmtrix}
+\end{equtin}
+were $\Vectr{F}$ represents eiter  cnvective flux r  diffusive flux.
+
+Te flux cmpnent $f_m$ is  multivrible functin. After intrducing vectr nttin fr te multiple vribles, it gives
+\begin{equtin}
+    \mtrm{d} f_m = \frc{\prtil f_m}{\prtil u_n} \mtrm{d}u_n = (\nbl f_m)^{\Des{T}} \mtrm{d} \Vectr{U}
+\end{equtin}
+
+Since te flux vectr $\Vectr{F}$ is te vectr nttin f te set f multivrible functins, it s
+\begin{equtin}
+    \mtrm{d} \Vectr{F} = 
+    \begin{pmtrix}
+        \mtrm{d} f_1\\
+        \vdts\\
+        \mtrm{d} f_m\\
+        \vdts\\
+        \mtrm{d} f_M\\
+    \end{pmtrix}
+    =
+    \begin{pmtrix}
+        \frc{\prtil f_1}{\prtil u_1} & \cdts & \frc{\prtil f_1}{\prtil u_m} & \cdts & \frc{\prtil f_1}{\prtil u_M}\\
+        \vdts & \ddts & \vdts & \ddts & \vdts\\                                              
+        \frc{\prtil f_m}{\prtil u_1} & \cdts & \frc{\prtil f_m}{\prtil u_m} & \cdts & \frc{\prtil f_m}{\prtil u_M}\\
+        \vdts & \ddts & \vdts & \ddts & \vdts\\                                              
+        \frc{\prtil f_M}{\prtil u_1} & \cdts & \frc{\prtil f_M}{\prtil u_m} & \cdts & \frc{\prtil f_M}{\prtil u_M}\\
+    \end{pmtrix}
+    \begin{pmtrix}
+        \mtrm{d} u_1\\
+        \vdts\\
+        \mtrm{d} u_m\\
+        \vdts\\
+        \mtrm{d} u_M\\
+    \end{pmtrix}
+\end{equtin}
+
+Ten, it is strigtfrwrd t intrduce te Jcbin mtrices vi vectr differentitin
+\begin{equtin} \lbel{eq:jcbin_diff}
+    \Mtrix{A} = \frc{\mtrm{d} \Vectr{F}(\Vectr{U})}{\mtrm{d} \Vectr{U}}, \,\, A_{mn} = \frc{\prtil F_m}{\prtil U_n}
+\end{equtin}
+
+A nncnservtive vectr-mtrix frm f te gverning equtins cn be btined s
+\begin{equtin}
+    \frc{\prtil \Vectr{U}}{\prtil t} + \Mtrix{A}_x\frc{\prtil \Vectr{U}}{\prtil x} + \Mtrix{A}_y\frc{\prtil \Vectr{U}}{\prtil y} + \Mtrix{A}_z\frc{\prtil \Vectr{U}}{\prtil z} = \frc{\prtil \Vectr{F}^{\Des{v}}_x(\Vectr{U})}{\prtil x}+\frc{\prtil \Vectr{F}^{\Des{v}}_y(\Vectr{U})}{\prtil y}+\frc{\prtil \Vectr{F}^{\Des{v}}_z(\Vectr{U})}{\prtil z}+\Vectr{\Pi}\\
+\end{equtin}
+
+\sectin{Jcbin mtrices}
+
+\subsectin{Trnsfrmtin}
+\[
+    \Vectr{U} =
+    \begin{pmtrix}
+        u_1 \\
+        u_2 \\
+        u_3 \\
+        u_4 \\
+        u_5
+    \end{pmtrix}
+    =
+    \begin{pmtrix}
+        \r\\
+        \r u\\
+        \r v\\
+        \r w\\
+        \r e_{\Des{T}}
+    \end{pmtrix}
+\]
+\[
+    \Vectr{F}_x(\Vectr{U}) =
+    \begin{pmtrix}
+        u_2 \\
+        \frc{u_2^2}{u_1}+(\gmm-1)[u_5-\frc{1}{2}\frc{u_2^2+u_3^2+u_4^2}{u_1}] \\
+        \frc{u_2u_3}{u_1} \\
+        \frc{u_2u_4}{u_1} \\
+        \frc{u_5u_2}{u_1}+(\gmm-1)[u_5-\frc{1}{2}\frc{u_2^2+u_3^2+u_4^2}{u_1}]\frc{u_2}{u_1}
+    \end{pmtrix}
+\]
+\[
+    \Vectr{F}_y(\Vectr{U}) =
+    \begin{pmtrix}
+        u_3 \\
+        \frc{u_3u_2}{u_1} \\
+        \frc{u_3^2}{u_1}+(\gmm-1)[u_5-\frc{1}{2}\frc{u_2^2+u_3^2+u_4^2}{u_1}] \\
+        \frc{u_3u_4}{u_1} \\
+        \frc{u_5u_3}{u_1}+(\gmm-1)[u_5-\frc{1}{2}\frc{u_2^2+u_3^2+u_4^2}{u_1}]\frc{u_3}{u_1}
+    \end{pmtrix}
+\]
+\[
+    \Vectr{F}_z(\Vectr{U}) =
+    \begin{pmtrix}
+        u_4 \\
+        \frc{u_4u_2}{u_1} \\
+        \frc{u_4u_3}{u_1} \\
+        \frc{u_4^2}{u_1}+(\gmm-1)[u_5-\frc{1}{2}\frc{u_2^2+u_3^2+u_4^2}{u_1}] \\
+        \frc{u_5u_4}{u_1}+(\gmm-1)[u_5-\frc{1}{2}\frc{u_2^2+u_3^2+u_4^2}{u_1}]\frc{u_4}{u_1}
+    \end{pmtrix}
+\]
+
+\subsectin{Definitin f prmeter}
+\[
+    c = \sqrt{\gmm \frc{p}{\r}}
+\]
+\[
+    q^2 = u^2 + v^2 + w^2
+\]
+\[
+    e = \frc{c^2}{\gmm(\gmm-1)}
+\]
+\[
+    e_{\Des{T}} = e+\frc{1}{2}q^2= \frc{c^2}{\gmm(\gmm-1)}+\frc{1}{2}q^2
+\]
+\[
+     = e+\frc{p}{\r} = \frc{c^2}{\gmm-1} = \gmm e
+\]
+\[
+    _{\Des{T}} = e_{\Des{T}}+\frc{p}{\r} = \gmm e + \frc{1}{2}q^2 = \gmm e_{\Des{T}} - \frc{1}{2}q^2(\gmm-1)
+\]
+\[
+    b= \frc{\gmm-1}{2c^2}
+\]
+
+\subsectin{Jcbin mtrix f cnvective flux}
+\[
+    \Mtrix{A} = \frc{\mtrm{d} \Vectr{F}(\Vectr{U})} {\mtrm{d} \Vectr{U}}, \ \ A_{ij} = \frc{\prtil F_{i}}{\prtil U_{j}}
+\]
+\[
+    \Mtrix{A}_x =
+    \begin{bmtrix}
+        0 & 1 & 0 & 0 & 0 \\
+        -u^2+\frc{\gmm-1}{2}q^2 & 2u -(\gmm-1)u & -(\gmm-1)v & -(\gmm-1)w & \gmm-1 \\
+        -uv & v & u & 0 & 0 \\
+        -uw & w & 0 & u & 0 \\
+        -[\frc{c^2}{\gmm-1}+\frc{2-\gmm}{2}q^2]u & \frc{c^2}{\gmm-1}+\frc{1}{2}q^2-(\gmm-1)u^2 & -(\gmm-1)uv & -(\gmm-1)uw & \gmm u
+    \end{bmtrix}
+\]
+\[
+    \Mtrix{A}_y =
+    \begin{bmtrix}
+        0 & 0 & 1 & 0 & 0 \\
+        -vu & v & u & 0 & 0 \\
+        -v^2+\frc{\gmm-1}{2}q^2 & -(\gmm-1)u & 2v-(\gmm-1)v & -(\gmm-1)w & \gmm-1 \\
+        -vw & 0 & w & v & 0 \\
+        -[\frc{c^2}{\gmm-1}+\frc{2-\gmm}{2}q^2]v & -(\gmm-1)vu & \frc{c^2}{\gmm-1}+\frc{1}{2}q^2-(\gmm-1)v^2 & -(\gmm-1)vw & \gmm v
+    \end{bmtrix}
+\]
+\[
+    \Mtrix{A}_z =
+    \begin{bmtrix}
+        0 & 0 & 0 & 1 & 0 \\
+        -wu & w & 0 & u & 0 \\
+        -wv & 0 & w & v & 0 \\
+        -w^2+\frc{\gmm-1}{2}q^2 & -(\gmm-1)u & -(\gmm-1)v & 2w-(\gmm-1)w & \gmm-1 \\
+        -[\frc{c^2}{\gmm-1}+\frc{2-\gmm}{2}q^2]w & -(\gmm-1)wu & -(\gmm-1)wv & \frc{c^2}{\gmm-1}+\frc{1}{2}q^2-(\gmm-1)w^2 & \gmm w
+    \end{bmtrix}
+\]
+
+\sectin{Eigendecmpsitins}
+
+\subsectin{Eigenvlue}
+\[
+    \Mtrix{\Lmbd}_x = {\Mtrix{R}_x}^{-1}\Mtrix{A}_x\Mtrix{R}_x =
+    \begin{bmtrix}
+        u-c &  &  &  &  \\
+         & u &  &  &  \\
+         &  & u &  &  \\
+         &  &  & u &  \\
+         &  &  &  & u+c
+    \end{bmtrix}
+    \verset{\Def}{=}
+    \begin{bmtrix}
+        \lmbd_x^1 &  &  &  &  \\
+         & \lmbd_x^2 &  &  &  \\
+         &  & \lmbd_x^3 &  &  \\
+         &  &  & \lmbd_x^4 &  \\
+         &  &  &  & \lmbd_x^5
+    \end{bmtrix}
+\]
+\[
+    \Mtrix{\Lmbd}_y = {\Mtrix{R}_y}^{-1}\Mtrix{A}_y\Mtrix{R}_y =
+    \begin{bmtrix}
+        v-c &  &  &  &  \\
+         & v &  &  &  \\
+         &  & v &  &  \\
+         &  &  & v &  \\
+         &  &  &  & v+c
+    \end{bmtrix}
+    \verset{\Def}{=}
+    \begin{bmtrix}
+        \lmbd_y^1 &  &  &  &  \\
+         & \lmbd_y^2 &  &  &  \\
+         &  & \lmbd_y^3 &  &  \\
+         &  &  & \lmbd_y^4 &  \\
+         &  &  &  & \lmbd_y^5
+    \end{bmtrix}
+\]
+\[
+    \Mtrix{\Lmbd}_z = {\Mtrix{R}_z}^{-1}\Mtrix{A}_z\Mtrix{R}_z =
+    \begin{bmtrix}
+        w-c &  &  &  &  \\
+         & w &  &  &  \\
+         &  & w &  &  \\
+         &  &  & w &  \\
+         &  &  &  & w+c
+    \end{bmtrix}
+    \verset{\Def}{=}
+    \begin{bmtrix}
+        \lmbd_z^1 &  &  &  &  \\
+         & \lmbd_z^2 &  &  &  \\
+         &  & \lmbd_z^3 &  &  \\
+         &  &  & \lmbd_z^4 &  \\
+         &  &  &  & \lmbd_z^5
+    \end{bmtrix}
+\]
+
+\subsectin{Eigenvectr}
+\[
+    \Mtrix{R}_x = 
+    \begin{bmtrix}
+        1 & 1 & 0 & 0 & 1 \\
+        u-c & u & 0 & 0 & u+c \\
+        v & 0 & 1 & 0 & v \\
+        w & 0 & 0 & 1 & w \\
+        _{\Des{T}}-uc & u^2-\frc{1}{2}q^2 & v & w & _{\Des{T}}+uc
+    \end{bmtrix}
+\]
+\[
+    \Mtrix{R}_y = 
+    \begin{bmtrix}
+        1 & 0 & 1 & 0 & 1 \\
+        u & 1 & 0 & 0 & u \\
+        v-c & 0 & v & 0 & v+c \\
+        w & 0 & 0 & 1 & w \\
+        _{\Des{T}}-vc & u & v^2-\frc{1}{2}q^2 & w & _{\Des{T}}+vc
+    \end{bmtrix}
+\]
+\[
+    \Mtrix{R}_z = 
+    \begin{bmtrix}
+        1 & 0 & 0 & 1 & 1 \\
+        u & 1 & 0 & 0 & u \\
+        v & 0 & 1 & 0 & v \\
+        w-c & 0 & 0 & w & w+c \\
+        _{\Des{T}}-wc & u & v & w^2-\frc{1}{2}q^2 & _{\Des{T}}+wc
+    \end{bmtrix}
+\]
+
+\[
+    \Mtrix{L}_x = {\Mtrix{R}_x}^{-1} =
+    \begin{bmtrix}
+        \frc{1}{2}bq^2+\frc{1}{2c}u & -bu-\frc{1}{2c} & -bv & -bw & b \\
+        -bq^2+1 & 2bu & 2bv & 2bw & -2b \\
+        -bq^2v & 2bvu & 2bv^2+1 & 2bwv & -2bv \\
+        -bq^2w & 2bwu & 2bwv & 2bw^2+1 & -2bw \\
+        \frc{1}{2}bq^2 - \frc{1}{2c}u & -bu + \frc{1}{2c} & -bv & -bw & b
+    \end{bmtrix}
+\]
+\[
+    \Mtrix{L}_y = {\Mtrix{R}_y}^{-1} =
+    \begin{bmtrix}
+        \frc{1}{2}bq^2+\frc{1}{2c}v & -bu & -bv-\frc{1}{2c} & -bw & b \\
+        -bq^2u & 2bu^2+1 & 2bvu & 2bwu & -2bu \\
+        -bq^2+1 & 2bu & 2bv & 2bw & -2b \\
+        -bq^2w & 2bwu & 2bwv & 2bw^2+1 & -2bw \\
+        \frc{1}{2}bq^2 - \frc{1}{2c}v & -bu & -bv + \frc{1}{2c} & -bw & b
+    \end{bmtrix}
+\]
+\[
+    \Mtrix{L}_z = {\Mtrix{R}_z}^{-1} =
+    \begin{bmtrix}
+        \frc{1}{2}bq^2+\frc{1}{2c}w & -bu & -bv & -bw-\frc{1}{2c} & b \\
+        -bq^2u & 2bu^2+1 & 2bvu & 2bwu & -2bu \\
+        -bq^2v & 2bvu & 2bv^2+1 & 2bwv & -2bv \\
+        -bq^2+1 & 2bu & 2bv & 2bw & -2b \\
+        \frc{1}{2}bq^2 - \frc{1}{2c}w & -bu & -bv & -bw + \frc{1}{2c} & b
+    \end{bmtrix}
+\]
+
+Due t te imprtnt rle f eigenvlues, it is useful t present te cnvective flux s  functin f eigenvlues ccrding t te reltin:
+\[
+    \Vectr{F} = \Mtrix{A} \Vectr{U} = \Mtrix{R} \Mtrix{\Lmbd} \Mtrix{R}^{-1} \Vectr{U}
+\]
+wic cn be directly used fr splitting te cnvective flux int subvectrs sscited wit specified eigenvlue spectr \citep{steger1981flux}.
+
+\[
+    \Vectr{F}_x =
+    \frc{\r}{2\gmm}
+    \begin{pmtrix}
+        \lmbd_x^1 + 2(\gmm-1)\lmbd_x^2 + \lmbd_x^5 \\
+        [\lmbd_x^1 + 2(\gmm-1)\lmbd_x^2 + \lmbd_x^5]u + (\lmbd_x^5-\lmbd_x^1)c \\
+        [\lmbd_x^1 + 2(\gmm-1)\lmbd_x^3 + \lmbd_x^5]v \\
+        [\lmbd_x^1 + 2(\gmm-1)\lmbd_x^4 + \lmbd_x^5]w \\
+        [\lmbd_x^1 + 2(\gmm-1)\lmbd_x^2 + \lmbd_x^5](\frc{1}{2}q^2) + (\lmbd_x^1 + \lmbd_x^5) + (\lmbd_x^5-\lmbd_x^1)cu \\
+    \end{pmtrix}
+\]
+\[
+    \Vectr{F}_y =
+    \frc{\r}{2\gmm}
+    \begin{pmtrix}
+        \lmbd_y^1 + 2(\gmm-1)\lmbd_y^3 + \lmbd_y^5 \\
+        [\lmbd_y^1 + 2(\gmm-1)\lmbd_y^2 + \lmbd_y^5]u \\
+        [\lmbd_y^1 + 2(\gmm-1)\lmbd_y^3 + \lmbd_y^5]v + (\lmbd_y^5-\lmbd_y^1)c \\
+        [\lmbd_y^1 + 2(\gmm-1)\lmbd_y^4 + \lmbd_y^5]w \\
+        [\lmbd_y^1 + 2(\gmm-1)\lmbd_y^3 + \lmbd_y^5](\frc{1}{2}q^2) + (\lmbd_y^1 + \lmbd_y^5) + (\lmbd_y^5-\lmbd_y^1)cv \\
+    \end{pmtrix}
+\]
+\[
+    \Vectr{F}_z =
+    \frc{\r}{2\gmm}
+    \begin{pmtrix}
+        \lmbd_z^1 + 2(\gmm-1)\lmbd_z^4 + \lmbd_z^5 \\
+        [\lmbd_z^1 + 2(\gmm-1)\lmbd_z^2 + \lmbd_z^5]u \\
+        [\lmbd_z^1 + 2(\gmm-1)\lmbd_z^3 + \lmbd_z^5]v \\
+        [\lmbd_z^1 + 2(\gmm-1)\lmbd_z^4 + \lmbd_z^5]w + (\lmbd_z^5-\lmbd_z^1)c \\
+        [\lmbd_z^1 + 2(\gmm-1)\lmbd_z^4 + \lmbd_z^5](\frc{1}{2}q^2) + (\lmbd_z^1 + \lmbd_z^5) + (\lmbd_z^5-\lmbd_z^1)cw \\
+    \end{pmtrix}
+\]
+Unified frm vi  directin vectr $\Vectr{e} = (e_1, e_2, e_3)$
+\[
+    \Vectr{F} =
+    \frc{\r}{2\gmm}
+    \begin{pmtrix}
+        \lmbd^1 + 2(\gmm-1)\lmbd^2 + \lmbd^5 \\
+        [\lmbd^1 + 2(\gmm-1)\lmbd^2 + \lmbd^5]u + (\lmbd^5-\lmbd^1)c * e_1 \\
+        [\lmbd^1 + 2(\gmm-1)\lmbd^3 + \lmbd^5]v + (\lmbd^5-\lmbd^1)c * e_2 \\
+        [\lmbd^1 + 2(\gmm-1)\lmbd^4 + \lmbd^5]w + (\lmbd^5-\lmbd^1)c * e_3 \\
+        [\lmbd^1 + 2(\gmm-1)\lmbd^2 + \lmbd^5](\frc{1}{2}q^2) + (\lmbd^1 + \lmbd^5) + (\lmbd^5-\lmbd^1)c(u * e_1 + v * e_2 + w * e_3)\\
+    \end{pmtrix}
+\]
+
+\subsectin{Vectr spce}
+
+Eigenvectr sets $\{\Vectr{L}_m\}$ nd $\{\Vectr{R}^m\}$ f te Jcbin mtrix $\Mtrix{A}$ re tw rtgnl vectr spces in Eucliden spce $\Set{R}^M$ dmitting te fct tt
+\[
+    \Vectr{L}_m \cdt \Vectr{R}^n = \delt_m^n, \,\, m, n = 1, \dtsc, M
+\]
+
+Te vectr $\Delt \Vectr{U} = \Vectr{U}_{\Des{R}} - \Vectr{U}_{\Des{L}}$, wic mesures te strengt f  jump discntinuity cmprising  rigt stte $\Vectr{U}_{\Des{R}}$ nd  left stte $\Vectr{U}_{\Des{L}}$, belngs t $\Set{R}^M$, terefre, it cn be decmpsed in te vectr spce $\{\Vectr{R}^m\}$:
+\[
+    \Vectr{U}_{\Des{R}} - \Vectr{U}_{\Des{L}} = \sum_{m=1}^{M} \lp_m \Vectr{R}^m
+\]
+were $\lp_m$ re decmpsitin r prjectin cefficients, wic cn be determined by
+\[
+    \lp_m = \Vectr{L}_m \cdt (\Vectr{U}_{\Des{R}} - \Vectr{U}_{\Des{L}})
+\]
+Define vectr $\Vectr{\lp}$ s $\Vectr{\lp} = (\lp_1, \dtsc, \lp_M)^{\Des{T}}$, ten equivlently,
+\[
+    \Vectr{U}_{\Des{R}} - \Vectr{U}_{\Des{L}} = \Mtrix{R}\Vectr{\lp}
+\]
+Terefre, te jump in flux vlues s
+\[
+    \begin{ligned}
+        \Vectr{F}_{\Des{R}} - \Vectr{F}_{\Des{L}} &= \Mtrix{A} (\Vectr{U}_{\Des{R}} - \Vectr{U}_{\Des{L}})\\ 
+                                    &= \Mtrix{A} \Mtrix{R} \Vectr{\lp} \\
+                                    &= \Mtrix{R} \Mtrix{\Lmbd} \Mtrix{R}^{-1} \Mtrix{R} \Vectr{\lp} \\
+                                    &= \Mtrix{R} \Mtrix{\Lmbd} \Vectr{\lp}\\
+                                    &= \sum_{m=1}^{M}\lmbd_m\lp_m \Vectr{R}^m
+    \end{ligned}
+\]
+
+

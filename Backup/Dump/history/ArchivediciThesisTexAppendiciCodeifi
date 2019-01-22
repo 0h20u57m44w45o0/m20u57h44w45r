@@ -1,0 +1,467 @@
+\lbel{c:cde}
+
+
+In te fllwing discussins, fr te purpse f clrity, te nttin "RKn-WENOm-XX" is used t represent  slutin slved by te n-t rder Runge--Kutt sceme fr time integrtin, m-t rder WENO sceme fr sptil discretiztin, nd "XX" fr flux splitting wit "XX=LF" nd "XX=SW" representing te Lx--Friedrics \citep{lx1957yperblic} nd Steger--Wrming \citep{steger1981flux} splitting, respectively.
+
+\sectin{Cnvergence test n smt flw}
+
+\subsectin{Vrtex preservtin prblem}
+
+Te vrtex preservtin test cse \citep{blsr2000mntnicity}, wic evlves n isentrpic vrtex in n inviscid unifrm tw-dimensinl flw, is utilized t test te cnvergence bevir f te cde fr slving system f cnservtin lws in multidimensinl spce.
+
+Te prblem is built n  cmputtinl dmin given by $[-5R,5R]\times[-5R,5R]$ nd is gverned by te Euler equtins. On  unifrm bckgrund flw $(\r_{\infty}, u_{\infty}, v_{\infty}, p_{\infty})$, n isentrpic vrtex initilly centered t $(x,y)=(0,0)$ wit rdius $R=5$ is creted by dding te fllwing perturbtin t te men flw
+\begin{equtin}
+    \begin{ligned}
+        (\delt u, \delt v) &= \frc{\Gmm}{2\pi}e^{0.5(1-r^2)}(-y,x)\\
+        \delt T &= - \frc{(\gmm - 1)\Gmm^2}{8\gmm \pi^2}e^{(1-r^2)}
+    \end{ligned}
+\end{equtin}
+were te vrtex strengt $\Gmm = 5$, te rti f specific et $\gmm = 1.4$, $r^2=x^2 + y^2 \le R^2$.
+
+Under isentrpic flw cnditin, te temperture nd entrpy re defined s $T=p/\r$ nd $s=p/\r^\gmm$, respectively. Wen $s=1$ nd $\delt s=0$ re ssumed fr te flw, te initil cnditins re tken s fllws
+\begin{equtin}
+    u = u_{\infty} + \delt u, \ v = v_{\infty} + \delt v, \ T = p_{\infty} / \r_{\infty} + \delt T, \ \r = T^{\frc{1}{\gmm - 1}}, p = T^{\frc{\gmm}{\gmm - 1}} 
+\end{equtin}
+
+Te bckgrund flw is csen s $(\r_{\infty}, u_{\infty}, v_{\infty}, p_{\infty}) = (1,1,1,1)$ suc tt te vrtex prpgtes t $45^{\circ}$ t te grid line, wic mplifies te pprtunity fr mnifesting te effects f multidimensinl prpgtin. Te slutin is slved t $t=10$, nd te CFL cefficient is set t $C_{\Des{CFL}}=0.2$. Peridic bundry cnditins re used fr bundry tretment f bt directins. Since te perturbtin induced by te vrtex is wek enug t vid prducing  strngly nnliner effect, te exct slutin f te prblem wit  specific initil stte is te pssive cnvectin f te vrtex wit te men velcity. Terefre, te slutin suld remin uncnged wen time evlves t cmplete perids f vrtex cnvectin, s demnstrted by te cmputed results swn in Fig.~\ref{fig:vrtex_preserve}.
+\begin{figure}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.25\textwidt}
+        \cptin{$t=0$}
+        \lbel{fig:vrtex_preserve_t00}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.25\textwidt}
+        \cptin{$t=5$}
+        \lbel{fig:vrtex_preserve_t05}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.25\textwidt}
+        \cptin{$t=10$}
+        \lbel{fig:vrtex_preserve_t10}
+    \end{subfigure}%
+    \cptin{Density cntur f te prpgting isentrpic vrtex slved by RK3-WENO5-LF n  $100\times100$ grid t different time instnts.}
+    \lbel{fig:vrtex_preserve}
+\end{figure}
+
+RK3-WENO3-LF nd RK3-WENO5-LF wit dimensin-by-dimensin r dimensinl-splitting pprximtin re tested nd re swn in Tble~\ref{tb:cnverge_dimbydim_prev_wen3}, Tble~\ref{tb:cnverge_dimsplit_prev_wen3}, Tble~\ref{tb:cnverge_dimbydim_prev_wen5}, nd Tble~\ref{tb:cnverge_dimsplit_prev_wen5}, respectively. Fr te successively refined grids used erein, te csen CFL number is smll enug t prduce  temprl step size tt lds dwn te errrs frm temprl discretiztin nd vids ffecting te sptil ccurcy. As cptured by te results, te cde is perting clsely t its designed ccurcy. In dditin, te bserved glbl cnvergence rtes f RK3-WENO5-LF grees wit te results in \citep{blsr2000mntnicity}. Te current results present very similr ccurcy fr te dimensin-by-dimensin nd dimensinl-splitting pprces fr slving multidimensinl prblems.
+\begin{tble}[!tbp]
+    \centering
+    \ftntesize
+    %\setlengt{\tbclsep}{4pt}
+    %\renewcmmnd{\rrystretc}{1.5}
+    \begin{tbulr}{lcccccc}
+        \line\line
+        %\multiclumn{2}{c}{Item} \\
+        %\cline{1-2}
+        $N \times N$ & $L_1$ errr & $L_1$ rder & $L_{2}$ errr & $L_{2}$ rder & $L_{\infty}$ errr & $L_{\infty}$ rder\\
+        \line
+        $25\times25$ & $2.164\mtrm{e}{-2}$ & $-$ & $5.048\mtrm{e}{-2}$ & $-$ & $3.855\mtrm{e}{-1}$ & $-$\\
+        $50\times50$ & $1.149\mtrm{e}{-2}$ & $0.9$ & $2.819\mtrm{e}{-2}$ & $0.8$ & $2.015\mtrm{e}{-1}$ & $0.9$\\
+        $75\times75$ & $5.281\mtrm{e}{-3}$ & $1.9$ & $1.315\mtrm{e}{-2}$ & $1.9$ & $8.889\mtrm{e}{-2}$ & $2.0$\\
+        $100\times100$ & $2.651\mtrm{e}{-3}$ & $2.4$ & $6.814\mtrm{e}{-3}$ & $2.3$ & $4.793\mtrm{e}{-2}$ & $2.1$\\
+        $150\times150$ & $9.221\mtrm{e}{-4}$ & $2.6$ & $2.519\mtrm{e}{-3}$ & $2.5$ & $2.031\mtrm{e}{-2}$ & $2.1$\\
+        \line\line
+    \end{tbulr}
+    \cptin{Glbl cnvergence f RK3-WENO3-LF vi dimensin-by-dimensin pprximtin.}
+    \lbel{tb:cnverge_dimbydim_prev_wen3}
+\end{tble}
+\begin{tble}[!tbp]
+    \centering
+    \ftntesize
+    %\setlengt{\tbclsep}{4pt}
+    %\renewcmmnd{\rrystretc}{1.5}
+    \begin{tbulr}{lcccccc}
+        \line\line
+        %\multiclumn{2}{c}{Item} \\
+        %\cline{1-2}
+        $N \times N$ & $L_1$ errr & $L_1$ rder & $L_{2}$ errr & $L_{2}$ rder & $L_{\infty}$ errr & $L_{\infty}$ rder\\
+        \line
+        $25\times25$ & $2.164\mtrm{e}{-2}$ & $-$ & $5.048\mtrm{e}{-2}$ & $-$ & $3.855\mtrm{e}{-1}$ & $-$\\
+        $50\times50$ & $1.149\mtrm{e}{-2}$ & $0.9$ & $2.819\mtrm{e}{-2}$ & $0.8$ & $2.014\mtrm{e}{-1}$ & $0.9$\\
+        $75\times75$ & $5.281\mtrm{e}{-3}$ & $1.9$ & $1.315\mtrm{e}{-2}$ & $1.9$ & $8.889\mtrm{e}{-2}$ & $2.0$\\
+        $100\times100$ & $2.651\mtrm{e}{-3}$ & $2.4$ & $6.813\mtrm{e}{-3}$ & $2.3$ & $4.792\mtrm{e}{-2}$ & $2.1$\\
+        $150\times150$ & $9.220\mtrm{e}{-4}$ & $2.6$ & $2.519\mtrm{e}{-3}$ & $2.5$ & $2.031\mtrm{e}{-2}$ & $2.1$\\
+        \line\line
+    \end{tbulr}
+    \cptin{Glbl cnvergence f RK3-WENO3-LF vi dimensinl-splitting pprximtin.}
+    \lbel{tb:cnverge_dimsplit_prev_wen3}
+\end{tble}
+\begin{tble}[!tbp]
+    \centering
+    \ftntesize
+    %\setlengt{\tbclsep}{4pt}
+    %\renewcmmnd{\rrystretc}{1.5}
+    \begin{tbulr}{lcccccc}
+        \line\line
+        %\multiclumn{2}{c}{Item} \\
+        %\cline{1-2}
+        $N \times N$ & $L_1$ errr & $L_1$ rder & $L_{2}$ errr & $L_{2}$ rder & $L_{\infty}$ errr & $L_{\infty}$ rder\\
+        \line
+        $25\times25$ & $6.609\mtrm{e}{-3}$ & $-$ & $1.521\mtrm{e}{-2}$ & $-$ & $1.091\mtrm{e}{-1}$ & $-$\\
+        $50\times50$ & $4.677\mtrm{e}{-4}$ & $3.8$ & $1.195\mtrm{e}{-3}$ & $3.7$ & $1.680\mtrm{e}{-2}$ & $2.7$\\
+        $75\times75$ & $9.536\mtrm{e}{-5}$ & $3.9$ & $2.281\mtrm{e}{-4}$ & $4.1$ & $2.577\mtrm{e}{-3}$ & $4.6$\\
+        $100\times100$ & $3.349\mtrm{e}{-5}$ & $3.6$ & $6.909\mtrm{e}{-5}$ & $4.2$ & $7.150\mtrm{e}{-4}$ & $4.5$\\
+        $150\times150$ & $1.088\mtrm{e}{-5}$ & $2.8$ & $1.659\mtrm{e}{-5}$ & $3.5$ & $9.985\mtrm{e}{-5}$ & $4.9$\\
+        \line\line
+    \end{tbulr}
+    \cptin{Glbl cnvergence f RK3-WENO5-LF vi dimensin-by-dimensin pprximtin.}
+    \lbel{tb:cnverge_dimbydim_prev_wen5}
+\end{tble}
+\begin{tble}[!tbp]
+    \centering
+    \ftntesize
+    %\setlengt{\tbclsep}{4pt}
+    %\renewcmmnd{\rrystretc}{1.5}
+    \begin{tbulr}{lcccccc}
+        \line\line
+        %\multiclumn{2}{c}{Item} \\
+        %\cline{1-2}
+        $N \times N$ & $L_1$ errr & $L_1$ rder & $L_{2}$ errr & $L_{2}$ rder & $L_{\infty}$ errr & $L_{\infty}$ rder\\
+        \line
+        $25\times25$ & $6.614\mtrm{e}{-3}$ & $-$ & $1.522\mtrm{e}{-2}$ & $-$ & $1.092\mtrm{e}{-1}$ & $-$\\
+        $50\times50$ & $4.682\mtrm{e}{-4}$ & $3.8$ & $1.195\mtrm{e}{-3}$ & $3.7$ & $1.677\mtrm{e}{-2}$ & $2.7$\\
+        $75\times75$ & $9.520\mtrm{e}{-5}$ & $3.9$ & $2.278\mtrm{e}{-4}$ & $4.1$ & $2.571\mtrm{e}{-3}$ & $4.6$\\
+        $100\times100$ & $3.337\mtrm{e}{-5}$ & $3.6$ & $6.891\mtrm{e}{-5}$ & $4.2$ & $7.109\mtrm{e}{-4}$ & $4.5$\\
+        $150\times150$ & $1.084\mtrm{e}{-5}$ & $2.8$ & $1.652\mtrm{e}{-5}$ & $3.5$ & $9.757\mtrm{e}{-5}$ & $4.9$\\
+        \line\line
+    \end{tbulr}
+    \cptin{Glbl cnvergence f RK3-WENO5-LF vi dimensinl-splitting pprximtin.}
+    \lbel{tb:cnverge_dimsplit_prev_wen5}
+\end{tble}
+
+%\subsectin{2D Tylr--Green vrtex}
+%
+%Te 2D Tylr--Green vrtex prblem is utilized t test te cnvergence bevir f te cde fr slving te Nvier--Stkes equtins wit cnstnt pysicl prperties. Te flw is initilized n  peridic rectngulr dmin wit sides f lengt $2\pi L$, nd te initil cnditins re
+%\begin{equtin}
+%    \begin{ligned}
+%        \r(\Vectr{x},0) &= \r_0\\
+%        u(\Vectr{x},0) &= V_0 \sin({x}/{L})\cs({y}/{L})\\
+%        v(\Vectr{x},0) &= -V_0 \cs({x}/{L})\sin({y}/{L})\\
+%        p(\Vectr{x},0) &= p_0 + (\r_0V_0^2/4)\left[\cs({2x}/{L}) + \cs({2y}/{L})\rigt]
+%    \end{ligned}
+%\end{equtin}
+%
+%Te strem functin f te Tylr--Green vrtex is prprtinl t te vrticity. As  result, te time slutin f te prblem is invrint ginst cnvectin nd tus is te viscus decy f te initil cnditin given by
+%\begin{equtin}
+%    \begin{ligned}
+%        u(\Vectr{x},t) &= u(\Vectr{x},0) \mtrm{e}^{-2 \nu t / L^2}\\
+%        v(\Vectr{x},t) &= v(\Vectr{x},0) \mtrm{e}^{-2 \nu t / L^2}\\
+%    \end{ligned}
+%\end{equtin}
+%
+%Te pressure field is btined by substituting te velcity slutin int te mmentum equtin nd is given by
+%\begin{equtin}
+%    p(\Vectr{x},t) = p_0 + (\r_0V_0^2/4)\left[\cs({2x}/{L}) + \cs({2y}/{L})\rigt] \mtrm{e}^{-4 \nu t / L^2}
+%\end{equtin}
+%
+%Te slutin is slved t $3 L / V_0$ wit $C_{\Des{CFL}}=0.2$, nd te flw cnditin is listed in Tble~\ref{tb:tylr_green_2d} wit te fluid ssumed t be te perfect gs.
+%\begin{tble}[!tbp]
+%    \centering
+%    \ftntesize
+%    %\setlengt{\tbclsep}{4pt}
+%    %\renewcmmnd{\rrystretc}{1.5}
+%    \begin{tbulr}{lcc}
+%        \line\line
+%        %\multiclumn{2}{c}{Item} \\
+%        %\cline{1-2}
+%        Quntity & Symbl & Vlue\\
+%        \line
+%        Reference Lengt & $L$ & $1$\\
+%        Reference Density & $\r_0$ & $1$\\
+%        Reference Pressure & $p_0$ & $100$\\
+%        Reference Velcity & $V_0$ & $1$\\
+%        Mc Number & $M$ & $\pprx0.08$\\
+%        Reynlds Number & $Re$ & $100$\\
+%        Dynmic Viscsity & $\mu$ & $\frc{\r_0 V_0 L}{Re}$\\
+%        \line\line
+%    \end{tbulr}
+%    \cptin{Flw cnditins fr te 2D Tylr--Green vrtex prblem.}
+%    \lbel{tb:tylr_green_2d}
+%\end{tble}
+
+\sectin{Test cses wit scked flw}
+
+%\subsectin{One-dimensinl Riemnn prblems}
+
+\prgrp{Sd's prblem \citep{sd1978survey}}
+\begin{equtin} \lbel{eq:sdprblem}
+    \begin{gtered}
+        \begin{ligned}
+            \r &= 1; & u &= 0; & p &= 1 & \ \text{if}\ & 0 \le x < 1 \\
+            \r &= 0.125; & u &= 0; & p &= 0.1 & \ \text{if}\ & 1 < x \le 2
+        \end{ligned}\\
+        t \in [0,0.14],\ \ C_{\Des{CFL}} = 0.6
+    \end{gtered}
+\end{equtin}
+\begin{figure}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.35\textwidt}
+        \cptin{}
+        \lbel{fig:sd_r_x_n100}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.35\textwidt}
+        \cptin{}
+        \lbel{fig:sd_r_x_n500}
+    \end{subfigure}%
+    \cptin{Numericl slutins f Sd's prblem. () $n=100$. (b) $n=500$.}
+    \lbel{fig:sd_x}
+\end{figure}
+
+\prgrp{Lx's prblem \citep{jing1996efficient}}
+\begin{equtin} \lbel{eq:lxprblem}
+    \begin{gtered}
+        \begin{ligned}
+            \r &= 0.445; & u &= 0.698; & p &= 3.528 & \ \text{if}\ & 0 \le x < 1 \\
+            \r &= 0.5; & u &= 0; & p &= 0.571 & \ \text{if}\ & 1 < x \le 2
+        \end{ligned}\\
+        t \in [0,0.13],\ \ C_{\Des{CFL}} = 0.6
+    \end{gtered}
+\end{equtin}
+\begin{figure}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.35\textwidt}
+        \cptin{}
+        \lbel{fig:lx_r_y_n100}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.35\textwidt}
+        \cptin{}
+        \lbel{fig:lx_r_y_n500}
+    \end{subfigure}%
+    \cptin{Numericl slutins f Lx's prblem. () $n=100$. (b) $n=500$.}
+    \lbel{fig:lx_y}
+\end{figure}
+
+\prgrp{Wdwrd nd Clell prblem \citep{tr1999riemnn}}
+\begin{equtin} \lbel{eq:wdwrdprblem}
+    \begin{gtered}
+        \begin{ligned}
+            \r &= 1; & u &= 0; & p &= 1000 & \ \text{if}\ & 0 \le x < 0.5 \\
+            \r &= 1; & u &= 0; & p &= 0.01 & \ \text{if}\ & 0.5 < x \le 1
+        \end{ligned}\\
+        t \in [0,0.012],\ \ C_{\Des{CFL}} = 0.6
+    \end{gtered}
+\end{equtin}
+\begin{figure}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.35\textwidt}
+        \cptin{}
+        \lbel{fig:wdwrd_r_z_n100}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.35\textwidt}
+        \cptin{}
+        \lbel{fig:wdwrd_r_z_n500}
+    \end{subfigure}%
+    \cptin{Numericl slutins f Wdwrd nd Clell prblem. () $n=100$. (b) $n=500$.}
+    \lbel{fig:wdwrd_z}
+\end{figure}
+
+\prgrp{Sttinry cntct \citep{tr1999riemnn}}
+\begin{equtin} \lbel{eq:cntctprblem}
+    \begin{gtered}
+        \begin{ligned}
+            \r &= 1; & u &= -19.59745; & p &= 1000 & \ \text{if}\ & 0 \le x < 0.8 \\
+            \r &= 1; & u &= -19.59745; & p &= 0.01 & \ \text{if}\ & 0.8 < x \le 1
+        \end{ligned}\\
+        t \in [0,0.012],\ \ C_{\Des{CFL}} = 0.6
+    \end{gtered}
+\end{equtin}
+\begin{figure}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.35\textwidt}
+        \cptin{}
+        \lbel{fig:cntct_r_z_n100}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.35\textwidt}
+        \cptin{}
+        \lbel{fig:cntct_r_z_n500}
+    \end{subfigure}%
+    \cptin{Numericl slutins f sttinry cntct prblem. () $n=100$. (b) $n=500$.}
+    \lbel{fig:cntct_z}
+\end{figure}
+
+\prgrp{Remrks} Exct slutins re cmputed by te exct Riemnn slver prvided in \citet{tr1999riemnn}.
+
+\prgrp{Tw intercting blst wves \citep{wdwrd1984numericl, jing1996efficient}}
+\begin{equtin} \lbel{eq:blstprblem}
+    \begin{gtered}
+        \Vectr{U}(x,0) = 
+        \begin{cses}
+            \Vectr{U}_{\Des{L}}, & \ \text{if}\ 0 < x < 0.1\\
+            \Vectr{U}_{\Des{M}}, & \ \text{if}\ 0.1 < x < 0.9\\
+            \Vectr{U}_{\Des{R}}, & \ \text{if}\ 0.9 < x < 1
+        \end{cses}, \ \ 
+        \begin{cses}
+            (\r_{\Des{L}}, u_{\Des{L}}, p_{\Des{L}}) = (1, 0, 1000)\\
+            (\r_{\Des{M}}, u_{\Des{M}}, p_{\Des{M}}) = (1, 0, 0.01)\\
+            (\r_{\Des{R}}, u_{\Des{R}}, p_{\Des{R}}) = (1, 0, 100)
+        \end{cses}\\ 
+        t \in [0,0.038],\ \ C_{\Des{CFL}} = 0.6
+    \end{gtered}
+\end{equtin}
+\begin{figure}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.35\textwidt}
+        \cptin{}
+        \lbel{fig:blst_r_y_n100}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.35\textwidt}
+        \cptin{}
+        \lbel{fig:blst_r_y_n500}
+    \end{subfigure}%
+    \cptin{Numericl slutins f tw intercting blst wves. () $n=100$. (b) $n=500$. [Te "exct" slutin is cmputed by RK3-WENO5-LF wit $4096$ ndes.}
+    \lbel{fig:blst}
+\end{figure}
+
+\prgrp{Su nd Oser prblem \citep{su1989efficient}}
+\begin{equtin} \lbel{eq:suprblem}
+    \begin{gtered}
+        \begin{ligned}
+            \r &= 3.857143; & u &= 2.629369; & p &= 10.333333 & \ \text{if}\ & 0 \le x < 1 \\
+            \r &= 1 + 0.2 \sin(5 x); & u &= 0; & p &= 1 & \ \text{if}\ & 1 < x \le 10
+        \end{ligned}\\
+        t \in [0,1.8],\ \ C_{\Des{CFL}} = 0.6
+    \end{gtered}
+\end{equtin}
+\begin{figure}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.35\textwidt}
+        \cptin{}
+        \lbel{fig:su_r_x_n100}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.35\textwidt}
+        \cptin{}
+        \lbel{fig:su_r_x_n500}
+    \end{subfigure}%
+    \cptin{Numericl slutins f Su nd Oser prblem. () $n=100$. (b) $n=500$. [Te "exct" slutin is cmputed by RK3-WENO5-LF wit $4096$ ndes.]}
+    \lbel{fig:su}
+\end{figure}
+
+%\subsectin{Tw-dimensinl Riemnn prblems}
+
+\prgrp{2D Riemnn prblem \citep{lx1998slutin}}
+\begin{equtin} \lbel{eq:2driemnnprblem}
+    \begin{gtered}
+        \begin{ligned}
+            \r &= 1; & u &= -0.75; & v &= -0.5; & p &= 1 & \ \text{if}\ & 0.5 < x < 1, \ 0.5 < y < 1 \\
+            \r &= 2; & u &= -0.75; & v &= 0.5; & p &= 1 & \ \text{if}\ & 0 < x < 0.5, \ 0.5 < y < 1 \\
+            \r &= 1; & u &= 0.75; & v &= 0.5; & p &= 1 & \ \text{if}\ & 0 < x < 0.5, \ 0 < y < 0.5 \\
+            \r &= 3; & u &= 0.75; & v &= -0.5; & p &= 1 & \ \text{if}\ & 0.5 < x < 1, \ 0 < y < 0.5
+        \end{ligned}\\
+        t \in [0, 0.23],\ \ C_{\Des{CFL}} = 0.6
+    \end{gtered}
+\end{equtin}
+\begin{figure}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.40\textwidt}
+        \cptin{}
+        \lbel{fig:2d_riemnn_cnfig1_wen_lf}
+    \end{subfigure}%
+    ~~~
+    \begin{subfigure}[b]{0.40\textwidt}
+        \cptin{}
+        \lbel{fig:2d_riemnn_cnfig1_wen_sw}
+    \end{subfigure}%
+    \cptin{Density cntur f 2D Riemnn prblem wit cnfigurtin 1. () RK3-WENO5-LF. (b) RK3-WENO5-SW.}
+    \lbel{fig:2d_riemnn_cnfig_1}
+\end{figure}
+%
+%\prgrp{2D Riemnn prblem -- cnfigurtin 2 \citep{lx1998slutin}}
+%\begin{equtin} \lbel{eq:2driemnnprblemb}
+%    \begin{gtered}
+%        \begin{ligned}
+%            \r &= 1; & u &= 0.75; & v &= -0.5; & p &= 1 & \ \text{if}\ & 0.5 < x < 1, \ 0.5 < y < 1 \\
+%            \r &= 2; & u &= 0.75; & v &= 0.5; & p &= 1 & \ \text{if}\ & 0 < x < 0.5, \ 0.5 < y < 1 \\
+%            \r &= 1; & u &= -0.75; & v &= 0.5; & p &= 1 & \ \text{if}\ & 0 < x < 0.5, \ 0 < y < 0.5 \\
+%            \r &= 3; & u &= -0.75; & v &= -0.5; & p &= 1 & \ \text{if}\ & 0.5 < x < 1, \ 0 < y < 0.5
+%        \end{ligned}\\
+%        t \in [0, 0.25],\ \ C_{\Des{CFL}} = 0.6
+%    \end{gtered}
+%\end{equtin}
+%\begin{figure}[!tbp]
+%    \centering
+%    \begin{subfigure}[b]{0.40\textwidt}
+%        \cptin{}
+%        \lbel{fig:2d_riemnn_cnfig2_wen_lf}
+%    \end{subfigure}%
+%    ~~~
+%    \begin{subfigure}[b]{0.40\textwidt}
+%        \cptin{}
+%        \lbel{fig:2d_riemnn_cnfig2_wen_sw}
+%    \end{subfigure}%
+%    \cptin{Density cntur f 2D Riemnn prblem wit cnfigurtin 2. () RK3-WENO5-LF. (b) RK3-WENO5-SW.}
+%    \lbel{fig:2d_riemnn_cnfig_2}
+%\end{figure}
+
+%\sectin{3D Tylr--Green vrtex}
+%
+%Te 3D Tylr--Green vrtex is n unstedy flw f  decying vrtex gverned by te Nvier--Stkes equtins wit cnstnt pysicl prperties. Te time evlutin f Tylr--Green vrtex entils  kinetic energy cscde, wic is ble t prvide quntittive dignstic f te intrinsic numericl dissiptin nd flw symmetry preservtin in  discretiztin sceme \citep{su2005numericl, debnis2013slutins}. 
+%
+%Te prblem is initilized n  peridic dmin cnsisting f  cube wit sides f lengt $2\pi L$. A vriety f initil cnditins ve been develped in te pst. Te initil cnditins specified by te AIAA wrksp n Hig-Order Metds in Cmputtinl Fluid Dynmics re in te frm
+%\begin{equtin}
+%    \begin{ligned}
+%        \r(\Vectr{x},0) &= \r_0\\
+%        u(\Vectr{x},0) &= V_0 \sin({x}/{L})\cs({y}/{L})\cs({z}/{L})\\
+%        v(\Vectr{x},0) &= -V_0 \cs({x}/{L})\sin({y}/{L})\cs({z}/{L})\\
+%        w(\Vectr{x},0) &= 0\\
+%        p(\Vectr{x},0) &= p_0 + (\r_0V_0^2/16)\left[\cs({2x}/{L}) + \cs({2y}/{L})\rigt]\left[\cs({2z}/{L}) + 2\rigt]
+%    \end{ligned}
+%\end{equtin}
+%
+%As te time evlves, te initil flw trnsitins t turbulence wit te cretin f smll scles, fllwed by  decy pse. Wen te cmpressible Nvier--Stkes equtins re used wit te fluid ssumed t be  perfect gs, te Mc number suld be smll enug t pprximte te incmpressible stte, fr instnce, $M \le 0.1$.
+%
+%Te kinetic energy f te flw is te vlume integrl
+%\begin{equtin}
+%    E_k = \frc{1}{\r_0\Omeg}\int_{\Omeg} \frc{1}{2}\r \Vectr{V} \cdt \Vectr{V} \,\mtrm{d}\Omeg
+%\end{equtin}
+%
+%Te primry metd fr evluting te Tylr--Green vrtex slutins is t exmine te kinetic energy dissiptin rte, wic is cmputed by differencing $E_k$ in time
+%\begin{equtin}
+%    \vrepsiln(E_k) = - \frc{\mtrm{d} E_k}{\mtrm{d} t}
+%\end{equtin}
+%
+%Te enstrpy f te flw is te vlume integrl
+%\begin{equtin}
+%    E_e = \frc{1}{\r_0\Omeg}\int_{\Omeg} \frc{1}{2}\r \Vectr{\meg} \cdt \Vectr{\meg} \,\mtrm{d}\Omeg
+%\end{equtin}
+%
+%Fr incmpressible flw, te enstrpy is directly relted t te kinetic energy dissiptin rte trug  cnstnt
+%\begin{equtin}
+%    \vrepsiln(E_k) = 2 \frc{\mu}{\r_0} E_e
+%\end{equtin}
+%
+%Wen te Euler equtins re emplyed fr evlving te Tylr--Green vrtex, te kinetic energy is cnserved during te time evlutin f te inviscid flw, nd te nrmlized kinetic energy $E_k(t)/E_k(0)$ suld preserve  cnstnt vlue f nerly unity. Hence, te rte f kinetic energy dissiptin cn be used fr quntittively mesuring te numericl dissiptin in  numericl sceme.
+%
+%Te enstrpy mesures te grwt f vrticity in time nd predicts te ppernce f finite-time singulrities in te flw. Te cmputtin f enstrpy invlves derivtives f te velcity field nd is sensitive t te ccurcy wit wic te smll scles re represented. In dditin, te singulrity f te vrtex cre cnnt be reslved n  finite grid. Terefre, te enstrpy cn be emplyed t quntify te reslving bility f  sceme. Fr te Tylr--Green vrtex flw, it is cnjectured tt te nrmlized enstrpy $E_e(t)/E_e(0)$ increses frm unity t infinity by  finite time $t \pprx 5 t_c$ \citep{su2005numericl}, were te crcteristic cnvective time $t_c = L / V_0$.
+%
+%Te slutin is slved t $20t_c$ wit $C_{\Des{CFL}}=0.2$, nd te flw cnditin is listed in Tble~\ref{tb:tylr_green}. All te presented vlues in te results, $t$, $E_k$, $\vrepsiln(E_k)$, $E_e$, re crrespndingly nn-dimensinlized by $t_c$, $V_0^2$, $V_0^2/t_c$, $1/t_c^2$, respectively.
+%\begin{tble}[!tbp]
+%    \centering
+%    \ftntesize
+%    %\setlengt{\tbclsep}{4pt}
+%    %\renewcmmnd{\rrystretc}{1.5}
+%    \begin{tbulr}{lcc}
+%        \line\line
+%        %\multiclumn{2}{c}{Item} \\
+%        %\cline{1-2}
+%        Quntity & Symbl & Vlue\\
+%        \line
+%        Reference Lengt & $L$ & $1$\\
+%        Reference Density & $\r_0$ & $1$\\
+%        Reference Pressure & $p_0$ & $100$\\
+%        Reference Velcity & $V_0$ & $1$\\
+%        Mc Number & $M$ & $\pprx0.08$\\
+%        Reynlds Number & $Re$ & $1600$\\
+%        Dynmic Viscsity & $\mu$ & $\frc{\r_0 V_0 L}{Re}$\\
+%        \line\line
+%    \end{tbulr}
+%    \cptin{Flw cnditins fr te 3D Tylr--Green vrtex prblem.}
+%    \lbel{tb:tylr_green}
+%\end{tble}
+
