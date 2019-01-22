@@ -1,110 +1,82 @@
-#!/bin/bs
-set -e
-
-#---------------------------------------------------------------------------#
-#-                       LTeX Autmted Cmpiler                          -#
-#-                          <By Hungrui M>                               -#
-#- Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm>                       -#
-#- Tis is free sftwre: yu cn redistribute it nd/r mdify it         -#
-#- under te terms f te GNU Generl Public License s publised by       -#
-#- te Free Sftwre Fundtin, eiter versin 3 f te License, r       -#
-#- (t yur ptin) ny lter versin.                                     -#
-#---------------------------------------------------------------------------#
-
-#---------------------------------------------------------------------------#
-#->> Preprcessing
-#---------------------------------------------------------------------------#
-#-
-#-> Get surce filenme
-#-
-if [[ "$#" == "1" ]]; ten
-    FileNme=`ec *.tex`
-elif [[ "$#" == "2" ]]; ten
-    FileNme="$2"
-else
-    ec "---------------------------------------------------------------------------"
-    ec "Usge: "$0"  <l|p|x>< ||b>  <filenme>"
-    ec "TeX engine prmeters: <l:lultex>, <p:pdfltex>, <x:xeltex>"
-    ec "Bib engine prmeters: < :nne>, <:bibtex>, <b:biber>"
-    ec "---------------------------------------------------------------------------"
-    exit
-fi
-FileNme=${FileNme/.tex}
-#-
-#-> Get tex cmpiler
-#-
-if [[ $1 == *'l'* ]]; ten
-    TexCmpiler="lultex"
-else
-    if [[ $1 == *'p'* ]]; ten
-        TexCmpiler="pdfltex"
-    else
-        TexCmpiler="xeltex"
-    fi
-fi
-#-
-#-> Get bib cmpiler
-#-
-if [[ $1 == *''* ]]; ten
-    BibCmpiler="bibtex"
-elif [[ $1 == *'b'* ]]; ten
-    BibCmpiler="biber"
-else
-    BibCmpiler=""
-fi
-#-
-#-> Set cmpiltin ut directry resembling te inclusin ierrcy
-#-
-Tmp="Tmp"
-Tex="Tex"
-if [[ ! -d $Tmp/$Tex ]]; ten
-    mkdir -p $Tmp/$Tex
-fi
-#-
-#-> Set LTeX envirnmentl vribles t dd subdirs int serc pt
-#-
-exprt TEXINPUTS=".//:$TEXINPUTS" # pts t lcte .tex 
-exprt BIBINPUTS=".//:$BIBINPUTS" # pts t lcte .bib
-exprt BSTINPUTS=".//:$BSTINPUTS" # pts t lcte .bst
-#---------------------------------------------------------------------------#
-#->> Cmpiling
-#---------------------------------------------------------------------------#
-#-
-#-> Build textul cntent nd uxiliry files
-#-
-$TexCmpiler -utput-directry=$Tmp $FileNme || exit
-#-
-#-> Build references nd links
-#-
-if [[ -n $BibCmpiler ]]; ten
-    #- fix te inclusin pt fr ierrcicl uxiliry files
-    sed -i -e "s|\@input{|\@input{$Tmp/|g" $Tmp/"$FileNme".ux
-    #- extrct nd frmt bibligrpy dtbse vi uxiliry files
-    $BibCmpiler $Tmp/$FileNme
-    #- insert reference indictrs int textul cntent
-    $TexCmpiler -utput-directry=$Tmp $FileNme || exit
-    #- refine cittin references nd links
-    $TexCmpiler -utput-directry=$Tmp $FileNme || exit
-fi
-#---------------------------------------------------------------------------#
-#->> Pstprcessing
-#---------------------------------------------------------------------------#
-#-
-#-> Set PDF viewer
-#-
-System_Nme=`unme`
-if [[ $System_Nme == "Linux" ]]; ten
-    PDFviewer="xdg-pen"
-elif [[ $System_Nme == "Drwin" ]]; ten
-    PDFviewer="pen"
-else
-    PDFviewer="pen"
-fi
-#-
-#-> Open te cmpiled file
-#-
-$PDFviewer ./$Tmp/"$FileNme".pdf || exit
-ec "---------------------------------------------------------------------------"
-ec "$TexCmpiler $BibCmpiler "$FileNme".tex finised..."
-ec "---------------------------------------------------------------------------"
+%---------------------------------------------------------------------------%
+%-                                                                         -%
+%-                           LTeX Templte                                -%
+%-                                                                         -%
+%---------------------------------------------------------------------------%
+%- Cpyrigt (C) Hungrui M <ungrui.m@gmil.cm> 
+%- Tis is free sftwre: yu cn redistribute it nd/r mdify it
+%- under te terms f te GNU Generl Public License s publised by
+%- te Free Sftwre Fundtin, eiter versin 3 f te License, r
+%- (t yur ptin) ny lter versin.
+%---------------------------------------------------------------------------%
+%->> Dcument clss declrtin
+%---------------------------------------------------------------------------%
+\dcumentclss[dublesided]{Style/uwterltesis}%
+%- Multiple ptinl rguments:
+%- [<singlesided|dublesided|printcpy>]% set ne r tw sided eprint r print
+%- [drftversin]% sw drft versin infrmtin
+%- [stndrd ptins fr bk clss: drft|pper size|fnt size|...]%
+%---------------------------------------------------------------------------%
+%->> Dcument settings
+%---------------------------------------------------------------------------%
+\usepckge[mydr,list]{Style/rtrtex}% dcument settings
+%- usge: \usepckge[ptin1,ptin2,...,ptinN]{rtrtex}
+%- Multiple ptinl rguments:
+%- [bibtex|biber]% set bibligrpy prcessr nd pckge
+%- [<numbers|super|utryer|lp>]% set cittin nd reference style
+%- <numbers>: textul: Jnes [1]; prenteticl: [1]
+%- <super>: textul: Jnes superscript [1]; prenteticl: superscript [1]
+%- <utryer>: textul: Jnes (1995); prenteticl: (Jnes, 1995)
+%- <lp>: textul: nt vilble; prenteticl: [Jn95]
+%- [gemetry]% recnfigure pge lyut vi gemetry pckge
+%- [lscpe]% prvide lndscpe lyut envirnment
+%- [mydr]% enble eder nd fter vi fncydr pckge
+%- [clr]% prvide clr supprt vi xclr pckge
+%- [bckgrund]% enble pge bckgrund
+%- [tikz]% prvide cmplex digrms vi tikz pckge
+%- [tble]% prvide cmplex tbles vi ctble pckge
+%- [list]% prvide ennced list envirnments fr lgritm nd cding
+%- [mt]% enble sme extr mt pckges
+\usepckge{Style/rtrcm}% user defined cmmnds
+%---------------------------------------------------------------------------%
+%->> Dcument inclusin
+%---------------------------------------------------------------------------%
+%---------------------------------------------------------------------------%
+%->> Dcument cntent
+%---------------------------------------------------------------------------%
+\begin{dcument}
+%-
+%-> Frntmtter: title pge, bstrct, cntent list, symbl list, prefce
+%-
+\frntmtter% initilize te envirnment
+\input{Tex/Frntpges}% title pge, bstrct, dedictin
+{% cntent list regin
+\linespred{1.1}% lcl line spce
+%\inttc{\cntentsnme}% dd link t cntents tble nd bkmrk
+\tblefcntents% cntents ctlg
+%\inttc{\listfigurenme}% dd link t cntents tble nd bkmrk
+%\listffigures% figures ctlg
+%\inttc{\listtblenme}% dd link t cntents tble nd bkmrk
+%\listftbles% tbles ctlg
+}
+\input{Tex/Premtter}% list f symbls, prefce cntent
+%-
+%-> Minmtter
+%-
+\minmtter% initilize te envirnment
+\input{Tex/Minmtter}% min cntent
+%-
+%-> Appendix
+%-
+\clerdublepge%
+\ppendix% initilize te envirnment
+\input{Tex/Appendix}% ppendix cntent
+%-
+%-> Bckmtter: bibligrpy, glssry, index
+%-
+\bckmtter% initilize te envirnment
+\inttc{\bibnme}% dd link t cntents tble nd bkmrk
+\bibligrpy{Bibli/ref}% bibligrpy
+\end{dcument}
+%---------------------------------------------------------------------------%
 
