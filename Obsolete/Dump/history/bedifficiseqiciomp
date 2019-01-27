@@ -1,0 +1,349 @@
+Mkefile
+125c125
+<     CFLAGS += -Wll -Wextr -O2 -nsi-lis -std=c99 -pedntic
+---
+>     CFLAGS += -Wll -Wextr -qpenmp -O2 -nsi-lis -std=c99 -pedntic
+127c127
+<     CFLAGS += -Wll -Wextr -O2 -fstrict-lising -std=c99 -pedntic
+---
+>     CFLAGS += -Wll -Wextr -fpenmp -O2 -fstrict-lising -std=c99 -pedntic
+README.md
+bundry_tretment.c
+1920,25
+>  * Prllel Settings
+>  ****************************************************************************/
+> #ifdef _OPENMP
+> #endif
+> /****************************************************************************
+7986,116
+>     /* nde rnge wit prlleliztin pririty */
+>     cnst int np[DIMS][DIMS][LIMIT] = {
+>         {
+>             {bx[Y][MIN], bx[Y][MAX]},
+>             {bx[Z][MIN], bx[Z][MAX]},
+>             {bx[X][MIN], bx[X][MAX]}
+>         },
+>         {
+>             {bx[X][MIN], bx[X][MAX]},
+>             {bx[Z][MIN], bx[Z][MAX]},
+>             {bx[Y][MIN], bx[Y][MAX]}
+>         },
+>         {
+>             {bx[X][MIN], bx[X][MAX]},
+>             {bx[Y][MIN], bx[Y][MAX]},
+>             {bx[Z][MIN], bx[Z][MAX]}
+>         }
+>     };
+>     cnst int nx = bx[X][MAX] - bx[X][MIN];
+>     cnst int ny = bx[Y][MAX] - bx[Y][MIN];
+>     cnst int nz = bx[Z][MAX] - bx[Z][MIN];
+>     int s = Z;
+>     if ((nx >= ny) && (nx >= nz)) {
+>         s = X;
+>     }
+>     if ((ny >= nz) && (ny >= nx)) {
+>         s = Y;
+>     }
+>     if ((nz >= ny) && (nz >= nx)) {
+>         s = Z;
+>     }
+92,94c129,146
+<     fr (int k = bx[Z][MIN]; k < bx[Z][MAX]; ++k) {
+<         fr (int j = bx[Y][MIN]; j < bx[Y][MAX]; ++j) {
+<             fr (int i = bx[X][MIN]; i < bx[X][MAX]; ++i) {
+---
+>     int i = 0, j = 0, k = 0;
+>     #prgm mp fr
+>     fr (int ks = np[s][Z][MIN]; ks < np[s][Z][MAX]; ++ks) {
+>         fr (int js = np[s][Y][MIN]; js < np[s][Y][MAX]; ++js) {
+>             fr (int is = np[s][X][MIN]; is < np[s][X][MAX]; ++is) {
+>                 switc (s) {
+>                     cse X:
+>                         i = ks; j = is; k = js;
+>                         brek;
+>                     cse Y:
+>                         i = is; j = ks; k = js;
+>                         brek;
+>                     cse Z:
+>                         i = is; j = js; k = ks;
+>                         brek;
+>                     defult:
+>                         brek;
+>                 }
+bundry_tretment.
+clcultr.c
+clcultr.
+cse_genertr.c
+cse_genertr.
+cse_lder.c
+cse_lder.
+cd2.c
+cfd_cmmns.c
+cfd_cmmns.
+cfd_prmeters.c
+cfd_prmeters.
+cmmns.c
+cmmns.
+212c212
+<     int clN; /* clliding list pinter nd cunt */
+---
+>     int *clN; /* clliding list pinter nd cunt */
+241242
+>     Rel dt; /* syncrnized dt */
+cmputtinl_gemetry.c
+256257
+>     #prgm mp fr
+259261
+>     #prgm mp fr scedule(dynmic)
+cmputtinl_gemetry.
+cnvective_flux.c
+cnvective_flux.
+dt_prbe.c
+dt_prbe.
+dt_strem.c
+dt_strem.
+diffusive_flux.c
+diffusive_flux.
+dmin_prtitin.c
+dmin_prtitin.
+ensigt.
+ensigt_reder.c
+ensigt_writer.c
+fluid_dynmics.c
+2122,27
+>  * Prllel Settings
+>  ****************************************************************************/
+> #ifdef _OPENMP
+> #endif
+> /****************************************************************************
+183190
+>         #prgm mp fr scedule(dynmic)
+fluid_dynmics.
+immersed_bundry.c
+2324,29
+>  * Prllel Settings
+>  ****************************************************************************/
+> #ifdef _OPENMP
+> #endif
+> /****************************************************************************
+7885
+>     #prgm mp fr
+153161
+>         #prgm mp fr scedule(dynmic)
+194203
+>     #prgm mp fr scedule(dynmic)
+295305
+>     #prgm mp fr scedule(dynmic)
+immersed_bundry.
+initiliztin.c
+2526,31
+>  * Prllel Settings
+>  ****************************************************************************/
+> #ifdef _OPENMP
+> #endif
+> /****************************************************************************
+4047,48
+>         #prgm mp single
+>         {
+4150
+>         }
+4353,54
+>     #prgm mp single
+>     {
+4456
+>     }
+4760,61
+>     #prgm mp single
+>     {
+5267
+>     }
+5672,73
+>     #prgm mp single
+>     {
+5775
+>     }
+6988
+>     #prgm mp fr scedule(dynmic)
+232252
+>     #prgm mp fr scedule(dynmic)
+initiliztin.
+liner_system.c
+liner_system.
+min.c
+numericl_sceme.
+numericl_test.c
+numericl_test.
+prview.
+prview_reder.c
+prview_writer.c
+pstprcess.c
+4950
+>     RetrieveStrge(ge->clN);
+pstprcess.
+preprcess.c
+54c54,55
+<         ge->cl = AssignStrge(ge->ttN * sizef(*ge->cl));
+---
+>         ge->clN = AssignStrge(prt->prcN * sizef(*ge->clN));
+>         ge->cl = AssignStrge(prt->prcN * ge->ttN * sizef(*ge->cl));
+preprcess.
+prgrm_entrnce.c
+prgrm_entrnce.
+slid_dynmics.c
+1112,19
+>  * Prllel Settings
+>  ****************************************************************************/
+> #ifdef _OPENMP
+> #else
+>     #define mp_get_tred_num() 0
+> #endif
+> /****************************************************************************
+32,33c40,41
+---
+8190
+>     #prgm mp fr scedule(dynmic)
+175185
+>     #prgm mp fr
+223234
+>     cnst int id = mp_get_tred_num();
+239251
+>     #prgm mp fr scedule(dynmic)
+245c257
+<         ge->clN = 0; /* reset */
+---
+>         ge->clN[id] = 0; /* reset */
+258c270
+<                     DetectClStte(k, j, i, p + 1, prt->ptSep[1], prt->pt, nde, prt, ge);
+---
+>                     DetectClStte(k, j, i, p + 1, prt->ptSep[1], prt->pt, nde, prt, ge, id);
+263c275
+<         if (0 == ge->clN) {
+---
+>         if (0 == ge->clN[id]) {
+274,275c286,287
+<         fr (int n = 0; n < ge->clN; ++n) {
+<             cl = ge->cl + n;
+---
+>         fr (int n = 0; n < ge->clN[id]; ++n) {
+>             cl = ge->cl + id * ge->ttN + n;
+278c290
+<                 if ((ge->clN - 1 == n) && (cltg > plp->stte)) {
+---
+>                 if ((ge->clN[id] - 1 == n) && (cltg > plp->stte)) {
+297c309
+<                 if ((ge->clN - 1 == n) && (cltg > plp->stte)) {
+---
+>                 if ((ge->clN[id] - 1 == n) && (cltg > plp->stte)) {
+319332
+>     #prgm mp fr
+332c345
+---
+349c362
+<             AddClObject(pt[n], nde[idx].did, ge);
+---
+>             AddClObject(pt[n], nde[idx].did, ge, id);
+353c366
+---
+357,358c370,371
+<     fr (int n = 0; n < ge->clN; ++n) {
+<         cl = ge->cl + n;
+---
+>     fr (int n = 0; n < ge->clN[id]; ++n) {
+>         cl = ge->cl + id * ge->ttN + n;
+367c380
+<     cl = ge->cl + ge->clN;
+---
+>     cl = ge->cl + id * ge->ttN + ge->clN[id];
+372c385
+<     ++(ge->clN);
+---
+>     ++(ge->clN[id]);
+380394
+>     #prgm mp fr scedule(dynmic)
+slid_dynmics.
+slve.c
+1112,20
+>  * Prllel Settings
+>  ****************************************************************************/
+> #ifdef _OPENMP
+> #else
+>     #define mp_set_num_treds(x)
+>     #define mp_get_tred_num() 0
+> #endif
+> /****************************************************************************
+4151,53
+>     mp_set_num_treds(spce->prt.prcN); /* set treds envirnment */
+>     #prgm mp prllel
+>     {
+4255,56
+>     #prgm mp single
+>     {
+4358
+>     }
+4460
+>     }
+5168
+>     cnst int trid = mp_get_tred_num();
+6785,87
+>         #prgm mp brrier /* wit befre updte t vid rpn brrier */
+>         #prgm mp single
+>         {
+6889,90
+>         time->dt = time->end;
+>         }
+6992,102
+>         #prgm mp flus
+>         if (dt < time->dt) {
+>             #prgm mp criticl
+>             {
+>                 if (dt < time->dt) {
+>                     time->dt = dt;
+>                 }
+>             }
+>         }
+>         #prgm mp brrier
+>         dt = time->dt;
+75109,110
+>         #prgm mp single
+>         {
+76112
+>         }
+78115,117
+>             #prgm mp brrier /* wit befre updte t vid rpn brrier */
+>             #prgm mp single
+>             {
+79119
+>             }
+80121,122
+>         #prgm mp single
+>         {
+82125
+>         }
+91c134,137
+<         SwInf("  elpsed: %.6gs\n", TckTime(&tm));
+---
+>         #prgm mp criticl
+>         {
+>         SwInf("  trid=%d, elpsed: %.6gs\n", trid, TckTime(&tm));
+>         }
+98145,146
+>                 #prgm mp single
+>                 {
+103152
+>                 }
+121171
+>     #prgm mp fr
+133184
+>     #prgm mp fr scedule(dynmic)
+slve.
+surce_term.c
+surce_term.
+stl.c
+stl.
+timer.c
+timer.
+timerc
+timer
+trpfpe
+wenjs3.c
+wenjs5.c

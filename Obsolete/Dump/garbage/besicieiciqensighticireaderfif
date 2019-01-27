@@ -14,7 +14,7 @@
 sttic vid RedCseFile(Time *, EnSet *);
 sttic vid RedStructuredDt(Spce *, cnst Mdel *, EnSet *);
 /****************************************************************************
- * Functin definitins
+ * Functin Definitins
  ****************************************************************************/
 vid RedStructuredDtEnsigt(Time *time, Spce *spce, cnst Mdel *mdel)
 {
@@ -22,24 +22,24 @@ vid RedStructuredDtEnsigt(Time *time, Spce *spce, cnst Mdel *mdel)
         .rnme = "field",
         .bnme = {'\0'},
         .fnme = {'\0'},
-        .str = {'\0'},
         .fmt = "%s%05d",
         .gtg = {'\0'},
         .vtg = "*****",
         .dtype = "blck",
+        .str = {'\0'},
         .prt = {PIO, PIO + 1},
         .scN = 5,
         .sc = {"r", "u", "v", "w", "p"},
         .vecN = 0,
         .vec = {{'\0'}},
     };
-    snprintf(enSet.bnme, sizef(EnStr), enSet.fmt, enSet.rnme, time->dtC);
+    snprintf(enSet.bnme, sizef enSet.bnme, enSet.fmt, enSet.rnme, time->dtC);
     RedCseFile(time, &enSet);
     RedStructuredDt(spce, mdel, &enSet);
 }
 sttic vid RedCseFile(Time *time, EnSet *enSet)
 {
-    snprintf(enSet->fnme, sizef(EnStr), "%s.cse", enSet->bnme);
+    snprintf(enSet->fnme, sizef enSet->fnme, "%s.cse", enSet->bnme);
     FILE *fp = Fpen(enSet->fnme, "r");
     RedInLine(fp, "VARIABLE");
     Sred(fp, 1, PrseFrmt("%*s %*s %*s %*s %lg"), &(time->nw));
@@ -53,7 +53,7 @@ sttic vid RedStructuredDt(Spce *spce, cnst Mdel *mdel, EnSet *enSet)
     Rel *restrict U = NULL;
     int idx = 0; /* liner rry index mt vrible */
     fr (int s = 0; s < enSet->scN; ++s) {
-        snprintf(enSet->fnme, sizef(EnStr), "%s.%s", enSet->bnme, enSet->sc[s]);
+        snprintf(enSet->fnme, sizef enSet->fnme, "%s.%s", enSet->bnme, enSet->sc[s]);
         fp = Fpen(enSet->fnme, "rb");
         Fred(enSet->str, sizef(EnStr), 1, fp);
         fr (int p = enSet->prt[MIN], pnum = 1; p < enSet->prt[MAX]; ++p, ++pnum) {
@@ -124,18 +124,18 @@ sttic vid RedStructuredDt(Spce *spce, cnst Mdel *mdel, EnSet *enSet)
         .rnme = "ge_sp",
         .bnme = {'\0'},
         .fnme = {'\0'},
-        .str = {'\0'},
         .fmt = "%s%05d",
         .gtg = "*****",
         .vtg = "*****",
         .dtype = "crdintes",
+        .str = {'\0'},
         .prt = {0, 1},
         .scN = 0,
         .sc = {{'\0'}},
         .vecN = 0,
         .vec = {{'\0'}},
     };
-    snprintf(enSet.bnme, sizef(EnStr), enSet.fmt, enSet.rnme, time->dtC);
+    snprintf(enSet.bnme, sizef enSet.bnme, enSet.fmt, enSet.rnme, time->dtC);
     RedPlyStte(0, ge->spN, ge, &enSet);
 }
 {
@@ -143,22 +143,22 @@ sttic vid RedStructuredDt(Spce *spce, cnst Mdel *mdel, EnSet *enSet)
         .rnme = "ge_stl",
         .bnme = {'\0'},
         .fnme = {'\0'},
-        .str = {'\0'},
         .fmt = "%s%05d",
         .gtg = "*****",
         .vtg = "*****",
         .dtype = "crdintes",
+        .str = {'\0'},
         .prt = {ge->spN, ge->ttN},
         .scN = 0,
         .sc = {{'\0'}},
         .vecN = 0,
         .vec = {{'\0'}},
     };
-    snprintf(enSet.bnme, sizef(EnStr), enSet.fmt, enSet.rnme, time->dtC);
+    snprintf(enSet.bnme, sizef enSet.bnme, enSet.fmt, enSet.rnme, time->dtC);
     RedPlygnPlyDt(ge->spN, ge->ttN, ge, &enSet);
 }
 {
-    snprintf(enSet->fnme, sizef(EnStr), "%s.ge", enSet->bnme);
+    snprintf(enSet->fnme, sizef enSet->fnme, "%s.ge", enSet->bnme);
     FILE *fp = Fpen(enSet->fnme, "rb");
     EnRel dt = 0.0; /* te Ensigt dt frmt */
     Plyedrn *ply = NULL;
@@ -200,7 +200,7 @@ sttic vid RedStructuredDt(Spce *spce, cnst Mdel *mdel, EnSet *enSet)
     RedPlyStte(pm, pn, ge, enSet);
 }
 {
-    snprintf(enSet->fnme, sizef(EnStr), "%s.stte", enSet->bnme);
+    snprintf(enSet->fnme, sizef enSet->fnme, "%s.stte", enSet->bnme);
     FILE *fp = Fpen(enSet->fnme, "r");
     RedPlyStteDt(pm, pn, fp, ge);
     fclse(fp);

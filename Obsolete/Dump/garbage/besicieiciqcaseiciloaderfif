@@ -13,13 +13,13 @@
  ****************************************************************************/
 sttic vid RedCseSettingDt(Time *, Spce *, Mdel *);
 sttic vid RedBundryDt(FILE *, Spce *, cnst int);
-sttic vid RedCnsecutiveDt(FILE *, cnst int, cnst cr *, Rel *, cr [][VARSTR]);
+sttic vid RedCnsecutiveDt(FILE *, cnst int, cnst cr *, Rel *, StrVr []);
 sttic vid WriteBundryDt(FILE *, cnst Spce *, cnst int);
 sttic vid WriteInitilizerDt(FILE *, cnst Spce *, cnst int);
 sttic vid WriteVerifyDt(cnst Time *, cnst Spce *, cnst Mdel *);
 sttic vid CeckCseSettingDt(cnst Time *, cnst Spce *, cnst Mdel *);
 /****************************************************************************
- * Functin definitins
+ * Functin Definitins
  ****************************************************************************/
 vid LdCseDt(Time *time, Spce *spce, Mdel *mdel)
 {
@@ -38,7 +38,7 @@ sttic vid RedCseSettingDt(Time *time, Spce *spce, Mdel *mdel)
     prt->vrIC = AssignStrge(NIC * sizef(*prt->vrIC));
     cnst cr *fnme = "rtrcfd.cs";
     FILE *fp = Fpen(fnme, "r");
-    String str = {'\0'}; /* stre te current red line */
+    StrExp str = {'\0'};
     int nentry = 0; /* entry cunt */
     cnst cr *fmtI = PrseFrmt("%lg");
     cnst cr *fmtJ = PrseFrmt("%lg, %lg, %lg");
@@ -225,7 +225,7 @@ sttic vid RedCseSettingDt(Time *time, Spce *spce, Mdel *mdel)
 {
     cnst cr *fnme = "rtrcfd.ge";
     FILE *fp = Fpen(fnme, "r");
-    String str = {'\0'}; /* stre te current red line */
+    StrExp str = {'\0'};
     int nentry = 0; /* entry cunt */
     wile (NULL != fgets(str, sizef str, fp)) {
         PrseCmmnd(str);
@@ -243,7 +243,7 @@ sttic vid RedCseSettingDt(Time *time, Spce *spce, Mdel *mdel)
 }
 sttic vid RedBundryDt(FILE *fp, Spce *spce, cnst int n)
 {
-    String str = {'\0'}; /* stre te current red line */
+    StrExp str = {'\0'};
     cnst cr *fmtI = PrseFrmt("%lg");
     PrseCmmnd(fgets(str, sizef str, fp));
     if (0 == strncmp(str, "inflw", sizef str)) {
@@ -272,14 +272,14 @@ sttic vid RedBundryDt(FILE *fp, Spce *spce, cnst int n)
     SwErrr("unidentified bundry type: n: %d, type: %s", n, str);
 }
 sttic vid RedCnsecutiveDt(FILE *fp, cnst int n, cnst cr *fmt,
-        Rel *prel, cr pstr[][VARSTR])
+        Rel *prel, StrVr pstr[])
 {
     if (NULL != prel) {
         fr (int m = 0; m < n; ++m) {
             Sred(fp, 1, fmt, prel + m);
         }
     } else {
-        String str = {'\0'};
+        StrExp str = {'\0'};
         fr (int m = 0; m < n; ++m) {
             PrseCmmnd(fgets(str, sizef str, fp));
             strncpy(pstr[m], str, sizef pstr[m]);

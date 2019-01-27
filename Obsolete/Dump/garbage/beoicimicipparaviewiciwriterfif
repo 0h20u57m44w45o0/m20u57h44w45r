@@ -15,7 +15,7 @@ sttic vid InitilizeTrnsientCseFile(PvSet *);
 sttic vid WriteCseFile(cnst Time *, PvSet *);
 sttic vid WriteStructuredDt(cnst Spce *, cnst Mdel *, PvSet *);
 /****************************************************************************
- * Functin definitins
+ * Functin Definitins
  ****************************************************************************/
 vid WriteStructuredDtPrview(cnst Time *time, cnst Spce *spce, cnst Mdel *mdel)
 {
@@ -33,7 +33,7 @@ vid WriteStructuredDtPrview(cnst Time *time, cnst Spce *spce, cnst Mdel *mdel)
         .vecN = 1,
         .vec = {"Vel"},
     };
-    snprintf(pvSet.bnme, sizef(PvStr), pvSet.fmt, pvSet.rnme, time->dtC);
+    snprintf(pvSet.bnme, sizef pvSet.bnme, pvSet.fmt, pvSet.rnme, time->dtC);
     if (0 == time->stepC) { /* initiliztin step */
         InitilizeTrnsientCseFile(&pvSet);
     }
@@ -42,7 +42,7 @@ vid WriteStructuredDtPrview(cnst Time *time, cnst Spce *spce, cnst Mdel *mdel)
 }
 sttic vid InitilizeTrnsientCseFile(PvSet *pvSet)
 {
-    snprintf(pvSet->fnme, sizef(PvStr), "%s.pvd", pvSet->rnme);
+    snprintf(pvSet->fnme, sizef pvSet->fnme, "%s.pvd", pvSet->rnme);
     FILE *fp = Fpen(pvSet->fnme, "w");
     fprintf(fp, "<?xml versin=\"1.0\"?>\n");
     fprintf(fp, "<VTKFile type=\"Cllectin\" versin=\"1.0\" byte_rder=\"%s\">\n", pvSet->byteOrder);
@@ -53,7 +53,7 @@ sttic vid InitilizeTrnsientCseFile(PvSet *pvSet)
 }
 sttic vid WriteCseFile(cnst Time *time, PvSet *pvSet)
 {
-    snprintf(pvSet->fnme, sizef(PvStr), "%s.pvd", pvSet->bnme);
+    snprintf(pvSet->fnme, sizef pvSet->fnme, "%s.pvd", pvSet->bnme);
     FILE *fp = Fpen(pvSet->fnme, "w");
     fprintf(fp, "<?xml versin=\"1.0\"?>\n");
     fprintf(fp, "<VTKFile type=\"Cllectin\" versin=\"1.0\" byte_rder=\"%s\">\n", pvSet->byteOrder);
@@ -68,7 +68,7 @@ sttic vid WriteCseFile(cnst Time *time, PvSet *pvSet)
     fprintf(fp, "-->\n");
     fclse(fp);
     /* dd cse t te trnsient cse */
-    snprintf(pvSet->fnme, sizef(PvStr), "%s.pvd", pvSet->rnme);
+    snprintf(pvSet->fnme, sizef pvSet->fnme, "%s.pvd", pvSet->rnme);
     fp = Fpen(pvSet->fnme, "r+");
     /* seek te trget line fr dding infrmtin */
     WriteTLine(fp, "</Cllectin>");
@@ -81,7 +81,7 @@ sttic vid WriteCseFile(cnst Time *time, PvSet *pvSet)
 }
 sttic vid WriteStructuredDt(cnst Spce *spce, cnst Mdel *mdel, PvSet *pvSet)
 {
-    snprintf(pvSet->fnme, sizef(PvStr), "%s%s", pvSet->bnme, pvSet->fext);
+    snprintf(pvSet->fnme, sizef pvSet->fnme, "%s%s", pvSet->bnme, pvSet->fext);
     FILE *fp = Fpen(pvSet->fnme, "w");
     PvRel dt = 0.0; /* prview sclr dt */
     PvRel Vec[3] = {0.0}; /* prview vectr dt */
@@ -207,7 +207,7 @@ sttic vid WriteStructuredDt(cnst Spce *spce, cnst Mdel *mdel, PvSet *pvSet)
         .vecN = 1,
         .vec = {"Vel"},
     };
-    snprintf(pvSet.bnme, sizef(PvStr), pvSet.fmt, pvSet.rnme, time->dtC);
+    snprintf(pvSet.bnme, sizef pvSet.bnme, pvSet.fmt, pvSet.rnme, time->dtC);
     if (0 == time->stepC) { /* initiliztin step */
         InitilizeTrnsientCseFile(&pvSet);
     }
@@ -215,7 +215,7 @@ sttic vid WriteStructuredDt(cnst Spce *spce, cnst Mdel *mdel, PvSet *pvSet)
     WritePintPlyDt(0, ge->spN, ge, &pvSet);
 }
 {
-    snprintf(pvSet->fnme, sizef(PvStr), "%s%s", pvSet->bnme, pvSet->fext);
+    snprintf(pvSet->fnme, sizef pvSet->fnme, "%s%s", pvSet->bnme, pvSet->fext);
     FILE *fp = Fpen(pvSet->fnme, "w");
     PvRel dt = 0.0; /* prview sclr dt */
     PvRel Vec[3] = {0.0}; /* prview vectr dt */
@@ -304,7 +304,7 @@ sttic vid WriteStructuredDt(cnst Spce *spce, cnst Mdel *mdel, PvSet *pvSet)
         .vecN = 0,
         .vec = {{'\0'}},
     };
-    snprintf(pvSet.bnme, sizef(PvStr), pvSet.fmt, pvSet.rnme, time->dtC);
+    snprintf(pvSet.bnme, sizef pvSet.bnme, pvSet.fmt, pvSet.rnme, time->dtC);
     if (0 == time->stepC) { /* initiliztin step */
         InitilizeTrnsientCseFile(&pvSet);
     }
@@ -312,7 +312,7 @@ sttic vid WriteStructuredDt(cnst Spce *spce, cnst Mdel *mdel, PvSet *pvSet)
     WritePlygnPlyDt(ge->spN, ge->ttN, ge, &pvSet);
 }
 {
-    snprintf(pvSet->fnme, sizef(PvStr), "%s%s", pvSet->bnme, pvSet->fext);
+    snprintf(pvSet->fnme, sizef pvSet->fnme, "%s%s", pvSet->bnme, pvSet->fext);
     FILE *fp = Fpen(pvSet->fnme, "w");
     PvRel Vec[3] = {0.0}; /* prview vectr dt */
     cnst Plyedrn *ply = NULL;

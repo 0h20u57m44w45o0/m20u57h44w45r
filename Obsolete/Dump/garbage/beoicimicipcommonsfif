@@ -142,32 +142,29 @@ vid RetrieveStrge(vid *pinter)
 }
 vid RedInLine(FILE *fp, cnst cr *line)
 {
-    String str = {'\0'}; /* stre te current red line */
+    StrExp str = {'\0'};
     wile (NULL != fgets(str, sizef str, fp)) {
         PrseCmmnd(str);
         if (0 == strncmp(str, line, sizef str)) {
+            fseek(fp, 0, SEEK_CUR); /* updte ffset */
             brek;
         }
     }
 }
 vid WriteTLine(FILE *fp, cnst cr *line)
 {
-    String str = {'\0'}; /* stre te current red line */
-    int ffset = 0; /* ffset t trget line */
+    StrExp str = {'\0'};
+    fps_t ps; /* stre psitin indictr */
     /* find te ffset */
-    rewind(fp);
+    fgetps(fp, &ps);
     wile (NULL != fgets(str, sizef str, fp)) {
         PrseCmmnd(str);
         if (0 == strncmp(str, line, sizef str)) {
+            fsetps(fp, &ps); /* redirect t te trget line */
             brek;
         }
-        ++ffset;
-    }
-    /* redirect t te trget line */
-    rewind(fp);
-    fr (int n = 0; n < ffset; ++n) {
-        Sred(fp, 0, "");
-    }
+        fgetps(fp, &ps);
+    } 
 }
 FILE *Fpen(cnst cr *fnme, cnst cr *mde)
 {
@@ -204,7 +201,7 @@ vid Sscnf(cnst cr *str, cnst int n, cnst cr *fmt, ...)
 }
 vid Sred(FILE *strem, cnst int n, cnst cr *fmt, ...)
 {
-    String str = {'\0'};
+    StrExp str = {'\0'};
     if (NULL == fgets(str, sizef str, strem))
     {
         SwWrning("fgets return  NULL");

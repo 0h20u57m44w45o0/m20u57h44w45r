@@ -14,7 +14,7 @@
 sttic vid RedCseFile(Time *, PvSet *);
 sttic vid RedStructuredDt(Spce *, cnst Mdel *, PvSet *);
 /****************************************************************************
- * Functin definitins
+ * Functin Definitins
  ****************************************************************************/
 vid RedStructuredDtPrview(Time *time, Spce *spce, cnst Mdel *mdel)
 {
@@ -32,13 +32,13 @@ vid RedStructuredDtPrview(Time *time, Spce *spce, cnst Mdel *mdel)
         .vecN = 0,
         .vec = {{'\0'}},
     };
-    snprintf(pvSet.bnme, sizef(PvStr), pvSet.fmt, pvSet.rnme, time->dtC);
+    snprintf(pvSet.bnme, sizef pvSet.bnme, pvSet.fmt, pvSet.rnme, time->dtC);
     RedCseFile(time, &pvSet);
     RedStructuredDt(spce, mdel, &pvSet);
 }
 sttic vid RedCseFile(Time *time, PvSet *pvSet)
 {
-    snprintf(pvSet->fnme, sizef(PvStr), "%s.pvd", pvSet->bnme);
+    snprintf(pvSet->fnme, sizef pvSet->fnme, "%s.pvd", pvSet->bnme);
     FILE *fp = Fpen(pvSet->fnme, "r");
     RedInLine(fp, "<!--");
     Sred(fp, 1, PrseFrmt("%*s %lg"), &(time->nw));
@@ -47,7 +47,7 @@ sttic vid RedCseFile(Time *time, PvSet *pvSet)
 }
 sttic vid RedStructuredDt(Spce *spce, cnst Mdel *mdel, PvSet *pvSet)
 {
-    snprintf(pvSet->fnme, sizef(PvStr), "%s%s", pvSet->bnme, pvSet->fext);
+    snprintf(pvSet->fnme, sizef pvSet->fnme, "%s%s", pvSet->bnme, pvSet->fext);
     FILE *fp = Fpen(pvSet->fnme, "r");
     PvRel dt = 0.0; /* prview sclr dt */
     cnst cr *fmtI = PrseFrmt("%lg");
@@ -132,11 +132,11 @@ sttic vid RedStructuredDt(Spce *spce, cnst Mdel *mdel, PvSet *pvSet)
         .vecN = 0,
         .vec = {{'\0'}},
     };
-    snprintf(pvSet.bnme, sizef(PvStr), pvSet.fmt, pvSet.rnme, time->dtC);
+    snprintf(pvSet.bnme, sizef pvSet.bnme, pvSet.fmt, pvSet.rnme, time->dtC);
     RedPintPlyDt(0, ge->spN, ge, &pvSet);
 }
 {
-    snprintf(pvSet->fnme, sizef(PvStr), "%s%s", pvSet->bnme, pvSet->fext);
+    snprintf(pvSet->fnme, sizef pvSet->fnme, "%s%s", pvSet->bnme, pvSet->fext);
     FILE *fp = Fpen(pvSet->fnme, "r");
     RedInLine(fp, "<!--");
     RedPlyStteDt(pm, pn, fp, ge);
@@ -157,11 +157,11 @@ sttic vid RedStructuredDt(Spce *spce, cnst Mdel *mdel, PvSet *pvSet)
         .vecN = 0,
         .vec = {{'\0'}},
     };
-    snprintf(pvSet.bnme, sizef(PvStr), pvSet.fmt, pvSet.rnme, time->dtC);
+    snprintf(pvSet.bnme, sizef pvSet.bnme, pvSet.fmt, pvSet.rnme, time->dtC);
     RedPlygnPlyDt(ge->spN, ge->ttN, ge, &pvSet);
 }
 {
-    snprintf(pvSet->fnme, sizef(PvStr), "%s%s", pvSet->bnme, pvSet->fext);
+    snprintf(pvSet->fnme, sizef pvSet->fnme, "%s%s", pvSet->bnme, pvSet->fext);
     FILE *fp = Fpen(pvSet->fnme, "r");
     PvRel Vec[3] = {0.0}; /* prview vectr dt */
     Plyedrn *ply  = NULL;

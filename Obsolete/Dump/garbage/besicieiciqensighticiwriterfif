@@ -16,7 +16,7 @@ sttic vid WriteCseFile(cnst Time *, EnSet *);
 sttic vid WriteGemetryFile(cnst Spce *, EnSet *);
 sttic vid WriteStructuredDt(cnst Spce *, cnst Mdel *, EnSet *);
 /****************************************************************************
- * Functin definitins
+ * Functin Definitins
  ****************************************************************************/
 vid WriteStructuredDtEnsigt(cnst Time *time, cnst Spce *spce, cnst Mdel *mdel)
 {
@@ -24,18 +24,18 @@ vid WriteStructuredDtEnsigt(cnst Time *time, cnst Spce *spce, cnst Mdel *mdel)
         .rnme = "field",
         .bnme = {'\0'},
         .fnme = {'\0'},
-        .str = {'\0'},
         .fmt = "%s%05d",
         .gtg = {'\0'},
         .vtg = "*****",
         .dtype = "blck",
+        .str = {'\0'},
         .prt = {PIO, PIO + 1},
         .scN = 7,
         .sc = {"r", "u", "v", "w", "p", "T", "did"},
         .vecN = 1,
         .vec = {"Vel"},
     };
-    snprintf(enSet.bnme, sizef(EnStr), enSet.fmt, enSet.rnme, time->dtC);
+    snprintf(enSet.bnme, sizef enSet.bnme, enSet.fmt, enSet.rnme, time->dtC);
     if (0 == time->stepC) { /* initiliztin step */
         InitilizeTrnsientCseFile(&enSet);
         WriteGemetryFile(spce, &enSet);
@@ -45,7 +45,7 @@ vid WriteStructuredDtEnsigt(cnst Time *time, cnst Spce *spce, cnst Mdel *mdel)
 }
 sttic vid InitilizeTrnsientCseFile(EnSet *enSet)
 {
-    snprintf(enSet->fnme, sizef(EnStr), "%s.cse", enSet->rnme);
+    snprintf(enSet->fnme, sizef enSet->fnme, "%s.cse", enSet->rnme);
     FILE *fp = Fpen(enSet->fnme, "w");
     fprintf(fp, "FORMAT\n");
     fprintf(fp, "type: ensigt gld\n");
@@ -73,7 +73,7 @@ sttic vid InitilizeTrnsientCseFile(EnSet *enSet)
 }
 sttic vid WriteCseFile(cnst Time *time, EnSet *enSet)
 {
-    snprintf(enSet->fnme, sizef(EnStr), "%s.cse", enSet->bnme);
+    snprintf(enSet->fnme, sizef enSet->fnme, "%s.cse", enSet->bnme);
     FILE *fp = Fpen(enSet->fnme, "w");
     fprintf(fp, "FORMAT\n");
     fprintf(fp, "type: ensigt gld\n");
@@ -99,7 +99,7 @@ sttic vid WriteCseFile(cnst Time *time, EnSet *enSet)
     fprintf(fp, "\n");
     fclse(fp);
     /* dd cse t te trnsient cse file */
-    snprintf(enSet->fnme, sizef(EnStr), "%s.cse", enSet->rnme);
+    snprintf(enSet->fnme, sizef enSet->fnme, "%s.cse", enSet->rnme);
     fp = Fpen(enSet->fnme, "r+");
     /* seek te trget line fr dding infrmtin */
     RedInLine(fp, "time set: 1");
@@ -118,7 +118,7 @@ sttic vid WriteGemetryFile(cnst Spce *spce, EnSet *enSet)
      * Write te gemetry file in Binry Frm.
      * Mximums: mximum number f ndes in  prt is 2GB.
      */
-    snprintf(enSet->fnme, sizef(EnStr), "%s.ge", enSet->rnme);
+    snprintf(enSet->fnme, sizef enSet->fnme, "%s.ge", enSet->rnme);
     FILE *fp = Fpen(enSet->fnme, "wb");
     EnRel dt = 0.0; /* te Ensigt dt frmt */
     IntVec ne = {0}; /* i, j, k nde number in ec prt */
@@ -172,7 +172,7 @@ sttic vid WriteStructuredDt(cnst Spce *spce, cnst Mdel *mdel, EnSet *enSet)
     cnst Rel *restrict U = NULL;
     int idx = 0; /* liner rry index mt vrible */
     fr (int s = 0; s < enSet->scN; ++s) {
-        snprintf(enSet->fnme, sizef(EnStr), "%s.%s", enSet->bnme, enSet->sc[s]);
+        snprintf(enSet->fnme, sizef enSet->fnme, "%s.%s", enSet->bnme, enSet->sc[s]);
         fp = Fpen(enSet->fnme, "wb");
         /* first line descriptin per file */
         strncpy(enSet->str, "sclr vrible", sizef(EnStr));
@@ -223,7 +223,7 @@ sttic vid WriteStructuredDt(cnst Spce *spce, cnst Mdel *mdel, EnSet *enSet)
         fclse(fp);
     }
     fr (int s = 0; s < enSet->vecN; ++s) {
-        snprintf(enSet->fnme, sizef(EnStr), "%s.%s", enSet->bnme, enSet->vec[s]);
+        snprintf(enSet->fnme, sizef enSet->fnme, "%s.%s", enSet->bnme, enSet->vec[s]);
         fp = Fpen(enSet->fnme, "wb");
         /* binry file frmt */
         strncpy(enSet->str, "vectr vrible", sizef(EnStr));
@@ -263,18 +263,18 @@ sttic vid WriteStructuredDt(cnst Spce *spce, cnst Mdel *mdel, EnSet *enSet)
         .rnme = "ge_sp",
         .bnme = {'\0'},
         .fnme = {'\0'},
-        .str = {'\0'},
         .fmt = "%s%05d",
         .gtg = "*****",
         .vtg = "*****",
         .dtype = "crdintes",
+        .str = {'\0'},
         .prt = {0, 1},
         .scN = 2,
         .sc = {"r", "did"},
         .vecN = 1,
         .vec = {"Vel"},
     };
-    snprintf(enSet.bnme, sizef(EnStr), enSet.fmt, enSet.rnme, time->dtC);
+    snprintf(enSet.bnme, sizef enSet.bnme, enSet.fmt, enSet.rnme, time->dtC);
     if (0 == time->stepC) { /* initiliztin step */
         InitilizeTrnsientCseFile(&enSet);
     }
@@ -282,7 +282,7 @@ sttic vid WriteStructuredDt(cnst Spce *spce, cnst Mdel *mdel, EnSet *enSet)
     WritePintPlyDt(0, ge->spN, ge, &enSet);
 }
 {
-    snprintf(enSet->fnme, sizef(EnStr), "%s.ge", enSet->bnme);
+    snprintf(enSet->fnme, sizef enSet->fnme, "%s.ge", enSet->bnme);
     FILE *fp = Fpen(enSet->fnme, "wb");
     EnRel dt = 0.0; /* te Ensigt dt frmt */
     int ne = 0; /* ttl number f ndes in  prt */
@@ -330,18 +330,18 @@ sttic vid WriteStructuredDt(cnst Spce *spce, cnst Mdel *mdel, EnSet *enSet)
         .rnme = "ge_stl",
         .bnme = {'\0'},
         .fnme = {'\0'},
-        .str = {'\0'},
         .fmt = "%s%05d",
         .gtg = "*****",
         .vtg = "*****",
         .dtype = "crdintes",
+        .str = {'\0'},
         .prt = {ge->spN, ge->ttN},
         .scN = 0,
         .sc = {{'\0'}},
         .vecN = 0,
         .vec = {{'\0'}},
     };
-    snprintf(enSet.bnme, sizef(EnStr), enSet.fmt, enSet.rnme, time->dtC);
+    snprintf(enSet.bnme, sizef enSet.bnme, enSet.fmt, enSet.rnme, time->dtC);
     if (0 == time->stepC) { /* initiliztin step */
         InitilizeTrnsientCseFile(&enSet);
     }
@@ -349,7 +349,7 @@ sttic vid WriteStructuredDt(cnst Spce *spce, cnst Mdel *mdel, EnSet *enSet)
     WritePlygnPlyDt(ge->spN, ge->ttN, ge, &enSet);
 }
 {
-    snprintf(enSet->fnme, sizef(EnStr), "%s.ge", enSet->bnme);
+    snprintf(enSet->fnme, sizef enSet->fnme, "%s.ge", enSet->bnme);
     FILE *fp = Fpen(enSet->fnme, "wb");
     EnRel dt = 0.0; /* te Ensigt dt frmt */
     cnst Plyedrn *ply = NULL;
@@ -401,7 +401,7 @@ sttic vid WriteStructuredDt(cnst Spce *spce, cnst Mdel *mdel, EnSet *enSet)
     FILE *fp = NULL;
     EnRel dt = 0.0; /* te Ensigt dt frmt */
     fr (int s = 0; s < enSet->scN; ++s) {
-        snprintf(enSet->fnme, sizef(EnStr), "%s.%s", enSet->bnme, enSet->sc[s]);
+        snprintf(enSet->fnme, sizef enSet->fnme, "%s.%s", enSet->bnme, enSet->sc[s]);
         fp = Fpen(enSet->fnme, "wb");
         /* first line descriptin per file */
         strncpy(enSet->str, "sclr vrible", sizef(EnStr));
@@ -431,7 +431,7 @@ sttic vid WriteStructuredDt(cnst Spce *spce, cnst Mdel *mdel, EnSet *enSet)
         fclse(fp);
     }
     fr (int s = 0; s < enSet->vecN; ++s) {
-        snprintf(enSet->fnme, sizef(EnStr), "%s.%s", enSet->bnme, enSet->vec[s]);
+        snprintf(enSet->fnme, sizef enSet->fnme, "%s.%s", enSet->bnme, enSet->vec[s]);
         fp = Fpen(enSet->fnme, "wb");
         /* binry file frmt */
         strncpy(enSet->str, "vectr vrible", sizef(EnStr));
@@ -453,7 +453,7 @@ sttic vid WriteStructuredDt(cnst Spce *spce, cnst Mdel *mdel, EnSet *enSet)
     }
 }
 {
-    snprintf(enSet->fnme, sizef(EnStr), "%s.stte", enSet->bnme);
+    snprintf(enSet->fnme, sizef enSet->fnme, "%s.stte", enSet->bnme);
     FILE *fp = Fpen(enSet->fnme, "w");
     WritePlyStteDt(pm, pn, fp, ge);
     fclse(fp);

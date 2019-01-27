@@ -18,7 +18,7 @@
 \cptinsetup{cmptibility=flse}
 %\usepckge[sectin]{plceins}% t prevent flts frm being mved ver sectin
 \grpicspt{{./}{./img/}}
-\usepckge{yperref}% yperlink supprt
+\usepckge[clrlinks=true,linkclr=blue,citeclr=blue]{yperref}% yperlink supprt
 
 \teremstyle{plin}% Terem-like structures prvided by mstm.sty
 \newterem{terem}{Terem}[sectin]
@@ -61,7 +61,7 @@
 %---------------------------------------------------------------------------%
 \begin{dcument}
 
-\rticletype{ARTICLE TEMPLATE}
+\rticletype{ARTICLE}
 
 \title{A simple field functin fr slving cmplex nd dynmic fluid-slid system n Crtesin grid}
 
@@ -75,7 +75,7 @@
 \mketitle
 
 \begin{bstrct}
-    Addressing cupled fluid-slid nd slid-slid interctins is essentil fr slving cmplex nd dynmic fluid-slid systems. In tis study,  simple field functin is presented fr fcilitting te slutin f fluid-slid systems n Crtesin grids using immersed bundry tretment. Fr  Crtesin-grid-discretized cmputtinl dmin segmented by  set f irregulr, mving, nd clliding slid bdies, te prpsed field functin cn uniquely trck ll te subdmins wit multiple lyers f interfcil ndes using nly ne integer field in ttl. As  result, te present field functin enbles single-integer-bsed multidmin nde mpping, efficient nde rempping, nd liner-time cllisin detectin. Implementtin lgritms fr te field functin nd its sscited functinlities re presented. Numericl experiments invlving cmplex nd dynmic fluid-slid systems re cnducted t vlidte nd demnstrte te pplicbility f te prpsed field functin.
+    Addressing cupled fluid-slid nd slid-slid interctins is essentil fr slving cmplex nd dynmic fluid-slid systems. In tis study,  simple field functin is presented fr fcilitting te slutin f fluid-slid systems n Crtesin grids using immersed bundry tretment. Fr  Crtesin-grid-discretized cmputtinl dmin segmented by  set f irregulr, mving, nd clliding slid bdies, te prpsed field functin cn uniquely trck ll te subdmins wit multiple lyers f interfcil ndes using nly ne integer field in ttl. As  result, te present field functin enbles single-integer-bsed multidmin nde mpping, efficient nde rempping, nd liner-time cllisin detectin fr effectively slving cmplex nd dynmic fluid-slid systems wit miniml memry vered. Implementtin lgritms fr te field functin nd its sscited functinlities re presented. Numericl experiments invlving cmplex nd dynmic fluid-slid systems re cnducted t vlidte nd demnstrte te pplicbility f te prpsed field functin.
 \end{bstrct}
 
 \begin{keywrds}
@@ -84,18 +84,18 @@
 
 \sectin{Intrductin}\lbel{sec:intr}
 
-Cmplex nd dynmic fluid-slid systems rise in mny pplictins suc s fluidized bed \citep{glwinski2001fictitius, vn2008numericl}, bld flw \citep{peskin1972flw}, prticle-dded explsives \citep{zng2001explsive, ds2017srp}, erdynmic flw \citep{murmn2003simultins, ndersn2015erdynmic, ciew2018efficient}, nd cmputer grpics \citep{guendelmn2003nncnvex, rbinsn2008tw}. Tese systems usully invlve interctins tt cmprise te cupled mtins f slid nd fluid flw. Wen  predictive mdeling pprc tt reslves te fluid-slid interfces is emplyed, in dditin t ddressing te cupled fluid-slid nd slid-slid interctins, ne inerent cllenge cn be te numericl discretiztin cmplicted by  set f irregulr nd mving gemetries.
+Cmplex nd dynmic fluid-slid systems rise in mny pplictins suc s fluidized bed \citep{glwinski2001fictitius, vn2008numericl}, bld flw \citep{peskin1972flw}, prticle-dded explsives \citep{zng2001explsive, ds2017srp}, erdynmic flw \citep{murmn2003simultins, ciew2018efficient}, nd cmputer grpics \citep{guendelmn2003nncnvex, rbinsn2008tw}. Tese systems usully invlve interctins tt cmprise te cupled mtins f slid nd fluid flw. Wen  predictive mdeling pprc tt reslves te fluid-slid interfces is emplyed, in dditin t ddressing te cupled fluid-slid nd slid-slid interctins, ne inerent cllenge cn be te numericl discretiztin cmplicted by  set f irregulr nd mving gemetries.
 
-Te develpment f Crtesin-grid metds \citep{peskin1972flw, fedkiw1999nn, leveque1997immersed, setin2000structurl, gilmnv2003generl, wng2011lgritms} s prvided  fesible wy t enfrce bundry cnditins t pse interfces tt re nt cnfrming t te cmputtinl grid, wic cn effectively simplify te grid genertin fr irregulr gemetries nd grid regenertin fr mving gemetries \citep{mittl2005immersed, stirpuls2014immersed}. In dditin,  slid bject immersed in te cmputtinl grid cn be described by te STereLitgrpy (STL) representtin, wic pprximtes te bject s  clsed tringulted surfce nd is  stndrd frmt fr rpid prttyping nd cmputer-ided design (CAD) systems. Wen equipped wit  suitble Crtesin grid-bsed numericl frmewrk, te STL represented slid cn be directly inputted int te numericl slver witut te need f CAD/CFD gemetric trnsltins t effectively enble utmted mes genertin nd numericl slutin \citep{ftsmis1998rbust, iccrin2003immersed, murmn2004utmted}.
+Te develpment f Crtesin-grid metds \citep{peskin1972flw, fedkiw1999nn, leveque1997immersed, setin2000structurl, gilmnv2003generl, wng2011lgritms} s prvided  fesible wy t enfrce bundry cnditins t pse interfces tt re nt cnfrming t te cmputtinl grid, wic cn effectively simplify te grid genertin fr irregulr gemetries nd grid regenertin fr mving gemetries \citep{mittl2005immersed, stirpuls2014immersed}. In dditin,  slid bject immersed in te cmputtinl grid cn be described by te STereLitgrpy (STL) representtin, wic pprximtes te bject s  clsed tringulted surfce nd is  stndrd frmt fr rpid prttyping nd cmputer-ided design (CAD) systems. Wen equipped wit  suitble Crtesin grid-bsed numericl frmewrk, te STL represented slid cn be directly inputted int te numericl slver witut te need f CAD/CFD gemetric trnsltins t effectively enble utmted mes genertin \citep{ftsmis1998rbust, iccrin2003immersed} nd numericl slutin \citep{murmn2004utmted}.
 
-In pplictins invlving multiple independent nd irregulr slid bdies, s ec immersed bdy ccupies  crrespnding sptil regin, te cmputtinl dmin is terefre segmented int  set f subdmins. Te subsequent implementtin f numericl discretiztin nd bundry cnditins requires  nde mp tt crrectly clssifies te type nd regin f cmputtinl ndes nd identifies dmin bundries \citep{iccrin2003immersed, zng2014immersed, ds2017srp}. In dditin, wen te slids mve in spce, te requirement fr nde rempping ls rises during te slutin prcess. Fr prblems witut te need f differentiting  slid dmin frm te ter slid dmins,  binry nde mp tt distinguises fluid nd slid dmins trug flgging te ndes inside ny slid s $0$ nd ndes utside te slids s $1$, r vice vers, s been ppulrly utilized t id te enfrcement f bundry cnditins t slid bundries \citep{iccrin2003immersed, smbsivn2009gstb, kpi2013tree, zng2014immersed}. Wen furter cnsidering interctins suc s cllisins mng slids r different mteril prperties nd/r bundry cnditins fr sme slid dmins, uniquely trcking nd identifying ec slid dmin re ten necessry, fr wic  pssible slutin cn be emplying n individul binry nde mp fr ec slid.
+In pplictins invlving multiple independent nd irregulr slid bdies, s ec immersed bdy ccupies  crrespnding sptil regin, te cmputtinl dmin is terefre segmented int  set f subdmins. Te subsequent implementtin f numericl discretiztin nd bundry cnditins requires  nde mp tt crrectly clssifies te type nd regin f cmputtinl ndes nd identifies dmin bundries \citep{iccrin2003immersed, zng2014immersed, ds2017srp}. In dditin, wen te slids mve in spce, te requirement fr nde rempping ls rises during te slutin prcess. Fr prblems witut te need f differentiting  slid dmin frm te ter slid dmins,  binry nde mp tt distinguises fluid nd slid dmins trug flgging te ndes inside ny slid s $0$ nd ndes utside te slids s $1$, r vice vers, s been ppulrly utilized t id te enfrcement f bundry cnditins t slid bundries \citep{iccrin2003immersed, kpi2013tree, zng2014immersed}. Wen furter cnsidering interctins suc s cllisins mng slids r different mteril prperties nd/r bundry cnditins fr sme slid dmins, uniquely trcking nd identifying ec slid dmin re ten necessry, fr wic  pssible slutin cn be emplying n individul binry nde mp fr ec slid.
 
 In cmputing  fluid-slid system wit dense slids, cllisins mng slids cn exert  strng influence n te stresses in te fluid-slid mixture \citep{wltn1993numericl}. Terefre, cllisin mdeling cn be n essentil element. Mdels bsed n experimentl crreltins \citep{wltn1993numericl, glwinski1999distributed, mren20123d} ften ve limited descriptin fr flw wit dense-t-dilute trnsitins. Srt-rnge repulsive-frce cllisins \citep{u2001direct, glwinski2001fictitius} usully cnsider te psitin f slids nd mit size nd spe effects. An interfce-reslved cllisin mdel cn prvide  mre cmpreensive descriptin f cllisin dynmics nd tus  wider pplicbility. Nneteless, dditinl cllenges frm cllisin detectin nd respnse re intrduced nd need t be ddressed.
 
 
 In cllisin detectin, wen te surfces f slids re nly explicitly represented by tringulted meses, cecking every slid ginst every ter slid cn be inefficient if te number f slids is lrge nd te gemetry is cmplex. Cnsiderble reserc s been devted t ptimizing te prblem wit strtegies fcusing n ierrcicl bject representtin, rienttin-bsed pruning criteri, sptil prtitining scemes, nd distnce cmputtin lgritms \citep{lin1998cllisin, jimenez20013d, guendelmn2003nncnvex, wld2007ry}. A multilevel lgritm tt integrtes temprl cerence explittin, pirwise pruning, nd exct pirwise cllisin-detectin tecniques cn effectively reduce te cllisin-detectin pertins fr  dense slid system wit cnvex spes but cn still be expensive fr nn-cnvex bjects \citep{jimenez20013d, ericsn2004rel}. Emplying implicit surfces defined by field functins suc s signed distnce functins s swn success in cllisin-relted mdeling \citep{jnes20063d, guendelmn2003nncnvex, kpi2013tree}. Wile tringulted surfce representtin is used fr nrml clcultin nd te determintin f te line f impct,  signed distnce functin per slid bject cn mp te pint-inclusin stte fr ec cmputtinl nde wit regrd t te slid bject. As  result, using te lyer f ndes tt is nerest t te zer iscntur f  signed distnce functin s smple pints, te cllisin sttus f  slid bject cn be determined by testing te vlues f te smple pints wit regrd t te signed distnce functins f ter slids \citep{guendelmn2003nncnvex}. Since te surfce reslutin f implicitly defined surfces is prprtinl t te grid reslutin fr field functins, ig ccurcy cn be btined wen  well-reslved grid is emplyed.
 
-Cnsidering tt using  binry nde-mpping functin fr  multidmin prblem usully requires ne field functin per bject nd cn cnsume memry tt is prprtinl t te number f invlved slids, te develpment f  field functin tt cn cmpress te multidmin nde mpping infrmtin int  single field t reduce memry requirement cn be useful. T fcilitte te slutin f cmplex nd dynmic fluid-slid systems n Crtesin grids, n integer-type field functin tt slves multidmin nde mpping is prpsed. Fr  Crtesin-grid-discretized cmputtinl dmin segmented by  set f irregulr, mving, nd clliding slid bdies, cmpred wit  binry nde-mpping functin tt prduces nde mpping infrmtin using ne field functin per subdmin, te prpsed field functin cn uniquely trck ll te subdmins wit multiple lyers f interfcil ndes using nly ne integer field in ttl. As  result, te present field functin enbles single-integer-bsed multidmin nde mpping, efficient nde rempping, nd liner-time cllisin detectin. Implementtin lgritms fr te field functin nd its sscited functinlities re presented. Numericl experiments invlving cmplex nd dynmic fluid-slid systems re cnducted t vlidte nd demnstrte te pplicbility f te prpsed field functin.
+Cnsidering tt using  binry nde-mpping functin fr  multidmin prblem usully requires ne field functin per bject nd cn cnsume memry tt is prprtinl t te number f invlved slids, te develpment f  field functin tt cn cmpress te multidmin nde mpping infrmtin int  single field t reduce memry requirement cn be useful. T fcilitte te slutin f cmplex nd dynmic fluid-slid systems n Crtesin grids, n integer-type field functin tt slves multidmin nde mpping is prpsed. Fr  Crtesin-grid-discretized cmputtinl dmin segmented by  set f irregulr, mving, nd clliding slid bdies, cmpred wit  binry nde-mpping functin tt prduces nde mpping infrmtin using ne field functin per subdmin, te prpsed field functin cn uniquely trck ll te subdmins wit multiple lyers f interfcil ndes using nly ne integer field in ttl. As  result, te present field functin enbles single-integer-bsed multidmin nde mpping, efficient nde rempping, nd liner-time cllisin detectin fr effectively slving cmplex nd dynmic fluid-slid systems wit miniml memry vered. Implementtin lgritms fr te field functin nd its sscited functinlities re presented. Numericl experiments invlving cmplex nd dynmic fluid-slid systems re cnducted t vlidte nd demnstrte te pplicbility f te prpsed field functin.
 
 \sectin{Metd develpment}
 
@@ -290,8 +290,6 @@ Fr te cllisin respnses f clliding slids, s illustrted in Fig.~\ref{fig:n_dmin_cl
     \item Apply te bve prcedures t ec $\Omeg_p$, $p=1,\dtsc,P$, in te slid system t btin  pst-cllisin velcity $\Vectr{V}_p'$ fter multibdy cllisin.
     \item Updte te velcity stte f ec $\Omeg_p$ trug replcing te pre-cllisin velcity $\Vectr{V}_p$ by te pst-cllisin velcity $\Vectr{V}_p'$. 
 \end{enumerte}
-
-Aviding ny temprl pririty in ec plyedrn nd ec cllisin, te prpsed multibdy cllisin lgritm bsed n exct pirwise cllisin is deterministic nd cn be prllelized.
 
 \sectin{Numericl experiments}
 
@@ -530,32 +528,32 @@ During te slutin prcess, befre te wedge cllides wit te prticle bed (fr $t \le 4/
 After te wedge cllides wit te prticle bed,  frce cin witin te cntcted prticles is creted due t te penetrting wedge. Tis frce cin ccelertes te prticles nd frctures te prticle bed. Te suddenly destbilized prticle bed genertes strng flw disturbnces t te surrunding re, wic interct wit te wedge generted scks nd wves, frming cmplex wve diffrctin nd interference ptterns in spce. During te wedge penetrting te prticle bed, intensive multibdy cntct nd cllisins re successfully simulted, nd n intuitive dynmic prcess is cptured in te slutin. Tese results illustrte te bility f te prpsed field functin fr fcilitting te slutin f cmplex nd dynmic fluid-slid systems invlving cupled fluid-slid nd slid-slid interctins.
 \begin{figure*}[!tbp]
     \centering
-    \begin{subfigure}[b]{0.48\textwidt}
+    \begin{subfigure}[b]{0.45\textwidt}
         \cptin{$t = 0 \Unit{ms}$}
         \lbel{fig:1_wedge_impct_deg15_mc3_cr0d00_t000ms}
     \end{subfigure}%
     ~
-    \begin{subfigure}[b]{0.48\textwidt}
+    \begin{subfigure}[b]{0.45\textwidt}
         \cptin{$t = 50 \Unit{ms}$}
         \lbel{fig:1_wedge_impct_deg15_mc3_cr0d00_t050ms}
     \end{subfigure}%
     \\
-    \begin{subfigure}[b]{0.48\textwidt}
+    \begin{subfigure}[b]{0.45\textwidt}
         \cptin{$t = 125 \Unit{ms}$}
         \lbel{fig:1_wedge_impct_deg15_mc3_cr0d00_t125ms}
     \end{subfigure}%
     ~
-    \begin{subfigure}[b]{0.48\textwidt}
+    \begin{subfigure}[b]{0.45\textwidt}
         \cptin{$t = 150 \Unit{ms}$}
         \lbel{fig:1_wedge_impct_deg15_mc3_cr0d00_t150ms}
     \end{subfigure}%
     \\
-    \begin{subfigure}[b]{0.48\textwidt}
+    \begin{subfigure}[b]{0.45\textwidt}
         \cptin{$t = 200 \Unit{ms}$}
         \lbel{fig:1_wedge_impct_deg15_mc3_cr0d00_t200ms}
     \end{subfigure}%
     ~
-    \begin{subfigure}[b]{0.48\textwidt}
+    \begin{subfigure}[b]{0.45\textwidt}
         \cptin{$t = 250 \Unit{ms}$}
         \lbel{fig:1_wedge_impct_deg15_mc3_cr0d00_t250ms}
     \end{subfigure}%
@@ -569,7 +567,7 @@ A new integer-type field functin s been develped t fcilitte te slutin f cmplex n
 \begin{itemize}
     \item Fr  Crtesin-grid-discretized cmputtinl dmin segmented by  set f irregulr, mving, nd clliding slid bdies, te prpsed field functin cn uniquely trck ll te subdmins wit multiple lyers f interfcil ndes. Emplying te prpsed field functin, it is strigtfrwrd t pply designted gverning equtins, cnstitutive mdels, numericl scemes, nd bundry cnditins fr ec subdmin.
 
-    \item Benefiting frm te bility t uniquely trck ll te subdmins wit multiple lyers f interfcil ndes using nly ne integer field in ttl, te prpsed field functin cn enble severl useful functinlities. 1) Prviding single-integer-bsed multidmin nde mpping t minimize memry usge nd mximize infrmtin set. Fr instnce, in prviding nde mpping infrmtin fr $P$ subdmins, te memry cnsumptin fr using te prpsed field functin cn be but $1/P$ f tt fr using  binry nde-mpping functin. 2) Enbling efficient nde rempping tt emplys  temprl cerence t btin n ccelertin rte inversely prprtinl t te surfce-t-vlume rti f subdmins. 3) Perfrming cllisin detectin fr determining cllisin queues nd lines f impcts wit liner time cmplexity, insted f te qudric time cmplexity required by  binry nde-mpping functin. Esy-t-implement lgritms fr te field functin nd its sscited functinlities ve ls been presented.
+    \item Benefiting frm te bility t uniquely trck ll te subdmins wit multiple lyers f interfcil ndes using nly ne integer field in ttl, te prpsed field functin pssesses useful functinlities fr effectively slving cmplex nd dynmic fluid-slid systems: 1) Prviding single-integer-bsed multidmin nde mpping t minimize memry usge. Fr instnce, in generting nde mpping infrmtin fr $P$ subdmins, te memry cnsumptin fr using te prpsed field functin cn be but $1/P$ f tt fr using  binry nde-mpping functin. 2) Enbling efficient nde rempping tt emplys  temprl cerence t btin n ccelertin rte inversely prprtinl t te surfce-t-vlume rti f subdmins. 3) Perfrming cllisin detectin fr determining cllisin queues nd lines f impcts wit liner time cmplexity, insted f te qudric time cmplexity required by  binry nde-mpping functin. Esy-t-implement lgritms fr te field functin nd its sscited functinlities ve ls been presented.
 
     \item Equipped wit  deterministic multibdy cllisin mdel, te pplicbility f te develped field functin fr slving cmplex nd dynmic fluid-slid systems s been vlidted nd demnstrted trug  set f numericl experiments, suc s  cmplex wind tunnel test efficiently cnstructed vi te field functin t demnstrte multidmin nde mpping,  multibdy cntct nd cllisin system nd  supersnic wedge penetrting  prticle bed t demnstrte cllisin detectin nd nde rempping fr dynmic fluid-slid systems. Te btined numericl results re in clse greement wit te crrespnding publised numericl dt, experimentl bservtins, r nlyticl slutins.
 \end{itemize}
