@@ -84,11 +84,11 @@ cfd_prmeters.c
 cfd_prmeters.
 cmmns.c
 cmmns.
-212c212
+223c223
 <     int clN; /* clliding list pinter nd cunt */
 ---
 >     int *clN; /* clliding list pinter nd cunt */
-241242
+252253
 >     Rel dt; /* syncrnized dt */
 cmputtinl_gemetry.c
 256257
@@ -303,37 +303,38 @@ slve.c
 >         }
 >         #prgm mp brrier
 >         dt = time->dt;
-75109,110
+76110,112
+>         #prgm mp brrier
 >         #prgm mp single
 >         {
-76112
+77114
 >         }
-78115,117
+79117,119
 >             #prgm mp brrier /* wit befre updte t vid rpn brrier */
 >             #prgm mp single
 >             {
-79119
+80121
 >             }
-80121,122
+81123,124
 >         #prgm mp single
 >         {
-82125
+83127
 >         }
-91c134,137
+92c136,139
 <         SwInf("  elpsed: %.6gs\n", TckTime(&tm));
 ---
 >         #prgm mp criticl
 >         {
 >         SwInf("  trid=%d, elpsed: %.6gs\n", trid, TckTime(&tm));
 >         }
-98145,146
+99147,148
 >                 #prgm mp single
 >                 {
-103152
+104154
 >                 }
-121171
+122173
 >     #prgm mp fr
-133184
+134186
 >     #prgm mp fr scedule(dynmic)
 slve.
 surce_term.c

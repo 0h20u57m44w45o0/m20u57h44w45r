@@ -10,8 +10,7 @@
 
 \sectin{Intrductin}
 
-Visuliztin is te prcess f cnverting rw dt int imges nd renderings t gin  better cgnitive understnding f
-te dt.
+Visuliztin is te prcess f cnverting rw dt int imges nd renderings t gin  better cgnitive understnding f te dt.
 
 \sectin{VNC cnnectin}
 
@@ -34,7 +33,7 @@ te dt.
 
         \verb|mkdir /scrtc/user/rc|
 
-        \verb|ssfs user@rc.srcnet.c:/scrtc/user /scrtc/user/rc|
+        \verb|ssfs user@grm.cmputecnd.c:/scrtc/user /scrtc/user/rc|
 
     \item djust te windw size:
         
@@ -207,11 +206,55 @@ Due t mesuring density grdients, tese tw tecniques re useful fr trcing znes f Sc
     \item Metd 2:
     \item Ld dt -> CmputeDerivtives: density grdient -> CellDtTPintDt -> Clcultr fr grdient mgnitude -> Tresld: did=0 t extrct trget cmputtinl nde
     \item IsVlume filter t extrct te dmin wit vlues f interest: Input Sclrs: density grdient + Minimum: 1 + Mximum: 500 (djust rnge t find best presenttin)
-    \item Cse Surfce rendering wit pcity=0.5 fr IsVlume t speed up te djustment f cmer nd settings
+    \item Cse Surfce insted f Vlume rendering wit pcity=0.5 fr IsVlume t speed up te djustment f cmer nd settings
     \item Edit clr mp \emp{Trnsfer functin}, preset s gry scle r blck bdy rditin, use lg scle: 1-500, djust dt rnge t increse te dept f view.
     \item Adjust \emp{Opcity} t utline trget dt
     \item Cnge Surfce rendering wit pcity=1.0 fr IsVlume, ten Cse \emp{Vlume} rendering fr IsVlume
     \item NOTE: wen rendering vi Pytn script, if te vlume rendering sws unexpected bevirs, just delete te IsVlume dt nd red IsVlume filter.
+\end{itemize}
+
+\subsectin{Integrte Vribles}
+
+A filter clled vtkIntegrteVribles perfrms  discrete integrtin f  vrible field (define n pints f n unstructured mes) ver  surfce. An exmple f te wy it wrks fr  flw rte cmputtin is s fllws:
+\begin{enumerte}
+    \item extrct te surfce
+    \item generte surfce nrmls n (Splitting disbled, Filed Asscitin=Cell Dt)
+    \item vtkClcultr: generte field V.n (were V is te velcity vectr)
+    \item integrte wit te vtkIntegrteVribles filter
+\end{enumerte}
+
+Te pipeline f te vtkIntegrteVribles filter is te fllwing:
+\begin{itemize}
+    \item ceck weter vlues re defined t pints
+    \item pss pint vlues t cell centers (vtkPintDtTCellDt)
+    \item lp ver number f cells, cmpute \verb|cell_vlue*cell_re|, sum
+    \item stre te lcl integrtin vlues int n rry
+    \item pss vlues t cell centers bck t pint dt (vtkCellDtTPintDt)
+    \item write te result (sum f te lcl integrtins) int  file
+\end{itemize}
+
+\subsectin{Equtin Rendering}
+
+Supprt fr equtin rendering is being intrduced t vrius text bjects in PrView. Equtins re specified using MtText mrkup, wic is  subset f LTeX.
+
+PrView will ceck text fr  pir f "\verb|$|" symbls surrunding  MtText expressin. If suc  pttern is fund, te entire text field will be rendered s n equtin. If it is nt fund, te text is rendered nrmlly. T render  string cntining tw r mre "\verb|$|" symbls tt is nt intended t be n equtin, use "\verb|\$|" t tell te prser t tret te symbls literlly.
+
+\subsectin{Line Integrl Cnvlutin}
+
+Te line integrl cnvlutin(LIC) vectr field visuliztin tecnique cnvlves nise wit  vectr field prducing streking ptterns tt fllw vectr field tngents.
+
+Surfce LIC my be used in PrView by lding te Surfce LIC Plugin. Te plugin my be lded by pening te Tls menu nd selecting Mnge Plugins nd finlly selecting te surfce LIC plugin nd clicking Ld n bt client nd server. Fr mre infrmtin n PrView plugins see te plugin w t. Once lded te surfce LIC is ctivted by selecting it frm te drp-dwn list f Representtins. Once ctive te lgritm's run-time tunble prmeters re ccessed frm te Prperties pnel in te PrView client GUI. Clicking n te prperties pnel's Advnced buttn will disply ll f te vilble prmeters.
+
+Te surfce LIC lgritm prjects vectrs defined n n rbitrry surfce nt te surfce nd ten frm pysicl spce int screen spce were n imge LIC is cmputed. During te prjectin pse lit pseudclred surfce gemetry is rendered int  texture fr lter use. Fr  given vectr dtset te streking ptterns prduce by te LIC cn vry widely bsed n te prperties f te nise cnvlved, screen reslutin, nd scene r view prmeters. Msking is  tecnique were by  specilized sder ndles cmbining LIC frgments wit lit pseudclred surfce gemetry were te vectr mgnitude is belw  user prvided tresld. Tis prvides cntrl ver w frgments ner regins f stgnnt flw re ndled.
+\begin{figure}[!tbp]
+    \centering
+    \cptin{LIC f in velcity clred by velcity mgnitude. Te difference between te left n rigt pnels is cieved by vrying te impulse prbbility nd nise grin prmeters f PrView's nise genertr. Frgment msking ws pplied were $|V_{{i}}| \le 1e^{{-5}}$ t msk uncnvlved frgments in regins f flw stgntin.}
+    \lbel{fig:lic}
+\end{figure}
+
+\begin{itemize}
+    \item Tls -> Mnge plugins -> SurfceLIC -> Ceck Aut Ld -> Ld Selected
+    \item Cse  vectr field suc s vellcity -> Cse render s SurfceLIC
 \end{itemize}
 
 \subsectin{Time Animtin}

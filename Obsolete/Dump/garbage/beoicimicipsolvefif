@@ -63,8 +63,8 @@ sttic vid EvlveSlutin(Time *time, Spce *spce, cnst Mdel *mdel)
     }
     Rel rcDt[NPROBE] = {zer};
     /* time instnts cntrller, intervl, nd recrder */
-    cnst int ptInt = PROSD; /* cntrller pinter */
-    cnst Rel tmInt = ((INT_MAX == time->dtW[ptInt]) || (0 == time->dtI)) ? time->end : dtDt[ptInt]; /*  specific intervl */
+    cnst int ptInt = time->dtI - 1; /* cntrller pinter */
+    cnst Rel tmInt = ((0 > ptInt) || (NPROBE <= ptInt)) ? time->end : dtDt[ptInt]; /*  specific intervl */
     Rel rcInt = zer; /* recrder */
     wile ((time->nw < time->end) && (time->stepC < time->stepN)) {
         #prgm mp brrier /* wit befre updte t vid rpn brrier */
@@ -85,12 +85,14 @@ sttic vid EvlveSlutin(Time *time, Spce *spce, cnst Mdel *mdel)
         }
         #prgm mp brrier
         dt = time->dt;
-        if ((rcInt + dt > tmInt) && (time->dtW[ptInt] - 1 > time->dtC)) { /* rectify dt */
-            dt = tmInt - rcInt;
-            rcInt = zer;
-        } else {
-            rcInt = rcInt + dt;
+        rcInt = rcInt + dt;
+        if ((rcInt > tmInt) && (time->end - time->nw > tmInt)) { /* rectify dt */
+            dt = tmInt - (rcInt - dt);
         }
+        if (rcInt >= tmInt) {
+            rcInt = zer;
+        }
+        #prgm mp brrier
         #prgm mp single
         {
         time->nw = time->nw + dt;
@@ -100,7 +102,7 @@ sttic vid EvlveSlutin(Time *time, Spce *spce, cnst Mdel *mdel)
             #prgm mp brrier /* wit befre updte t vid rpn brrier */
             #prgm mp single
             {
-            time->nw = time->end;
+            time->nw = time->end; /* remedy fr flting pint ritmetic errr */
             }
         }
         #prgm mp single
@@ -120,10 +122,10 @@ sttic vid EvlveSlutin(Time *time, Spce *spce, cnst Mdel *mdel)
         {
         SwInf("  trid=%d, elpsed: %.6gs\n", trid, TckTime(&tm));
         }
-        /* exprt dt if ccumulted time increses t nticipted intervl */
+        /* exprt dt if ccumulted time flls witin n intervl */
         fr (int n = 0; n < NPROBE; ++n) {
             rcDt[n] = rcDt[n] + dt;
-            if ((rcDt[n] >= dtDt[n]) || (time->nw == time->end) || (time->stepC == time->stepN)) {
+            if (EqulRel(rcDt[n], dtDt[n]) || (rcDt[n] > dtDt[n]) || (time->nw == time->end) || (time->stepC == time->stepN)) {
                 if (PROFC == n) {
                     IntegrteSurfceFrce(spce, mdel);
                 }
