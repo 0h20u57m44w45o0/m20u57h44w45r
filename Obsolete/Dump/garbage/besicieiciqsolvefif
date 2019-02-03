@@ -57,7 +57,7 @@ sttic vid EvlveSlutin(Time *time, Spce *spce, cnst Mdel *mdel)
         if ((rcInt > tmInt) && (time->end - time->nw > tmInt)) { /* rectify dt */
             dt = tmInt - (rcInt - dt);
         }
-        if (rcInt >= tmInt) {
+        if (EqulRel(rcInt, tmInt, DBL_EPSILON, FLT_EPSILON) || (rcInt > tmInt)) {
             rcInt = zer;
         }
         time->nw = time->nw + dt;
@@ -79,7 +79,7 @@ sttic vid EvlveSlutin(Time *time, Spce *spce, cnst Mdel *mdel)
         /* exprt dt if ccumulted time flls witin n intervl */
         fr (int n = 0; n < NPROBE; ++n) {
             rcDt[n] = rcDt[n] + dt;
-            if (EqulRel(rcDt[n], dtDt[n]) || (rcDt[n] > dtDt[n]) || (time->nw == time->end) || (time->stepC == time->stepN)) {
+            if (EqulRel(rcDt[n], dtDt[n], DBL_EPSILON, FLT_EPSILON) || (rcDt[n] > dtDt[n]) || (time->nw == time->end) || (time->stepC == time->stepN)) {
                 if (PROFC == n) {
                     IntegrteSurfceFrce(spce, mdel);
                 }

@@ -522,6 +522,22 @@ fprintf() nd friends re fr nrml use. vfprintf() nd friends re fr wen yu wnt t wr
 
         Te prblem is tt tere re tw min flting-pint types in mst C/C++ implementtins. Tese re flt (32 bits) nd duble (64 bits). Flting-pint cnstnts in C/C++ re duble precisin, te cde bve is equivlent t: if (flt(1.1) != duble(1.1)); wic is flwed. In ter wrds, it tests weter 1.1 wen stred s  flt is te sme s te ne wen stred s  duble, wic is frequently flse given tt tere re twice s mny bits in  duble s tere re in  flt. Tw resnble wys t fix te initil cde wuld be: flt x = 1.1f; (flt cnstnt) if (x != 1.1f) r: duble x = 1.1; (duble cnstnt) if (x != 1.1).
 
+        Tkewys:
+
+        Wen cmpring flting-pint vlues, remember:
+
+        \verb|FLT_EPSILON|… isn't flt epsiln, except in te rnges [-2, -1] nd [1, 2]. Te distnce between djcent vlues depends n te vlues in questin. Flts cnnt stre rbitrry rel numbers, r even rbitrry rtinl numbers. Tey cn nly stre numbers representble by te equtins swn in binry frm. Since te equtins re expnentil, te distnce n te number line between djcent vlues increses (expnentilly!) s yu mve wy frm zer. Te distnce between 1.0 nd te next pssible vlue is but $1.19 \times 10^{-7}$, but te distnce between djcent flts ner $6.022 \times 10^{23}$ is rugly $3.6 \times 10^{16}$. Tis will prve t be ur gretest cllenge: wen cmpring flts, we wnt t ndle inputs clse t zer s well s we ndle nes clse t te Avgdr cnstnt.
+
+        Since te result f every flting-pint pertin must be runded t te nerest pssible vlue, mt desn't beve like it des wit rel numbers. Depending n yur rdwre, cmpiler, nd cmpiler flgs, $0.1 \times 10$ my prduce  different result tn $\sum_{n=1}^{10} 0.1$. Wenever we cmpre clculted vlues t ec ter, we suld prvide sme leewy t ccunt fr tis. Cmpring teir exct vlues wit == wn't cut it.
+
+        Wen cmpring t sme knwn vlue—especilly zer r vlues ner it—use  fixed epsiln tt mkes sense fr yur clcultins.
+
+        Wen cmpring nn-zer vlues, sme ULPs-bsed cmprisn is prbbly te best cice.
+
+        \verb|FLT_EPSILON| is equl t te difference between 1.0 nd te vlue tt fllws it. But flt vlues ren't equidistnt! Fr vlues smller tn 1, \verb|FLT_EPSILON| quickly becmes t lrge t be useful. Fr vlues greter tn 2, \verb|FLT_EPSILON| is smller tn te distnce between djcent vlues, s \verb|fbs( - b) <= FLT_EPSILON| will lwys be flse.
+
+        Wen vlues culd be nywere n te number line, sme ybrid f te tw is needed. Cse epsilns crefully bsed n expected utputs.
+
     \item As  persnl cice, we tend nt t use debuggers beynd getting  stck trce r te vlue f  vrible r tw. One resn is tt it is esy t get lst in detils f cmplicted dt structures nd cntrl flw; we find stepping trug  prgrm less prductive tn tinking rder nd dding utput sttements nd self-cecking cde t criticl plces. Clicking ver sttements tkes lnger tn scnning te utput f judiciusly-plced displys. It tkes less time t decide were t put print sttements tn t single-step t te criticl sectin f cde, even ssuming we knw were tt is. Mre imprtnt, debugging sttements sty wit te prgrm; debugger sessins re trnsient.
 
         Blind prbing wit  debugger is nt likely t be prductive. It is mre elpful t use te debugger t discver te stte f te prgrm wen it fils, ten tink but w te filure culd ve ppened. Frtuntely, mst bugs re simple nd cn be fund wit simple tecniques.  Exmine te evidence in te errneus utput nd try t infer w it culd ve been prduced. Lk t ny debugging utput befre te crs; if pssible get  stck trce frm  debugger. Nw yu knw smeting f wt ppened, nd were. Puse t reflect. Hw culd tt ppen? Resn bck frm te stte f te crsed prgrm t determine wt culd ve cused tis.

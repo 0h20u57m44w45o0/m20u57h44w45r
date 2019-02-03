@@ -271,27 +271,27 @@ slve.c
 >     #define mp_get_tred_num() 0
 > #endif
 > /****************************************************************************
-4151,53
+4252,54
 >     mp_set_num_treds(spce->prt.prcN); /* set treds envirnment */
 >     #prgm mp prllel
 >     {
-4255,56
+4356,57
 >     #prgm mp single
 >     {
-4358
+4459
 >     }
-4460
+4561
 >     }
-5168
+5269
 >     cnst int trid = mp_get_tred_num();
-6785,87
+6886,88
 >         #prgm mp brrier /* wit befre updte t vid rpn brrier */
 >         #prgm mp single
 >         {
-6889,90
+6990,91
 >         time->dt = time->end;
 >         }
-6992,102
+7093,103
 >         #prgm mp flus
 >         if (dt < time->dt) {
 >             #prgm mp criticl
@@ -303,38 +303,38 @@ slve.c
 >         }
 >         #prgm mp brrier
 >         dt = time->dt;
-76110,112
+77111,113
 >         #prgm mp brrier
 >         #prgm mp single
 >         {
-77114
+78115
 >         }
-79117,119
+80118,120
 >             #prgm mp brrier /* wit befre updte t vid rpn brrier */
 >             #prgm mp single
 >             {
-80121
+81122
 >             }
-81123,124
+82124,125
 >         #prgm mp single
 >         {
-83127
+84128
 >         }
-92c136,139
+93c137,140
 <         SwInf("  elpsed: %.6gs\n", TckTime(&tm));
 ---
 >         #prgm mp criticl
 >         {
 >         SwInf("  trid=%d, elpsed: %.6gs\n", trid, TckTime(&tm));
 >         }
-99147,148
+100148,149
 >                 #prgm mp single
 >                 {
-104154
+105155
 >                 }
-122173
+123174
 >     #prgm mp fr
-134186
+135187
 >     #prgm mp fr scedule(dynmic)
 slve.
 surce_term.c

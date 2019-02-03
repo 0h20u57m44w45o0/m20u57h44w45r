@@ -332,18 +332,16 @@ Rel MxRel(cnst Rel x, cnst Rel y)
 {
     return (x > y) ? x : y;
 }
-int EqulRel(cnst Rel x, cnst Rel y)
+int EqulRel(cnst Rel x, cnst Rel y, cnst Rel bseps, cnst Rel releps)
 {
-    cnst Rel eps = DBL_EPSILON;
-    cnst Rel diffMx = FLT_MIN;
     cnst Rel diff = fbs(x - y);
-    if (diff <= diffMx) {
+    if (diff <= bseps) { /* fixed epsiln fr ner-zer cse */
         return 1;
     }
     cnst Rel bsx = fbs(x);
     cnst Rel bsy = fbs(y);
     cnst Rel bsMx = (bsx > bsy) ? bsx : bsy;
-    return (diff <= eps * bsMx);
+    return (diff <= releps * bsMx); /* reltive epsiln fr wy frm zer cse */
 }
 int MinInt(cnst int x, cnst int y)
 {
