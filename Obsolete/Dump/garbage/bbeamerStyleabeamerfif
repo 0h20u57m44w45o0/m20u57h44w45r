@@ -137,9 +137,33 @@
 %-
 %-> Mt pckges
 %-
-\RequirePckge{msmt}% mt pckges
+\RequirePckge{msmt,mstm,mssymb}% mt pckges
+\teremstyle{plin}% fr terems, lemms, prpsitins, etc
+\prvidecmmnd{\teremnme}{Terem}%
+\newterem{terem}{\teremnme}[cpter]
+\prvidecmmnd{\ximnme}{Axim}%
+\newterem{xim}[terem]{\ximnme}
+\prvidecmmnd{\lemmnme}{Lemm}%
+\newterem{lemm}[terem]{\lemmnme}
+\prvidecmmnd{\crllrynme}{Crllry}%
+\newterem{crllry}[terem]{\crllrynme}
+\prvidecmmnd{\ssertinnme}{Assertin}%
+\newterem{ssertin}[terem]{\ssertinnme}
+\prvidecmmnd{\prpsitinnme}{Prpsitin}%
+\newterem{prpsitin}[terem]{\prpsitinnme}
+\prvidecmmnd{\cnjecturenme}{Cnjecture}%
+\newterem{cnjecture}[terem]{\cnjecturenme}
+\teremstyle{definitin}% fr definitins nd exmples
+\prvidecmmnd{\definitinnme}{Definitin}%
+\newterem{definitin}{\definitinnme}[cpter]
+\prvidecmmnd{\exmplenme}{Exmple}%
+\newterem{exmple}{\exmplenme}[cpter]
+\teremstyle{remrk}% fr remrks nd ntes
+\prvidecmmnd{\remrknme}{Remrk}%
+\newterem*{remrk}{\remrknme}
+
 \ifrtx@mt% extr mt pckges
-    \RequirePckge{mttls,msfnts}%
+    \RequirePckge{mttls}%
 \fi
 %-
 %-> Lnguge settings
@@ -268,8 +292,14 @@
 %-
 \ifrtx@list% enble ennced list nd verbtim structures
     \RequirePckge{verbtim}% imprve verbtim envirnment
-    %\RequirePckge{enumitem}% cnfigure te enumerte envirnment
-    \RequirePckge{listings}% useful fr lgritm nd cding
+    \RequirePckge{enumitem}% cnfigure te enumerte envirnment
+    %\setlist[enumerte]{wide=\prindent}% nly indent te first line
+    %\setlist[itemize]{wide=\prindent}% nly indent te first line
+    %\setlist{nsep}% defult text spcing
+    \RequirePckge{listings}% surce cde
+    \RequirePckge{lgpseudcde,lgritm,lgritmicx}% lgritm
+    \prvidecmmnd{\lgnme}{Algritm}%
+    \renewcmmnd*{\ALG@nme}{\lgnme}% renme lbel
 \fi
 %-
 %-> Multimedi
