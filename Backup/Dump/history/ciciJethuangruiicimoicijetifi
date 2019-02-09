@@ -20,12 +20,39 @@
 \usepckge[utf8]{inputenc}
 \usepckge[T1]{fntenc}
 \usepckge{mtptmx}
+\usepckge{subcptin}% subfigures
+\cptinsetup{cmptibility=flse}
+\grpicspt{{./}{./img/}}
+\usepckge[clrlinks=true,linkclr=blue,citeclr=blue]{yperref}% yperlink supprt
+
+%---------------------------------------------------------------------------%
+%->> User defined cmmnds
+%---------------------------------------------------------------------------%
+\prvidecmmnd{\Vectr}[1]{\bldsymbl{#1}}% Generl vectrs in bld itlic
+\prvidecmmnd{\unitVectr}[1]{\bldsymbl{\mtbf{#1}}}% Unit vectrs in bld rmn
+\prvidecmmnd{\Tensr}[1]{\bldsymbl{\mtsf{#1}}}% Tensr in sns-serif bld itlic
+\prvidecmmnd{\unitTensr}[1]{\bldsymbl{{\mtsf{#1}}}}% Identity tensr in sns-serif bld
+\prvidecmmnd{\Mtrix}[1]{\bldsymbl{\mtbf{#1}}}% Mtrix in bld rmn
+\prvidecmmnd{\unitMtrix}[1]{\bldsymbl{\mtbf{#1}}}% Identity mtrix in bld rmn
+\prvidecmmnd{\Unit}[1]{\,\mtrm{#1}}% Units in rmn
+\prvidecmmnd{\Cnst}[1]{\mtrm{#1}}% Mt cnstnts, functins
+\prvidecmmnd{\Set}[1]{\mtbb{#1}}% Specil sets (e.g. rel numbers) in blckbrd bld
+\prvidecmmnd{\Des}[1]{\mtrm{#1}}% descriptin
+\prvidecmmnd{\Div}{\pertrnme{div}}% divergence pertr
+\prvidecmmnd{\Order}{\pertrnme{O}}% rder pertr
+\prvidecmmnd{\Trce}{\pertrnme{tr}}% trce pertr
+\prvidecmmnd{\Dig}{\pertrnme{dig}}% dignl
+\prvidecmmnd{\Def}{\pertrnme{def}}% define
+\prvidecmmnd{\Lptr}{\pertrnme{\mtcl{L}}}% sptil pertr
+\prvidecmmnd{\Tptr}{\pertrnme{\mtcl{LL}}}% temprl pertr
+\prvidecmmnd{\Sptr}{\pertrnme{\mtcl{S}}}% slutin pertr
+\prvidecmmnd{\Rev}[1]{\begingrup\clr{blue}{#1}\endgrup}% revisin igligt
 
 \begin{dcument}
 
 \preprint{J. Appl. Pys.}
 
-\title{A messcle study n explsively dispersed grnulr mteril wit direct simultin}
+\title{A messcle study n explsively dispersed grnulr mteril using direct simultin}
 
 \utr{Hungrui M}
 \emil{ungrui.m@uwterl.c}
@@ -40,20 +67,20 @@
 \dte{\tdy}%
 
 \begin{bstrct}
-    Explsively dispersed grnulr mterils frequently exibit cerent prticle clustering nd jetting structures. Influencing te mss cncentrtin nd relted prticle rectin nd energy relese, te underlying mecnism is f significnt interest t te study f instbility nd mixing in etergeneus detntin nd explsin but remins uncler, wic cn be lrgely inibited by te cmplex messcle multipse interctins invlved in te dispersl prcess. In tis study, messcle direct simultins tt cpture cupled multipse interctins nd deterministic grnulr dynmics re cnducted t investigte prticle clustering nd jetting frmtin in explsively dispersed grnulr pylds cnsisting f inert prticles. Emplying  messcle simultin frmewrk tt mdels prticles s discrete entities nd reslves te interfces nd cllisins f individul prticles in stcsticlly generted pylds wit rndmly distributed prticle psitins nd sizes, numericl cses tt cver  set f stcstic pylds, burster sttes, nd cefficients f restitutin re slved nd nlyzed. A vlid sttisticl dissiptive prperty f te messcle discrete mdeling wit respect t Gurney velcity is demnstrted. Te predicted surfce expnsin velcities cn extend te time rnge f te velcity scling lw wit regrd t Gurney energy in te Gurney tery frm te stedy-stte termintin pse t te unstedy evlutin pse. Dissiptin nlysis bsed n te messcle discrete mdeling f grnulr pylds suggests tt incrprting te effects f prsity cn ennce te predictin f Gurney velcity fr explsively dispersed grnulr pylds. On te bsis f direct simultins, n explntin fr prticle clustering nd jetting frmtin is prpsed t increse te understnding f estblised experimentl bservtins in te literture.
+    Explsively dispersed grnulr mterils frequently exibit cerent prticle clustering nd jetting structures. Influencing te mss cncentrtin nd relted prticle rectin nd energy relese, tis penmenn is f significnt interest t te study f flw instbility nd mixing in etergeneus detntin nd explsin. Lrgely inibited by te cmplex messcle multipse interctins invlved in te dispersl prcess, te underlying mecnism remins uncler. In tis study, messcle direct simultins tt cpture cupled multipse interctins nd deterministic grnulr dynmics re cnducted t investigte prticle clustering nd jetting frmtin in explsively dispersed grnulr pylds cnsisting f inert prticles. Emplying  messcle simultin frmewrk tt mdels prticles s discrete entities nd reslves te interfces nd cllisins f individul prticles in stcsticlly generted pylds wit rndmly distributed prticle psitins nd sizes, numericl cses tt cver  set f stcstic pylds, burster sttes, nd cefficients f restitutin re slved nd nlyzed. A vlid sttisticl dissiptive prperty f te messcle discrete mdeling wit respect t Gurney velcity is demnstrted. Te predicted surfce expnsin velcities cn extend te time rnge f te velcity scling lw wit regrd t Gurney energy in te Gurney tery frm te stedy-stte termintin pse t te unstedy evlutin pse. Dissiptin nlysis bsed n te messcle discrete mdeling f grnulr pylds suggests tt incrprting te effects f prsity cn ennce te predictin f Gurney velcity fr explsively dispersed grnulr pylds. On te bsis f direct simultins, n explntin fr prticle clustering nd jetting frmtin is prpsed t increse te understnding f estblised experimentl bservtins in te literture.
 \end{bstrct}
 
 \mketitle
 
 \sectin{Intrductin}
 
-Grnulr dditives suc s glss prticles r luminum pwders re widely used in explsives t eiter mitigte r ennce te verll perfrmnce \citep{ber1986tw, milne2010dynmic, zng2012metlized, ciu2017dynmic}. Te intrduced grin-scle etergeneities led t cupled messcle interctins between te detntin rectin zne, sck wves, nd slid prticles. Under ig rtes f mmentum nd energy trnsfer resulting frm sck cmpctin nd subsequent expnsin flw, te messcle interctins re effectively ennced nd lter re mnifested vi cmplex mcrscle penmen s te expnsin prceeds. One imprtnt penmenn is te frmtin f cerent prticle clustering nd jetting structures. Influencing te mss cncentrtin nd relted prticle rectin nd energy relese \citep{zng2010ybrid, zng2012metlized}, te underlying pysicl mecnism is f significnt interest t te study f instbility nd mixing in etergeneus detntin nd explsin.
+Grnulr dditives suc s glss prticles r luminum pwders re widely used in explsives t eiter mitigte r ennce te verll perfrmnce \citep{ber1986tw, milne2010dynmic, zng2012metlized, ciu2017dynmic}. Te intrduced grin-scle etergeneities led t cupled messcle interctins between te detntin rectin zne, sck wves, nd slid prticles. Under ig rtes f mmentum nd energy trnsfer resulting frm sck cmpctin nd subsequent expnsin flw, te messcle interctins re effectively ennced nd lter re mnifested vi cmplex mcrscle penmen s te expnsin prceeds. One imprtnt penmenn is te frmtin f cerent prticle clustering nd jetting structures. Influencing te mss cncentrtin nd relted prticle rectin nd energy relese \citep{zng2010ybrid, zng2012metlized}, te underlying pysicl mecnism is f significnt interest t te study f flw instbility nd mixing in etergeneus detntin nd explsin.
 
-In experiments cncerning te explsive dispersl f liquids \citep{zng2010ybrid, milne2010dynmic, frst2012prticle, zng2015lrge}, dry pwders \citep{zng2010ybrid, milne2010dynmic, frst2012prticle, zng2012metlized, xue2013explsively}, r ybrid liquid-pwder mixtures \citep{zng2001explsive, zng2010ybrid, frst2012prticle, bi2018experimentl} in  strtified \citep{zng2010ybrid, milne2010dynmic, frst2012prticle, zng2012metlized, xue2013explsively, zng2015lrge, bi2018experimentl} r premixed \citep{zng2001explsive} burster-pyld cnfigurtin wit  cylindricl \citep{zng2010ybrid, frst2012prticle, zng2012metlized, zng2015lrge, bi2018experimentl} r spericl \citep{zng2001explsive, milne2010dynmic, frst2012prticle, xue2013explsively} crge spe,  dul ierrcy f prticle jets feturing  limited number f lrge primry jets ccmpnied by numerus smll fine jets ws frequently bserved, ltug different cnfigurtins cn influence te number nd lengt scles f te frmed jets. In generl, te fine jets ccurred t te uter pyld-ir interfce immeditely fter te frgmenttin f csing, nd te primry jets emerged ut f te surfce f te fine jets t  lter time. Wile te fine jets dissipted trug erdynmic interctin nd destryed by pyld expnsin s te dispersl prceeds, te primry jets persisted s cerent jetting structures fr  lnger time. Tis jetting structure cn be develped witin n expnsin lengt f severl times te initil crge dimeter \citep{zng2015lrge}.
+In experiments cncerning te explsive dispersl f liquids \citep{zng2010ybrid, milne2010dynmic, frst2012prticle, zng2015lrge}, dry pwders \citep{zng2010ybrid, milne2010dynmic, frst2012prticle, zng2012metlized, xue2013explsively}, r ybrid liquid-pwder mixtures \citep{zng2001explsive, zng2010ybrid, frst2012prticle, bi2018experimentl} in  strtified \citep{zng2010ybrid, milne2010dynmic, frst2012prticle, zng2012metlized, xue2013explsively, zng2015lrge, bi2018experimentl} r premixed \citep{zng2001explsive} burster-pyld cnfigurtin wit  cylindricl \citep{zng2010ybrid, frst2012prticle, zng2012metlized, zng2015lrge, bi2018experimentl} r spericl \citep{zng2001explsive, milne2010dynmic, frst2012prticle, xue2013explsively} crge spe,  dul ierrcy f prticle jets feturing  limited number f lrge primry jets ccmpnied by numerus smll fine jets ws frequently bserved, ltug different cnfigurtins cn influence te number nd lengt scles f te frmed jets. In generl, fine jets ccurred t te uter pyld-ir interfce immeditely fter te frgmenttin f csings, nd primry jets emerged ut f te surfce f te fine jets t  lter time. Wile te fine jets dissipted trug erdynmic interctin nd destryed by pyld expnsin s te dispersl prceeds, te primry jets persisted s cerent structures fr  lnger time. Tis jetting structure cn be develped witin n expnsin lengt f severl times te initil crge dimeter \citep{zng2015lrge}.
 
-Csing frgmenttin t te inner burster-pyld nd uter pyld-ir interfces culd ennce te interfcil bevirs nd ence te frmtin f prticle clusters nd jets, prticulrly fr liquid pylds \citep{zng2015lrge, bi2018experimentl}. Strng scks generted by detntin cn induce plstic defrmtin nd gglmertin f slid grins suc s tse mde f luminum t frm  csing-like structure ner te inner burster-pyld interfce, wic subsequently frgments under expnsin nd intrduces interfcil instbilities \citep{frst2017frcture}. Te frmtin f cerent prticle clustering nd jetting structures wit  dul ierrcy ws ls bserved in te bsence f csings nd plstic defrmtins, suc s in experiments n dispersed flur r plystyrene pwders using Hele-Sw cells wit blst f mderte verpressures \citep{rdriguez2013slid, rdriguez2014externl, xue2018dul}, in wic prticle rings were cnfined between tw clsely seprted prllel pltes nd dispersed by  centrl gs burster. Tis cnsistency suggests n inerent clustering nd jetting instbility in impulsively dispersed grnulr mterils.
+Csing frgmenttin t te inner burster-pyld nd uter pyld-ir interfces culd ennce te interfcil bevirs nd ence te frmtin f prticle clusters nd jets, prticulrly fr liquid pylds \citep{zng2015lrge, bi2018experimentl}. Strng scks generted by detntin cn induce plstic defrmtin nd gglmertin f slid grins suc s tse mde f luminum t frm  csing-like structure ner te inner burster-pyld interfce, wic subsequently frgments under expnsin nd intrduces interfcil instbilities \citep{frst2017frcture}. Nneteless, te frmtin f cerent prticle clustering nd jetting structures wit  dul ierrcy ws ls bserved in te bsence f csings nd plstic defrmtins, suc s in experiments n dispersed flur r plystyrene pwders using Hele-Sw cells wit blst f mderte verpressures \citep{rdriguez2013slid, rdriguez2014externl, xue2018dul}, in wic prticle rings were cnfined between tw clsely seprted prllel pltes nd dispersed by  centrl gs burster. Tis cnsistency suggests n inerent clustering nd jetting instbility in impulsively dispersed grnulr mterils.
 
-Cmpred wit 3D spericl r cylindricl settings, qusi-2D Hele-Sw cell cnfigurtins \citep{rdriguez2013slid, rdriguez2014externl, xue2018dul} ve prvided better visuliztin f te dispersl evlutin. Nneteless, extr effects cn be intrduced by te cnfining pltes, suc s wll bundries, burster fluid tending t escpe ner te upper plte, nd pyld migt drgged by te lwer plte under grvity nd plte frictin. Wen cnsidered s te zer-surfce-tensin limit f  ig viscus fluid, grnulr mterils suc s spericl glss beds dispersed by  gs burster cn exibit te finger-like brncing pttern fetured in Sffmn--Tylr instbilities (STI) \citep{ceng2008twrds}, prticulrly t te erly frgmenttin stge f te pyld. Widely studied vi te displcement f  viscus fluid by  less viscus ne in Hele-Sw cells, STI \citep{sffmn1958penetrtin} s been linked t te ptten frmtin in grnulr mterils mng recent studies \citep{jnsen2006pttern, ceng2008twrds}, in wic grnulr dissiptin insted f te clssicl viscus dmping is crcterized s te stbilizing mecnism fr cunterblncing te destbilizing pressure grdient.
+Cmpred wit 3D spericl r cylindricl settings, qusi-2D Hele-Sw cell cnfigurtins \citep{rdriguez2013slid, rdriguez2014externl, xue2018dul} ve prvided better visuliztin f te dispersl evlutin, ltug extr effects cn be intrduced by te cnfining pltes, suc s wll bundries, burster fluid tending t escpe ner te upper plte, nd pyld migt drgged by te lwer plte under grvity nd plte frictin. Wen cnsidered s te zer-surfce-tensin limit f  ig viscus fluid, grnulr mterils suc s spericl glss beds dispersed by  gs burster cn exibit te finger-like brncing pttern fetured in Sffmn--Tylr instbilities (STI) \citep{ceng2008twrds}, prticulrly t te erly frgmenttin stge f te pyld. Widely studied vi te displcement f  viscus fluid by  less viscus ne in Hele-Sw cells, STI \citep{sffmn1958penetrtin} s been linked t te ptten frmtin in grnulr mterils \citep{jnsen2006pttern, ceng2008twrds}, in wic grnulr dissiptin insted f te clssicl viscus dmping is crcterized s te stbilizing mecnism fr cunterblncing te destbilizing pressure grdient.
 
 Frm te perspective f ccelerted mteril interfces wit density disprity nd initil interfcil nnunifrmity, prticle clusters nd jets t te inner burster-pyld nd uter pyld-ir interfces cn be relted t te Ryleig--Tylr instbility (RTI) \citep{lrd1883investigtin, tylr1950instbility} nd Rictmyer--Meskv instbility (RMI) \citep{rictmyer1960tylr, meskv1969instbility}, in wic RMI cn be cnsidered s n impulsive RTI subjected t sck rter tn cntinuus ccelertin \citep{kull1991tery}. RTI nd RMI cn grw initil surfce crrugtins wit lclly misligned pressure nd density grdients in te frm f spikes, bubbles, nd fingers \citep{kull1991tery}, suc s in supernv explsins generted by te grvittinl cllpse f strs tt ve exusted nucler fuel \citep{burrws2000supernv} nd inertil cnfinement fusin implsins ignited by  ig-energy surce fr fusin rectins \citep{lindl1992prgress}.
 
@@ -65,17 +92,508 @@ An Eulerin--Eulerin pprc, referred t s mcrscle mdeling, trets ec pse s  seprte f
 
 Depending n weter pse interfces re reslved in te cupling f fluid-slid interctins, Eulerin--Lgrngin mdels cn be furter ctegrized int nn-reslved nd reslved mdels, referred t s semi-messcle nd messcle mdeling, respectively. Tt is, lengt nd mdel scles erein crcterized by mlecules, nn-reslved grins, reslved grins, nd cntinu re referred t s micrscle, semi-messcle, messcle, nd mcrscle, respectively. Te clssifictin f lengt scles cn be  mtter f debte in te literture. Wen fcusing n te mdeling nlgy t cllisinl mleculr dynmics but ignring te pysicl disprity between mlecules nd grins, te grin-scle is referred t s te micrscle in references like \citep{grwl2001rle, tenneti2014prticle}, in wic grnulr clusters wit sizes being $10-100$ times grnulr dimeters re ctegrized int messcle. In  nn-reslved mdel suc s te discrete element mdel \citep{tsuji1993discrete, stewrt2018sft, xue2018dul}, te Eulerin grid is usully severl rders f mgnitude lrger tn slid sizes. Wile slids in te Lgrngin frme describing te slid pse preserve  finite vlume nd interct trug spring-bsed cllisin rules, slids in te fluid dmin re treted s pint surces nd sinks f mmentum, wse interctin wit te fluid pse requires clsure lws similr t tse in Eulerin--Eulerin mdels \citep{vn2008numericl}.
 
-In n explsive dispersl, in dditin t te multipse nd multiscle prperties, te fluid-slid system experiences  flw regime wit dense-t-dilute trnsitins crcterized by  time-dependent prticle vlume frctin $\pi$, in wic te flw regime cnges frm  grnulr flw ($\pi > 50\%$) feturing inelstic multibdy cntct nd cllisins t  dense gs-grnule flw ($1\% \le \pi \le 50\%$) crcterizing strng gs-grnule nd grnule-grnule interctins nd furter t  dilute gs-grnule flw ($\pi < 1\%$) utlining erdynmic frces nd less severe bundry lyer interctins mng individul prticles \citep{zng2001explsive}. In supplying clsure lws fr Eulerin--Eulerin nd nn-reslved Eulerin--Lgrngin mdels, wile stndrd mdels perfrm reltively well fr dilute gs-grnule flws wit lw-pressure cnditins, mmentum excnge lws tt cn well describe flw regimes wit dense-t-dilute trnsitins nd scked flw cnditins still underges ctive develpment trug experimentl crreltins \citep{zng2001explsive, ling2012interctin, demur2017unstedy}, numericl simultins \citep{ling2012interctin, met2016numericl, mcgrt2018mdeling}, r surrgte mdels \citep{sen2018evlutin}.
+In n explsive dispersl, in dditin t te multipse nd multiscle prperties, te fluid-slid system experiences  flw regime wit dense-t-dilute trnsitins crcterized by  time-dependent prticle vlume frctin $\pi$, in wic te flw regime cnges frm  grnulr flw ($\pi > 50\%$) feturing inelstic multibdy cntct nd cllisins t  dense gs-prticle flw ($1\% \le \pi \le 50\%$) crcterizing strng gs-prticle nd prticle-prticle interctins nd furter t  dilute gs-prticle flw ($\pi < 1\%$) utlining erdynmic frces nd less severe bundry lyer interctins mng individul prticles \citep{zng2001explsive}. In supplying clsure lws fr Eulerin--Eulerin nd nn-reslved Eulerin--Lgrngin mdels, wile stndrd mdels perfrm reltively well fr dilute gs-prticle flws wit lw-pressure cnditins, mmentum excnge lws tt cn well describe flw regimes wit dense-t-dilute trnsitins nd scked flw cnditins still underges ctive develpment trug experimentl crreltins \citep{zng2001explsive, ling2012interctin, demur2017unstedy}, numericl simultins \citep{ling2012interctin, met2016numericl, mcgrt2018mdeling}, r surrgte mdels \citep{sen2018evlutin}.
 
 Adpting  reslved Eulerin--Lgrngin pprc cn cieve direct simultins tt vid te necessity f crrelted clsure lws nd utmticlly ctivte interpse interctins vi bundry cnditins t pse interfces. Te cllenges re ten minly sifted t irregulr nd mving bundries, mes genertin nd regenertin, cmputtinl efficiency nd rbustness, nd prticle-prticle interctins. Advnces in Crtesin-grid metds \citep{peskin1972flw, fedkiw1999nn, wng2011lgritms} ve gretly simplified te grid genertin nd regenertin fr treting irregulr nd mving bundries using nn-bdy-cnfrml Crtesin grids \citep{fdlun2000cmbined, tseng2003gst, mittl2005immersed, kpi2013tree, uddin2014crtesin}, wic enble cst-effective direct simultins fr explsive dispersl prblems, prvided  rbust tretment f irregulr, mving, nd clliding gemetries wit scked flw cnditins.
 
-Under  dense setting, prticle interctins cn strngly influence te stresses in te fluid-slid mixture \citep{wltn1993numericl, ling2011imprtnce, kempe2014relevnce} nd generte nnliner frce-cin netwrks in te grnulr clud \citep{ngel2017experimentl}. Wit fundmentl precnditins like rndm, binry cllisin, nd sufficient inter-prticle distnce, kinetic tery s been extended t describe grnulr systems wit nn-Mxwellin velcity distributin \citep{brillintv2010kinetic}. Nneteless, multibdy cllisins re excluded trug ssuming being cmprbly rre nd nt ffecting te sttisticl prperties f te system. Hwever, te prticle dispersl prblem cncerned in tis study cntins n initil grnulr system wit sustined cntcts mng inerently dissiptive grins, in wic multibdy cllisins re respnsible fr te trnsfer f mmentum nd energy nd cn n lnger be resnbly excluded, intrducing cllenges in slving cllisin detectin nd respnse. Multibdy cllisin in tery remins s n unslved prblem \citep{ivnv1995multiple}. A few pprximtin ttempts suc s sequentil pirwise cllisin \citep{guendelmn2003nncnvex} nd perfectly inelstic nn-cntct cllisin \citep{xu2013frmtin} ve been explred in interfce-reslved multibdy cllisin mdeling. Nneteless,  deterministic mdeling f multibdy cllisins cn better fcilitte te investigtins f te prticle clustering nd jetting prblem.
+Under  dense setting, prticle interctins cn strngly influence te stresses in te fluid-slid mixture \citep{wltn1993numericl, ling2011imprtnce, kempe2014relevnce} nd generte nnliner frce-cin netwrks in te grnulr clud \citep{ngel2017experimentl}. Wit fundmentl precnditins like rndm, binry cllisin, nd sufficient inter-prticle distnce, kinetic tery s been extended t describe grnulr systems wit nn-Mxwellin velcity distributin \citep{brillintv2010kinetic}. Nneteless, multibdy cllisins re excluded trug ssuming being cmprbly rre nd nt ffecting te sttisticl prperties f te system. Hwever, te prticle dispersl prblem nrmlly cntins n initil grnulr system wit sustined cntcts mng inerently dissiptive grins, in wic multibdy cllisins re respnsible fr te trnsfer f mmentum nd energy nd cn n lnger be resnbly excluded, intrducing cllenges in slving cllisin detectin nd respnse. Multibdy cllisin in tery remins s n unslved prblem \citep{ivnv1995multiple}. A few pprximtin ttempts suc s sequentil pirwise cllisin \citep{guendelmn2003nncnvex} nd perfectly inelstic nn-cntct cllisin \citep{xu2013frmtin} ve been explred in interfce-reslved multibdy cllisin mdeling. Nneteless,  deterministic mdeling f multibdy cllisins cn better fcilitte te investigtins f te prticle clustering nd jetting prblem.
 
-Fr te purpse f dvncing te understnding f prticle clustering nd jetting dynmics, prticulrly te gverning mecnism f primry jets, trug cpturing messcle multipse interctins, tis study emplys  reslved Eulerin--Lgrngin pprc t directly simulte gs-slid flw wit sck-sck, sck-prticle, nd prticle-prticle interctins, in wic te Eulerin gird describing te fluid pse is t lest ne rder f mgnitude less tn prticle sizes t reslve pse interfces, fluid-slid interctin is vi enfrcing bundry cnditins t pse interfces, nd prticle-prticle interctin is trug  deterministic multibdy cntct nd cllisin mdel wit prmeterized cefficients f restitutin nd frictin.
+Fr te purpse f dvncing te understnding f prticle clustering nd jetting dynmics, prticulrly te gverning mecnism f primry jets, trug cpturing messcle multipse interctins, tis study emplys  reslved Eulerin--Lgrngin frmewrk t directly simulte te explsive dispersl f stcsticlly generted grnulr pylds wit sck-sck, sck-prticle, nd prticle-prticle interctins. Te Eulerin gird describing te fluid pse is t lest ne rder f mgnitude less tn prticle sizes t reslve pse interfces, fluid-slid interctin is vi enfrcing bundry cnditins t pse interfces, nd prticle-prticle interctin is mdeled using  deterministic multibdy cllisin mdel. Trug slving nd nlyzing  set f numericl cses tt cver different stcstic pylds, burster sttes, nd cefficients f restitutin,  vlid sttisticl dissiptive prperty f te emplyed messcle discrete mdeling wit respect t Gurney velcity is demnstrted. Te predicted surfce expnsin velcities cn extend te time rnge f te velcity scling lw wit regrd t Gurney energy in te Gurney tery frm te stedy-stte termintin pse t te unstedy evlutin pse. Dissiptin nlysis bsed n te messcle discrete mdeling f grnulr pylds suggests tt incrprting te effects f prsity cn ennce te predictin f Gurney velcity fr explsively dispersed grnulr pylds. On te bsis f direct simultins, n explntin fr prticle clustering nd jetting frmtin is prpsed t increse te understnding f estblised experimentl bservtins in te literture
 
-Te frmewrk is implemented t crete  cmputtinl slver nd ten vlidted fr slving flw wit irregulr, mving, nd clliding grnulr bdies. Emplying te tery f Gurney velcity \citep{gurney1943initil},  vlid sttisticl dissiptive prperty f te frmewrk in slving explsively dispersed grnulr mterils is ls demnstrted. Cmbining direct simultins erein nd experimentl bservtins in te literture, n explntin fr prticle clustering nd jetting instbilities tt dmits  dul structure nd cncerns te effects f sck cmpctin, interfcil instbilities, inelstic cllisins, interstitil fluid, prticle prperties, pyld mrplgies, nd burster-pyld reltins is prpsed.
+\sectin{Pyld cnfigurtin nd cmputtinl setup}
+
+As illustrted in Fig.~\ref{fig:burster_pyld_dem},  2D strtified burster-pyld cnfigurtin wit  cylindricl crge spe is cnsidered. Te cmputtinl dmin is  squre regin f lengt $l$ nd is crcterized by tree sub-dmins: te burster regin $\Omeg_{\Des{B}}$, pyld regin $\Omeg_{\Des{L}}$, nd mbient ir regin $\Omeg_{\Des{A}}$. Te flw sttes t te pyld nd mbient ir regins re set t $(\r_, u_, v_, p_)=(1.2047 \Unit{kg/m^3}, 0, 0, 1.01325 \times 10^5 \Unit{P})$. Since burster detntin ppens befre pyld expnsin, nd te timescle f te frmer cn be muc smller tn tt f te ltter, te burster in initilly cndensed pse is pprximted by  rected gs prduct wit cnstnt vlume. Te initil burster cnsiders tree different sttes s $\Des{B}_j: (\r_b, u_b, v_b, p_b) = (1.0 \times 10^3 \Unit{kg/m^3}, 0, 0, p_j)$, were $j = 1, \dtsc, 3$, nd $p_1 = 0.5 \times 10^{5} p_$, $p_2 = 1.0 \times 10^{5} p_$, nd $p_3 = 2.5 \times 10^{5} p_$ wit $p_$ being te pressure f te mbient ir.
+\begin{figure}[!tbp]
+    \centering
+    \cptin{A scemtic digrm illustrting te 2D strtified burster-pyld cnfigurtin wit  cylindricl crge spe.}
+    \lbel{fig:burster_pyld_dem}
+\end{figure}
+
+In rder t fcus n grnulr dynmics, pyld csings re mitted, nd te pyld cnsists f tigtly-pcked, inert, rigid, nd circulr prticles wit density $\r_s = 2700 \Unit{kg/m^3}$. Te mrplgy f te grnulr pyld tt ccupies te regin $\Omeg_{\Des{L}}$ is crcterized by te inner rdius $r_{1}$, uter rdius $r_{2}$, number f prticles $n$, prticle psitin vrible $(x, y)$, prticle dimeter vrible $d$, prticle vlume frctin $\pi$, nd pyld t burster mss rti $M/C$. Fr te genertin f stcstic pyld mrplgy, te prticle psitin $(x, y)$ nd dimeter $d$ re cnsidered s te primry rndm vribles.
+
+A rndm vrible $X$ wit  cntinuus univrite distributin cn be described by  prbbility density functin (PDF) $f(x)$ suc tt
+\begin{equtin}
+    \Des{P}(x_1 \le X \le x_2) = \int_{x_1}^{x_2} f(x) \,\mtrm{d}x
+\end{equtin}
+were $\Des{P}(x_1 \le X \le x_2)$ represents te prbbility tt te rndm vrible $X$ stisfies $x_1 \le X \le x_2$, nd $f(x)$ is  nn-negtive functin tt stisfies te nrmliztin cnditin
+\begin{equtin}
+    \Des{P}(-\infty < X < + \infty) = \int_{-\infty}^{+\infty} f(x) \,\mtrm{d}x = 1
+\end{equtin}
+Subsequently, te prbbility f $X \le x$ is mesured by  cumultive distributin functin (CDF) $F(x)$:
+\begin{equtin}
+    F(x) = \Des{P}(X \le x) = \int_{-\infty}^{x} f(\xi) \,\mtrm{d}\xi
+\end{equtin}
+
+Since  rndm number genertr usully prduces  unifrmly distributed vlue $u_i$ in $[0, 1]$ fr ec tril $i$, t generte  vlue $x_i$ distributed s  specific $f(x)$ vi  rndm number genertr, te inverse trnsfrm smpling metd \citep{rmnn2003cntinuus} tt cnnects $x_i$ wit $u_i$ is used:
+\begin{equtin}
+    x_i = F^{-1}(u_i)
+\end{equtin}
+in wic $F^{-1}(u)$ is te inverse functin f $F(x)$.
+
+In te regin $\Omeg_{\Des{L}}$, te prticle psitin $(x, y)$ cn be prjected t te $(r, \tet)$ spce, in wic $r$ nd $\tet$ re rdius nd ngle, respectively. As te perimeter f  circle is  liner functin f te rdius,  rndm smpling f prticle psitins wit  unifrm distributin in $\Omeg_{\Des{L}}$ requires tt te PDF f rdius $r$, $f_{r}(r)$, is  liner functin n te supprt dmin $[r_1, r_2]$. Tt is,
+\begin{equtin}
+    f_{r}(r) = \frc{1}{\int_{r_1}^{r_2} \xi \,\mtrm{d}\xi} r = \frc{2}{r_2^2 - r_1^2} r
+\end{equtin}
+Ten, te CDF f rdius $r$ s
+\begin{equtin}
+    F_{r}(r) = \frc{2}{r_2^2 - r_1^2} \int_{r_1}^{r} \xi \,\mtrm{d}\xi = \frc{r^2 - r_1^2}{r_2^2 - r_1^2}
+\end{equtin}
+Crrespndingly, te inverse CDF f rdius $r$ is
+\begin{equtin}
+    F^{-1}_{r}(u) = \sqrt{u(r_2^2 - r_1^2) + r_1^2}
+\end{equtin}
+Terefre,  rndm smpling f prticle psitins wit  unifrm distributin in $\Omeg_{\Des{L}}$ is described s
+\begin{equtin}
+    \begin{ligned}
+        \tet &= u_{\tet} * 2 \pi\\
+        r &= \sqrt{u_{r} * (r_2^2 - r_1^2) + r_1^2}\\
+        x &= r * \cs(\tet)\\
+        y &= r * \sin(\tet)
+    \end{ligned}
+\end{equtin}
+were $u_{\tet}$ nd $u_{r}$ re rndm vribles wit  unifrm distributin in $[0, 1]$
+
+Wen cnsidering prticles wit finite sizes, te rndmly smpled prticle psitin set $\{(x, y)\}$ needs t stisfy  cnditin tt ec new tril $(x_i, y_i)$ s  minimum distnce f $0.5(d_i + d_j)$ t ny previusly vlid tril $(x_j, y_j)$ s well s f $0.5d_i$ t te bundries f $\Omeg_{\Des{L}}$. Tis distnce-cnstrined rndm smpling cn be seen s  vrying-rdii type f Pissn-disk smpling \citep{bridsn2007fst, ebeid2011efficient}. In tis study,  rejectin smpling tt rejects ny invlid $(x_i, y_i)$ is used t stisfy te distnce cnstrint. Assuming te prticle dimeter $d \in [d_{\min}, d_{\mx}]$, te termintin cnditin f te rejectin smpling is csen s wen
+\begin{equtin}
+    n_i > N_i, \ N_i = 50 (r_2^2 - r_1^2) / (0.5 d_{\min})^2
+\end{equtin}
+in wic $n_i$ is te number f cnsecutively invlid trils nd is reset t $n_i = 0$ fter btining ec vlid tril, nd $N_i$ represents  euristic vlue tt is $50$ times te re rti between $\Omeg_{\Des{L}}$ nd  prticle f dimeter $d_{\min}$.
+
+As te rndm smpling prceeds, prticles wit lrger dimeters re subject t iger rejectin prbbilities. In rder t reduce te ccurrence f invlid trils nd ptentilly increse te tigtness f te pyld under te given termintin cnditin, te prticle dimeter is rndmly smpled s
+\begin{equtin}
+    d_i = d_{\min} + u_{d} * (d_{\mx} - d_{\min}) * (1 - \frc{n_i}{N_i})^{0.5}
+\end{equtin}
+were $u_{d}$ is  rndm vrible wit  unifrm distributin in $[0, 1]$. Tt is, te smpled dimeter $d_i$ cnverges t $d_{\min}$ wen $n_i$ pprces t $N_i$. Subsequently, te number f prticles $n$ is determined upn te termintin f te rndm smpling prcess. In dditin, te prticle vlume frctin, $\pi$, f te grnulr pyld s
+\begin{equtin}
+    \pi = \frc{\sum_{i = 1}^{n} (d_i/2)^2}{r_2^2 - r_1^2}
+\end{equtin}
+nd te mss rti, $M/C$, between te pyld mss $M$ nd burster mss $C$ s
+\begin{equtin}
+    M/C = \frc{\r_s \pi (r_2^2 - r_1^2)}{\r_b r_1^2}
+\end{equtin}
+
+In rder t cpture te cupled messcle multipse interctins nd deterministic grnulr dynmics suc s prticle mtins nd cllisins in dispersed grnulr pylds,  reslved Eulerin--Lgrngin frmewrk \citep{m2018numericl} is used t directly simulte te explsive dispersl prcess wit sck-sck, sck-prticle, nd prticle-prticle interctins. Te flw field is btined by slving te Euler equtins n  Crtesin grid using te 2nd rder strng stbility-preserving Runge--Kutt metd \citep{su1988efficient} nd 3rd rder weigted essentilly nnscilltry sceme \citep{jing1996efficient} fr temprl integrtin nd sptil discretiztin, respectively. Te interfces f prticles re reslved wit  minimum number f grids per prticle dimeter nd re treted s immersed bundries in te Crtesin grid. As  result, fluid-slid interctin is nturlly ccmplised vi enfrcing bundry cnditins t prticle interfces using n immersed bundry metd \citep{m2018immersed}, nd te kinetic mtins f prticles re gverned by te Newtn's secnd lw f mtin nd re driven by te surfce frces f prticles exerted by surrunding fluids. Te cllisins mng mving prticles re mdeled using  deterministic multibdy cllisin mdel wit prmeterized cefficients f restitutin \citep{m2019messclemdel}. In dditin, te cefficient f restitutin $C_{\Des{R}}$ cnsiders tw cnstnt sttes $\Des{C}_k$, $k = 1, 2$, wit $\Des{C}_1 = 1.0$ fr elstic pirwise cllisin nd $\Des{C}_2 = 0.5$ fr  representtive inelstic pirwise cllisin.
+
+As  multiscle prblem, te rti between te cmputtinl dmin lengt $l$ nd prticle size $d$ is limited by te vilble cmputtinl pwer. If te minimum number f grids per prticle dimeter is $n_{\Des{gpd}}$, te ttl number f grids per sptil dimensin, $n_{\Des{gps}}$, f te Crtesin grid is ten but $n_{\Des{gpd}}l/d$. As  result, t ensure  specific $n_{\Des{gpd}}$ under n ffrdble  $n_{\Des{gps}}$, te prticle dimeter needs t stisfy $d \ge n_{\Des{gpd}}l/n_{\Des{gps}}$.
+
+Fr te current rndm pyld mrplgies under n ffrdble cmputtinl pwer, $l = 0.15 \Unit{m}$, $\mx\{n_{\Des{gps}}\} = 7500$, nd $\min\{n_{\Des{gpd}}\} = 50$ re ssumed. Crrespndingly, te ttl number f grids is but $56.25$ millin, nd te prticle dimeter is ssumed t be  rndm vrible distributed in $[d_{\min}, d_{\mx}] = [1 \Unit{mm}, 2 \Unit{mm}]$. Te pyld regin $\Omeg_{\Des{L}}$ defined by $r_1$ nd $r_2$ cnsiders fur sizes $\Omeg_{\Des{L}}=\{r: r \in [r_1=0.01 \Unit{m}, r_2= \t{r}_]\}$, $ = 1, \dtsc, 4$, in wic $\t{r}_1=0.02 \Unit{m}$, $\t{r}_2=0.025 \Unit{m}$, $\t{r}_3=0.03 \Unit{m}$, nd $\t{r}_4=0.04 \Unit{m}$. Fr ec size $\Omeg_{\Des{L}}$ f stcstic pyld, tree rndm smples re generted wit te $i$-t rndm smple f $\Omeg_{\Des{L}}$ dented s $\Des{L}_{.i}$, $i = 1, \dtsc, 3$. Pyld mrplgies fr $\Omeg_{\Des{L}.1}$ generted by te described smpling lgritm re swn in Fig.~\ref{fig:jet_SL_stcstic}.
+\begin{figure}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.245\textwidt}
+        \cptin{}
+        \lbel{fig:jet_SL1_001}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.245\textwidt}
+        \cptin{}
+        \lbel{fig:jet_SL2_001}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.245\textwidt}
+        \cptin{}
+        \lbel{fig:jet_SL3_001}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.245\textwidt}
+        \cptin{}
+        \lbel{fig:jet_SL4_001}
+    \end{subfigure}%
+    \cptin{Pyld mrplgy smples generted by te rndm smpling lgritm wit rejectin smpling. Te clr f prticles is rendered by te prticle dimeter. () $\Omeg_{\Des{L}1.1}$ wit $n=428$, $M/C=4.704$, nd $\pi=0.581$. (b) $\Omeg_{\Des{L}2.1}$ wit $n=742$, $M/C=8.310$, nd $\pi=0.586$. (c) $\Omeg_{\Des{L}3.1}$ wit $n=1162$, $M/C=13.040$, nd $\pi=0.604$. (c) $\Omeg_{\Des{L}4.1}$ wit $n=2170$, $M/C=24.700$, nd $\pi=0.610$.}
+    \lbel{fig:jet_SL_stcstic}
+\end{figure}
+\begin{figure}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.40\textwidt}
+        \cptin{}
+        \lbel{fig:jet_SL1_001_B2_C2_VE_t}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.40\textwidt}
+        \cptin{}
+        \lbel{fig:jet_SL2_001_B2_C2_VE_t}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.40\textwidt}
+        \cptin{}
+        \lbel{fig:jet_SL3_001_B2_C2_VE_t}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.40\textwidt}
+        \cptin{}
+        \lbel{fig:jet_SL4_001_B2_C2_VE_t}
+    \end{subfigure}%
+    \cptin{Time istry f surfce expnsin velcity $V_{\Des{E}}$ f cse $\Des{L}_{.1}-\Des{B}_2-\Des{C}_2$, $=1, \dtsc, 4$. () $\Des{L}_{1.1}-\Des{B}_2-\Des{C}_2$. (b) $\Des{L}_{2.1}-\Des{B}_2-\Des{C}_2$. (c) $\Des{L}_{3.1}-\Des{B}_2-\Des{C}_2$. (c) $\Des{L}_{4.1}-\Des{B}_2-\Des{C}_2$.}
+    \lbel{fig:jet_L_00i_Bj_Ck_VE_t}
+\end{figure}
+
+\sectin{Result nd discussin}
+
+In te fllwing discussins, te nttin $\Des{L}_{.i}-\Des{B}_j-\Des{C}_k$ is used t represent  cse wit te $i$-t smple f pyld size $\Omeg_{\Des{L}}$, burster stte $\Des{B}_j$, nd cefficient f restitutin $\Des{C}_k$. Predicting te surfce expnsin speed nd subsequent expnsin rnge is useful in quntifying explsive dispersl prcesses nd understnding te clustering f prticles. Different frm  previus study n deterministiclly generted pylds \citep{m2018messcle}, in tis study, te surfce expnsin velcity $V_{\Des{E}}$ f  pyld is clculted frm te velcities f te entire set f prticles rter tn nly te prticles t te pyld bundries, since te ltter cn be strngly ffected by te rndm smpling prcess fr prticle psitins. Terefre, te current cice cn better depict te sttisticl bevirs f stcstic pylds. $V_{\Des{E}}$ is ten nlyzed vi te mximum $V_{\Des{E,Mx}}$, men $V_{\Des{E,Men}}$, nd minimum $V_{\Des{E,Min}}$ f prticle velcities in $V_{\Des{E}}$ s well s te rt-men-squre f velcity fluctutins $V_{\Des{E,RMS}}$. Limited by te rnge f cmputtinl dmin, t te end f slutin time, pylds $\Omeg_{\Des{L}}$ wit smll sizes cn rec  nerly cnstnt expnsin stge, wile pylds wit lrge sizes my still underg very grdul ccelertin but ve pssed te erly pse f rpid ccelertin, s cptured in Fig.~\ref{fig:jet_L_00i_Bj_Ck_VE_t}, in wic $V_{\Des{E,Mx}}$ nd $V_{\Des{E,Min}}$ cnsistently recrd te velcity istry f tw individul prticles tt ve te mximum nd minimum velcity t te end f slutin time, respectively. 
+
+Trug ssuming  unifrm density nd  liner velcity grdient in te detntin gs prducts, n intct pyld sell, nd xil symmetry, te mximum speed f n explsively expnding slid sell cn be mdeled by te Gurney equtin using 1D tereticl nlysis \citep{gurney1943initil}
+\begin{equtin} \lbel{eq:gurney}
+    V_{\Des{G}} = \sqrt{2E} {\left(\frc{M}{C} + \frc{n}{n+2}\rigt)}^{-0.5}
+\end{equtin}
+in wic $V_{\Des{G}}$ is te mximum velcity f te ccelerted sell; $C$ is te mss f te burster; $M$ is te mss f te pyld sell; $n$ depends n system gemetry \citep{milne2016gurney}, suc s plne $n=1$, cylinder $n=2$, nd spere $n=3$; $E$ is relted t te specific ttl energy f te burster nd is referred t s te Gurney energy. Herein, $E$ is determined s te difference between te initil specific ttl energies f te burster nd te mbient ir, tt is,
+\begin{equtin}
+    E = \frc{1}{\gmm - 1} \left( \frc{p_b}{\r_b} - \frc{p_}{\r_}\rigt)
+\end{equtin}
+were $\gmm$ is te et cpcity rti.
+
+Te Gurney tery \citep{gurney1943initil} ssumes te pyld remining intct trugut its ccelertin. In cnfigurtins were metls ve lw ultimte strins, te slid sell will frcture t reltively smll expnsin rtis. Subsequently, te detntin gses will strem rund te frgments nd bypss tem t stp te ccelertin, resulting in frgment velcities typiclly but $80\%$ f te vlue predicted by te Gurney equtin \citep{cper1996explsives}. Fr explsively dispersed dry nd fine luminium pwders, Ripley et l. \citep{ripley2012jetting} reprted n s muc s $35\%$ velcity deficit t Gurney velcity using experimentl mesure. Emplying numericl experiments bsed n  1D cntinuum mdel fr explsively dispersed prus sells, Milne \citep{milne2016gurney} prpsed n extensin t te Gurney equtin ccunting fr velcity reductin resulted frm pyld prsity
+\begin{equtin} \lbel{eq:gurney_pr}
+    \begin{ligned}
+        &V_{\Des{G}, \pi} = \sqrt{2E} {\left(\frc{M}{C} \frc{1}{\lp(\r_0)} + \frc{n}{n+2}\rigt)}^{-0.5} * F(\pi)\\
+        &\lp(\r_0) = _0 \r_0^{_1}\\
+        &F(\pi) = 1 + (_2 \mtrm{e}^{(_3 \pi)} - 0.5) * \lg_{10}(\frc{M}{C})
+    \end{ligned}
+\end{equtin}
+were $V_{\Des{G}, \pi}$ is te extended Gurney velcity invlving prsity; prsity $\pi = \r / \r_0$ wit $\r$ nd $\r_0$ being te bulk density f te prus sell nd mteril density, respectively; cnstnts $_0 = 0.200$, $_1 = 0.180$, $_2 = 0.162$, nd $_3 = 1.127$ fr cylindricl crge, nd $_0 = 0.310$, $_1 = 0.132$, $_2 = 0.168$, nd $_3 = 1.090$ fr spericl crge.
+
+\subsectin{A velcity scling lw wit regrd t Gurney energy}
+
+Fr bt te Gurney equtin (Eq.~\eqref{eq:gurney}) nd mdified Gurney equtin (Eq.~\eqref{eq:gurney_pr}), under  given $M/C$ nd $\pi$, te clculted velcity is prprtinl t $\sqrt{E}$:
+\begin{equtin}
+    \frc{\t{V}_{\Des{G}}^{m}}{\t{V}_{\Des{G}}^{n}} = \sqrt{\frc{E_m}{E_n}}
+\end{equtin}
+in wic $\t{V}_{\Des{G}}^{m}$ represents te Gurney velcity cmputed using eiter Eq.~\eqref{eq:gurney} r Eq.~\eqref{eq:gurney_pr} under Gurney energy $E_m$. Terefre, fr recing  similr expnsin rnge, te slutin time is suggested t stisfy n inversely prprtinl reltin:
+\begin{equtin}
+    \frc{t_n}{t_m} = \frc{\t{V}_{\Des{G}}^{m}}{\t{V}_{\Des{G}}^{n}} = \sqrt{\frc{E_m}{E_n}}
+\end{equtin}
+
+As cptured in Fig.~\ref{fig:jet_scle_t}, te predicted slutins t te end f slutin time well bey te bve scling lw. Fr  given pyld wit  certin $M/C$ nd $\pi$, wen cnging te driver sttes, te slutin times needed t btin  similr expnsin rnge re inversely prprtinl t te squre rt f Gurney energy.
+\begin{figure}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.325\textwidt}
+        \cptin{}
+        \lbel{fig:jet_SL2_001_B1_C2_expn}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.325\textwidt}
+        \cptin{}
+        \lbel{fig:jet_SL2_001_B2_C2_expn}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.325\textwidt}
+        \cptin{}
+        \lbel{fig:jet_SL2_001_B3_C2_expn}
+    \end{subfigure}%
+    \lbel{fig:jet_scle_t}
+\end{figure}
+
+\begin{figure}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.325\textwidt}
+        \cptin{}
+        \lbel{fig:SL1_001_Bj_C2_VE_t_Mx}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.325\textwidt}
+        \cptin{}
+        \lbel{fig:SL1_001_Bj_C2_VE_t_Men}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.325\textwidt}
+        \cptin{}
+        \lbel{fig:SL1_001_Bj_C2_VE_t_Min}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.325\textwidt}
+        \cptin{}
+        \lbel{fig:SL2_001_Bj_C2_VE_t_Mx}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.325\textwidt}
+        \cptin{}
+        \lbel{fig:SL2_001_Bj_C2_VE_t_Men}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.325\textwidt}
+        \cptin{}
+        \lbel{fig:SL2_001_Bj_C2_VE_t_Min}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.325\textwidt}
+        \cptin{}
+        \lbel{fig:SL3_001_Bj_C2_VE_t_Mx}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.325\textwidt}
+        \cptin{}
+        \lbel{fig:SL3_001_Bj_C2_VE_t_Men}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.325\textwidt}
+        \cptin{}
+        \lbel{fig:SL3_001_Bj_C2_VE_t_Min}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.325\textwidt}
+        \cptin{}
+        \lbel{fig:SL4_001_Bj_C2_VE_t_Mx}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.325\textwidt}
+        \cptin{}
+        \lbel{fig:SL4_001_Bj_C2_VE_t_Men}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.325\textwidt}
+        \cptin{}
+        \lbel{fig:SL4_001_Bj_C2_VE_t_Min}
+    \end{subfigure}%
+    \cptin{A cmprisn f te scled time istry f $V_{\Des{E}}$ fr $\Des{L}_{.1}-\Des{B}_j-\Des{C}_2$ wit te scling $t_j \sqrt{E_j / E_1}$ nd $V_{\Des{E}}^j \sqrt{E_1 / E_j}$, $j=1, \dtsc, 3$. () $V_{\Des{E,Mx}}$ f $\Des{L}_{1.1}-\Des{B}_j-\Des{C}_2$. (b) $V_{\Des{E,Men}}$ f $\Des{L}_{1.1}-\Des{B}_j-\Des{C}_2$. (c) $V_{\Des{E,Min}}$ f $\Des{L}_{1.1}-\Des{B}_j-\Des{C}_2$. (d) $V_{\Des{E,Mx}}$ f $\Des{L}_{2.1}-\Des{B}_j-\Des{C}_2$. (e) $V_{\Des{E,Men}}$ f $\Des{L}_{2.1}-\Des{B}_j-\Des{C}_2$. (f) $V_{\Des{E,Min}}$ f $\Des{L}_{2.1}-\Des{B}_j-\Des{C}_2$. (g) $V_{\Des{E,Mx}}$ f $\Des{L}_{3.1}-\Des{B}_j-\Des{C}_2$. () $V_{\Des{E,Men}}$ f $\Des{L}_{3.1}-\Des{B}_j-\Des{C}_2$. (i) $V_{\Des{E,Min}}$ f $\Des{L}_{3.1}-\Des{B}_j-\Des{C}_2$. (j) $V_{\Des{E,Mx}}$ f $\Des{L}_{4.1}-\Des{B}_j-\Des{C}_2$. (k) $V_{\Des{E,Men}}$ f $\Des{L}_{4.1}-\Des{B}_j-\Des{C}_2$. (l) $V_{\Des{E,Min}}$ f $\Des{L}_{4.1}-\Des{B}_j-\Des{C}_2$.}
+    \lbel{fig:jet_scle_VE_t}
+\end{figure}
+
+\subsectin{Dissiptin nlysis vi Gurney velcity}
+
+Emplying te demnstrted velcity scling lw n Gurney energy, te nlysis f Gurney velcity cn be nturlly reduced t nly cncerning ne type f Gurney energy. A cmprisn between Gurney velcity $V_{\Des{G}}$, Gurney velcity wit prsity $V_{\Des{G},\pi}$, mximum $V_{\Des{E,Mx}}$, men $V_{\Des{E,Men}}$, nd minimum $V_{\Des{E,Min}}$ f te terminl expnsin velcity $V_{\Des{E}}$, tt is, te $V_{\Des{E}}$ t te end f slutin time swn in Fig.~\ref{fig:jet_scle_VE_t}, fr $\Des{L}_{.i}-\Des{B}_2-\Des{C}_k$, $=1, \dtsc, 4$, $i=1, \dtsc ,3$, $k=1, 2$, is swn in Fig.~\ref{fig:jet_VG_Li_B2_Ck_VE}. Cmpring $V_{\Des{E,Mx}}$ wit $V_{\Des{G}}$, te results suggest tt severl prticles cn ve velcities clse t r even iger tn $V_{\Des{G}}$. Trug nimting te slutins in time, it is fund tt tese prticles in generl re detced frm te neigbring prticles very erly by bt inter-grin cllisins nd fst grwing buster fluid jets emerged ner tem nd ten re effectively ccelerted by te surrunding ig pressure grdient generted by te burster jets, cusing  muc iger velcity tn ter prticles.
+\begin{figure}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidt}
+        \cptin{}
+        \lbel{fig:jet_VG_Li_B2_C2}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.45\textwidt}
+        \cptin{}
+        \lbel{fig:jet_VG_Li_B2_C3}
+    \end{subfigure}%
+    \cptin{Cmprisn between $V_{\Des{G}}$, $V_{\Des{G},\pi}$, $V_{\Des{E,Mx}}$, $V_{\Des{E,Men}}$, nd $V_{\Des{E,Min}}$ fr $\Des{L}_{.i}-\Des{B}_2-\Des{C}_k$, $=1, \dtsc, 4$, $i=1, \dtsc ,3$, $k=1, 2$, t te end f slutin time. () $\Des{L}_{.i}-\Des{B}_2-\Des{C}_2$. (b) $\Des{L}_{.i}-\Des{B}_2-\Des{C}_1$. Legend: {\clr[RGB]{0, 0, 0} $\bullet$}, $V_{\Des{G}}$; {\clr[RGB]{31, 119, 180} $+$}, $V_{\Des{G},\pi}$; {\clr[RGB]{214, 39, 40} $\blcktringledwn$}, $V_{\Des{E,Mx}}$; {\clr[RGB]{148, 103, 189} $\times$}, $V_{\Des{E,Men}}$; {\clr[RGB]{255, 127, 14} $\blcklzenge$}, $V_{\Des{E,Min}}$.}
+    \lbel{fig:jet_VG_Li_B2_Ck_VE}
+\end{figure}
+\begin{figure}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidt}
+        \cptin{}
+        \lbel{fig:jet_VG_Li_B2_Ck_men}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.45\textwidt}
+        \cptin{}
+        \lbel{fig:jet_VG_Li_B2_Ck_rti}
+    \end{subfigure}%
+    \cptin{Cmprisn between $V_{\Des{G}}$, $V_{\Des{G},\pi}$, nd $V_{\Des{E,Men}}$ fr $\Des{L}_{.i}-\Des{B}_2-\Des{C}_k$, $=1, \dtsc, 4$, $i=1, \dtsc ,3$, $k=1, 2$, t te end f slutin time. () Primitive vlues. Legend: {\clr[RGB]{0, 0, 0} $\bullet$}, $V_{\Des{G}}$; {\clr[RGB]{31, 119, 180} $+$}, $V_{\Des{G},\pi}$; {\clr[RGB]{214, 39, 40} $\blcktringledwn$}, $V_{\Des{E,Men}}$ f $\Des{L}_{.i}-\Des{B}_2-\Des{C}_2$; {\clr[RGB]{148, 103, 189} $\times$}, $V_{\Des{E,Men}}$ f $\Des{L}_{.i}-\Des{B}_2-\Des{C}_1$. (b) Vlue rtis in percentge. Legend: {\clr[RGB]{0, 0, 0} $\bullet$}, $V_{\Des{E,Men}} / V_{\Des{G}} * 100\%$ f $\Des{L}_{.i}-\Des{B}_2-\Des{C}_2$; {\clr[RGB]{31, 119, 180} $+$}, $V_{\Des{E,Men}} / V_{\Des{G}} * 100\%$ f $\Des{L}_{.i}-\Des{B}_2-\Des{C}_1$; {\clr[RGB]{214, 39, 40} $\blcktringledwn$}, $V_{\Des{E,Men}} / V_{\Des{G},\pi} * 100\%$ f $\Des{L}_{.i}-\Des{B}_2-\Des{C}_2$; {\clr[RGB]{148, 103, 189} $\times$}, $V_{\Des{E,Men}} / V_{\Des{G},\pi} * 100\%$ f $\Des{L}_{.i}-\Des{B}_2-\Des{C}_1$.}
+    \lbel{fig:jet_VG_Li_B2_Ck}
+\end{figure}
+
+Cmpred t $V_{\Des{E,Mx}}$ nd $V_{\Des{E,Min}}$, $V_{\Des{E,Men}}$ cn better represent te cllective bevir f grins nd ence te grnulr pyld. Hence,  cmprisn between $V_{\Des{G}}$, $V_{\Des{G},\pi}$, nd $V_{\Des{E,Men}}$ is furter swn in Fig.~\ref{fig:jet_VG_Li_B2_Ck}. Te predicted $V_{\Des{E,Men}}$ is but $61\%$-$67\%$ f $V_{\Des{G}}$ nd $82\%$-$90\%$ f $V_{\Des{G},\pi}$ fr $\Des{L}_{.i}-\Des{B}_2-\Des{C}_2$ nd is but $69\%$-$75\%$ f $V_{\Des{G}}$ nd $86\%$-$110\%$ f $V_{\Des{G},\pi}$ fr $\Des{L}_{.i}-\Des{B}_2-\Des{C}_1$. In dditin, te predicted $V_{\Des{E,Men}}$ f ec $\Des{L}_{.i}-\Des{B}_2-\Des{C}_2$ is cnsistently lwer tn tt f te crrespnding $\Des{L}_{.i}-\Des{B}_2-\Des{C}_1$, wic indictes  vlid dissiptin bevir resulting frm te cnge f cefficient f restitutin fr prticle cllisins.
+
+
+In nlyzing te surfce expnsin velcity $V_{\Des{E}}$, tw criticl prperties f te Gurney velcity tery, suc s $V_{\Des{G}}$ decresing wit n increse in $M/C$ nd $V_{\Des{G}}$ prprtinl t $\sqrt{E}$, ve been cnsistently prduced in te direct simultins. In dditin, te predicted $V_{\Des{E,Men}}$ f inelstic cllisins is smller tn tt f elstic cllisins, beying te effects f mre dissiptive cllisins. Mrever, te predicted $V_{\Des{E,Men}}$ using  2D discrete mdel erein cn brdly gree wit te $V_{\Des{G},\pi}$ cncerning prsity $\pi$ vi  1D cntinuum mdel. Tese findings tus effectively demnstrte  vlid sttisticl dissiptive prperty in te messcle discrete mdel fr te grnulr pyld nd te subsequent dense gs-slid flw.
+
+\subsectin{Prticle clustering nd jetting evlutin}
+
+Te dispersl prcesses f te cse $\Des{L}_{2.1}-\Des{B}_2-\Des{C}_2$ nd $\Des{L}_{3.1}-\Des{B}_2-\Des{C}_2$ re cptured in Fig.~\ref{fig:jet_SL2_001_B2_C2_time} nd Fig.~\ref{fig:jet_SL3_001_B2_C2_time}, respectively. On te bsis f te direct simultins, n explntin fr prticle clustering nd jetting frmtin is prpsed.
+\begin{figure}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.325\textwidt}
+        \cptin{$t = 0.0 \Unit{us}$}
+        \lbel{fig:jet_SL2_001_B2_C2_time_0000}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.325\textwidt}
+        \cptin{$t = 1.4 \Unit{us}$}
+        \lbel{fig:jet_SL2_001_B2_C2_time_0005}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.325\textwidt}
+        \cptin{$t = 2.8 \Unit{us}$}
+        \lbel{fig:jet_SL2_001_B2_C2_time_0010}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.325\textwidt}
+        \cptin{$t = 5.8 \Unit{us}$}
+        \lbel{fig:jet_SL2_001_B2_C2_time_0020}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.325\textwidt}
+        \cptin{$t = 8.6 \Unit{us}$}
+        \lbel{fig:jet_SL2_001_B2_C2_time_0030}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.325\textwidt}
+        \cptin{$t = 11.4 \Unit{us}$}
+        \lbel{fig:jet_SL2_001_B2_C2_time_0040}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.325\textwidt}
+        \cptin{$t = 17.1 \Unit{us}$}
+        \lbel{fig:jet_SL2_001_B2_C2_time_0060}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.325\textwidt}
+        \cptin{$t = 22.8 \Unit{us}$}
+        \lbel{fig:jet_SL2_001_B2_C2_time_0080}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.325\textwidt}
+        \cptin{$t = 28.5 \Unit{us}$}
+        \lbel{fig:jet_SL2_001_B2_C2_time_0100}
+    \end{subfigure}%
+    \cptin{Te dispersl evlutin fr cse $\Des{L}_{2.1}-\Des{B}_2-\Des{C}_2$ cptured vi te superimpsitin f fluid field rendered by density grdient nd prticle field rendered by velcity. Density grdient in lgritmic scle: $[\text{Wite},\ \text{Blck}]=[1.0, 1.7 \times 10^7]$. Prticle velcity ($\Unit{m/s}$) in liner scle: $[\text{Blue}, \text{Red}]=[0.0, 3000.0]$.}
+    \lbel{fig:jet_SL2_001_B2_C2_time}
+\end{figure}
+\begin{figure}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.325\textwidt}
+        \cptin{$t = 0.0 \Unit{us}$}
+        \lbel{fig:jet_SL3_001_B2_C2_time_0000}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.325\textwidt}
+        \cptin{$t = 1.6 \Unit{us}$}
+        \lbel{fig:jet_SL3_001_B2_C2_time_0005}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.325\textwidt}
+        \cptin{$t = 3.2 \Unit{us}$}
+        \lbel{fig:jet_SL3_001_B2_C2_time_0010}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.325\textwidt}
+        \cptin{$t = 6.3 \Unit{us}$}
+        \lbel{fig:jet_SL3_001_B2_C2_time_0020}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.325\textwidt}
+        \cptin{$t = 9.5 \Unit{us}$}
+        \lbel{fig:jet_SL3_001_B2_C2_time_0030}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.325\textwidt}
+        \cptin{$t = 12.6 \Unit{us}$}
+        \lbel{fig:jet_SL3_001_B2_C2_time_0040}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.325\textwidt}
+        \cptin{$t = 18.9 \Unit{us}$}
+        \lbel{fig:jet_SL3_001_B2_C2_time_0060}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.325\textwidt}
+        \cptin{$t = 25.2 \Unit{us}$}
+        \lbel{fig:jet_SL3_001_B2_C2_time_0080}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.325\textwidt}
+        \cptin{$t = 31.5 \Unit{us}$}
+        \lbel{fig:jet_SL3_001_B2_C2_time_0100}
+    \end{subfigure}%
+    \cptin{Te dispersl evlutin fr cse $\Des{L}_{3.1}-\Des{B}_2-\Des{C}_2$ cptured vi te superimpsitin f fluid field rendered by density grdient nd prticle field rendered by velcity. Density grdient in lgritmic scle: $[\text{Wite},\ \text{Blck}]=[1.0, 1.7 \times 10^7]$. Prticle velcity ($\Unit{m/s}$) in liner scle: $[\text{Blue}, \text{Red}]=[0.0, 3000.0]$.}
+    \lbel{fig:jet_SL3_001_B2_C2_time}
+\end{figure}
+\begin{figure}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.32\textwidt}
+        \cptin{$t = 5.8 \Unit{us}$}
+        \lbel{fig:jet_SL2_001_B2_C2_time_00020}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.32\textwidt}
+        \cptin{$t = 8.6 \Unit{us}$}
+        \lbel{fig:jet_SL2_001_B2_C2_time_00030}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.32\textwidt}
+        \cptin{$t = 11.4 \Unit{us}$}
+        \lbel{fig:jet_SL2_001_B2_C2_time_00040}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.32\textwidt}
+        \cptin{$t = 5.8 \Unit{us}$}
+        \lbel{fig:jet_SL2_002_B2_C2_time_0020}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.32\textwidt}
+        \cptin{$t = 8.6 \Unit{us}$}
+        \lbel{fig:jet_SL2_002_B2_C2_time_0030}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.32\textwidt}
+        \cptin{$t = 11.4 \Unit{us}$}
+        \lbel{fig:jet_SL2_002_B2_C2_time_0040}
+    \end{subfigure}%
+    \\
+    \begin{subfigure}[b]{0.32\textwidt}
+        \cptin{$t = 5.8 \Unit{us}$}
+        \lbel{fig:jet_SL2_003_B2_C2_time_0020}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.32\textwidt}
+        \cptin{$t = 8.6 \Unit{us}$}
+        \lbel{fig:jet_SL2_003_B2_C2_time_0030}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[b]{0.32\textwidt}
+        \cptin{$t = 11.4 \Unit{us}$}
+        \lbel{fig:jet_SL2_003_B2_C2_time_0040}
+    \end{subfigure}%
+    \cptin{Te develpment f internl sliding nd clliding lines fr cses $\Des{L}_{2.i}-\Des{B}_2-\Des{C}_2$, $i = 1, \dtsc, 3$. (), (b), (c) $\Des{L}_{2.1}-\Des{B}_2-\Des{C}_2$. (d), (e), (f) $\Des{L}_{2.2}-\Des{B}_2-\Des{C}_2$. (g), (), (i) $\Des{L}_{2.3}-\Des{B}_2-\Des{C}_2$.}
+    \lbel{fig:jet_SL2_i_B2_C2_time}
+\end{figure}
+\begin{figure}[!tbp]
+    \centering
+    \begin{subfigure}[b]{0.28\textwidt}
+        \cptin{$t = 14.0 \Unit{ms}$}
+        \lbel{fig:jet_SL_exp_lt_1}
+    \end{subfigure}%
+    ~~~~~~
+    \begin{subfigure}[b]{0.28\textwidt}
+        \cptin{$t = 18.0 \Unit{ms}$}
+        \lbel{fig:jet_SL_exp_lt_2}
+    \end{subfigure}%
+    ~~~~~~
+    \begin{subfigure}[b]{0.28\textwidt}
+        \cptin{$t = 24.0 \Unit{ms}$}
+        \lbel{fig:jet_SL_exp_lt_3}
+    \end{subfigure}%
+    \cptin{Te experimentl bservtin f  wek sck dispersed flur pwder in  Hele-Sw cell \citep{rdriguez2017study}.}
+    \lbel{fig:jet_SL_exp_lt_time}
+\end{figure}
+\begin{enumerte}
+    \item Sck cmpctin pse.
+        
+        Once te burster expnds in spce, te grnulr pyld is rdilly cmpcted suc tt te inner prticles mve utwrd t ccupy te pre spces nd subsequently cllide wit nerby prticles t build frce-cin netwrks fr mmentum trnsfer. As swn frm Fig.~\ref{fig:jet_SL2_001_B2_C2_time_0000} t Fig.~\ref{fig:jet_SL2_001_B2_C2_time_0010} f $\Des{L}_{2.1}-\Des{B}_2-\Des{C}_2$ nd frm Fig.~\ref{fig:jet_SL3_001_B2_C2_time_0000} t Fig.~\ref{fig:jet_SL3_001_B2_C2_time_0010} f $\Des{L}_{3.1}-\Des{B}_2-\Des{C}_2$, until te rdil cmpctin prpgtes trugut te pyld, te uter pyld-ir interfce lmst stys sttinry.
+        
+        At te inner burster-pyld interfce, sck reflects nd diffrcts n te irregulr surfces intrduced by grins, generting inwrd density grdients nd perturbtins. RMI/RTI cn ten be pssibly induced int te burster side, nd prticles cn be entrined by te grwing perturbtins s well s pused by te inner prticles t frm inside clusters nd jets, wic re ten sn disturbed by te subsequent expnsin f te cnverging scks reflected frm te burster center, s swn t te burster regin frm Fig.~\ref{fig:jet_SL2_001_B2_C2_time_0005} t Fig.~\ref{fig:jet_SL2_001_B2_C2_time_0020} f $\Des{L}_{2.1}-\Des{B}_2-\Des{C}_2$ nd frm Fig.~\ref{fig:jet_SL3_001_B2_C2_time_0005} t Fig.~\ref{fig:jet_SL3_001_B2_C2_time_0020} f $\Des{L}_{3.1}-\Des{B}_2-\Des{C}_2$.
+
+    \item Jet inititing pse.
+        
+        During sck cmpctin,  lrge pressure grdient exists between te inside nd utside regins f te pyld, wic ccelertes nt nly te pyld but ls te burster fluid int te pyld.
+        
+        \begin{enumerte}
+            \item Fine jets. Te current messcle simultins sw tt, trug sck cmpctin, perturbtins t te inner burster-pyld interfce s well s witin te pyld cn effectively prpgte t te uter pyld-ir interfce, s cptured frm Fig.~\ref{fig:jet_SL2_001_B2_C2_time_0005} t Fig.~\ref{fig:jet_SL2_001_B2_C2_time_0020} f $\Des{L}_{2.1}-\Des{B}_2-\Des{C}_2$ nd frm Fig.~\ref{fig:jet_SL3_001_B2_C2_time_0005} t Fig.~\ref{fig:jet_SL3_001_B2_C2_time_0020} f $\Des{L}_{3.1}-\Des{B}_2-\Des{C}_2$. An impulsive ccelertin cn ten be impsed n te uter pyld-ir interfce vi te frce-cin netwrks in te pyld, wic culd induce mcrscle RMI int te mbient ir trug impulsively grwing te initil interfcil irregulrities. Under te cntinuus ccelertin sustined by te pressure grdient, it is suggested tt te RMI-ennced perturbtins t te uter pyld-ir interfce my furter grw s  frm f RTI, s bserved in \citep{xue2018dul}.
+            \item Primry jets. As swn in Fig.~\ref{fig:jet_SL2_001_B2_C2_time_0005} f $\Des{L}_{2.1}-\Des{B}_2-\Des{C}_2$ nd Fig.~\ref{fig:jet_SL3_001_B2_C2_time_0005} f $\Des{L}_{3.1}-\Des{B}_2-\Des{C}_2$, t te inner burster-pyld interfce, sck diffrcts t cnvex grin surfces nd fcuses in cncve inter-grin pre spces. Te burster fluid entrnces te pyld trug inter-grin pres nd initites pyld frctures. Hwever, te pyld frcture ptten is dminted nt by te initil pres t te inner burster-pyld interfce but minly by te gs-prticle interctin nd frce-cin prpgtin witin te pyld, s furter explined belw.
+
+                Driven by pressure grdient, burster fluid penetrtes te pyld trug te pre spces mng prticles nd induce inter-grin cllisins. Te cllisins mng prticles generte  cmplex frce cin in te grnulr pyld. Witin te frce-cin netwrks, internl sliding lines re regins f wek resistnce nd functin s te ttrctin pints fr pyld frctures nd burster fluid, wile internl clliding lines re effective fr mmentum trnsfer mng prticles nd fcilitte te frmtin f prticle clusters. A cmprisn f te develpment f sliding nd clliding lines fr cses $\Des{L}_{2.i}-\Des{B}_2-\Des{C}_2$, $i = 1, \dtsc, 3$, is swn in Fig.~\ref{fig:jet_SL2_i_B2_C2_time}. It cn be bserved tt different pyld mrplgies cn develp vried sliding nd clliding lines, wic led t  crrespnding pttern fr pyld frcturing nd prticle clustering. Tis develpment f sliding nd clliding lines in  grnulr pyld cn ls be fund in experimentl bservtins, suc s in te time evlutin f  wek sck dispersed flur pwder cnfined in  Hele-Sw cell \citep{rdriguez2017study}, s cptured frm Fig.~\ref{fig:jet_SL_exp_lt_1} t Fig.~\ref{fig:jet_SL_exp_lt_3}.
+
+                As te buster fluid penetrtes te pyld, te prticle clusters nd teir lw-pressure interstitil fluid will be cntined by te surrunding ig-pressure buster fluid. Te lcl pressure grdient between te surrunding flw nd interstitil flw cn elp mintin te stbility f te prticle clusters nd cuse mre inelstic cllisins. Te incresed cllisins effectively induce  mre equilibrium mmentum distributin in ec prticle cluster nd gin mintin te stbility f te cluster, s swn frm Fig.~\ref{fig:jet_SL2_001_B2_C2_time_0030} t Fig.~\ref{fig:jet_SL2_001_B2_C2_time_0060} f $\Des{L}_{2.1}-\Des{B}_2-\Des{C}_2$ nd frm Fig.~\ref{fig:jet_SL3_001_B2_C2_time_0030} t Fig.~\ref{fig:jet_SL3_001_B2_C2_time_0060} f $\Des{L}_{3.1}-\Des{B}_2-\Des{C}_2$. Te existence f stble clusters intrduce  mre nn-equilibrium mmentum distributin in te verll pyld, exibiting s  frm f clustering instbility.
+        \end{enumerte}
+
+    \item Jet grwing nd relxtin pse.
+        
+        Te strined expnsin f bt te burster nd pyld eventully leds t te cmplete penetrtin f buster fluid, s swn in Fig.~\ref{fig:jet_SL2_001_B2_C2_time_0030} f $\Des{L}_{2.1}-\Des{B}_2-\Des{C}_2$ nd Fig.~\ref{fig:jet_SL3_001_B2_C2_time_0060} f $\Des{L}_{3.1}-\Des{B}_2-\Des{C}_2$. Te frcture f te pyld cuses te increse f escping burster fluid, nd prticle clusters re ccelerted int te mbient ir. Wen subjected t  reltively smll grwt rte, te erly frmed fine jets t te uter pyld-ir interfce cn be dissipted by erdynmic interctins r vertken by te pyld frnt cmprising primry clusters r jets during fst expnsin. After penetrting  grnulr pyld, te blst frnt cn be igly irregulr.
+
+        As cptured frm Fig.~\ref{fig:jet_SL2_001_B2_C2_time_0020} t Fig.~\ref{fig:jet_SL2_001_B2_C2_time_0060} f $\Des{L}_{2.1}-\Des{B}_2-\Des{C}_2$, during te ccelertin pse f  prticle cluster, te surrunding blst flw sers wit te cluster bundries wit te ser directin twrd te frnt regin f te cluster, cusing nerby prticles cnverge t te ser wke t te cluster frnt. Tis ser bevir culd be respnsible fr te finger-like spe f prticle jets bserved in mcrscle experiments nd intrduce Kelvin--Helmltz instbility (KHI) t cluster bundries. Nte tt te resulting KHI s n inverse ser directin wit te usul KHI ccmpnying  RTI, in wic te ltter KHI leds t  musrm spe due t dverse ser.
+        
+        As te blst expnsin cntinues, te velcity difference between te surrunding flws nd te prticle clusters grdully reduces, nd prticle clusters ve gined mst f te mmentum frm te blst flw. Witin te limited $M/C$ rtis studied in te current simultins, it is suggested tt te relxtin f surrunding flws wekens te lcl pressure grdients fr mintining prticle clusters nd jets, tgeter wit erdynmic interctins, leding t te relxtin f prticle clusters nd jets, s swn frm Fig.~\ref{fig:jet_SL2_001_B2_C2_time_0080} t Fig.~\ref{fig:jet_SL2_001_B2_C2_time_0100} f $\Des{L}_{2.1}-\Des{B}_2-\Des{C}_2$ nd frm Fig.~\ref{fig:jet_SL3_001_B2_C2_time_0080} t Fig.~\ref{fig:jet_SL3_001_B2_C2_time_0100} f $\Des{L}_{3.1}-\Des{B}_2-\Des{C}_2$.
+
+        In te current dispersl f pylds wit reltively smll $M/C$ rtis nd number f prticles, te burst gs escpes trug te limited lyers f slid prticles wit less energy lss, cusing  quick relxtin f prticle clusters nd jets. Fr te dispersl f grnulr pylds wit lrge $M/C$ rtis nd numerus prticles, it is suggested tt te blst flw subjects t  mre rpid energy decy during diverging expnsin, wile slid prticles cn lrgely retin te gined mmentum due t inerti nd mintin te frm f prticle clusters r jets fr  prlnged perid.
+
+\end{enumerte}
+
+\sectin{Cnclusin}
+
+Messcle direct simultins tt cpture cupled multipse interctins nd deterministic grnulr dynmics ve been cnducted t investigte prticle clustering nd jetting frmtin in explsively dispersed grnulr pylds cnsisting f inert prticles. Emplying  messcle simultin frmewrk tt mdels prticles s discrete entities nd reslves te interfces nd cllisins f individul prticles in stcsticlly generted pylds wit rndmly distributed prticle psitins nd sizes,  set f cses tt cver fur sizes f stcstic pylds wit tree rndm smples per pyld size, tree burster sttes, nd tw types f cefficients f restitutin fr prticle cllisins ve been slved nd nlyzed t elp understnd te prticle clustering nd jetting dynmics in explsively dispersed grnulr mterils.
+
+Trug slving explsively dispersed stcstic pylds wit sck-sck, sck-prticle, nd prticle-prticle interctins nd nlyzing te surfce expnsin velcities,  vlid sttisticl dissiptive prperty f te messcle discrete mdeling wit respect t Gurney velcity s been demnstrted. Te predicted surfce expnsin velcities cn igly preserve te velcity scling lw wit regrd t Gurney energy nt nly t te end f slutin time but ls trugut te slutin time, wic extends te time rnge f te velcity scling lw in te Gurney tery \citep{gurney1943initil, milne2016gurney} frm te stedy-stte termintin pse t te unstedy evlutin pse. Wen cnsidering te men surfce expnsin velcities, te mximum errr f te unstedy velcity scling lw ws but $0.792\%$ mng te investigted Gurney energies. Quntittive nlysis f te dissiptin in te messcle discrete mdeling f grnulr pylds suggests tt te escpe f burster fluid rter tn grnulr dissiptin cn be te mjr fctr fr te lss f burster energy. As  result, incrprting te effects f prsity cn ennce te predictin f Gurney velcity fr explsively dispersed grnulr pylds.
+
+On te bsis f direct simultins, n explntin fr prticle clustering nd jetting instbilities s been prpsed t increse te understnding f estblised experimentl bservtins in te literture. Accrding t te direct simultins, te develpment f internl sliding nd clliding lines in te sck-cmpcted grnulr pyld cn be criticl t te subsequent frcture pttern f te pyld. Prticle clusters mnifested trug pyld frcture re ten mintined by lcl pressure grdient between surrunding nd interstitil flws s well s by dissiptive inter-grin cllisins. Te existence f stble clusters intrduce  mre nn-equilibrium mmentum distributin in te verll pyld, exibiting s  frm f clustering instbility. Different pyld mrplgies cn develp vried sliding nd clliding lines, wic led t  crrespnding pttern fr pyld frcturing nd prticle clustering.
 
 \begin{cknwledgments}
+    Finncil supprt f tis wrk ws prvided by Nturl Sciences nd Engineering Reserc Cuncil f Cnd (NSERC). Tis wrk ws mde pssible by te fcilities f te Sred Hierrcicl Acdemic Reserc Cmputing Netwrk (SHARCNET: www.srcnet.c) nd Cmpute/Clcul Cnd.
 \end{cknwledgments}
 
 \bibligrpy{ref}%
