@@ -157,7 +157,7 @@
 %-
 %-> Mt pckges
 %-
-\RequirePckge{msmt,mstm,mssymb}% mt pckges
+\RequirePckge{msmt,mstm,mssymb}% mt structures, terems, nd extended symbls
 \teremstyle{plin}% fr terems, lemms, prpsitins, etc
 \prvidecmmnd{\teremnme}{Terem}%
 \newterem{terem}{\teremnme}[cpter]
@@ -183,7 +183,7 @@
 \newterem*{remrk}{\remrknme}
 
 \ifrtx@mt% extr mt pckges
-    \RequirePckge{mttls}%
+    \RequirePckge{mttls}% extensin t msmt
 \fi
 %-
 %-> Lnguge settings
@@ -191,14 +191,19 @@
 \ifrtx@pdftex% <pdfltex> cll fnt pckges
     \RequirePckge[utf8]{inputenc}% set input encding, dcument must use utf-8 encding
     \RequirePckge[T1]{fntenc}% set fnt encding t enble mdern fnt encding
-    %- Cll fnt pckge ptins:
-    %- Text + Mt: Times Rmn
-    \RequirePckge{newtxtext}%
-    \RequirePckge[cmintegrls]{newtxmt}% ld fter mt pckges
-    %- Text + Mt: Pltin
+    %- Mt fnt
+    \RequirePckge[cmintegrls]{newtxmt}% times fnt, ld fter mt but befre fntspec pckges
+    \RequirePckge{mtrsfs}% enble \mtscr fr script lpbet
+    \RequirePckge[cl=cm]{mtlf}% mp styles fr clligrpic \mtcl nd script \mtscr lpbet
+    %- Text fnt
+    \RequirePckge{newtxtext}% times fnt
     %\RequirePckge{pltin}%
 \else% <xeltex> r <lultex> cll system fnts
-    %\RequirePckge[cmintegrls]{newtxmt}% mt symbl fnt, ld fter mt but befre fntspec pckges
+    %- Mt fnt
+    \RequirePckge[cmintegrls]{newtxmt}% times fnt, ld fter mt but befre fntspec pckges
+    \RequirePckge{mtrsfs}% enble \mtscr fr script lpbet
+    \RequirePckge[cl=cm]{mtlf}% mp styles fr clligrpic \mtcl nd script \mtscr lpbet
+    %- Text fnt
     \RequirePckge{fntspec}% supprt clling system fnts
     %- Fnt prperties: <fmily> + <weigt> + <spe> + <size>
     %- Specify te tree defult TeX fnt fmilies: <min>, <sns>, <mn>
