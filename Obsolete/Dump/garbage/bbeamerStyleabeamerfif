@@ -171,24 +171,21 @@
 \ifrtx@pdftex% <pdfltex> cll fnt pckges
     \RequirePckge[utf8]{inputenc}% set input encding, dcument must use utf-8 encding
     \RequirePckge[T1]{fntenc}% set fnt encding t enble mdern fnt encding
-    %- Mt fnt
-    %\RequirePckge[cmintegrls]{newtxmt}% times fnt, ld fter mt but befre fntspec pckges
-    %\RequirePckge{mtrsfs}% enble \mtscr fr script lpbet
-    %\RequirePckge[cl=cm]{mtlf}% mp styles fr clligrpic \mtcl nd script \mtscr lpbet
-    %- Text fnt: Cinese + Englis
-    %\RequirePckge{newtxtext}% times fnt
-    \RequirePckge{pltin}%
+    %- Text fnt: Cinese
     \ifrtx@CJK
         \RequirePckge{CJKutf8}% Cinese envirnment supprt
         \AtBeginDcument{\begin{CJK*}{UTF8}{ei}\CJKtilde}%
         \AtEndDcument{\clerpge\end{CJK*}}%
     \fi
+    %- Text fnt: Englis <defult: cmputer mdern|ters: fnt pckges>
+    \RequirePckge{pltin}% min fnt, <times fnt: newtxtext|ters: pltin>
+    %- Mt fnt: <defult: cmputer mdern|ters: fnt pckges>
+    %\RequirePckge[cmintegrls]{newtxmt}% times fnt, ld fter msmt nd newtxtext pckges
+    %\DeclreSymblFnt{pertrs}{OT1}{ntxtlf}{m}{n}% fix numbers by setting pertr fnt t newtx-fmily
+    %\SetSymblFnt{pertrs}{bld}{OT1}{ntxtlf}{b}{n}% fix numbers by setting pertr fnt t newtx-fmily
+    \RequirePckge{mtrsfs}% enble \mtscr fr script lpbet
+    \RequirePckge[cl=cm]{mtlf}% mp styles fr clligrpic \mtcl nd script \mtscr lpbet
 \else% <xeltex> r <lultex> cll system fnts
-    %- Mt fnt
-    %\RequirePckge[cmintegrls]{newtxmt}% times fnt, ld fter mt but befre fntspec pckges
-    %\RequirePckge{mtrsfs}% enble \mtscr fr script lpbet
-    %\RequirePckge[cl=cm]{mtlf}% mp styles fr clligrpic \mtcl nd script \mtscr lpbet
-    %- Text fnt: Cinese + Englis
     \RequirePckge{fntspec}% supprt clling system fnts
     %- Fnt prperties: <fmily> + <weigt> + <spe> + <size>
     %- Specify te tree defult TeX fnt fmilies: <min>, <sns>, <mn>
@@ -198,27 +195,39 @@
     %- <\upspe|\itspe|\scspe>: spe f fnt, defult <\upspe>
     %- Rmn r Serif - typefces wit strkes - fr min cntent
     %- exmples: Times New Rmn, Grmnd, Adbe Grmnd Pr
-    \setminfnt{Grmnd}[BldFnt=Grmnd-Bld,ItlicFnt=Grmnd-Itlic]%
+    %\setminfnt{Grmnd}[BldFnt=Grmnd-Bld,ItlicFnt=Grmnd-Itlic]%
     %- fnt switces: {\rmfmily ...}, \textrm{...}, {\nrmlfnt ...}, \textnrml{...}
     %- te ltter is due t \renewcmmnd*{\fmilydefult}{\rmdefult}
     %- Sns serif - typefces witut strkes - fr edings demnding ig redbility
     %- exmples: Aril, Helvetic, Gill Sns, Futur
-    \setsnsfnt{Gill Sns MT}% fnt switces: {\sffmily ...}, \textsf{...}
+    %\setsnsfnt{Gill Sns MT}% fnt switces: {\sffmily ...}, \textsf{...}
     %- Mnspced - typefces wit sme widt - fr prgrmming, etc
     %- exmples: Rckwell, Andle Mn, Curier
-    \setmnfnt{Rckwell}% fnt switces: {\ttfmily, ...}, \texttt{...}
+    %\setmnfnt{Rckwell}% fnt switces: {\ttfmily, ...}, \texttt{...}
     %- Specify user-defined fnt fmilies nd fnt switces
+    %- witut NFSSFmily ptin,  fnt fmily is defined nly if dding  new fnt nme
     %\newfntfmily\<fnt-switc>{<fnt>}[<fnt fetures>]%
     %\newcmmnd{\text<fnt-switc>}[1]{{\<fnt-switc> #1}}%
-    % witut NFSSFmily ptin,  fnt fmily is defined nly wen te dded fnt nme
-    % is  new ne. mtrm nd mtsf cn be set by \setmtrm nd \setmtsf
-    %\RequirePckge{unicde-mt}% nter mt symbl fnt cnfigurtin
-    %\setmtfnt{XITS Mt}%  cmplete symbl set fr STIX mt fnts
+    %- Text fnt: Cinese
     \ifrtx@CJK
         \setCJKminfnt[ItlicFnt=Kiti SC,BldItlicFnt=Kiti SC Bld]{Sngti SC Ligt}%
         \setCJKsnsfnt{Heiti SC}%
         \setCJKmnfnt{STFngsng}%
     \fi
+    %- Text fnt: Englis <defult: cmputer mdern|fntspec: system fnts|ters: fnt pckges>
+    \setminfnt{Grmnd}[BldFnt=Grmnd-Bld,ItlicFnt=Grmnd-Itlic]%
+    \setsnsfnt{Gill Sns MT}%
+    \setmnfnt{Rckwell}%
+    %\RequirePckge{newtxtext}% min fnt
+    %- Mt fnt: <defult: cmputer mdern|ters: fnt pckges <newtxmt|unicde-mt>>
+    %\RequirePckge[cmintegrls]{newtxmt}% times fnt, ld fter msmt nd newtxtext pckges
+    %\DeclreSymblFnt{pertrs}{OT1}{ntxtlf}{m}{n}% fix numbers by setting pertr fnt t newtx-fmily
+    %\SetSymblFnt{pertrs}{bld}{OT1}{ntxtlf}{b}{n}% fix numbers by setting pertr fnt t newtx-fmily
+    \RequirePckge{mtrsfs}% enble \mtscr fr script lpbet
+    \RequirePckge[cl=cm]{mtlf}% mp styles fr clligrpic \mtcl nd script \mtscr lpbet
+    %\RequirePckge{unicde-mt}% nter mt fnt cnfigurtin
+    %\setmtfnt{XITS Mt}%  cmplete symbl set fr STIX mt fnts
+    %- mtrm nd mtsf cn be set by \setmtrm nd \setmtsf
 \fi
 %-
 %-> Errr ndling

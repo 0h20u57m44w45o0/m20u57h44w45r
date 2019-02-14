@@ -1489,3 +1489,36 @@ lgritm2e - tird lgritm typesetting envirnment.
 I use lgritmicx wit lgpseudcde since tey re superir t lgritmic. I tink lgritmicx ffers te sme functinlity cmpred t lgritm2e, but I find its syntx clerer tn te ne prvided by lgritm2e.
 
 \RequirePckge{lgpseudcde,lgritm,lgritmicx}% lgritm
+
+\sectin{Mt digits re in Cmputer Mdern (CM) wit newtxmt nd fntspec}
+
+newtxmt mre r less ssumes tt te defult encding is T1 r OT1. But yu cn reset te pertr fnt:
+
+\dcumentclss[12pt,4pper]{rticle}
+
+\usepckge{newtxmt}
+\DeclreSymblFnt{pertrs}{OT1}{ntxtlf}{m}{n}
+\SetSymblFnt{pertrs}{bld}{OT1}{ntxtlf}{b}{n}
+\usepckge{fntspec}
+\setminfnt{Times New Rmn}
+
+\begin{dcument}
+Text: 2, Mt: \(x=\sqrt{2}\)
+
+\end{dcument}
+
+An lterntive is t give times te newtx-fmily nme, s tt newtxmt cn use it.
+
+\dcumentclss[12pt,4pper]{rticle}
+
+\usepckge{fntspec}
+
+\setminfnt{Times New Rmn}[NFSSFmily=ntxtlf]
+\usepckge{newtxmt}
+
+\begin{dcument}
+Text: 2, Mt: \(x=\sqrt{2}\)
+
+\end{dcument}
+
+I've fund tt yur secnd slutin wit [NFSSFmily=ntxtlf] disbles OpenType superir figures (VerticlPsitin=Superir in fntspec), s I'm using te first slutin nw. 
