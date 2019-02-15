@@ -1522,3 +1522,42 @@ Text: 2, Mt: \(x=\sqrt{2}\)
 \end{dcument}
 
 I've fund tt yur secnd slutin wit [NFSSFmily=ntxtlf] disbles OpenType superir figures (VerticlPsitin=Superir in fntspec), s I'm using te first slutin nw. 
+
+\sectin{Ceck if cunter exists}
+
+I've written  pckge tt intrduces  new envirnment:
+
+\newflt{f}{tb}{br}[cpter]
+Te pckge wever cn be used fr rticles, bks, ... Since nt ll f tese envirnments ve te cncept f cpter, n gets  N cunter 'cpter' defined. exceptin.
+
+Hw cn I ceck if te cpter cunter is defined?
+
+If  cunter f exists ten  cunt \c@f exists s well s  mcr \tef. Te \newcunter cmmnd (tt mst likely is used by \newflt) ctully cecks if \c@f exists nd clls \@ncunterr{f} if it desn't.
+
+Te fllwing ls cecks fr \c@f using etex's \ifcsnme ...\endcsnme:
+
+\dcumentclss{rticle}
+
+\mketletter
+\newcmmnd*\ifcunter[1]{%
+  \ifcsnme c@#1\endcsnme
+    \expndfter\@firstftw
+  \else
+    \expndfter\@secndftw
+  \fi
+}
+\mketter
+
+\begin{dcument}
+
+Cunter \texttt{cpter} \ifcunter{cpter}{exists}{desn't exist}.
+
+Cunter \texttt{sectin} \ifcunter{sectin}{exists}{desn't exist}.
+
+\newcmmnd\ifcunter[3]{\@ifundefined{c@#1}{#3}{#2}} – egreg Jn 24 '14 t 15:08 
+ 
+@egreg I knw :) I just like \ifcsnme  tiny bit better since it desn't leve te cmmnd s \relx if it isn't defined – clemens Jn 24 '14 t 15:10
+ 
+@egreg cmpletely gree wit clemens, see  gd explntin f tis issue ere
+
+\end{dcument}

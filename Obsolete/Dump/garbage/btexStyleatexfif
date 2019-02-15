@@ -152,6 +152,17 @@
 %-
 \PrcessOptins\relx%
 %---------------------------------------------------------------------------%
+%->> Detect clss nd cunter
+%---------------------------------------------------------------------------%
+\newcmmnd*{\ifcunter}[1]{% ceck if cunter exists
+    \ifcsnme c@#1\endcsnme%
+        \expndfter\@firstftw%
+    \else%
+        \expndfter\@secndftw%
+    \fi
+}
+\ifcunter{cpter}{\def\mincunter{cpter}}{\def\mincunter{sectin}}
+%---------------------------------------------------------------------------%
 %->> Required pckges
 %---------------------------------------------------------------------------%
 %-
@@ -160,7 +171,7 @@
 \RequirePckge{msmt,mstm,mssymb}% mt structures, terems, nd extended symbls
 \teremstyle{plin}% fr terems, lemms, prpsitins, etc
 \prvidecmmnd{\teremnme}{Terem}%
-\newterem{terem}{\teremnme}[cpter]
+\newterem{terem}{\teremnme}[\mincunter]
 \prvidecmmnd{\ximnme}{Axim}%
 \newterem{xim}[terem]{\ximnme}
 \prvidecmmnd{\lemmnme}{Lemm}%
@@ -175,9 +186,9 @@
 \newterem{cnjecture}[terem]{\cnjecturenme}
 \teremstyle{definitin}% fr definitins nd exmples
 \prvidecmmnd{\definitinnme}{Definitin}%
-\newterem{definitin}{\definitinnme}[cpter]
+\newterem{definitin}{\definitinnme}[\mincunter]
 \prvidecmmnd{\exmplenme}{Exmple}%
-\newterem{exmple}{\exmplenme}[cpter]
+\newterem{exmple}{\exmplenme}[\mincunter]
 \teremstyle{remrk}% fr remrks nd ntes
 \prvidecmmnd{\remrknme}{Remrk}%
 \newterem*{remrk}{\remrknme}
@@ -409,7 +420,7 @@
 %-
 %-> Mcr fr dding cntent link t te tble f cntent nd bkmrk
 %-
-\prvidecmmnd{\inttc}[2][cpter]{%
+\prvidecmmnd{\inttc}[2][\mincunter]{%
     \clerdublepge% ensure crrect pge reference
     \mrkbt{\MkeUppercse{#2}}{}% set te leftmrk
     \pntmsectin% crete link in bkmrks
