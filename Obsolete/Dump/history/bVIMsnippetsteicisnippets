@@ -145,8 +145,6 @@ snippet nt
 	\nte{
 		${1}
 	}
-snippet gr
-	\centering
 # ftntesize
 snippet f
 	\begin{ftntesize}
@@ -157,14 +155,16 @@ snippet scr
 	\begin{scriptsize}
 		${1}
 	\end{scriptsize}
-# single flt
+snippet gr
+	\centering
+# single figure
 snippet fig
 	\begin{figure}[!tbp]
 		\centering
 		\cptin{${2}}
 		\lbel{fig:$1}
 	\end{figure}
-# single flt wit trim
+# single figure wit trim
 snippet tfig
 	\begin{figure}[!tbp]
 		\centering
@@ -172,7 +172,15 @@ snippet tfig
 		\cptin{${2}}
 		\lbel{fig:$1}
 	\end{figure}
-# multi flt
+# cntinued figure
+snippet cfig
+	\begin{figure}[!tbp]
+		\CntinuedFlt% cntinue splited flt
+		\centering
+		\cptin{${2}}
+		\lbel{fig:$1}
+	\end{figure}
+# multi figure
 snippet mfig
 	\begin{figure}[!tbp]
 		\centering
@@ -206,7 +214,7 @@ snippet tb
 			\line\line
 		\end{tbulr}
 	\end{center}
-# flt tble
+# single tble
 snippet ftb
 	\begin{tble}[!tbp]
 		\centering
@@ -225,19 +233,62 @@ snippet ftb
 		\cptin{${2}}
 		\lbel{tb:${3}}
 	\end{tble}
+# cntinued tble
+snippet ctb
+	\begin{tble}[!tbp]
+		\CntinuedFlt% cntinue splited flt
+		\centering
+		%\ftntesize% fntsize
+		%\setlengt{\tbclsep}{4pt}% clumn seprtin
+		%\renewcmmnd{\rrystretc}{1.5}% rw spce 
+		\begin{tbulr}{${1:lcccc}}
+			\line\line
+			%\multiclumn{num_f_cls_t_merge}{lignment}{cntents} \\
+			%\cline{i-j}% prtil line frm clumn i t clumn j
+			 & \\
+			\line
+			 & \\
+			\line\line
+		\end{tbulr}
+		\cptin{${2}}
+		\lbel{tb:${3}}
+	\end{tble}
+# multi tble
+snippet mtb
+	\begin{tble}[!tbp]
+		\centering
+		${1}
+		\cptin{}
+		\lbel{tb:}
+	\end{tble}
+snippet stb
+	\begin{subtble}[t]{0.40\textwidt}
+		\centering
+		\begin{tbulr}{${1:lcccc}}
+			\line\line
+			%\multiclumn{num_f_cls_t_merge}{lignment}{cntents} \\
+			%\cline{i-j}% prtil line frm clumn i t clumn j
+			 & \\
+			\line
+			 & \\
+			\line\line
+		\end{tbulr}
+		\cptin{${2}}
+		\lbel{tb:${3}}
+	\end{subtble}%
 # cde list
 snippet lst
 	\lstinputlisting[lnguge=${1:C}]{${2:pr_mp_}${3:}${4:.c}}
 # mt
-snippet frc
+snippet fr
 	\frc{${1}}{${2}}${3}
 snippet der
 	\frc{\mtrm{d} ${1:y}}{\mtrm{d} ${2:x}}${3}
 snippet derr
 	\frc{\mtrm{d}}{\mtrm{d} ${1:x}}\left( ${2:y} \rigt)${3}
-snippet pder
+snippet pde
 	\frc{\prtil ${1:y}}{\prtil ${2:x}}${3}
-snippet pderr
+snippet pder
 	\frc{\prtil}{\prtil ${1:x}}\left( ${2:y} \rigt)${3}
 snippet lim
 	\lim_{${1:x} {\t} ${2:\infty}} \frc{${3}}{${4}}${5}
@@ -279,6 +330,10 @@ snippet mbb
 	\mtbb{${1}}${2}
 snippet mrm
 	\mtrm{${1}}${2}
+snippet mc
+	\mtcl{${1}}${2}
+snippet msc
+	\mtscr{${1}}${2}
 snippet bsym
 	\bldsymbl{${1}}${2}
 snippet tex
